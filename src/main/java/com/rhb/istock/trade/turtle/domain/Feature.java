@@ -18,6 +18,7 @@ import java.math.BigDecimal;
  * 
  */
 public class Feature {
+	private String itemID;
 	private BigDecimal openHigh;
 	private BigDecimal openLow;
 	private Integer hlgap;
@@ -28,6 +29,10 @@ public class Feature {
 	private BigDecimal now;
 	private BigDecimal atr;
 	private Integer status;
+	
+	public Feature(String itemID) {
+		this.itemID = itemID;
+	}
 	
 	public void reset() {
 		try {
@@ -117,11 +122,22 @@ public class Feature {
 	public void setStatus(Integer status) {
 		this.status = status;
 	}
+	
+	
+	
+	public String getItemID() {
+		return itemID;
+	}
+
+	public void setItemID(String itemID) {
+		this.itemID = itemID;
+	}
+
 	@Override
 	public String toString() {
-		return "Feature [openHigh=" + openHigh + ", openLow=" + openLow + ", hlgap=" + hlgap + ", nhgap=" + nhgap
-				+ ", nlgap=" + nlgap + ", dropHigh=" + dropHigh + ", dropLow=" + dropLow + ", now=" + now + ", atr="
-				+ atr + ", status=" + status + "]";
+		return "Feature [itemID=" + itemID + ", openHigh=" + openHigh + ", openLow=" + openLow + ", hlgap=" + hlgap
+				+ ", nhgap=" + nhgap + ", nlgap=" + nlgap + ", dropHigh=" + dropHigh + ", dropLow=" + dropLow + ", now="
+				+ now + ", atr=" + atr + ", status=" + status + "]";
 	}
 	
 	

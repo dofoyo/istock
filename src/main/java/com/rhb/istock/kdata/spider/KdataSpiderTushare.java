@@ -93,14 +93,19 @@ public class KdataSpiderTushare implements KdataSpider {
 		args.put("params", params);
 		
 		String str = HttpClient.doPostJson(url, args.toString());
-		
+
+		//String kdataFile = kdataPath + "/" + date + ".json";
+		//FileUtil.writeTextFile(kdataFile, str, false);
+
 		JSONArray items = (new JSONObject(str)).getJSONObject("data").getJSONArray("items");	
+		
 		if(items.length()>0) {
 			JSONArray item;
 			for(int i=0; i<items.length(); i++) {
-				Progress.show(items.length(),i++,"");
-
 				item = items.getJSONArray(i);
+
+				Progress.show(items.length(),i,item.getString(0));
+
 				setKdata(item);
 			}
 		}
@@ -128,13 +133,19 @@ public class KdataSpiderTushare implements KdataSpider {
 		args.put("params", params);
 		
 		String str = HttpClient.doPostJson(url, args.toString());
+		
+		//String kdataFile = kdataPath + "/" + date + "_factor.json";
+		//FileUtil.writeTextFile(kdataFile, str, false);
 
+		
 		JSONArray items = (new JSONObject(str)).getJSONObject("data").getJSONArray("items");	
 		if(items.length()>0) {
 			JSONArray item;
 			for(int i=0; i<items.length(); i++) {
-				Progress.show(items.length(),i++,"");
 				item = items.getJSONArray(i);
+				
+				Progress.show(items.length(),i,item.getString(0));
+				
 				setFactor(item);
 			}
 		}

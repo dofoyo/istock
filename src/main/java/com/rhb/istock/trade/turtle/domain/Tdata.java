@@ -48,7 +48,12 @@ public class Tdata {
 		this.openDuration = openDuration;
 		this.dropDuration = dropDuration;
 		this.bars = new ArrayList<Tbar>();
-		this.feature = new Feature();
+		this.feature = new Feature(itemID);
+	}
+	
+	//一字板
+	public boolean yzb() {
+		return latestBar.getHigh().compareTo(latestBar.getLow())==0;
 	}
 	
 	public void addBar(LocalDate date, BigDecimal open, BigDecimal high, BigDecimal low, BigDecimal close) {
@@ -111,7 +116,7 @@ public class Tdata {
 	}
 	
 	public Feature getFeature() {
-		if(this.bars.size()<openDuration) return null;
+		if(this.latestBar==null || this.bars.size()<openDuration) return null;
 		
 		BigDecimal[] hl = getHighestAndLowest(openDuration);
 		this.feature.setOpenHigh(hl[0]);
@@ -128,12 +133,15 @@ public class Tdata {
 		
 		return this.feature;
 	}
+
+	public void clearBars() {
+		this.bars = new ArrayList<Tbar>();
+		this.feature = new Feature(itemID);
+	}
 	
 	//----------
 	
-	public void clearBars() {
-		this.bars = new ArrayList<Tbar>();
-	}
+
 	
 	public Tbar getLatestBar() {
 		return this.latestBar;

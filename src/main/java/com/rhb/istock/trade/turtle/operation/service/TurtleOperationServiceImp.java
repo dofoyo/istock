@@ -1,4 +1,4 @@
-package com.rhb.istock.trade.turtle.service;
+package com.rhb.istock.trade.turtle.operation.service;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
@@ -21,14 +21,14 @@ import com.rhb.istock.kdata.Kbar;
 import com.rhb.istock.kdata.Kdata;
 import com.rhb.istock.kdata.KdataService;
 import com.rhb.istock.kdata.spider.KdataRealtimeSpider;
-import com.rhb.istock.trade.turtle.api.HoldView;
-import com.rhb.istock.trade.turtle.api.KdatasView;
-import com.rhb.istock.trade.turtle.api.PreyView;
 import com.rhb.istock.trade.turtle.domain.Feature;
 import com.rhb.istock.trade.turtle.domain.Tbar;
 import com.rhb.istock.trade.turtle.domain.Turtle;
-import com.rhb.istock.trade.turtle.repository.HoldEntity;
-import com.rhb.istock.trade.turtle.repository.TurtleRepository;
+import com.rhb.istock.trade.turtle.operation.api.HoldView;
+import com.rhb.istock.trade.turtle.operation.api.KdatasView;
+import com.rhb.istock.trade.turtle.operation.api.PreyView;
+import com.rhb.istock.trade.turtle.operation.repository.HoldEntity;
+import com.rhb.istock.trade.turtle.operation.repository.TurtleRepository;
 
 @Service("turtleOperationServiceImp")
 public class TurtleOperationServiceImp implements TurtleOperationService {
@@ -192,9 +192,10 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 	
 	private void setDailyKdata(String itemID) {
 		LocalDate endDate = kdataService.getLatestMarketDate();
+		boolean byCache = false;  // 实操仅仅在初始化时要将全部kdata读入，一次性的，因此不需要cache
 		
 		Kbar kbar;
-		Kdata kdata = kdataService.getDailyKdata(itemID, endDate, turtle.getOpenDuration());
+		Kdata kdata = kdataService.getDailyKdata(itemID, endDate, turtle.getOpenDuration(), byCache);
 		List<LocalDate> dates = kdata.getDates();
 		for(LocalDate date : dates) {
 			kbar = kdata.getBar(date);

@@ -16,6 +16,7 @@ public class KbarEntity {
 		this.low = low;
 		this.close = close;
 		this.amount = amount;
+		this.quantity = quantity;
 	}
 	
 	public BigDecimal getOpen() {
@@ -64,6 +65,12 @@ public class KbarEntity {
 
 	public void setQuantity(BigDecimal quantity) {
 		this.quantity = quantity;
+	}
+
+	@Override
+	public String toString() {
+		return "KbarEntity [open=" + open + ", high=" + high + ", low=" + low + ", close=" + close + ", amount="
+				+ amount + ", quantity=" + quantity + "]";
 	}
 	
 }

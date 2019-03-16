@@ -30,6 +30,10 @@ public class Kbar {
 		this.quantity = new BigDecimal(quantity);
 	}
 	
+	public boolean isLine() {
+		return high.compareTo(low)==0;
+	}
+	
 	public BigDecimal getOpen() {
 		return open;
 	}
@@ -76,6 +80,12 @@ public class Kbar {
 
 	public void setQuantity(BigDecimal quantity) {
 		this.quantity = quantity;
+	}
+
+	@Override
+	public String toString() {
+		return "Kbar [open=" + open + ", high=" + high + ", low=" + low + ", close=" + close + ", quantity=" + quantity
+				+ ", amount=" + amount + "]";
 	}
 
 }

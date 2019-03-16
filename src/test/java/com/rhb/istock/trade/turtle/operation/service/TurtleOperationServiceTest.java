@@ -1,4 +1,4 @@
-package com.rhb.istock.trade.turtle.service;
+package com.rhb.istock.trade.turtle.operation.service;
 
 import java.util.List;
 
@@ -9,9 +9,10 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import com.rhb.istock.trade.turtle.api.HoldView;
-import com.rhb.istock.trade.turtle.api.KdatasView;
-import com.rhb.istock.trade.turtle.api.PreyView;
+import com.rhb.istock.trade.turtle.operation.api.HoldView;
+import com.rhb.istock.trade.turtle.operation.api.KdatasView;
+import com.rhb.istock.trade.turtle.operation.api.PreyView;
+import com.rhb.istock.trade.turtle.operation.service.TurtleOperationService;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest

@@ -2,9 +2,13 @@ package com.rhb.istock.trade.turtle.domain;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import com.rhb.istock.fund.Account;
@@ -39,9 +43,9 @@ public class Turtle {
 	private Integer maxOfLot; 
 
 	/*
-	 * 是否止损
+	 * 止损策略：0--不止损； 1--标准止损； 2--双重止损
 	 */
-	private boolean isStop;  
+	private Integer stopStrategy;  
 	
 	private Integer gap;  //30在2013-2015年化为35%
 	
@@ -58,8 +62,8 @@ public class Turtle {
 		openDuration = 89; 
 		dropDuration = 34; 
 		maxOfLot = 3; 
-		initCash = new BigDecimal(100000);
-		isStop  = false;
+		initCash = new BigDecimal(500000);
+		stopStrategy  = 1;
 		gap = 60;
 		account = new Account(initCash);
 		tdatas = new HashMap<String,Tdata>();		
@@ -70,7 +74,7 @@ public class Turtle {
 				Integer dropDuration, 
 				Integer maxOfLot, 
 				BigDecimal initCash, 
-				boolean isStop,
+				Integer stopStrategy,
 				Integer gap
 				) {
 		
@@ -79,9 +83,17 @@ public class Turtle {
 		this.dropDuration = dropDuration;
 		this.maxOfLot = maxOfLot;
 		this.initCash = initCash;
-		this.isStop = isStop;
+		this.stopStrategy = stopStrategy;
 		this.gap = gap;
 		account = new Account(initCash);
+		tdatas = new HashMap<String,Tdata>();
+	}
+	
+	public Set<String> getItemIDsOfHolds(){
+		return account.getItemIDsOfHolds();
+	}
+	
+	public void clearDatas() {
 		tdatas = new HashMap<String,Tdata>();
 	}
 	
@@ -95,10 +107,14 @@ public class Turtle {
 		
 	}
 	
+	/*
+	 * setLatestBar很重要
+	 * 其修改了account的endDate和price，为doit中的stop、drop、open以及getValue等提供了date和price
+	 */
 	public boolean setLatestBar(String itemID,LocalDate date, BigDecimal open, BigDecimal high, BigDecimal low, BigDecimal close) {
 		Tdata tdata = tdatas.get(itemID);
 		if(tdata == null) {
-			System.out.println("ERROR: item is null!");
+			System.out.println(" ERROR: tdata is null!");
 			return false;
 		}
 		tdata.setLatestBar(date,open,high,low,close);
@@ -111,7 +127,6 @@ public class Turtle {
 		Tdata tdata = tdatas.get(itemID);
 		if(tdata==null) {
 			System.out.println("can Not get feature, for " + itemID + " do not in tdatas.");
-			//System.out.println(tdatas);
 			return null;
 		}
 		return tdatas.get(itemID).getFeature();
@@ -127,118 +142,207 @@ public class Turtle {
 		return tdata.getLatestBar();
 	}
 	
-	//--------------
+	/*
+	 * 
+	 */
+	public void doIt() {
+		Feature f;
+		List<Feature> features = new ArrayList<Feature>();
+		for(Tdata tdata : tdatas.values()) {
+			f = tdata.getFeature();
+			if(f != null) {
+				features.add(tdata.getFeature());
+			}
+		}
+		
+		if(features.size()==0) return;
+		
+		Collections.sort(features, new Comparator<Feature>() {
+			@Override
+			public int compare(Feature o1, Feature o2) {
+				if(o1.getHlgap().equals(o2.getHlgap())) {
+					return o2.getNhgap().compareTo(o1.getNhgap());
+				}else {
+					return o1.getHlgap().compareTo(o2.getHlgap());
+				}
+			}
+		});
+		
+		for(Feature feature : features) {
+			doIt(feature.getItemID());
+		}
+	}
 
-	
-	public void doit(Map<String,String> kData) {
-		Tdata tdata = tdatas.get(kData.get("itemID"));
+	private void doIt(String itemID) {
+		Tdata tdata = tdatas.get(itemID);
 		if(tdata == null) {
-			System.out.format("ERROR: item is null of %s.\n", kData.get("itemID") );
+			System.out.format("ERROR: tdata is null of %s.\n", itemID);
 			return;
 		}		
 		if(tdata.getTbars().size()<openDuration) {
-			//System.out.format("INF: %s history bars is %d, below open duration %d, skip.\n", kData.get("itemID"),item.getBars().size(),openDuration );
+			System.out.format("INF: %s history bars is %d, below open duration %d, skip.\n", itemID,tdata.getTbars().size(),openDuration );
+			return;
+		}
+		if(tdata.yzb()) {
+			System.out.println("INF: " + itemID + " 一字板，无法成交");
 			return;
 		}
 		
-		//item.setLatestBar(kData);
-		
-/*		Map<String,String> features = tdata.getFeatures();
-		Integer hlgap = new BigDecimal(features.get("hlgap")).multiply(new BigDecimal(100)).intValue();
-
-		account.updatePrice(tdata.getItemID(), new BigDecimal(kData.get("close")));
-		Integer lots = account.getLots(tdata.getItemID());
-		
 		//止损
-		if(lots>0 && isStop) {
-			//account.stop(kData);
+		if(stopStrategy==1) {
+			doStop(itemID);
+		}else if(stopStrategy==2) {
+			doDoubleStop(itemID);
 		}
 		
 		//平仓
-		if(lots>0 && (features.get("status").equals("-1") || features.get("status").equals("-2"))) {
-			//account.drop(kData);
-		}
+		doDrop(itemID);
 		
-		//开新仓、加仓
-		if(features.get("status").equals("2")) {
-			if(lots>0 && lots<maxOfLot) {
-				doReopen(kData);
-			}else if(lots==0 && hlgap<=gap){
-				//System.out.println("hlgap: " + hlgap);
-				doOpen(kData);
+		//加仓
+		doReopen(itemID);
+		
+		//开新仓
+		doOpen(itemID);
+	}
+	
+	//双重止损
+	private void doDoubleStop(String itemID) {
+		Tdata tdata = tdatas.get(itemID);
+		
+		Feature feature = tdata.getFeature();
+		System.out.println(feature); //--------------
+
+		Integer lots = account.getLots(tdata.getItemID());
+		System.out.println("lots=" + lots);//--------------
+		
+		if(lots>0) {
+			System.out.println("the lots " + lots + ">0, should do Double stop?");//--------------
+			BigDecimal hlaf_atr = feature.getAtr().divide(new BigDecimal(2),BigDecimal.ROUND_HALF_UP);
+			BigDecimal now = feature.getNow();
+			Map<String,BigDecimal> openPrices = account.getOpenPrices(itemID);
+			BigDecimal stopPrice;
+			for(Map.Entry<String, BigDecimal> entry : openPrices.entrySet()) {
+				stopPrice = entry.getValue().subtract(hlaf_atr);
+				System.out.println("stopPrice=" + stopPrice + ",now=" + now);
+				if(stopPrice.compareTo(now)==1) {
+					System.out.println("do stop!!");
+					account.stopByOrderID(entry.getKey());
+					System.out.println("cash=" + account.getCash());
+
+				}
 			}
-		}*/
+		}		
 	}
 	
+	//标准止损
+	private void doStop(String itemID) {
+		Tdata tdata = tdatas.get(itemID);
+		
+		Feature feature = tdata.getFeature();
+		System.out.println(feature); //--------------
 
-	
-	public boolean isExist(String itemID) {
-		return tdatas.containsKey(itemID);
-	}
-	
-	public void clearBars(String itemID) {
-		Tdata item = tdatas.get(itemID);
-		if(item!=null) {
-			item.clearBars();
-		}
-	}
-	
-	public void addBars(List<Map<String,String>> kDatas) {
-		for(Map<String,String> kData : kDatas) {
-			//this.addBar(kData);
-		}
-	}
-	
+		Integer lots = account.getLots(tdata.getItemID());
+		System.out.println("lots=" + lots);//--------------
+		
+		if(lots>0) {
+			System.out.println("the lots " + lots + ">0, should do stop?");//--------------
+			BigDecimal doubleAtr = feature.getAtr().multiply(new BigDecimal(2));
+			BigDecimal stopPrice = account.getLatestOpenPrice(itemID).subtract(doubleAtr);
+			BigDecimal now = feature.getNow();
+			System.out.println("stopPrice=" + stopPrice + ",now=" + now);
+			if(stopPrice.compareTo(now)==1) {
+				System.out.println("do stop!!");
+				account.stopByItemID(itemID);
+				System.out.println("cash=" + account.getCash());
 
-	
-	//开新仓
-	private void doOpen(Map<String,String> kData) {
-/*		Kline item = klines.get(kData.get("itemID"));
-		BigDecimal atr = item.getATR();
-		BigDecimal price = new BigDecimal(kData.get("close"));
-		LocalDate date = LocalDate.parse(kData.get("dateTime"));
-		
-		BigDecimal stopPrice = price.subtract(atr);
-		BigDecimal reopenPrice = price.add(atr.divide(new BigDecimal(2),BigDecimal.ROUND_HALF_UP));
-		
-		Order openOrder = new Order(UUID.randomUUID().toString(),item.getItemID(),date, 1, price,stopPrice,reopenPrice	);
-		openOrder.setNote("open，stop=" + stopPrice + "，reOpen="+reopenPrice);
-		
-		account.open(openOrder, deficitFactor, atr, getLot(item.getItemID()));
-*/	
+			}
+		}		
 	}
 	
-	//加仓
-	private void doReopen(Map<String,String> kData) {
-/*		Kline item = klines.get(kData.get("itemID"));
-		BigDecimal atr = item.getATR();
-		BigDecimal reopenPrice = account.getReopenPrice(item.getItemID());
-		BigDecimal price = new BigDecimal(kData.get("close"));
-		LocalDate date = LocalDate.parse(kData.get("dateTime"));
+	private void doDrop(String itemID) {
+		Tdata tdata = tdatas.get(itemID);
+		Feature feature = tdata.getFeature();
+		Integer lots = account.getLots(tdata.getItemID());
+		if(lots>0 && feature.getStatus()<0) {
+			System.out.println("the lots " + lots + ">0, and status is "+feature.getStatus()+", do drop!!");//--------------
+			account.drop(itemID);
+			System.out.println("cash=" + account.getCash());
+		}
 		
-		BigDecimal high = new BigDecimal(kData.get("high"));
-		if(high.compareTo(reopenPrice)==1) {
-			BigDecimal stopPrice = price.subtract(atr);
-			reopenPrice = price.add(atr.divide(new BigDecimal(2),BigDecimal.ROUND_HALF_UP));
+	}
+	
+	private void doReopen(String itemID) {
+		Tdata tdata = tdatas.get(itemID);
+		Feature feature = tdata.getFeature();
+		Integer lots = account.getLots(tdata.getItemID());
+		if(feature.getStatus()==2 && lots>0 && lots<maxOfLot) {
+			System.out.println("the lots " + lots + ">0, and < "+ maxOfLot +", should do reopen?");//--------------
 			
-			Order openOrder = new Order(UUID.randomUUID().toString(),item.getItemID(),date, 1, price,stopPrice,	reopenPrice	);
-			openOrder.setNote("reOpen，stop=" + stopPrice + "，reOpen="+reopenPrice);
-			account.open(openOrder, deficitFactor, atr, getLot(item.getItemID()));
-		}*/
-	}
+			BigDecimal half_atr = feature.getAtr().divide(new BigDecimal(2),BigDecimal.ROUND_HALF_UP);
+			BigDecimal now = feature.getNow();
+			
+			BigDecimal reopenPrice = account.getLatestOpenPrice(itemID).add(half_atr);
+			if(reopenPrice.compareTo(now)==-1) {
+				System.out.println("reopenPrice "+ reopenPrice +" below now price "+now+", do reopen!!");
+				Integer unit = getPositionUnit(feature.getAtr(),getLot(itemID),deficitFactor);
+				//Integer quantity = getLot(itemID).multiply(new BigDecimal(unit)).intValue();
+				Integer quantity = getQuantity(feature.getAtr(),getLot(itemID),deficitFactor,feature.getNow());
+				account.reopen(itemID, quantity);
+				System.out.println("cash=" + account.getCash());
+			}else {
+				System.out.println("reopenPrice "+ reopenPrice +" above now price "+now+", do NOT reopen!!");
+			}
+		}
 		
+	}
+	
+	private void doOpen(String itemID) {
+		Tdata tdata = tdatas.get(itemID);
+		Feature feature = tdata.getFeature();
+		Integer lots = account.getLots(tdata.getItemID());
+		if(feature.getStatus()==2 && lots==0 && feature.getHlgap()<=gap) {
+			System.out.println("do open");//--------------
+			Integer quantity = getQuantity(feature.getAtr(),getLot(itemID),deficitFactor,feature.getNow());
+			account.open(itemID, quantity);
+			System.out.println("cash=" + account.getCash());
+		}
+		
+	}
+	
+	
+	private Integer getQuantity(BigDecimal atr, BigDecimal lot, BigDecimal deficitFactor, BigDecimal price) {
+		Integer unit = getPositionUnit(atr,lot,deficitFactor);
+		Integer quantity = lot.multiply(new BigDecimal(unit)).intValue();
+		BigDecimal amount = price.multiply(new BigDecimal(quantity));
+		BigDecimal cash = account.getCash();
+		System.out.println("cash=" + cash + ", need " + amount);
+		if(amount.compareTo(cash)==1) {
+			System.out.print("not enough cash, change quantity from " + quantity);
+			quantity = cash.divide(price,BigDecimal.ROUND_DOWN).divide(lot,BigDecimal.ROUND_DOWN).intValue() * lot.intValue();
+			System.out.println(" to " + quantity);
+
+		}
+		return quantity;
+	}
+	
+	/*
+	 * 根据账户总市值和在手现金获得头寸规模单位，即一次可买入多少手
+	 */
+	private Integer getPositionUnit(BigDecimal atr, BigDecimal lot, BigDecimal deficitFactor) {
+		return account.getTotal().multiply(deficitFactor).divide(atr,BigDecimal.ROUND_DOWN).divide(lot,BigDecimal.ROUND_DOWN).intValue();
+	}
 	
 	public Map<String,String> result() {
 		if(account == null) return null;
 		
 		Map<String,String> result = new HashMap<String,String>();
-		//result.put("CSV", account.getCSV());
+		result.put("CSV", account.getCSV());
 		result.put("initCash", this.initCash.toString());
 		result.put("cash", account.getCash().toString());
 		result.put("value", account.getValue().toString());
 		result.put("total", account.getTotal().toString());
 		result.put("winRatio", account.getWinRatio().toString()); //赢率
-		//result.put("cagr", account.getCAGR().toString());  //复合增长率的英文缩写为：CAGR（Compound Annual Growth Rate）
+		result.put("cagr", account.getCAGR().toString());  //复合增长率的英文缩写为：CAGR（Compound Annual Growth Rate）
 		return result;
 	}
 	

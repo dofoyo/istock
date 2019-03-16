@@ -43,6 +43,31 @@ public class Kdata {
 	public void setItemID(String itemID) {
 		this.itemID = itemID;
 	}
+	
+	public String getString() {
+		//System.out.println(bars.size());
+		StringBuffer sb = new StringBuffer();
+		sb.append("'"+itemID+"'	日线\n");
+		sb.append("日期	开盘	最高	最低	收盘	成交量	成交额\n");
+		for(Map.Entry<LocalDate, Kbar> entry : bars.entrySet()) {
+			sb.append(entry.getKey());
+			sb.append(" ");
+			sb.append(entry.getValue().getOpen());
+			sb.append(" ");
+			sb.append(entry.getValue().getHigh());
+			sb.append(" ");
+			sb.append(entry.getValue().getLow());
+			sb.append(" ");
+			sb.append(entry.getValue().getClose());
+			sb.append(" ");
+			sb.append(entry.getValue().getQuantity());
+			sb.append(" ");
+			sb.append(entry.getValue().getAmount());
+			sb.append("\n");
+		}
+		
+		return sb.toString();
+	}
 
 	
 

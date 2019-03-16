@@ -87,9 +87,12 @@ public class FileUtil {
 				filewriter.close();
 			}
 
+			//System.out.println("have saved " + path + ". ");
 		} catch (Exception d) {
 			d.printStackTrace();
 		}
+		
+		
 	}
 
 	public static String readTextFile(String path) {

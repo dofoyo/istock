@@ -9,6 +9,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import com.rhb.istock.kdata.Kdata;
+import com.rhb.istock.kdata.KdataService;
+
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest
 public class KdataRepositoryTest {
@@ -24,8 +27,8 @@ public class KdataRepositoryTest {
 	@Qualifier("kdataRepositoryTushare")
 	KdataRepository kdataRepositoryTushare;
 	
-	String id="sh600011";
-	LocalDate date = LocalDate.parse("2018-09-12");
+	String id="sz300059";
+	LocalDate date = LocalDate.parse("2017-02-17");
 	
 	@Test
 	public void testGetDailyKdata() {
@@ -40,7 +43,6 @@ public class KdataRepositoryTest {
 		System.out.println("kdataRepositoryTushare");
 		KdataEntity kdata3 = kdataRepositoryTushare.getDailyKdata(id);
 		System.out.println(kdata3.getBar(date));
-
 	
 	}
 	

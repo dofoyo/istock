@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -21,11 +22,10 @@ public class KdataRepositoryTushare implements KdataRepository{
 	private String kdataPath;
 	
 	@Override
-	@CacheEvict(value="dailyKdatas",allEntries=true)
-	public void EvictDailyKDataCache() {}
+	@CacheEvict(value="tushareDailyKdatas",allEntries=true)
+	public void evictDailyKDataCache() {}
 	
 	@Override
-	//@Cacheable("dailyKdatas")
 	public KdataEntity getDailyKdata(String itemID) {
 		//System.out.println("itemID: " + itemID);
 
@@ -35,17 +35,24 @@ public class KdataRepositoryTushare implements KdataRepository{
 		String kdataFile = kdataPath + "/" + tushareID + ".json";
 		String factorFile = kdataPath + "/" + tushareID + "_factor.json";
 
+		//System.out.println(kdataFile);//----------------
+		BigDecimal roof = null;
 		if(FileUtil.isExists(kdataFile) && FileUtil.isExists(factorFile)) {
+			BigDecimal f = null;
 			JSONObject factor = new JSONObject(FileUtil.readTextFile(factorFile));
-			Map<LocalDate,BigDecimal> factors = new HashMap<LocalDate,BigDecimal>();
+			Map<LocalDate,BigDecimal> factors = new TreeMap<LocalDate,BigDecimal>();
 			JSONArray items = factor.getJSONArray("items");
 			if(items.length()>0) {
 				JSONArray item;
 				for(int i=0; i<items.length(); i++) {
 					item = items.getJSONArray(i);
-					factors.put(LocalDate.parse(item.getString(1), DateTimeFormatter.ofPattern("yyyyMMdd")),item.getBigDecimal(2));
+					f = item.getBigDecimal(2);
+					if(roof==null || roof.compareTo(f)==-1) roof = f;
+					factors.put(LocalDate.parse(item.getString(1), DateTimeFormatter.ofPattern("yyyyMMdd")),f);
 				}
 			}
+			
+			
 
 			LocalDate date;
 			BigDecimal open,high,low,close,amount,quantity;
@@ -59,20 +66,20 @@ public class KdataRepositoryTushare implements KdataRepository{
 					
 					date = LocalDate.parse(item.getString(1),DateTimeFormatter.ofPattern("yyyyMMdd"));
 					nowFactor = factors.get(date);
-					if(i==0) {
-						preFactor = nowFactor;
-					}
+					if(preFactor==null) preFactor = nowFactor;
 					
-					open = getPrice(item.getBigDecimal(2),nowFactor,preFactor);
-					high = getPrice(item.getBigDecimal(3),nowFactor,preFactor);
-					low = getPrice(item.getBigDecimal(4),nowFactor,preFactor);
-					close = getPrice(item.getBigDecimal(5),nowFactor,preFactor);
+					//System.out.println(item);
+					//System.out.println(nowFactor);
+					//System.out.println(preFactor);
+					
+					open = getPrice(item.getBigDecimal(2),nowFactor,roof);
+					high = getPrice(item.getBigDecimal(3),nowFactor,roof);
+					low = getPrice(item.getBigDecimal(4),nowFactor,roof);
+					close = getPrice(item.getBigDecimal(5),nowFactor,roof);
 					amount = item.getBigDecimal(10);
 					quantity = item.getBigDecimal(9);
 
 					kdata.addBar(date,open,high,low,close,amount,quantity);
-					
-					preFactor = nowFactor;
 				}
 			}
 			
@@ -82,6 +89,12 @@ public class KdataRepositoryTushare implements KdataRepository{
 	}
 	
 	private BigDecimal getPrice(BigDecimal price, BigDecimal nowFactor, BigDecimal preFactor) {
-		return price.multiply(nowFactor).divide(preFactor,BigDecimal.ROUND_HALF_UP);
+		return price.multiply(nowFactor).divide(preFactor,3,BigDecimal.ROUND_HALF_DOWN);
+	}
+
+	@Override
+	@Cacheable("tushareDailyKdatas")
+	public KdataEntity getDailyKdataByCache(String itemID) {
+		return this.getDailyKdata(itemID);
 	}
 }

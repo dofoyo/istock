@@ -4,9 +4,11 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import org.slf4j.Logger;
@@ -41,9 +43,13 @@ public class Account {
 		prices = new HashMap<String,BigDecimal>();
 	}
 	
-	public String open(String itemID, LocalDate date, BigDecimal price, Integer quantity) {
+	public String reopen(String itemID, Integer quantity) {
 		String orderID = UUID.randomUUID().toString();
-		Order order = new Order(orderID,itemID,date,price,quantity);
+		Order order = new Order(orderID,itemID,LocalDate.parse(endDate.toString()),prices.get(itemID),quantity);
+		order.setNote("reopen");
+		
+		System.out.println(order); //----------------------------------------------
+		
 		cash = cash.subtract(order.getAmount());  // 买入时，现金减少
 		value = value.add(order.getAmount()); // 市值增加
 		holds.put(order.getOrderID(), order);
@@ -52,14 +58,31 @@ public class Account {
 		return orderID;
 	}
 	
-	public void drop(String itemID, LocalDate date, BigDecimal price) {
+	public String open(String itemID, Integer quantity) {
+		String orderID = UUID.randomUUID().toString();
+		Order order = new Order(orderID,itemID,LocalDate.parse(endDate.toString()),prices.get(itemID),quantity);
+		order.setNote("open");
+
+		System.out.println(order); //----------------------------------------------
+
+		cash = cash.subtract(order.getAmount());  // 买入时，现金减少
+		value = value.add(order.getAmount()); // 市值增加
+		holds.put(order.getOrderID(), order);
+		opens.put(order.getOrderID(), order);
+		
+		return orderID;
+	}
+	
+	public void drop(String itemID) {
 		Order openOrder;
 		for(Iterator<Map.Entry<String, Order>> hands_it = holds.entrySet().iterator(); hands_it.hasNext();) {
 			openOrder = hands_it.next().getValue();
 			if(openOrder.getItemID().equals(itemID)) {
-				Order dropOrder = new Order(openOrder.getOrderID(),itemID, date, price,openOrder.getQuantity());
+				Order dropOrder = new Order(openOrder.getOrderID(),itemID, LocalDate.parse(endDate.toString()), prices.get(itemID), openOrder.getQuantity());
 				dropOrder.setNote("drop");
-				
+
+				System.out.println(dropOrder); //----------------------------------------------
+			
 				cash = cash.add(dropOrder.getAmount()); 			//卖出时，现金增加
 				value = value.subtract(dropOrder.getAmount());		//市值减少
 				
@@ -69,32 +92,53 @@ public class Account {
 		}
 	}
 	
-	public void stop(String orderID, LocalDate date, BigDecimal price) {
+	public void stopByItemID(String itemID) {
+		Order openOrder;
+		for(Iterator<Map.Entry<String, Order>> hands_it = holds.entrySet().iterator(); hands_it.hasNext();) {
+			openOrder = hands_it.next().getValue();
+			if(openOrder.getItemID().equals(itemID)) {
+				Order stopOrder = new Order(openOrder.getOrderID(),itemID, LocalDate.parse(endDate.toString()), prices.get(itemID), openOrder.getQuantity());
+				stopOrder.setNote("stop");
+
+				System.out.println(stopOrder); //----------------------------------------------
+			
+				cash = cash.add(stopOrder.getAmount()); 			//卖出时，现金增加
+				value = value.subtract(stopOrder.getAmount());		//市值减少
+				
+				hands_it.remove();
+				drops.put(stopOrder.getOrderID(), stopOrder);
+			}
+		}
+	}	
+	
+	public void stopByOrderID(String orderID) {
 		Order openOrder = holds.get(orderID);
 		if(openOrder!=null) {
-			Order stopOrder = new Order(openOrder.getOrderID(), openOrder.getItemID(), date, price, openOrder.getQuantity());
+			Order stopOrder = new Order(openOrder.getOrderID(), openOrder.getItemID(), LocalDate.parse(endDate.toString()), prices.get(openOrder.getItemID()), openOrder.getQuantity());
 			stopOrder.setNote("stop");
+
+			System.out.println(stopOrder); //----------------------------------------------
+		
 			
 			cash = cash.add(stopOrder.getAmount()); 			//卖出时，现金增加
 			value = value.subtract(stopOrder.getAmount());		//市值减少	
 			
 			holds.remove(orderID);
 			stops.put(stopOrder.getOrderID(), stopOrder);
-			
 		}
 	}
 	
-	public void setLatestDate(LocalDate latestDate) {
-		if(this.beginDate==null) this.beginDate = latestDate;
-		this.endDate = latestDate;
+	public void setLatestDate(LocalDate date) {
+		if(this.beginDate==null) this.beginDate = date;
+		this.endDate = date;
 	}
 
 	public void refreshHoldsPrice(String itemID, BigDecimal price) {
 		prices.put(itemID, price);
 	}
 	
-	public List<String> getItemIDsOfHolds() {
-		List<String> ids = new ArrayList<String>();
+	public Set<String> getItemIDsOfHolds() {
+		Set<String> ids = new HashSet<String>();
 		for(Order order : holds.values()) {
 			ids.add(order.getItemID());
 		}
@@ -120,6 +164,16 @@ public class Account {
 			}
 		}		
 		return ps;
+	}
+	
+	public BigDecimal getLatestOpenPrice(String itemID){
+		BigDecimal price = new BigDecimal(0);
+		for(Order order : holds.values()) {
+			if(order.getItemID().equals(itemID)) {
+				price = price.compareTo(order.getPrice())==-1 ? order.getPrice() : price;
+			}
+		}		
+		return price;
 	}
 	
 	public Integer getWinRatio() {
@@ -181,6 +235,8 @@ public class Account {
 
 	public String getCSVTitle() {
 		StringBuffer sb = new StringBuffer();
+		sb.append("orderID");
+		sb.append(",");
 		sb.append("itemID");
 		sb.append(",");
 		sb.append("name");
@@ -222,6 +278,8 @@ public class Account {
 				dsOrder = new Order(openOrder.getOrderID(),openOrder.getItemID(),endDate,prices.get(openOrder.getItemID()),openOrder.getQuantity());
 				dsOrder.setNote("hold");
 			}
+			sb.append("'" + openOrder.getOrderID());
+			sb.append(",");
 			sb.append("'" + openOrder.getItemID());
 			sb.append(",");
 			sb.append("");
@@ -331,5 +389,12 @@ public class Account {
 		public void setNote(String note) {
 			this.note = note;
 		}
+
+		@Override
+		public String toString() {
+			return "Order [orderID=" + orderID + ", itemID=" + itemID + ", date=" + date + ", price=" + price
+					+ ", quantity=" + quantity + ", note=" + note + "]";
+		}
+		
 	}
 }

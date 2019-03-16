@@ -17,11 +17,10 @@ public class KdataRepositoryDzh implements KdataRepository{
 	private String kdataPath;
 	
 	@Override
-	@CacheEvict(value="dailyKdatas",allEntries=true)
-	public void EvictDailyKDataCache() {}
+	@CacheEvict(value="dzhDailyKdatas",allEntries=true)
+	public void evictDailyKDataCache() {}
 	
 	@Override
-	@Cacheable("dailyKdatas")
 	public KdataEntity getDailyKdata(String itemID) {
 		KdataEntity kdata = null;
 		
@@ -58,5 +57,11 @@ public class KdataRepositoryDzh implements KdataRepository{
 			kdata.addBar(date, open, high, low, close, amount,quantity);
 		}
 		return kdata;
+	}
+
+	@Override
+	@Cacheable("dzhDailyKdatas")
+	public KdataEntity getDailyKdataByCache(String itemID) {
+		return this.getDailyKdata(itemID);
 	}
 }

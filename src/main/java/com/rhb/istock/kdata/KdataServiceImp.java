@@ -27,14 +27,46 @@ public class KdataServiceImp implements KdataService{
 	@Autowired
 	@Qualifier("kdataSpiderTushare")
 	KdataSpider kdataSpider;
+
+	@Override
+	public Kdata getDailyKdata(String itemID, boolean byCache) {
+		Kdata kdata = new Kdata(itemID);
+		
+		KdataEntity entity = null;
+		if(byCache) {
+			entity = kdataRepository.getDailyKdataByCache(itemID);
+		}else {
+			entity = kdataRepository.getDailyKdata(itemID);
+		}
+		
+		//System.out.println(entity.getBarSize());
+		LocalDate date;
+		KbarEntity bar;
+		for(Map.Entry<LocalDate, KbarEntity> entry : entity.getBars().entrySet()) {
+				date = entry.getKey();
+				bar = entry.getValue();
+				kdata.addBar(date, bar.getOpen(), bar.getHigh(), bar.getLow(), bar.getClose(), bar.getAmount(), bar.getQuantity());
+		}
+		
+		return kdata;
+	}
 	
 	@Override
-	public Kdata getDailyKdata(String itemID, LocalDate endDate, Integer count) {
+	public Kdata getDailyKdata(String itemID, LocalDate endDate, Integer count, boolean byCache) {
 		Kdata kdata = new Kdata(itemID);
 
 		KbarEntity bar;
 		LocalDate date = endDate.minusDays(1);
-		KdataEntity entity = kdataRepository.getDailyKdata(itemID);
+		KdataEntity entity = null;
+		
+		if(byCache) {
+			entity = kdataRepository.getDailyKdataByCache(itemID);
+		}else {
+			entity = kdataRepository.getDailyKdata(itemID);
+		}
+		
+		//System.out.println(entity.getBarSize());
+		
 		for(int i=0,j=0; i<count && j<entity.getBarSize(); j++) {
 			bar = entity.getBar(date);
 			if(bar!=null) {
@@ -79,6 +111,33 @@ public class KdataServiceImp implements KdataService{
 	public void downLatestKdatas() throws Exception {
 		LocalDate latestDate = kdataRealtimeSpider.getLatestMarketDate();
 		kdataSpider.downKdata(latestDate);
+	}
+
+
+	@Override
+	public Kbar getKbar(String itemID, LocalDate date, boolean byCache) {
+		Kbar kbar= null;
+		KdataEntity entity = null;
+		
+		if(byCache) {
+			entity = kdataRepository.getDailyKdataByCache(itemID);
+		}else {
+			entity = kdataRepository.getDailyKdata(itemID);
+		}
+		
+		KbarEntity bar = entity.getBar(date);
+		if(bar!=null) {
+			kbar = new Kbar(bar.getOpen(), bar.getHigh(), bar.getLow(), bar.getClose(), bar.getAmount(), bar.getQuantity());
+		}else {
+			System.out.println(" kbar is null");
+			//System.out.println(entity);
+		}
+		return kbar;
+	}
+
+	@Override
+	public void evictDailyKDataCache() {
+		kdataRepository.evictDailyKDataCache();
 	}
 
 

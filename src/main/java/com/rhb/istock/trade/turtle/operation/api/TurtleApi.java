@@ -1,4 +1,4 @@
-package com.rhb.istock.trade.turtle.api;
+package com.rhb.istock.trade.turtle.operation.api;
 
 import java.math.BigDecimal;
 import java.util.Collections;
@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.rhb.istock.comm.api.ResponseContent;
 import com.rhb.istock.comm.api.ResponseEnum;
-import com.rhb.istock.trade.turtle.service.TurtleOperationService;
+import com.rhb.istock.trade.turtle.operation.service.TurtleOperationService;
 
 @RestController
 public class TurtleApi{
@@ -23,7 +23,7 @@ public class TurtleApi{
 
 	@GetMapping("/tops")
 	public ResponseContent<List<PreyView>> getTops() {
-		List<PreyView> tops = ts.getTops(50);
+		List<PreyView> tops = ts.getTops(100);
 		Collections.sort(tops, new Comparator<PreyView>() {
 			@Override
 			public int compare(PreyView o1, PreyView o2) {

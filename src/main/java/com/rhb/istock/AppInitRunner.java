@@ -7,7 +7,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import com.rhb.istock.item.spider.ItemSpider;
-import com.rhb.istock.trade.turtle.service.TurtleOperationService;
+import com.rhb.istock.trade.turtle.operation.service.TurtleOperationService;
 
 
 @Component
@@ -23,9 +23,9 @@ public class AppInitRunner implements CommandLineRunner {
 	
     @Override
     public void run(String... args) throws Exception {
-		itemSpider.download();
-    	turtleOperationService.init();
-		turtleOperationService.generatePreys();
+		//itemSpider.download();
+    	//turtleOperationService.init();
+		//turtleOperationService.generatePreys();
     }
 
 }

@@ -37,5 +37,15 @@ public class KdataEntity {
 	public void setItemID(String itemID) {
 		this.itemID = itemID;
 	}
+	
+	public Map<LocalDate,KbarEntity> getBars(){
+		return this.bars;
+	}
+
+
+	@Override
+	public String toString() {
+		return "KdataEntity [itemID=" + itemID + ", bars=" + bars + "]";
+	}
 
 }

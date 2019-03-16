@@ -22,11 +22,10 @@ public class KdataRepositorySina implements KdataRepository{
 	private String kdataPath;
 	
 	@Override
-	@CacheEvict(value="dailyKdatas",allEntries=true)
-	public void EvictDailyKDataCache() {}
+	@CacheEvict(value="sinaDailyKdatas",allEntries=true)
+	public void evictDailyKDataCache() {}
 	
 	@Override
-	@Cacheable("dailyKdatas")
 	public KdataEntity getDailyKdata(String itemID) {
 		KdataEntity kdata = new KdataEntity(itemID);
 		
@@ -40,6 +39,8 @@ public class KdataRepositorySina implements KdataRepository{
 				kdata.addBar(bar.get("date"), bar.get("open"), bar.get("high"), bar.get("low"), bar.get("close"), bar.get("amount"),bar.get("quantity"));
 			}
 		}
+		
+		//System.out.println(kdata);
 		
 		return kdata;
 	}
@@ -81,6 +82,12 @@ public class KdataRepositorySina implements KdataRepository{
 		bar.put("quantity", quantity);
 			
 		return bar;
+	}
+
+	@Override
+	@Cacheable("sinaDailyKdatas")
+	public KdataEntity getDailyKdataByCache(String itemID) {
+		return this.getDailyKdata(itemID);
 	}
 
 }
