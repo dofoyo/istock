@@ -3,9 +3,13 @@ package com.rhb.istock.kdata.repository;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -15,11 +19,15 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import com.rhb.istock.comm.util.FileUtil;
+import com.rhb.istock.comm.util.Progress;
 
 @Service("kdataRepositoryTushare")
 public class KdataRepositoryTushare implements KdataRepository{
 	@Value("${tushareKdataPath}")
 	private String kdataPath;
+	
+	@Value("${avarageAmountTopsFile}")
+	private String avarageAmountTopsFile;
 	
 	@Override
 	@CacheEvict(value="tushareDailyKdatas",allEntries=true)
@@ -52,8 +60,6 @@ public class KdataRepositoryTushare implements KdataRepository{
 				}
 			}
 			
-			
-
 			LocalDate date;
 			BigDecimal open,high,low,close,amount,quantity;
 			BigDecimal preFactor=null,nowFactor;
@@ -82,7 +88,6 @@ public class KdataRepositoryTushare implements KdataRepository{
 					kdata.addBar(date,open,high,low,close,amount,quantity);
 				}
 			}
-			
 		}
 
 		return kdata;
@@ -96,5 +101,90 @@ public class KdataRepositoryTushare implements KdataRepository{
 	@Cacheable("tushareDailyKdatas")
 	public KdataEntity getDailyKdataByCache(String itemID) {
 		return this.getDailyKdata(itemID);
+	}
+
+	@Override
+	public LocalDate getLatestDate() {
+		String itemID1="sh601398"; //工商银行
+		String itemID2="sh601288"; //农业银行
+		LocalDate date1 = getDailyKdata(itemID1).getLatestDate();
+		LocalDate date2 = getDailyKdata(itemID2).getLatestDate();
+		return date1.isAfter(date2) ? date1 : date2;
+	}
+
+	@Override
+	public List<String> getDailyAverageAmountTops() {
+		String[] ids = FileUtil.readTextFile(avarageAmountTopsFile).split(",");
+		return Arrays.asList(ids);
+	}
+
+	@Override
+	public void generateDailyAverageAmountTops(List<String> itemIDs, Integer duration) {
+		TreeSet<Amount> tops = new TreeSet<Amount>();
+		Amount amount = null;
+		KdataEntity kdata;
+		BigDecimal av;
+		int d = 1;
+		for(String itemID : itemIDs) {
+			Progress.show(itemIDs.size(), d++, itemID);
+			kdata = this.getDailyKdata(itemID);
+			av = kdata.getAvarageAmount(duration);
+			amount = new Amount(itemID,av);
+			tops.add(amount);
+		}
+		StringBuffer sb = new StringBuffer();
+		for(Iterator<Amount> i = tops.iterator() ; i.hasNext();) {
+			amount = i.next();
+			sb.append(amount.getCode());
+			sb.append(",");
+		}
+		sb.deleteCharAt(sb.length()-1);
+		
+		FileUtil.writeTextFile(avarageAmountTopsFile, sb.toString(), false);
+	}
+	
+	class Amount  implements Comparable<Amount>{
+		@Override
+		public String toString() {
+			return "BarEntity [code=" + code + ", amount=" + amount + "]";
+		}
+
+		private String code;
+		private BigDecimal amount = new BigDecimal(0);
+		
+		public Amount(String code) {
+			this.code = code;
+		}
+		
+		public Amount(String code, BigDecimal amount) {
+			this.code = code;
+			this.amount = amount;
+		}
+
+		public String getCode() {
+			return code;
+		}
+
+		public void setCode(String code) {
+			this.code = code;
+		}
+
+		public BigDecimal getAmount() {
+			return amount;
+		}
+		
+		public Integer getAmountInt() {
+			return amount.divide(new BigDecimal(100000),BigDecimal.ROUND_HALF_UP).intValue();
+		}
+
+		public void setAmount(BigDecimal amount) {
+			this.amount = amount;
+		}
+		
+		@Override
+		public int compareTo(Amount o) {
+			return o.getAmount().compareTo(this.getAmount()); //倒叙
+		}
+		
 	}
 }

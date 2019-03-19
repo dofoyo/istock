@@ -17,7 +17,7 @@ public class SimulationRepositoryTest {
 
 	@Autowired
 	@Qualifier("simulationRepositoryImp")
-	SimulationRepository simulationRepository;
+	TurtleSimulationRepository simulationRepository;
 	
 	//@Test
 	public void getDailyAmountTops() {

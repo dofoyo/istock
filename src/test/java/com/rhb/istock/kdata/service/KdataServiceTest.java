@@ -18,7 +18,7 @@ public class KdataServiceTest {
 	@Qualifier("kdataServiceImp")
 	KdataService kdataService;
 	
-	@Test
+	//@Test
 	public void test() {
 		String path = "D:\\dev\\istock-data\\kdata\\sz000651.txt";
 		String itemID = "sz000651";

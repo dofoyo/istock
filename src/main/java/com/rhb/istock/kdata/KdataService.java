@@ -13,14 +13,13 @@ public interface KdataService {
 	public Kbar getKbar(String itemID,LocalDate date, boolean byCache);
 	public void evictDailyKDataCache();
 	
-	
-	public List<String> getDailyAmountTops(LocalDate date, Integer top);
-	public List<String> getDailyAverageAmountTops(LocalDate date, Integer top);
-	
-	
 	public LocalDate getLatestMarketDate(); 
 	public Kbar getLatestMarketData(String itemID);
 	
-	public void downLatestKdatas()  throws Exception ;
+	public void downKdatas()  throws Exception ;
 	
+	
+	public List<String> getDailyAverageAmountTops(Integer top);
+	public void generateDailyAverageAmountTops(List<String> itemIDs, Integer duration);
+
 }

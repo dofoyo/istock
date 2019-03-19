@@ -41,14 +41,14 @@ public class Tdata {
 	private Integer dropDuration;
 	private List<Tbar> bars;
 	private Tbar latestBar;
-	private Feature feature;
+	private Tfeature feature;
 	
 	public Tdata(String itemID, Integer openDuration, Integer dropDuration) {
 		this.itemID = itemID;
 		this.openDuration = openDuration;
 		this.dropDuration = dropDuration;
 		this.bars = new ArrayList<Tbar>();
-		this.feature = new Feature(itemID);
+		this.feature = new Tfeature(itemID);
 	}
 	
 	//一字板
@@ -115,7 +115,7 @@ public class Tdata {
 		feature.setNow(latestBar.getClose());
 	}
 	
-	public Feature getFeature() {
+	public Tfeature getFeature() {
 		if(this.latestBar==null || this.bars.size()<openDuration) return null;
 		
 		BigDecimal[] hl = getHighestAndLowest(openDuration);
@@ -136,7 +136,7 @@ public class Tdata {
 
 	public void clearBars() {
 		this.bars = new ArrayList<Tbar>();
-		this.feature = new Feature(itemID);
+		this.feature = new Tfeature(itemID);
 	}
 	
 	//----------

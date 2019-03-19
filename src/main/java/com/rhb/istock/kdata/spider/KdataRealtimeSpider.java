@@ -8,4 +8,6 @@ public interface KdataRealtimeSpider {
 	public LocalDate getLatestMarketDate(); 
 	public Map<String,String> getLatestMarketData(String id);
 	public List<String> getLatestDailyTop(Integer top);
+	public List<LocalDate> getCalendar(LocalDate startDate) throws Exception;
+
 }

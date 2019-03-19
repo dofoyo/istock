@@ -17,7 +17,7 @@ import java.math.BigDecimal;
  * -2 -- 表示当前价位低于低点low，做空
  * 
  */
-public class Feature {
+public class Tfeature {
 	private String itemID;
 	private BigDecimal openHigh;
 	private BigDecimal openLow;
@@ -30,7 +30,7 @@ public class Feature {
 	private BigDecimal atr;
 	private Integer status;
 	
-	public Feature(String itemID) {
+	public Tfeature(String itemID) {
 		this.itemID = itemID;
 	}
 	

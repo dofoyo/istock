@@ -42,7 +42,7 @@ public class KdataSpiderTest {
 
 	@Test
 	public void testDwnKdataByDate() {
-		LocalDate date = LocalDate.parse("2019-03-14");
+		LocalDate date = LocalDate.parse("2019-03-15");
 		try {
 			kdataSpiderTushare.downKdata(date);
 		} catch (Exception e) {

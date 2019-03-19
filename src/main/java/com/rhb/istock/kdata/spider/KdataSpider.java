@@ -10,8 +10,6 @@ public interface KdataSpider {
 	 */
 	public void downKdata(List<String> ids) throws Exception ;
 	public void downKdata(String id) throws Exception ;
-	
-	
 	public void downKdata(LocalDate date) throws Exception ;
 
 	

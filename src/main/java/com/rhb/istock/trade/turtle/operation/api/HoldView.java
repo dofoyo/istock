@@ -84,7 +84,7 @@ public class HoldView {
 	}
 	
 	public String getStatus() {
-		return nowPrice.compareTo(buyPrice)==1 ? "1" : "-1";
+		return nowPrice.compareTo(buyPrice)==1 ? "2" : "-2";
 	}
 
 	@Override

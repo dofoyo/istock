@@ -6,7 +6,7 @@ import java.util.Map;
 
 import com.rhb.istock.comm.util.Line;
 
-public class PreyView {
+public class TurtleView {
 	private String itemID;
 	private String code;
 	private String name;
@@ -20,7 +20,7 @@ public class PreyView {
 	private String atr;
 	private String status;
 
-	public PreyView(Map<String, String> map) {
+	public TurtleView(Map<String, String> map) {
 		//System.out.println(map);
 		this.itemID = map.get("itemID");
 		this.code = map.get("code");

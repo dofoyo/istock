@@ -90,27 +90,26 @@ public class KdataServiceImp implements KdataService{
 	}
 
 	@Override
-	public List<String> getDailyAmountTops(LocalDate date, Integer top) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public List<String> getDailyAverageAmountTops(LocalDate date, Integer top) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
 	public LocalDate getLatestMarketDate() {
 		return kdataRealtimeSpider.getLatestMarketDate();
 	}
 
 
 	@Override
-	public void downLatestKdatas() throws Exception {
+	public void downKdatas() throws Exception {
 		LocalDate latestDate = kdataRealtimeSpider.getLatestMarketDate();
-		kdataSpider.downKdata(latestDate);
+		LocalDate latestDownDate = kdataRepository.getLatestDate();
+		List<LocalDate> dates = kdataRealtimeSpider.getCalendar(latestDownDate);
+		
+		for(LocalDate date : dates) {
+			if(date.isBefore(latestDate)) {
+				System.out.println("download "+ date +" kdatas from tushare, please wait....... ");
+				kdataSpider.downKdata(date);
+				System.out.println("downloaded "+ date +" kdatas from tushare.");
+			}else {
+				break;
+			}
+		}
 	}
 
 
@@ -129,7 +128,7 @@ public class KdataServiceImp implements KdataService{
 		if(bar!=null) {
 			kbar = new Kbar(bar.getOpen(), bar.getHigh(), bar.getLow(), bar.getClose(), bar.getAmount(), bar.getQuantity());
 		}else {
-			System.out.println(" kbar is null");
+			//System.out.println(" kbar is null");
 			//System.out.println(entity);
 		}
 		return kbar;
@@ -138,6 +137,17 @@ public class KdataServiceImp implements KdataService{
 	@Override
 	public void evictDailyKDataCache() {
 		kdataRepository.evictDailyKDataCache();
+	}
+
+	@Override
+	public List<String> getDailyAverageAmountTops(Integer top) {
+		List<String> ids = kdataRepository.getDailyAverageAmountTops();
+		return ids.subList(0, Math.min(top, ids.size()));
+	}
+
+	@Override
+	public void generateDailyAverageAmountTops(List<String> itemIDs, Integer duration) {
+		kdataRepository.generateDailyAverageAmountTops(itemIDs, duration);
 	}
 
 

@@ -35,21 +35,20 @@ public class IstockScheduledTask {
 	 * 2、下载上一交易日收盘后的K线数据
 	 * 3、初始化: 即把日K线读入内存
 	 */
-	//@Scheduled(cron="0 0 9 ? * 1-5") 
+	@Scheduled(cron="0 0 9 ? * 1-5") 
 	public void dailyInit() throws Exception {
 		itemSpider.download();
-
-		kdataService.downLatestKdatas();
-
+		kdataService.downKdatas();
 		turtleOperationService.init();
 	}
 	
 	/*
-	 * 每周1至5，9:30 -- 15，每5分钟，生成preys
+	 * 每周1至5，9:40 -- 15，每10分钟，生成preys
 	 */
-	//@Scheduled(cron="0 30/5 9-15 ? * 1-5")  //
+	@Scheduled(cron="0 45/15 9-15 ? * 1-5")  //
 	public void generatePreys() {
 		turtleOperationService.generatePreys();
+		turtleOperationService.generateAvTops();
 	}
 
 }

@@ -3,6 +3,7 @@ package com.rhb.istock.kdata.repository;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheEvict;
@@ -63,5 +64,23 @@ public class KdataRepositoryDzh implements KdataRepository{
 	@Cacheable("dzhDailyKdatas")
 	public KdataEntity getDailyKdataByCache(String itemID) {
 		return this.getDailyKdata(itemID);
+	}
+
+	@Override
+	public LocalDate getLatestDate() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<String> getDailyAverageAmountTops() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void generateDailyAverageAmountTops(List<String> itemIDs, Integer duration) {
+		// TODO Auto-generated method stub
+		
 	}
 }

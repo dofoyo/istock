@@ -4,7 +4,7 @@ import java.time.LocalDate;
 
 import com.rhb.istock.trade.turtle.simulation.DailyItem;
 
-public interface SimulationRepository {
+public interface TurtleSimulationRepository {
 	public DailyItem getDailyAmountTops(Integer top,LocalDate beginDate, LocalDate endDate);
 	public DailyItem getAvarageAmountTops(Integer top,LocalDate beginDate, LocalDate endDate);
 	public DailyItem getBluechips(Integer top,LocalDate beginDate, LocalDate endDate);

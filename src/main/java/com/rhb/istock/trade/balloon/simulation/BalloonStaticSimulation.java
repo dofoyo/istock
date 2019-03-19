@@ -1,4 +1,4 @@
-package com.rhb.istock.trade.turtle.simulation;
+package com.rhb.istock.trade.balloon.simulation;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -15,13 +15,14 @@ import com.rhb.istock.comm.util.Progress;
 import com.rhb.istock.kdata.Kbar;
 import com.rhb.istock.kdata.Kdata;
 import com.rhb.istock.kdata.KdataService;
-import com.rhb.istock.trade.turtle.domain.Turtle;
+import com.rhb.istock.trade.balloon.domain.Balloon;
+import com.rhb.istock.trade.turtle.simulation.DailyItem;
 
 /*
  * 所谓static，即每天要交易的item是确定的，如上证50、每日交易量top50、日均交易量top50、等
  */
-@Service("turtleStaticSimulation")
-public class TurtleStaticSimulation implements TurtleSimulation{
+@Service("balloonStaticSimulation")
+public class BalloonStaticSimulation implements BalloonSimulation{
 	@Value("${reportPath}")
 	private String reportPath;
 	
@@ -34,7 +35,7 @@ public class TurtleStaticSimulation implements TurtleSimulation{
 	LocalDate beginDate = null;
 	LocalDate endDate = null;
 
-	Turtle turtle = null;
+	Balloon balloon = null;
 	
 	@Override
 	public Map<String, String> simulate(DailyItem dailyItem, Option option) {
@@ -42,15 +43,8 @@ public class TurtleStaticSimulation implements TurtleSimulation{
 		this.endDate = dailyItem.getEndDate();
 		
 		if(option==null) {
-			turtle = new Turtle();			
+			balloon = new Balloon();			
 		}else {
-			turtle = new Turtle(option.getDeficitFactor(),
-					option.getOpenDuration(),
-					option.getDropDuration(),
-					option.getMaxOfLot(),
-					option.getInitCash(),
-					option.getStopStrategy(),
-					option.getGap());
 		}
 		
 		long days = endDate.toEpochDay()- beginDate.toEpochDay();
@@ -60,21 +54,23 @@ public class TurtleStaticSimulation implements TurtleSimulation{
 		for(LocalDate date=beginDate; date.isBefore(endDate); date=date.plusDays(1)) {
 			Progress.show((int)days, i++, date.toString());
 			
-			turtle.clearDatas(); //开始前清除历史记录，当某个item停牌几天，原记录可能会缺失
+			//balloon.clearDatas(); //开始前清除历史记录，当某个item停牌几天，原记录可能会缺失
 			
 			itemIDs = dailyItem.getItemIDs(date);
 			if(itemIDs!=null) {
-				itemIDs.addAll(turtle.getItemIDsOfHolds());//加入在手的ID
+				itemIDs.addAll(balloon.getItemIDsOfHolds());//加入在手的ID
 				for(String itemID : itemIDs) {
-					setDailyKdata(itemID, date); //放入beginDate之前的历史记录
+					if(balloon.noData(itemID)){
+						setDailyKdata(itemID, date); //放入beginDate之前的历史记录
+					}
 					setLatestKdata(itemID, date); //放入当前记录
 				}				
+				System.out.println("");
+				balloon.doIt();
 			}
-			System.out.println("");
-			turtle.doIt();
 		}
 		
-		Map<String, String> result = turtle.result();
+		Map<String, String> result = balloon.result();
 		System.out.println("initCash: " + result.get("initCash"));
 		System.out.println("cash: " + result.get("cash"));
 		System.out.println("value: " + result.get("value"));
@@ -87,21 +83,21 @@ public class TurtleStaticSimulation implements TurtleSimulation{
 
 	private void setDailyKdata(String itemID, LocalDate theDate) {
 		Kbar kbar;
-		Kdata kdata = kdataService.getDailyKdata(itemID, theDate, turtle.getOpenDuration(), byCache);
+		Kdata kdata = kdataService.getDailyKdata(itemID, theDate, balloon.getMidDuration(), byCache);
 		
 		List<LocalDate> dates = kdata.getDates();
 		//System.out.println(dates);
 		for(LocalDate date : dates) {
 			kbar = kdata.getBar(date);
-			//System.out.println(date + "," + kbar);
-			turtle.addDailyData(itemID,date,kbar.getOpen(), kbar.getHigh(), kbar.getLow(), kbar.getClose());
+			//System.out.println("\n" + date + "," + kbar);
+			balloon.addDailyData(itemID,date,kbar.getOpen(), kbar.getHigh(), kbar.getLow(), kbar.getClose());
 		}
 	}
 	
 	private Kbar setLatestKdata(String itemID, LocalDate theDate) {
 		Kbar kbar = kdataService.getKbar(itemID, theDate, byCache);
 		if(kbar!=null) {
-			turtle.addLatestData(itemID,theDate ,kbar.getOpen(), kbar.getHigh(), kbar.getLow(), kbar.getClose());
+			balloon.addDailyData(itemID,theDate ,kbar.getOpen(), kbar.getHigh(), kbar.getLow(), kbar.getClose());
 		}
 		return kbar;
 	}

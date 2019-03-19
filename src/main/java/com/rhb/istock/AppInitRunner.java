@@ -7,6 +7,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import com.rhb.istock.item.spider.ItemSpider;
+import com.rhb.istock.kdata.KdataService;
 import com.rhb.istock.trade.turtle.operation.service.TurtleOperationService;
 
 
@@ -20,12 +21,15 @@ public class AppInitRunner implements CommandLineRunner {
 	@Qualifier("turtleOperationServiceImp")
 	TurtleOperationService turtleOperationService;
 	
+	@Autowired
+	@Qualifier("kdataServiceImp")
+	KdataService kdataService;
 	
     @Override
     public void run(String... args) throws Exception {
-		//itemSpider.download();
-    	//turtleOperationService.init();
-		//turtleOperationService.generatePreys();
+		itemSpider.download();
+    	kdataService.downKdatas();
+    	turtleOperationService.init();
     }
 
 }

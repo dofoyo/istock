@@ -168,9 +168,16 @@ public class Account {
 	
 	public BigDecimal getLatestOpenPrice(String itemID){
 		BigDecimal price = new BigDecimal(0);
+		LocalDate date = null;
 		for(Order order : holds.values()) {
 			if(order.getItemID().equals(itemID)) {
-				price = price.compareTo(order.getPrice())==-1 ? order.getPrice() : price;
+				if(date == null) {
+					date = order.getDate();
+					price = order.getPrice();
+				}else if(date.isBefore(order.getDate())){
+					date = order.getDate();
+					price = order.getPrice();
+				}				
 			}
 		}		
 		return price;

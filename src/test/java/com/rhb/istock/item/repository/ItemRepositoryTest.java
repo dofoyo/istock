@@ -26,7 +26,7 @@ public class ItemRepositoryTest {
 	
 	//@Test
 	public void test() {
-		String itemID = "sh600919";
+		String itemID = "sz300571";
 		ItemEntity item = itemRepository.getItemEntity(itemID);
 		System.out.println(item);
 	}

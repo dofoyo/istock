@@ -21,51 +21,88 @@ public class TurtleApi{
 	@Qualifier("turtleOperationServiceImp")
 	TurtleOperationService ts;
 
-	@GetMapping("/tops")
-	public ResponseContent<List<PreyView>> getTops() {
-		List<PreyView> tops = ts.getTops(100);
-		Collections.sort(tops, new Comparator<PreyView>() {
+	@GetMapping("/turtle/avtops")
+	public ResponseContent<List<TurtleView>> getAvTops() {
+		List<TurtleView> tops = ts.getAvTops(55);
+		Collections.sort(tops, new Comparator<TurtleView>() {
 			@Override
-			public int compare(PreyView o1, PreyView o2) {
+			public int compare(TurtleView o1, TurtleView o2) {
 				BigDecimal hl1 = new BigDecimal(o1.getHlgap());
 				BigDecimal hl2 = new BigDecimal(o2.getHlgap());
-				BigDecimal nh1 = new BigDecimal(o1.getNhgap());
-				BigDecimal nh2 = new BigDecimal(o2.getNhgap());
 				
-				if(hl1.equals(hl2)) {
-					return (nh2).compareTo(nh1);
-				}else {
+				if(o1.getStatus().equals(o2.getStatus())) {
 					return (hl1).compareTo(hl2);
+				}else {
+					return (o2.getStatus()).compareTo(o1.getStatus());
 				}
 			}
 		});	
-		return new ResponseContent<List<PreyView>>(ResponseEnum.SUCCESS, tops);
+		return new ResponseContent<List<TurtleView>>(ResponseEnum.SUCCESS, tops);
 	}
 	
-	@GetMapping("/favors")
-	public ResponseContent<List<PreyView>> getFavors() {
-		List<PreyView> favors = ts.getFavors();
-		Collections.sort(favors, new Comparator<PreyView>() {
+	@GetMapping("/turtle/dailytops")
+	public ResponseContent<List<TurtleView>> getDailyTops() {
+		List<TurtleView> tops = ts.getDailyTops(55);
+		Collections.sort(tops, new Comparator<TurtleView>() {
 			@Override
-			public int compare(PreyView o1, PreyView o2) {
+			public int compare(TurtleView o1, TurtleView o2) {
 				BigDecimal hl1 = new BigDecimal(o1.getHlgap());
 				BigDecimal hl2 = new BigDecimal(o2.getHlgap());
-				BigDecimal nh1 = new BigDecimal(o1.getNhgap());
-				BigDecimal nh2 = new BigDecimal(o2.getNhgap());
-				
-				if(hl1.equals(hl2)) {
-					return (nh2).compareTo(nh1);
-				}else {
+				if(o1.getStatus().equals(o2.getStatus())) {
 					return (hl1).compareTo(hl2);
+				}else {
+					return (o2.getStatus()).compareTo(o1.getStatus());
 				}
 			}
 		});	
-		return new ResponseContent<List<PreyView>>(ResponseEnum.SUCCESS, favors);
+		return new ResponseContent<List<TurtleView>>(ResponseEnum.SUCCESS, tops);
 	}
 	
-	@GetMapping("/holds")
+	@GetMapping("/turtle/bluechips")
+	public ResponseContent<List<TurtleView>> getBluechips() {
+		List<TurtleView> favors = ts.getBluechips();
+		Collections.sort(favors, new Comparator<TurtleView>() {
+			@Override
+			public int compare(TurtleView o1, TurtleView o2) {
+				BigDecimal hl1 = new BigDecimal(o1.getHlgap());
+				BigDecimal hl2 = new BigDecimal(o2.getHlgap());
+				if(o1.getStatus().equals(o2.getStatus())) {
+					return (hl1).compareTo(hl2);
+				}else {
+					return (o2.getStatus()).compareTo(o1.getStatus());
+				}
+			}
+		});	
+		return new ResponseContent<List<TurtleView>>(ResponseEnum.SUCCESS, favors);
+	}
+	
+	@GetMapping("/turtle/favors")
+	public ResponseContent<List<TurtleView>> getFavors() {
+		List<TurtleView> favors = ts.getFavors();
+		Collections.sort(favors, new Comparator<TurtleView>() {
+			@Override
+			public int compare(TurtleView o1, TurtleView o2) {
+				BigDecimal hl1 = new BigDecimal(o1.getHlgap());
+				BigDecimal hl2 = new BigDecimal(o2.getHlgap());
+				if(o1.getStatus().equals(o2.getStatus())) {
+					return (hl1).compareTo(hl2);
+				}else {
+					return (o2.getStatus()).compareTo(o1.getStatus());
+				}
+			}
+		});	
+		return new ResponseContent<List<TurtleView>>(ResponseEnum.SUCCESS, favors);
+	}
+	
+	@GetMapping("/turtle/holds")
 	public ResponseContent<List<HoldView>> getHolds() {
 		List<HoldView> holds = ts.getHolds();
+		Collections.sort(holds, new Comparator<HoldView>() {
+			@Override
+			public int compare(HoldView o1, HoldView o2) {
+				return (o2.getStatus()).compareTo(o1.getStatus());
+			}
+		});	
 		return new ResponseContent<List<HoldView>>(ResponseEnum.SUCCESS, holds);
 	}
 
@@ -73,30 +110,27 @@ public class TurtleApi{
 	 * 突破时(status=2)，hlgap最小的50个
 	 * 蓄势时(status=1)，nhgap最小的50个
 	 */
-	@GetMapping("/preys")
-	public ResponseContent<List<PreyView>> getPreys() {
+	@GetMapping("/turtle/preys")
+	public ResponseContent<List<TurtleView>> getPreys() {
 		//System.out.println("status" + status);
-		List<PreyView> preys = ts.getPreys();
+		List<TurtleView> preys = ts.getPreys();
 		
-		Collections.sort(preys, new Comparator<PreyView>() {
+		Collections.sort(preys, new Comparator<TurtleView>() {
 			@Override
-			public int compare(PreyView o1, PreyView o2) {
+			public int compare(TurtleView o1, TurtleView o2) {
 				BigDecimal hl1 = new BigDecimal(o1.getHlgap());
 				BigDecimal hl2 = new BigDecimal(o2.getHlgap());
-				BigDecimal nh1 = new BigDecimal(o1.getNhgap());
-				BigDecimal nh2 = new BigDecimal(o2.getNhgap());
-				
-				if(hl1.equals(hl2)) {
-					return (nh2).compareTo(nh1);
-				}else {
+				if(o1.getStatus().equals(o2.getStatus())) {
 					return (hl1).compareTo(hl2);
+				}else {
+					return (o2.getStatus()).compareTo(o1.getStatus());
 				}
 			}
 		});	
 		
 		int count = Math.min(preys.size(), 50);
 		
-		return new ResponseContent<List<PreyView>>(ResponseEnum.SUCCESS, preys.subList(0, count));
+		return new ResponseContent<List<TurtleView>>(ResponseEnum.SUCCESS, preys.subList(0, count));
 	}
 	
 	@GetMapping("/kdatas/{itemID}")

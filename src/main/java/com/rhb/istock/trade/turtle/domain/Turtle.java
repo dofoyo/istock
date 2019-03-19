@@ -9,10 +9,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
 import com.rhb.istock.fund.Account;
-import com.rhb.istock.kdata.Kdata;
 
 /*
  * 按照海龟的标准版本，突破上轨买入，跌破下轨卖出
@@ -97,21 +95,20 @@ public class Turtle {
 		tdatas = new HashMap<String,Tdata>();
 	}
 	
-	public void addBar(String itemID,LocalDate date, BigDecimal open, BigDecimal high, BigDecimal low, BigDecimal close) {
+	public void addDailyData(String itemID,LocalDate date, BigDecimal open, BigDecimal high, BigDecimal low, BigDecimal close) {
 		Tdata tdata = tdatas.get(itemID);
 		if(tdata == null) {
 			tdata = new Tdata(itemID,openDuration,dropDuration);
 			tdatas.put(itemID, tdata);
 		}
 		tdata.addBar(date,open,high,low,close);
-		
 	}
 	
 	/*
-	 * setLatestBar很重要
+	 * 此方法很重要
 	 * 其修改了account的endDate和price，为doit中的stop、drop、open以及getValue等提供了date和price
 	 */
-	public boolean setLatestBar(String itemID,LocalDate date, BigDecimal open, BigDecimal high, BigDecimal low, BigDecimal close) {
+	public boolean addLatestData(String itemID,LocalDate date, BigDecimal open, BigDecimal high, BigDecimal low, BigDecimal close) {
 		Tdata tdata = tdatas.get(itemID);
 		if(tdata == null) {
 			System.out.println(" ERROR: tdata is null!");
@@ -123,21 +120,26 @@ public class Turtle {
 		return true;
 	}
 
-	public Feature getFeature(String itemID){
+	public Tfeature getFeature(String itemID){
 		Tdata tdata = tdatas.get(itemID);
 		if(tdata==null) {
 			System.out.println("can Not get feature, for " + itemID + " do not in tdatas.");
 			return null;
 		}
-		return tdatas.get(itemID).getFeature();
-	}
-
-	public List<Tbar> getTbars(String itemID){
-		Tdata tdata = tdatas.get(itemID);
-		return tdata.getTbars();
+		return tdata.getFeature();
 	}
 	
-	public Tbar getLatestBar(String itemID) {
+
+	public List<Tbar> getDailyDatas(String itemID){
+		Tdata tdata = tdatas.get(itemID);
+		if(tdata==null) {
+			return null;
+		}else {
+			return tdata.getTbars();
+		}
+	}
+	
+	public Tbar getLatestData(String itemID) {
 		Tdata tdata = tdatas.get(itemID);
 		return tdata.getLatestBar();
 	}
@@ -146,8 +148,8 @@ public class Turtle {
 	 * 
 	 */
 	public void doIt() {
-		Feature f;
-		List<Feature> features = new ArrayList<Feature>();
+		Tfeature f;
+		List<Tfeature> features = new ArrayList<Tfeature>();
 		for(Tdata tdata : tdatas.values()) {
 			f = tdata.getFeature();
 			if(f != null) {
@@ -157,9 +159,9 @@ public class Turtle {
 		
 		if(features.size()==0) return;
 		
-		Collections.sort(features, new Comparator<Feature>() {
+		Collections.sort(features, new Comparator<Tfeature>() {
 			@Override
-			public int compare(Feature o1, Feature o2) {
+			public int compare(Tfeature o1, Tfeature o2) {
 				if(o1.getHlgap().equals(o2.getHlgap())) {
 					return o2.getNhgap().compareTo(o1.getNhgap());
 				}else {
@@ -168,7 +170,7 @@ public class Turtle {
 			}
 		});
 		
-		for(Feature feature : features) {
+		for(Tfeature feature : features) {
 			doIt(feature.getItemID());
 		}
 	}
@@ -209,7 +211,7 @@ public class Turtle {
 	private void doDoubleStop(String itemID) {
 		Tdata tdata = tdatas.get(itemID);
 		
-		Feature feature = tdata.getFeature();
+		Tfeature feature = tdata.getFeature();
 		System.out.println(feature); //--------------
 
 		Integer lots = account.getLots(tdata.getItemID());
@@ -238,7 +240,7 @@ public class Turtle {
 	private void doStop(String itemID) {
 		Tdata tdata = tdatas.get(itemID);
 		
-		Feature feature = tdata.getFeature();
+		Tfeature feature = tdata.getFeature();
 		System.out.println(feature); //--------------
 
 		Integer lots = account.getLots(tdata.getItemID());
@@ -261,7 +263,7 @@ public class Turtle {
 	
 	private void doDrop(String itemID) {
 		Tdata tdata = tdatas.get(itemID);
-		Feature feature = tdata.getFeature();
+		Tfeature feature = tdata.getFeature();
 		Integer lots = account.getLots(tdata.getItemID());
 		if(lots>0 && feature.getStatus()<0) {
 			System.out.println("the lots " + lots + ">0, and status is "+feature.getStatus()+", do drop!!");//--------------
@@ -273,7 +275,7 @@ public class Turtle {
 	
 	private void doReopen(String itemID) {
 		Tdata tdata = tdatas.get(itemID);
-		Feature feature = tdata.getFeature();
+		Tfeature feature = tdata.getFeature();
 		Integer lots = account.getLots(tdata.getItemID());
 		if(feature.getStatus()==2 && lots>0 && lots<maxOfLot) {
 			System.out.println("the lots " + lots + ">0, and < "+ maxOfLot +", should do reopen?");//--------------
@@ -284,9 +286,9 @@ public class Turtle {
 			BigDecimal reopenPrice = account.getLatestOpenPrice(itemID).add(half_atr);
 			if(reopenPrice.compareTo(now)==-1) {
 				System.out.println("reopenPrice "+ reopenPrice +" below now price "+now+", do reopen!!");
-				Integer unit = getPositionUnit(feature.getAtr(),getLot(itemID),deficitFactor);
+				Integer unit = getPositionUnit(feature.getAtr(),getQuantityPerHand(itemID),deficitFactor);
 				//Integer quantity = getLot(itemID).multiply(new BigDecimal(unit)).intValue();
-				Integer quantity = getQuantity(feature.getAtr(),getLot(itemID),deficitFactor,feature.getNow());
+				Integer quantity = getQuantity(feature.getAtr(),getQuantityPerHand(itemID),deficitFactor,feature.getNow());
 				account.reopen(itemID, quantity);
 				System.out.println("cash=" + account.getCash());
 			}else {
@@ -298,11 +300,11 @@ public class Turtle {
 	
 	private void doOpen(String itemID) {
 		Tdata tdata = tdatas.get(itemID);
-		Feature feature = tdata.getFeature();
+		Tfeature feature = tdata.getFeature();
 		Integer lots = account.getLots(tdata.getItemID());
 		if(feature.getStatus()==2 && lots==0 && feature.getHlgap()<=gap) {
 			System.out.println("do open");//--------------
-			Integer quantity = getQuantity(feature.getAtr(),getLot(itemID),deficitFactor,feature.getNow());
+			Integer quantity = getQuantity(feature.getAtr(),getQuantityPerHand(itemID),deficitFactor,feature.getNow());
 			account.open(itemID, quantity);
 			System.out.println("cash=" + account.getCash());
 		}
@@ -348,10 +350,10 @@ public class Turtle {
 	
 	/*
 	 *
-	 * 一手的数量，股票是100股，螺纹钢是10吨，...
+	 * 每一手的数量，股票是100股，螺纹钢是10吨，...
 	 * 目前只针对股票
 	 */
-	private BigDecimal getLot(String articleID) {
+	private BigDecimal getQuantityPerHand(String itemID) {
 		return new BigDecimal(100);
 	}
 

@@ -240,8 +240,6 @@ public class KdataSpiderTushare implements KdataSpider {
 		System.out.println("用时：" + used + "秒");          
 		
 	}
-	
-	
 
 
 }

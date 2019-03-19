@@ -11,7 +11,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.rhb.istock.trade.turtle.operation.api.HoldView;
 import com.rhb.istock.trade.turtle.operation.api.KdatasView;
-import com.rhb.istock.trade.turtle.operation.api.PreyView;
+import com.rhb.istock.trade.turtle.operation.api.TurtleView;
 import com.rhb.istock.trade.turtle.operation.service.TurtleOperationService;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -20,6 +20,20 @@ public class TurtleOperationServiceTest {
 	@Autowired
 	@Qualifier("turtleOperationServiceImp")
 	TurtleOperationService turtleService;
+
+	
+	//@Test
+	public void getAvTops() {
+		List<TurtleView> views = turtleService.getAvTops(50);
+		for(TurtleView view : views) {
+			System.out.println(view);
+		}		
+	}
+	
+	@Test
+	public void generateAvTops() {
+		turtleService.generateAvTops();
+	}
 	
 	//@Test
 	public void testGetHolds() {
@@ -36,14 +50,14 @@ public class TurtleOperationServiceTest {
 	
 	//@Test
 	public void test() {
-		List<PreyView> preys = turtleService.getPreys();
-		for(PreyView prey : preys) {
+		List<TurtleView> preys = turtleService.getPreys();
+		for(TurtleView prey : preys) {
 			System.out.println(prey);
 		}
 		System.out.println("There are " + preys.size() + " preys");
 	}
 	
-	@Test
+	//@Test
 	public void testGetKdatas() {
 		String itemID = "sh600919";
 		KdatasView view = turtleService.getKdatas(itemID);

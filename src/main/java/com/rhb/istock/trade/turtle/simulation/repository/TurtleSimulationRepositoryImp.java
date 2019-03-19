@@ -24,8 +24,8 @@ import com.rhb.istock.kdata.Kdata;
 import com.rhb.istock.kdata.KdataService;
 import com.rhb.istock.trade.turtle.simulation.DailyItem;
 
-@Service("simulationRepositoryImp")
-public class SimulationRepositoryImp implements SimulationRepository {
+@Service("turtleSimulationRepositoryImp")
+public class TurtleSimulationRepositoryImp implements TurtleSimulationRepository {
 	@Value("${dailyAmountTopsFile}")
 	private String dailyAmountTopsFile;
 
@@ -208,7 +208,5 @@ public class SimulationRepositoryImp implements SimulationRepository {
 		FileUtil.writeTextFile(avarageAmountTopsFile, sb.toString(), false);
 
 	}
-
-
 	
 }

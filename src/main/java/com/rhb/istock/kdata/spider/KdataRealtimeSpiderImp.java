@@ -7,6 +7,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 
 import com.rhb.istock.comm.util.HttpClient;
@@ -75,6 +77,37 @@ public class KdataRealtimeSpiderImp implements KdataRealtimeSpider{
 		sb.deleteCharAt(sb.length()-1);
 		
 		return ids;
+	}
+
+
+	@Override
+	public List<LocalDate> getCalendar(LocalDate startDate) throws Exception {
+		List<LocalDate> dates = new ArrayList<LocalDate>();
+		String url = "http://api.tushare.pro";
+		JSONObject args = new JSONObject();
+		args.put("api_name", "trade_cal");
+		args.put("token", "175936caa4637bc9ac8e5e75ac92eff6887739ca6be771b81653f278");
+		
+		JSONObject params = new JSONObject();
+		params.put("start_date", startDate.format(DateTimeFormatter.ofPattern("yyyyMMdd")));
+		
+		args.put("params", params);
+		
+		String str = HttpClient.doPostJson(url, args.toString());
+		JSONArray items = (new JSONObject(str)).getJSONObject("data").getJSONArray("items");
+		Integer isOpen;
+		if(items.length()>0) {
+			JSONArray item;
+			for(int i=1; i<items.length(); i++) {
+				item = items.getJSONArray(i);
+				isOpen = item.getInt(2);
+				if(isOpen==1) {
+					dates.add(LocalDate.parse(item.getString(1),DateTimeFormatter.ofPattern("yyyyMMdd")));
+				}
+			}
+		}
+		
+		return dates;
 	}
 	
 }

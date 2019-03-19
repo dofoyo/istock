@@ -2,7 +2,7 @@ spring:
   profiles: 
     active: dev
 server:
-  port: 8088
+  port: 6088
  
  #配置日志
 logging:
