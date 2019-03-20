@@ -39,7 +39,7 @@ public class KdataRealtimeSpiderImp implements KdataRealtimeSpider{
 		String result = HttpClient.doGet(url);
 		
 		String[] ss = result.split("~");
-		if(!ss[3].equals("0.00")) {
+		if(ss.length>4 && !ss[3].equals("0.00")) {
 			map = new HashMap<String,String>();
 			map.put("dateTime", LocalDate.parse(ss[30].substring(0, 8),DateTimeFormatter.ofPattern("yyyyMMdd")).toString());
 			map.put("itemID", id);

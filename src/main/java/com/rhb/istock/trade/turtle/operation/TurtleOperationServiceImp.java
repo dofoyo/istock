@@ -1,4 +1,4 @@
-package com.rhb.istock.trade.turtle.operation.service;
+package com.rhb.istock.trade.turtle.operation;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
@@ -21,6 +21,7 @@ import com.rhb.istock.kdata.Kbar;
 import com.rhb.istock.kdata.Kdata;
 import com.rhb.istock.kdata.KdataService;
 import com.rhb.istock.kdata.spider.KdataRealtimeSpider;
+import com.rhb.istock.selector.bluechip.BluechipService;
 import com.rhb.istock.trade.turtle.domain.Tfeature;
 import com.rhb.istock.trade.balloon.operation.repository.BalloonOperationRepository;
 import com.rhb.istock.trade.turtle.domain.Tbar;
@@ -53,8 +54,9 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 	KdataRealtimeSpider kdataRealtimeSpider;
 
 	@Autowired
-	@Qualifier("balloonOperationRepositoryImp")
-	BalloonOperationRepository balloonOperationRepository;
+	@Qualifier("bluechipServiceImp")
+	BluechipService bluechipService;
+	
 	
 	Turtle turtle = null;
 	
@@ -416,11 +418,13 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 		Item item;
 		
 		Tfeature feature;
-		List<String> ids = balloonOperationRepository.getBluechipIDs();
+		List<String> ids = bluechipService.getBluechipIDs(LocalDate.now());
 		
 		int i=1;
 		for(String id : ids) {
 			Progress.show(ids.size(),i++,id);
+			
+			id = id.replaceAll("\r|\n", "");
 			
 			if(this.setLatestKdata(id,true)) {
 				feature = turtle.getFeature(id);

@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.rhb.istock.comm.api.ResponseContent;
 import com.rhb.istock.comm.api.ResponseEnum;
-import com.rhb.istock.trade.balloon.operation.service.BalloonOperationService;
+import com.rhb.istock.trade.balloon.operation.BalloonOperationService;
 
 @RestController
 public class BalloonApi{

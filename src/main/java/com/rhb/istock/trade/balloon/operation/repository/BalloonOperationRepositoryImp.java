@@ -14,7 +14,7 @@ public class BalloonOperationRepositoryImp implements BalloonOperationRepository
 	private String bluechipsFile;
 	
 	
-	@Override
+	//@Override
 	public List<String> getBluechipIDs() {
 		String[] ids = FileUtil.readTextFile(bluechipsFile).split(",");
 		return Arrays.asList(ids);

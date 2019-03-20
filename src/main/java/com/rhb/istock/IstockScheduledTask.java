@@ -5,10 +5,12 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import com.rhb.istock.fdata.FinancialStatementService;
 import com.rhb.istock.item.repository.ItemRepository;
 import com.rhb.istock.item.spider.ItemSpider;
 import com.rhb.istock.kdata.KdataService;
-import com.rhb.istock.trade.turtle.operation.service.TurtleOperationService;
+import com.rhb.istock.selector.bluechip.BluechipService;
+import com.rhb.istock.trade.turtle.operation.TurtleOperationService;
 
 @Component
 public class IstockScheduledTask {
@@ -28,27 +30,40 @@ public class IstockScheduledTask {
 	@Qualifier("turtleOperationServiceImp")
 	TurtleOperationService turtleOperationService;
 	
+	@Autowired
+	@Qualifier("financialStatementServiceImp")
+	FinancialStatementService financialStatementService;
+
+	@Autowired
+	@Qualifier("bluechipServiceImp")
+	BluechipService bluechipService;
 	
 	/*
-	 * 每周1至5，9:00,开盘前，
+	 * 每周1至5，9:30,开盘后，
 	 * 1、下载最新股票代码
 	 * 2、下载上一交易日收盘后的K线数据
 	 * 3、初始化: 即把日K线读入内存
 	 */
-	@Scheduled(cron="0 0 9 ? * 1-5") 
+	@Scheduled(cron="0 30 9 ? * 1-5") 
 	public void dailyInit() throws Exception {
 		itemSpider.download();
 		kdataService.downKdatas();
 		turtleOperationService.init();
+		turtleOperationService.generateAvTops();
 	}
 	
 	/*
 	 * 每周1至5，9:40 -- 15，每10分钟，生成preys
 	 */
-	@Scheduled(cron="0 45/15 9-15 ? * 1-5")  //
+	@Scheduled(cron="0 40/10 9-15 ? * 1-5")  //
 	public void generatePreys() {
 		turtleOperationService.generatePreys();
-		turtleOperationService.generateAvTops();
+	}
+	
+	@Scheduled(cron="0 0 5 ? * *") //每日凌晨5点，下载最新年报，并生成bluechip
+	public void downloadReports() {
+		financialStatementService.downloadReports();
+		bluechipService.generateBluechip();
 	}
 
 }

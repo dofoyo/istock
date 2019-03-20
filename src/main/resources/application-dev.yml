@@ -8,8 +8,8 @@ preysFile: D:/dev/istock-data/preys.csv
 favorsFile: D:/dev/istock-data/favors.txt
 dailyAmountTopsFile: D:/dev/istock-data/dailyAmountTops.txt
 avarageAmountTopsFile: D:/dev/istock-data/avarageAmountTops.txt
-bluechipsFile: D:/dev/istock-data/bluechips.txt
-
+bluechipsFile: D:/dev/istock-data/bluechips.json
+fdataPath: D:/dev/istock-data/fdata/
 
 
 
