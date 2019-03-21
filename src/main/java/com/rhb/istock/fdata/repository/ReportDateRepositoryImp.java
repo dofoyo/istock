@@ -81,7 +81,7 @@ public class ReportDateRepositoryImp implements ReportDateRepository{
 		}
 		
 		if(codeYearDates.get(stockcode)==null){
-			System.out.println(stockcode + " has no reportDate!!!");
+			//System.out.println(stockcode + " has no reportDate!!!");
 			return null;
 		}else {
 			return codeYearDates.get(stockcode);

@@ -41,8 +41,8 @@ public class BluechipEntity {
 		return reportDates;
 	}
 
-	public void setReportDates(Map<Integer, String> reportDates) {
-		this.reportDates = reportDates;
+	public void addReportDate(Integer year, String date) {
+		this.reportDates.put(year, date);
 	}
 
 	public Set<Integer> getOkYears() {
@@ -66,10 +66,6 @@ public class BluechipEntity {
 			sb.append(",");
 		}
 		return sb.toString();
-	}
-
-	public void setOkYears(Set<Integer> okYears) {
-		this.okYears = okYears;
 	}
 
 	public String getIpoDate() {

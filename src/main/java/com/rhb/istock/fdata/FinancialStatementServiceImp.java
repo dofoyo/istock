@@ -3,8 +3,6 @@ package com.rhb.istock.fdata;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -39,105 +37,21 @@ public class FinancialStatementServiceImp implements FinancialStatementService {
 	@Qualifier("downloadFinancialStatementsFromSina")
 	DownloadFinancialStatements downloadFinancialStatements;
 	
-	Map<String,FinancialStatement> financialStatements = new HashMap<String,FinancialStatement>();
-	
 	private String out = "000527,600840,002710,600631,000522,601206,600005";
-
 	
 	@Override
-	public boolean isOk(String stockcode, Integer year) {
+	public FinancialStatement getFinancialStatement(String stockcode) {
 		if(out.indexOf(stockcode)!=-1){
-			return false;
-		}
-		if(!financialStatements.containsKey(stockcode)){
-			setFinancialStatement(stockcode);
-		}
+			return null;
+		}	
 		
-		boolean flag = false;
-		
-		FinancialStatement fs = financialStatements.get(stockcode);
-		if(fs!=null){
-			flag = fs.isOK(year);
-		}		
-		return flag;
-	}
-	
-	@Override
-	public List<Integer> getPeriods(String stockcode){
-		if(!financialStatements.containsKey(stockcode)){
-			setFinancialStatement(stockcode);
-		}
-		List<Integer> years = null;
-		FinancialStatement fs = financialStatements.get(stockcode);
-		if(fs!=null){
-			years = fs.getPeriods();
-		}
-		
-		return years;
-		
-	}
-	
-	
-	private void setFinancialStatement(String stockcode) {
-		//System.out.println("setFinancialStatement of  " + stockcode);
 		FinancialStatement fs = new FinancialStatement();
 		fs.setBalancesheets(financeStatementsRepository.getBalanceSheets(stockcode));
 		fs.setCashflows(financeStatementsRepository.getCashFlows(stockcode));
 		fs.setProfitstatements(financeStatementsRepository.getProfitStatements(stockcode));
-		financialStatements.put(stockcode, fs);
-		//stock.refreshFinancialStatements();
-
+		return fs;
 	}
-
-
-	@Override
-	public Map<Integer, String> getOks(String stockcode) {
-		Map<Integer, String> oks  = new HashMap<Integer, String>();
-		
-		if(!financialStatements.containsKey(stockcode)){
-			setFinancialStatement(stockcode);
-		}
-		
-		FinancialStatement fs = financialStatements.get(stockcode);
-
-				
-		Map<Integer, String> reportdates = reportDateRepository.getReportDates(stockcode);
-		for(Map.Entry<Integer, String> entry : reportdates.entrySet()){
-			if(fs.isOK(entry.getKey())){
-				oks.put(entry.getKey(), entry.getValue());
-			}
-		}
-		
-		return oks;
-	}
-
-
-	@Override
-	public List<OkfinanceStatementDto> getOks() {
-		List<OkfinanceStatementDto> dtos = new LinkedList<OkfinanceStatementDto>();
-		List<Integer> years;
-		Set<String> codes = financeStatementsRepository.getReportedStockcode();
-		int i=0;
-		for(String code : codes){
-			System.out.print(i++ + "/" + codes.size() + " codes.size" + "\r");
-
-			years = this.getPeriods(code);
-			for(Integer year : years){
-				if(this.isOk(code, year)){
-					String reportDate = reportDateRepository.getReportDate(code, year);
-					OkfinanceStatementDto dto = new OkfinanceStatementDto();
-					dto.setStockcode(code);
-					dto.setYear(year);
-					dto.setReportdate(reportDate==null ? null : reportDate.toString());
-					dtos.add(dto);
-					//System.out.println(dto);
-				}
-			}
-		}
-		
-		return dtos;
-	}
-
+	
 	@Override
 	public void downloadReports() {
 		LocalDate today = LocalDate.now();
@@ -170,6 +84,20 @@ public class FinancialStatementServiceImp implements FinancialStatementService {
 			System.out.println(Thread.currentThread().getName() + ":  下载年报任务完成.............");
 		}		
 	}
-	
+
+	@Override
+	public Set<String> getReportedStockCodes() {
+		return financeStatementsRepository.getReportedStockcode();
+	}
+
+	@Override
+	public Map<Integer, String> getReportDates(String stockcode) {
+		return reportDateRepository.getReportDates(stockcode);
+	}
+
+	//@Override
+	public String getReportDate(String stockcode, Integer year) {
+		return reportDateRepository.getReportDate(stockcode, year);
+	}
 
 }
