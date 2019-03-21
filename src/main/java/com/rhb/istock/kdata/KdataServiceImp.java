@@ -97,18 +97,19 @@ public class KdataServiceImp implements KdataService{
 
 	@Override
 	public void downKdatas() throws Exception {
+		System.out.println("KdataService.downKdatas..........");
 		LocalDate latestDate = kdataRealtimeSpider.getLatestMarketDate();
 		LocalDate latestDownDate = kdataRepository.getLatestDate();
-		List<LocalDate> dates = kdataRealtimeSpider.getCalendar(latestDownDate);
+		List<LocalDate> dates = kdataRealtimeSpider.getCalendar(latestDownDate,latestDate);
+		
+		System.out.println("latest trade date " + latestDate);
+		System.out.println("latest down date " + latestDownDate);
+		System.out.println("dates bewteen latest trade date and down date " + dates);
 		
 		for(LocalDate date : dates) {
-			if(date.isBefore(latestDate)) {
-				System.out.println("download "+ date +" kdatas from tushare, please wait....... ");
-				kdataSpider.downKdata(date);
-				System.out.println("downloaded "+ date +" kdatas from tushare.");
-			}else {
-				break;
-			}
+			System.out.println("download "+ date +" kdatas from tushare, please wait....... ");
+			kdataSpider.downKdata(date);
+			System.out.println("downloaded "+ date +" kdatas from tushare.");
 		}
 	}
 

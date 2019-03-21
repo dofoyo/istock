@@ -81,7 +81,7 @@ public class KdataRealtimeSpiderImp implements KdataRealtimeSpider{
 
 
 	@Override
-	public List<LocalDate> getCalendar(LocalDate startDate) throws Exception {
+	public List<LocalDate> getCalendar(LocalDate startDate, LocalDate endDate) throws Exception {
 		List<LocalDate> dates = new ArrayList<LocalDate>();
 		String url = "http://api.tushare.pro";
 		JSONObject args = new JSONObject();
@@ -96,13 +96,19 @@ public class KdataRealtimeSpiderImp implements KdataRealtimeSpider{
 		String str = HttpClient.doPostJson(url, args.toString());
 		JSONArray items = (new JSONObject(str)).getJSONObject("data").getJSONArray("items");
 		Integer isOpen;
+		LocalDate date;
 		if(items.length()>0) {
 			JSONArray item;
 			for(int i=1; i<items.length(); i++) {
 				item = items.getJSONArray(i);
 				isOpen = item.getInt(2);
 				if(isOpen==1) {
-					dates.add(LocalDate.parse(item.getString(1),DateTimeFormatter.ofPattern("yyyyMMdd")));
+					date = LocalDate.parse(item.getString(1),DateTimeFormatter.ofPattern("yyyyMMdd"));
+					if(date.isBefore(endDate)) {
+						dates.add(date);
+					}else {
+						break;
+					}
 				}
 			}
 		}
