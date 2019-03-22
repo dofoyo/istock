@@ -2,7 +2,6 @@ package com.rhb.istock.kdata;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
 
 public interface KdataService {
 	/*
@@ -15,11 +14,8 @@ public interface KdataService {
 	
 	public LocalDate getLatestMarketDate(); 
 	public Kbar getLatestMarketData(String itemID);
+	public List<String> getLatestDailyTop(Integer top); 
 	
 	public void downKdatas()  throws Exception ;
-	
-	
-	public List<String> getDailyAverageAmountTops(Integer top);
-	public void generateDailyAverageAmountTops(List<String> itemIDs, Integer duration);
 
 }

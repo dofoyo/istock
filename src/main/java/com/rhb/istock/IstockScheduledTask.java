@@ -9,7 +9,7 @@ import com.rhb.istock.fdata.FinancialStatementService;
 import com.rhb.istock.item.repository.ItemRepository;
 import com.rhb.istock.item.spider.ItemSpider;
 import com.rhb.istock.kdata.KdataService;
-import com.rhb.istock.selector.bluechip.BluechipService;
+import com.rhb.istock.selector.SelectorService;
 import com.rhb.istock.trade.turtle.operation.TurtleOperationService;
 
 @Component
@@ -35,8 +35,9 @@ public class IstockScheduledTask {
 	FinancialStatementService financialStatementService;
 
 	@Autowired
-	@Qualifier("bluechipServiceImp")
-	BluechipService bluechipService;
+	@Qualifier("selectorServiceImp")
+	SelectorService selectorService;
+	
 	
 	/*
 	 * 每周1至5，9:30,开盘后，
@@ -49,21 +50,14 @@ public class IstockScheduledTask {
 		itemSpider.download();
 		kdataService.downKdatas();
 		turtleOperationService.init();
-		turtleOperationService.generateAvTops();
-	}
-	
-	/*
-	 * 每周1至5，9:40 -- 15，每10分钟，生成preys
-	 */
-	@Scheduled(cron="0 40/10 9-15 ? * 1-5")  //
-	public void generatePreys() {
-		turtleOperationService.generatePreys();
+		selectorService.generateAverageAmountTops();
+		selectorService.generateHighLowTops();
 	}
 	
 	@Scheduled(cron="0 0 5 ? * *") //每日凌晨5点，下载最新年报，并生成bluechip
 	public void downloadReports() {
 		financialStatementService.downloadReports();
-		bluechipService.generateBluechip();
+		selectorService.generateBluechip();
 	}
 
 }

@@ -13,17 +13,13 @@ import com.rhb.istock.item.ItemService;
 import com.rhb.istock.kdata.Kbar;
 import com.rhb.istock.kdata.Kdata;
 import com.rhb.istock.kdata.KdataService;
-import com.rhb.istock.selector.bluechip.BluechipService;
+import com.rhb.istock.selector.SelectorService;
 import com.rhb.istock.trade.balloon.domain.Balloon;
 import com.rhb.istock.trade.balloon.domain.Bfeature;
 import com.rhb.istock.trade.balloon.operation.api.BluechipView;
-import com.rhb.istock.trade.balloon.operation.repository.BalloonOperationRepository;
 
 @Service("balloonOperationServiceImp")
 public class BalloonOperationServiceImp implements BalloonOperationService {
-	@Autowired
-	@Qualifier("balloonOperationRepositoryImp")
-	BalloonOperationRepository balloonOperationRepository;
 	
 	@Autowired
 	@Qualifier("kdataServiceImp")
@@ -34,8 +30,8 @@ public class BalloonOperationServiceImp implements BalloonOperationService {
 	ItemService itemService;
 	
 	@Autowired
-	@Qualifier("bluechipServiceImp")
-	BluechipService bluechipService;
+	@Qualifier("selectorServiceImp")
+	SelectorService selectorService;
 	
 	Balloon balloon = null;
 	
@@ -49,7 +45,7 @@ public class BalloonOperationServiceImp implements BalloonOperationService {
 		Item item;
 		Bfeature feature;
 		
-		List<String> itemIDs = bluechipService.getBluechipIDs(LocalDate.now());
+		List<String> itemIDs = selectorService.getBluechipIDs(LocalDate.now());
 		for(String itemID : itemIDs) {
 			itemID = itemID.replaceAll("\r|\n", "");
 			

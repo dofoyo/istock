@@ -286,7 +286,7 @@ public class Turtle {
 			BigDecimal reopenPrice = account.getLatestOpenPrice(itemID).add(half_atr);
 			if(reopenPrice.compareTo(now)==-1) {
 				System.out.println("reopenPrice "+ reopenPrice +" below now price "+now+", do reopen!!");
-				Integer unit = getPositionUnit(feature.getAtr(),getQuantityPerHand(itemID),deficitFactor);
+				//Integer unit = getPositionUnit(feature.getAtr(),getQuantityPerHand(itemID),deficitFactor);
 				//Integer quantity = getLot(itemID).multiply(new BigDecimal(unit)).intValue();
 				Integer quantity = getQuantity(feature.getAtr(),getQuantityPerHand(itemID),deficitFactor,feature.getNow());
 				account.reopen(itemID, quantity);

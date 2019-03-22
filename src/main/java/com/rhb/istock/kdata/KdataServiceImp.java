@@ -141,15 +141,8 @@ public class KdataServiceImp implements KdataService{
 	}
 
 	@Override
-	public List<String> getDailyAverageAmountTops(Integer top) {
-		List<String> ids = kdataRepository.getDailyAverageAmountTops();
-		return ids.subList(0, Math.min(top, ids.size()));
+	public List<String> getLatestDailyTop(Integer top) {
+		return kdataRealtimeSpider.getLatestDailyTop(top);
 	}
-
-	@Override
-	public void generateDailyAverageAmountTops(List<String> itemIDs, Integer duration) {
-		kdataRepository.generateDailyAverageAmountTops(itemIDs, duration);
-	}
-
 
 }

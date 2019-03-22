@@ -10,8 +10,6 @@ import com.rhb.istock.fdata.CashFlow;
 import com.rhb.istock.fdata.ProfitStatement;
 
 public class FinancialReport {
-	private String stockcode;
-	
 	private Map<String,BalanceSheet> balancesheets;
 	private Map<String,CashFlow> cashflows;
 	private Map<String,ProfitStatement> profitstatements;

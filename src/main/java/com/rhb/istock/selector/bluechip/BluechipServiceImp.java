@@ -113,7 +113,7 @@ public class BluechipServiceImp implements BluechipService {
 		LocalDate date;
 		int i=0;
 		for(BluechipEntity entity : entities){
-			Progress.show(entities.size(), i++, entity.toString());
+			Progress.show(entities.size(), i++, entity.getCode());
 			
 			bluechip = new Bluechip();
 			bluechip.setCode(entity.getCode());

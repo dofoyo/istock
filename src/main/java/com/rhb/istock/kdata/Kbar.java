@@ -1,8 +1,6 @@
 package com.rhb.istock.kdata;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.Map;
 
 public class Kbar {
 	private BigDecimal open;

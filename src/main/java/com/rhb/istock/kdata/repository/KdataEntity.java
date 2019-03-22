@@ -3,7 +3,6 @@ package com.rhb.istock.kdata.repository;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Map;
-import java.util.NavigableSet;
 import java.util.TreeMap;
 
 public class KdataEntity {
@@ -26,22 +25,6 @@ public class KdataEntity {
 	public LocalDate getLatestDate() {
 		TreeMap<LocalDate,KbarEntity> bs = (TreeMap<LocalDate,KbarEntity>)this.bars;
 		return bs.lastKey();
-	}
-	
-	public BigDecimal getAvarageAmount(Integer count) {
-		BigDecimal total = new BigDecimal(0);
-		NavigableSet<LocalDate> dates = this.bars.descendingKeySet();
-		int i=0;
-		for(LocalDate date : dates) {
-			//System.out.println(date);
-			if(i++ < count) {
-				total = total.add(this.bars.get(date).getAmount());
-			}else {
-				break;
-			}
-		}
-		
-		return total.divide(new BigDecimal(count),BigDecimal.ROUND_HALF_UP);
 	}
 	
 	public KbarEntity getBar(LocalDate date){

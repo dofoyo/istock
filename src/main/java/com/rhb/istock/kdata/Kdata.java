@@ -5,15 +5,51 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.NavigableSet;
 import java.util.TreeMap;
 
 public class Kdata {
 	private String itemID;
-	private Map<LocalDate,Kbar> bars;
+	private TreeMap<LocalDate,Kbar> bars;
 
 	public Kdata(String itemID) {
 		this.itemID = itemID;
 		this.bars = new TreeMap<LocalDate,Kbar>();
+	}
+	
+	public BigDecimal getAvarageAmount(Integer count) {
+		BigDecimal total = new BigDecimal(0);
+		NavigableSet<LocalDate> dates = this.bars.descendingKeySet();
+		int i=0;
+		for(LocalDate date : dates) {
+			//System.out.println(date);
+			if(i++ < count) {
+				total = total.add(this.bars.get(date).getAmount());
+			}else {
+				break;
+			}
+		}
+		
+		return total.divide(new BigDecimal(count),BigDecimal.ROUND_HALF_UP);
+	}
+
+	
+	public Integer getHighLowGap(Integer count) {
+		BigDecimal high = new BigDecimal(0);
+		BigDecimal low = new BigDecimal(10000);
+		NavigableSet<LocalDate> dates = this.bars.descendingKeySet();
+		int i=0;
+		for(LocalDate date : dates) {
+			if(i++ < count) {
+				high = high.compareTo(this.bars.get(date).getHigh())==-1 ? this.bars.get(date).getHigh() : high;
+				low = low.compareTo(this.bars.get(date).getLow())==1 ? this.bars.get(date).getLow() : low;
+			}else {
+				break;
+			}
+		}
+		BigDecimal rate = high.subtract(low).divide(low,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100));
+
+		return rate.intValue();
 	}
 	
 	public void addBar(LocalDate date,BigDecimal open,BigDecimal high,BigDecimal low,BigDecimal close,BigDecimal amount,BigDecimal quantity) {

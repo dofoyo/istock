@@ -97,16 +97,5 @@ public class KdataRepositorySina implements KdataRepository{
 		return null;
 	}
 
-	@Override
-	public List<String> getDailyAverageAmountTops() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void generateDailyAverageAmountTops(List<String> itemIDs, Integer duration) {
-		// TODO Auto-generated method stub
-		
-	}
 
 }

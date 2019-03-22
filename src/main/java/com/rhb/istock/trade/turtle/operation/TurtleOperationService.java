@@ -23,22 +23,7 @@ public interface TurtleOperationService {
 	public List<TurtleView> getDailyTops(Integer top);
 	public List<TurtleView> getAvTops(Integer top);
 	public List<TurtleView> getBluechips();
-	
-	/*
-	 * 获得不同状态的股票
-	 */
-	public List<TurtleView> getPreys();
-	
-	/*
-	 * 生成股票的状态
-	 * 一般每周1-5，上午9:30 -- 15:00，每5分钟运行一次
-	 */
-	public void generatePreys();
-	
-	/*
-	 * 下载新收盘数据后执行一次
-	 */
-	public void generateAvTops();
+	public List<TurtleView> getHighLowTops(Integer top);
 	
 	
 	/*

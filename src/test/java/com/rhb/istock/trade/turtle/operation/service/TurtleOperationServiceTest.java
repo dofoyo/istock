@@ -29,32 +29,13 @@ public class TurtleOperationServiceTest {
 			System.out.println(view);
 		}		
 	}
-	
-	@Test
-	public void generateAvTops() {
-		turtleService.generateAvTops();
-	}
-	
+
 	//@Test
 	public void testGetHolds() {
 		List<HoldView> views = turtleService.getHolds();
 		for(HoldView view : views) {
 			System.out.println(view);
 		}
-	}
-	
-	//@Test
-	public void testGeneratePreys() {
-		turtleService.generatePreys();
-	}
-	
-	//@Test
-	public void test() {
-		List<TurtleView> preys = turtleService.getPreys();
-		for(TurtleView prey : preys) {
-			System.out.println(prey);
-		}
-		System.out.println("There are " + preys.size() + " preys");
 	}
 	
 	//@Test

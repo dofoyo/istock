@@ -1,7 +1,6 @@
 package com.rhb.istock.trade.turtle.simulation;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 
 public class Option {
 	private BigDecimal deficitFactor;
@@ -11,9 +10,6 @@ public class Option {
 	private BigDecimal initCash;
 	private Integer stopStrategy;
 	private Integer gap;
-	
-	private LocalDate beginDate;
-	private LocalDate endDate;
 
 	public BigDecimal getDeficitFactor() {
 		return deficitFactor;

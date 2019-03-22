@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,33 +15,25 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.rhb.istock.comm.util.FileUtil;
 import com.rhb.istock.comm.util.Progress;
 import com.rhb.istock.item.Item;
 import com.rhb.istock.item.ItemService;
 import com.rhb.istock.kdata.Kbar;
 import com.rhb.istock.kdata.Kdata;
 import com.rhb.istock.kdata.KdataService;
-import com.rhb.istock.kdata.spider.KdataRealtimeSpider;
-import com.rhb.istock.selector.bluechip.BluechipService;
+import com.rhb.istock.selector.SelectorService;
+import com.rhb.istock.selector.hold.HoldEntity;
 import com.rhb.istock.trade.turtle.domain.Tfeature;
-import com.rhb.istock.trade.balloon.operation.repository.BalloonOperationRepository;
 import com.rhb.istock.trade.turtle.domain.Tbar;
 import com.rhb.istock.trade.turtle.domain.Turtle;
 import com.rhb.istock.trade.turtle.operation.api.HoldView;
 import com.rhb.istock.trade.turtle.operation.api.KdatasView;
 import com.rhb.istock.trade.turtle.operation.api.TurtleView;
-import com.rhb.istock.trade.turtle.operation.repository.HoldEntity;
-import com.rhb.istock.trade.turtle.operation.repository.TurtleRepository;
 
 @Service("turtleOperationServiceImp")
 public class TurtleOperationServiceImp implements TurtleOperationService {
 	@Value("${preysFile}")
 	private String preysFile;
-	
-	@Autowired
-	@Qualifier("turtleRepositoryImp")
-	TurtleRepository turtleRepository;
 
 	@Autowired
 	@Qualifier("kdataServiceImp")
@@ -50,13 +44,8 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 	ItemService itemService;
 
 	@Autowired
-	@Qualifier("kdataRealtimeSpiderImp")
-	KdataRealtimeSpider kdataRealtimeSpider;
-
-	@Autowired
-	@Qualifier("bluechipServiceImp")
-	BluechipService bluechipService;
-	
+	@Qualifier("selectorServiceImp")
+	SelectorService selectorService;
 	
 	Turtle turtle = null;
 	
@@ -65,14 +54,6 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 		long beginTime=System.currentTimeMillis(); 
 		System.out.println("TurtleOperationService init...");
 		turtle = new Turtle();
-		//启动时把数据都加载，太耗时。大约6至7分钟
-/*		List<Item> items = itemService.getItems();
-		int i=1;
-		for(Item item : items) {
-			Progress.show(items.size(),i++,item.getItemID());
-			this.setDailyKdata(item.getItemID());
-			this.setLatestKdata(item.getItemID());
-		}*/		
 		System.out.println("TurtleOperationService init done!");
 		
 		long used = (System.currentTimeMillis() - beginTime)/1000; 
@@ -88,7 +69,7 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 		Item item;
 		
 		HoldView hold;
-		List<HoldEntity> entities = turtleRepository.getHolds();
+		List<HoldEntity> entities = selectorService.getHolds();
 		//System.out.println(entities);
 		for(HoldEntity entity : entities) {
 			this.setLatestKdata(entity.getItemID(),true);
@@ -110,87 +91,13 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 			
 			holds.add(hold);
 			
-			//System.out.println(hold);
 		}
 		return holds;
 	}
 
 	@Override
-	public List<TurtleView> getPreys() {
-		List<TurtleView> views = new ArrayList<TurtleView>();
-		
-		Map<String,String> preyMap;
-		String[] columns;
-		String[] lines = FileUtil.readTextFile(preysFile).split("\n");
-		for(int i=1; i<lines.length; i++) {
-			columns = lines[i].split(",");
-			preyMap = new HashMap<String,String>();
-			preyMap.put("itemID", columns[0]);
-			preyMap.put("code", columns[1]);
-			preyMap.put("name", columns[2]);
-			preyMap.put("low", columns[3]);
-			preyMap.put("high", columns[4]);
-			preyMap.put("now", columns[5]);
-			preyMap.put("drop", columns[6]);
-			preyMap.put("hlgap", columns[7]);
-			preyMap.put("nhgap", columns[8]);
-			preyMap.put("atr", columns[9]);	
-			preyMap.put("status", columns[10]);	
-			
-			views.add(new TurtleView(preyMap));
-		}
-		return views;
-	}
-
-	@Override
-	public void generatePreys() {
-		long beginTime=System.currentTimeMillis(); 
-		System.out.println("generate preys ......");
-		DecimalFormat df = new DecimalFormat("0.00"); 
-
-		StringBuffer sb = new StringBuffer();
-		sb.append("itemID,code,name,openLow,openHigh,now,dropLow,hlgap,nhgap,atr,status\n");
-		
-		List<Item> items = itemService.getItems();
-		
-		Tfeature feature;
-		int i=1;
-		for(Item item : items) {
-			Progress.show(items.size(),i++, item.getItemID());
-			
-			if(this.setLatestKdata(item.getItemID(),false)) {
-				feature = turtle.getFeature(item.getItemID());
-				if(feature!=null) {
-					sb.append(item.getItemID());
-					sb.append(",");
-					sb.append(item.getCode());
-					sb.append(",");
-					sb.append(item.getName());
-					sb.append(",");
-					sb.append(feature.getOpenLow());
-					sb.append(",");
-					sb.append(feature.getOpenHigh());
-					sb.append(",");
-					sb.append(feature.getNow());
-					sb.append(",");
-					sb.append(feature.getDropLow());
-					sb.append(",");
-					sb.append(feature.getHlgap());
-					sb.append(",");
-					sb.append(feature.getNhgap());
-					sb.append(",");
-					sb.append(df.format(feature.getAtr()));
-					sb.append(",");
-					sb.append(feature.getStatus());
-					sb.append("\n");
-				}
-			}
-		}
-		FileUtil.writeTextFile(preysFile, sb.toString(), false);
-		System.out.println("generate preys done!");
-		long used = (System.currentTimeMillis() - beginTime)/1000; 
-		System.out.println("用时：" + used + "秒");          
-
+	public List<TurtleView> getHighLowTops(Integer top) {
+		return getTurtleViews(selectorService.getHighLowTops(top));
 	}
 	
 	private void setDailyKdata(String itemID, boolean byCache) {
@@ -251,103 +158,31 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 
 	@Override
 	public List<TurtleView> getFavors() {
-		long beginTime=System.currentTimeMillis(); 
-		System.out.println("getting favors ......");
-		
-		List<TurtleView> views = new ArrayList<TurtleView>();
-		
-		DecimalFormat df = new DecimalFormat("0.00"); 
-		Map<String,String> preyMap;
+		Map<String, String> favors = selectorService.getFavors();
 
-		Tfeature feature;
-		Map<String, String> favors = turtleRepository.getFavors();
+		List<TurtleView> views = getTurtleViews(new ArrayList<String>(favors.keySet()));
 		
-		int i=1;
-		for(String id : favors.keySet()) {
-			Progress.show(favors.size(),i++,id);
-			
-			if(this.setLatestKdata(id,true)) {
-				feature = turtle.getFeature(id);
-				if(feature!=null) {
-					preyMap = new HashMap<String,String>();
-					preyMap.put("itemID", id);
-					preyMap.put("code", id.substring(2));
-					preyMap.put("name", favors.get(id));
-					preyMap.put("low", df.format(feature.getOpenLow()));
-					preyMap.put("high", df.format(feature.getOpenHigh()));
-					preyMap.put("now", df.format(feature.getNow()));
-					preyMap.put("drop", df.format(feature.getDropLow()));
-					preyMap.put("hlgap", feature.getHlgap().toString());
-					preyMap.put("nhgap", feature.getNhgap().toString());
-					preyMap.put("atr", df.format(feature.getAtr()));	
-					preyMap.put("status",feature.getStatus().toString());	
-					
-					views.add(new TurtleView(preyMap));
-
-				}
-			}
+		for(TurtleView view : views) {
+			view.setName(favors.get(view.getItemID()));
 		}
-		System.out.println("get favors done!");
-		long used = (System.currentTimeMillis() - beginTime)/1000; 
-		System.out.println("用时：" + used + "秒");     
 		
 		return views;
-		
 	}
 
 	@Override
 	public List<TurtleView> getDailyTops(Integer top) {
-		long beginTime=System.currentTimeMillis(); 
-		System.out.println("getting daily amount tops " + top + " ......");
-		
-		List<TurtleView> views = new ArrayList<TurtleView>();
-		
-		DecimalFormat df = new DecimalFormat("0.00"); 
-		Map<String,String> preyMap;
-
-		Tfeature feature;
-		Item item;
-		
-		List<String> ids = kdataRealtimeSpider.getLatestDailyTop(top);
-		
-		int i=1;
-		for(String id : ids) {
-			Progress.show(ids.size(),i++,id);
-			
-			if(this.setLatestKdata(id, true)) {
-				feature = turtle.getFeature(id);
-				if(feature!=null) {
-					item = itemService.getItem(id);
-
-					preyMap = new HashMap<String,String>();
-					preyMap.put("itemID", id);
-					preyMap.put("code", item.getCode());
-					preyMap.put("name", item.getName());
-					preyMap.put("low", df.format(feature.getOpenLow()));
-					preyMap.put("high", df.format(feature.getOpenHigh()));
-					preyMap.put("now", df.format(feature.getNow()));
-					preyMap.put("drop", df.format(feature.getDropLow()));
-					preyMap.put("hlgap", feature.getHlgap().toString());
-					preyMap.put("nhgap", feature.getNhgap().toString());
-					preyMap.put("atr", df.format(feature.getAtr()));	
-					preyMap.put("status", feature.getStatus().toString());	
-					
-					views.add(new TurtleView(preyMap));
-
-				}
-			}
-		}
-		System.out.println("getting daily amount tops "+top+" done!");
-		long used = (System.currentTimeMillis() - beginTime)/1000; 
-		System.out.println("用时：" + used + "秒");     
-		
-		return views;
+		return getTurtleViews(selectorService.getDailyAmountTops(top));
 	}
 
 	@Override
 	public List<TurtleView> getAvTops(Integer top) {
+		return getTurtleViews(selectorService.getAverageAmountTops(top));
+		
+	}
+	
+	private List<TurtleView> getTurtleViews(List<String> itemIDs) {
 		long beginTime=System.currentTimeMillis(); 
-		System.out.println("getting average amount tops " + top + " ......");
+		System.out.println("getting turtle views ......");
 		
 		List<TurtleView> views = new ArrayList<TurtleView>();
 		
@@ -357,11 +192,9 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 		Tfeature feature;
 		Item item;
 		
-		List<String> ids = kdataService.getDailyAverageAmountTops(top);
-		
 		int i=1;
-		for(String id : ids) {
-			Progress.show(ids.size(),i++,id);
+		for(String id : itemIDs) {
+			Progress.show(itemIDs.size(),i++,id);
 			
 			if(this.setLatestKdata(id, true)) {
 				feature = turtle.getFeature(id);
@@ -386,74 +219,33 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 				}
 			}
 		}
-		System.out.println("getting average amount tops  "+top+" done!");
+		
+		Collections.sort(views, new Comparator<TurtleView>() {
+			@Override
+			public int compare(TurtleView o1, TurtleView o2) {
+				BigDecimal hl1 = new BigDecimal(o1.getHlgap());
+				BigDecimal hl2 = new BigDecimal(o2.getHlgap());
+				
+				if(o1.getStatus().equals(o2.getStatus())) {
+					return (hl1).compareTo(hl2);
+				}else {
+					return (o2.getStatus()).compareTo(o1.getStatus());
+				}
+			}
+		});	
+		
+		System.out.println("getting turtle views done!");
 		long used = (System.currentTimeMillis() - beginTime)/1000; 
 		System.out.println("用时：" + used + "秒");     
 		
 		return views;
 		
-	}
-
-	@Override
-	public void generateAvTops() {
-		Integer duration = turtle==null ? 89 : turtle.getOpenDuration();
-		
-		List<String> ids = kdataRealtimeSpider.getLatestDailyTop(100);
-		//System.out.println(ids);
-		
-		kdataService.generateDailyAverageAmountTops(ids, duration);
 		
 	}
 
 	@Override
 	public List<TurtleView> getBluechips() {
-		long beginTime=System.currentTimeMillis(); 
-		System.out.println("getting bluechips ......");
-		
-		List<TurtleView> views = new ArrayList<TurtleView>();
-		
-		DecimalFormat df = new DecimalFormat("0.00"); 
-		Map<String,String> preyMap;
-		
-		Item item;
-		
-		Tfeature feature;
-		List<String> ids = bluechipService.getBluechipIDs(LocalDate.now());
-		
-		int i=1;
-		for(String id : ids) {
-			Progress.show(ids.size(),i++,id);
-			
-			id = id.replaceAll("\r|\n", "");
-			
-			if(this.setLatestKdata(id,true)) {
-				feature = turtle.getFeature(id);
-				if(feature!=null) {
-					item = itemService.getItem(id);
-
-					preyMap = new HashMap<String,String>();
-					preyMap.put("itemID", id);
-					preyMap.put("code", item.getCode());
-					preyMap.put("name", item.getName());
-					preyMap.put("low", df.format(feature.getOpenLow()));
-					preyMap.put("high", df.format(feature.getOpenHigh()));
-					preyMap.put("now", df.format(feature.getNow()));
-					preyMap.put("drop", df.format(feature.getDropLow()));
-					preyMap.put("hlgap", feature.getHlgap().toString());
-					preyMap.put("nhgap", feature.getNhgap().toString());
-					preyMap.put("atr", df.format(feature.getAtr()));	
-					preyMap.put("status",feature.getStatus().toString());	
-					
-					views.add(new TurtleView(preyMap));
-
-				}
-			}
-		}
-		System.out.println("get bluechips done!");
-		long used = (System.currentTimeMillis() - beginTime)/1000; 
-		System.out.println("用时：" + used + "秒");     
-		
-		return views;
+		return getTurtleViews(selectorService.getBluechipIDs(LocalDate.now()));
 	}
 
 	
