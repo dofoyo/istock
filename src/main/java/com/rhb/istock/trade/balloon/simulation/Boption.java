@@ -1,4 +1,4 @@
 package com.rhb.istock.trade.balloon.simulation;
 
-public class Option {
+public class Boption {
 }

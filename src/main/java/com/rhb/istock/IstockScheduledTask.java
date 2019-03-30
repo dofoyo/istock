@@ -50,8 +50,8 @@ public class IstockScheduledTask {
 		itemSpider.download();
 		kdataService.downKdatas();
 		turtleOperationService.init();
-		selectorService.generateAverageAmountTops();
-		selectorService.generateHighLowTops();
+		selectorService.generateLatestAverageAmountTops();
+		selectorService.generateLatestHighLowTops();
 	}
 	
 	@Scheduled(cron="0 0 5 ? * *") //每日凌晨5点，下载最新年报，并生成bluechip

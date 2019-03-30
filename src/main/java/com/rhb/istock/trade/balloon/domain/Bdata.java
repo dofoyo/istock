@@ -29,7 +29,9 @@ public class Bdata {
 	private Integer buyValue;
 	private Integer minSlip;
 	private Integer maxSlip;
-	private Integer buyMoreThan;
+	private Integer reopenRatio;
+	private Integer stopLossRatio = 8;		//最近一次买入下跌8%以上，止损;
+	private Integer stopWinRatio = 13;		//买入后，股价从最高点下跌超过13%，止盈;
 	
 	public Bdata(String itemID, 
 			Integer tradeDuration, 
@@ -41,7 +43,9 @@ public class Bdata {
 			Integer buyValue,
 			Integer minSlip,
 			Integer maxSlip,
-			Integer buyMoreThan) {
+			Integer reopenRatio,
+			Integer stopLossRatio,
+			Integer stopWinRatio) {
 		this.itemID = itemID;
 		this.tradeDuration = tradeDuration;
 		this.upDuration = upDuration;
@@ -52,7 +56,9 @@ public class Bdata {
 		this.buyValue = buyValue;
 		this.minSlip = minSlip;
 		this.maxSlip = maxSlip;
-		this.buyMoreThan = buyMoreThan;
+		this.reopenRatio = reopenRatio;
+		this.stopLossRatio = stopLossRatio;
+		this.stopWinRatio = stopWinRatio;
 		
 		this.bars = new TreeSet<Bbar>(new BbarComparator());
 	}
@@ -88,7 +94,9 @@ public class Bdata {
 		feature.setMaxSlip(maxSlip);
 		feature.setTradeDuration(tradeDuration);
 		feature.setYzb(latestBar.isYzb());
-		feature.setBuyMoreThan(buyMoreThan);
+		feature.setReopenRatio(reopenRatio);
+		feature.setStopLossRatio(stopLossRatio);
+		feature.setStopWinRatio(stopWinRatio);
 		
 		return feature;
 	}

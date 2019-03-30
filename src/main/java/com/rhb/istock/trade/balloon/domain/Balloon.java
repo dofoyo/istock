@@ -54,23 +54,27 @@ import com.rhb.istock.fund.Account;
 	 *停牌期间不能买卖
 	 *当天股价为一字板，不能买卖
 	 *
+	 *1 1 2 3 5 8 13 21 34 55 89 144 193 337 530
+	 *
  */
 public class Balloon {
-	private Integer tradeDuration = 300; //股票上市多少天后才能买， 默认值300天
-	private Integer upDuration = 60;	//用于计算最近多少天股票在upLine之上的天数，默认与upLine一样
-	private Integer upLine = 60;		//用于定义upLine，即几日均线。一般用60日均线作为upline
-	private Integer baseLine = 120;		//用于定义baseLine,也是几日均线。一般用120均线作为baseLine。股价在baseLine之上才能买入
-	private Integer midDuration = 750; 	//用于计算最近多少日的股价中位数。
-	private Integer buyValue = 50;   	//买入阀值，
+	private Integer tradeDuration = 337; 		//股票上市多少天后才能买， 默认值337天
+	private Integer upDuration = 55;			//用于计算最近多少天股票在upLine之上的天数，默认与upLine一样
+	private Integer upLine = 55;				//用于定义upLine，即几日均线。一般用60日均线作为upline
+	private Integer baseLine = 144;				//用于定义baseLine,也是几日均线。一般用120均线作为baseLine。股价在baseLine之上才能买入
+	private Integer midDuration = 530; 			//用于计算最近多少日的股价中位数。
+	private Integer buyValue = 34;   			//买入阀值，
 	
-	private Integer latestDuration = 11; //用于计算最近多少个交易日股价在upline之下的天数。
-	private Integer minSlip = 5; //在latestDuration期间低于upline均线的次数最多为5次， 超出5次，不得买入
-	private Integer maxSlip = 11; //在latestDuration期间低于upline均线的次数最多为10次， 超出10次，卖出
+	private Integer latestDuration = 13; 	//用于计算最近多少个交易日股价在upline之下的天数。
+	private Integer minSlip = 5; 			//在latestDuration期间低于upline均线的次数最多为5次， 超出5次，不得买入
+	private Integer maxSlip = 13; 			//在latestDuration期间低于upline均线的次数最多为8次， 超出8次，卖出
 	
-	private Integer buyPosition = 30; //买入仓位，市值的30%
-	private Integer buyMoreThan = 10; //最近一次买入上涨或下跌10%以上，再次出现买点，可以加仓
+	private Integer buyPosition = 13; 		//买入仓位，市值的13%
+	private Integer reopenRatio = 5; 		//最近一次买入上涨5%以上，再次出现买点，可以加仓; 
+	private Integer stopLossRatio = -13;		//最近一次买入下跌5%以上，止损;
+	private Integer stopWinRatio = -21;		//买入后，股价从最高点下跌超过13%，止盈;
 	
-	private BigDecimal initCash = new BigDecimal(100000);
+	private BigDecimal initCash = new BigDecimal(1000000);
 	private Account account = new Account(initCash);
 	
 	private Map<String, Bdata> bdatas = new HashMap<String,Bdata>();
@@ -82,7 +86,7 @@ public class Balloon {
 	public void addDailyData(String itemID,LocalDate date, BigDecimal open, BigDecimal high, BigDecimal low, BigDecimal close) {
 		Bdata bdata = bdatas.get(itemID);
 		if(bdata == null) {
-			bdata = new Bdata(itemID, tradeDuration, upDuration, midDuration,latestDuration,upLine,baseLine,buyValue,minSlip,maxSlip,buyMoreThan);
+			bdata = new Bdata(itemID, tradeDuration, upDuration, midDuration,latestDuration,upLine,baseLine,buyValue,minSlip,maxSlip,reopenRatio,stopLossRatio,stopWinRatio);
 			bdatas.put(itemID, bdata);
 		}
 		bdata.addBar(date, open, high, low, close);
@@ -130,13 +134,21 @@ public class Balloon {
 		Integer lots = account.getLots(feature.getItemID());
 		if(lots>0) {
 			feature.setLatestOpenPrice(account.getLatestOpenPrice(feature.getItemID()));
+			feature.setHighestPriceOfHold(account.getHighestPriceOfHold(feature.getItemID()));
 		}
-		//System.out.println(feature);
+		if(feature.getItemID().equals("sz002223")) {
+			System.out.println(feature);
+		}
+		
+		//止损或止盈
+		if(feature.getStatus() == -2) {
+			account.stopByItemID(feature.getItemID());
+		}
 
-		//平仓
+/*		//平仓
 		if(feature.getStatus()==-1) {
 			account.drop(feature.getItemID());
-		}
+		}*/
 		
 		//开新仓
 		if(feature.getStatus()==1) {
@@ -162,6 +174,16 @@ public class Balloon {
 	private Integer getQuantity(String itemID,BigDecimal price) {
 		BigDecimal amount = account.getTotal().multiply(new BigDecimal(buyPosition)).divide(new BigDecimal(100),BigDecimal.ROUND_DOWN);
 		Integer quantity = amount.divide(price,BigDecimal.ROUND_DOWN).divide(getQuantityPerHand(itemID),BigDecimal.ROUND_DOWN).intValue() * getQuantityPerHand(itemID).intValue();
+		
+		amount = price.multiply(new BigDecimal(quantity));
+		BigDecimal cash = account.getCash();
+		//System.out.println("cash=" + cash + ", need " + amount);
+		if(amount.compareTo(cash)==1) {
+			//System.out.print("not enough cash, change quantity from " + quantity);
+			quantity = cash.divide(price,BigDecimal.ROUND_DOWN).divide(getQuantityPerHand(itemID),BigDecimal.ROUND_DOWN).intValue() * getQuantityPerHand(itemID).intValue();
+			//System.out.println(" to " + quantity);
+
+		}
 		return quantity;
 	}
 	

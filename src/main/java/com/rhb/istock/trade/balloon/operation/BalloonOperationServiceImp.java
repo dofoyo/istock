@@ -58,7 +58,7 @@ public class BalloonOperationServiceImp implements BalloonOperationService {
 			view.setCode(item.getCode());
 			view.setName(item.getName());
 			view.setUps(feature.getUps());
-			view.setBiasOfBaseLine(feature.getBiasBaseLIne());
+			view.setBiasOfBaseLine(feature.getBiasBaseLine());
 			view.setBiasOfGolden(feature.getBiasOfGolden());
 			view.setSlips(feature.getSlips());
 			view.setStatus(feature.getStatus());

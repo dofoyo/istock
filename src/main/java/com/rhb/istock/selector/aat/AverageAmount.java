@@ -1,25 +1,25 @@
-package com.rhb.istock.trade.turtle.simulation.repository;
+package com.rhb.istock.selector.aat;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-public class Amount  implements Comparable<Amount>{
+public class AverageAmount  implements Comparable<AverageAmount>{
 	@Override
 	public String toString() {
-		return "BarEntity [date=" + date + ", code=" + code + ", amount=" + amount + "]";
+		return "BarEntity [date=" + date + ", itemID=" + itemID + ", amount=" + amount + "]";
 	}
 
 	private LocalDate date;
-	private String code;
+	private String itemID;
 	private BigDecimal amount = new BigDecimal(0);
 	
-	public Amount(String code) {
-		this.code = code;
+	public AverageAmount(String itemID) {
+		this.itemID = itemID;
 	}
 	
-	public Amount(LocalDate date,String code, BigDecimal amount) {
+	public AverageAmount(LocalDate date,String itemID, BigDecimal amount) {
 		this.date = date;
-		this.code = code;
+		this.itemID = itemID;
 		this.amount = amount;
 	}
 
@@ -31,12 +31,12 @@ public class Amount  implements Comparable<Amount>{
 		this.date = date;
 	}
 
-	public String getCode() {
-		return code;
+	public String getItemID() {
+		return itemID;
 	}
 
-	public void setCode(String code) {
-		this.code = code;
+	public void setItemID(String itemID) {
+		this.itemID = itemID;
 	}
 
 	public BigDecimal getAmount() {
@@ -52,8 +52,8 @@ public class Amount  implements Comparable<Amount>{
 	}
 	
 	@Override
-	public int compareTo(Amount o) {
-		return o.getAmount().compareTo(this.getAmount());
+	public int compareTo(AverageAmount o) {
+		return o.getAmount().compareTo(this.getAmount()); //倒叙
 	}
 	
 }

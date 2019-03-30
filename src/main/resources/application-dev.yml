@@ -8,9 +8,13 @@ holdsFile: D:/dev/istock-data/holds.txt
 preysFile: D:/dev/istock-data/preys.csv
 favorsFile: D:/dev/istock-data/favors.txt
 dailyAmountTopsFile: D:/dev/istock-data/dailyAmountTops.txt
-avarageAmountTopsFile: D:/dev/istock-data/avarageAmountTops.txt
+latestAverageAmountTopsFile: D:/dev/istock-data/latestAverageAmountTops.txt
+averageAmountTopsFile: D:/dev/istock-data/averageAmountTops.txt
 bluechipsFile: D:/dev/istock-data/bluechips.json
+latestHighLowTopsFile: D:/dev/istock-data/latestHighLowTops.txt
 highLowTopsFile: D:/dev/istock-data/highLowTops.txt
+twinOpenListFile: D:/dev/istock-data/twinOpenList.txt
+twinDropListFile: D:/dev/istock-data/twinDropList.txt
 
 
 

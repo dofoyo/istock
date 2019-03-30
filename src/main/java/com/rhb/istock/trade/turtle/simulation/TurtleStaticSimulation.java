@@ -3,7 +3,7 @@ package com.rhb.istock.trade.turtle.simulation;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.TreeMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -31,15 +31,11 @@ public class TurtleStaticSimulation implements TurtleSimulation{
 
 	boolean byCache = true;
 	
-	LocalDate beginDate = null;
-	LocalDate endDate = null;
-
 	Turtle turtle = null;
 	
 	@Override
-	public Map<String, String> simulate(DailyItem dailyItem, Option option) {
-		this.beginDate = dailyItem.getBeginDate();
-		this.endDate = dailyItem.getEndDate();
+	public Map<String, String> simulate(TreeMap<LocalDate,List<String>> dailyItems, Toption option) {
+		if(dailyItems==null || dailyItems.size()==0) return null;
 		
 		if(option==null) {
 			turtle = new Turtle();			
@@ -53,22 +49,22 @@ public class TurtleStaticSimulation implements TurtleSimulation{
 					option.getGap());
 		}
 		
-		long days = endDate.toEpochDay()- beginDate.toEpochDay();
+		long days = dailyItems.lastKey().toEpochDay()- dailyItems.firstKey().toEpochDay();
 		
-		Set<String> itemIDs;
+		List<String> itemIDs;
 		int i = 0;
-		for(LocalDate date=beginDate; date.isBefore(endDate); date=date.plusDays(1)) {
-			Progress.show((int)days, i++, date.toString());
+		for(Map.Entry<LocalDate, List<String>> entry : dailyItems.entrySet()) {
+			Progress.show((int)days, i++, entry.getKey().toString());
 			
 			turtle.clearDatas(); //开始前清除历史记录，当某个item停牌几天，原记录可能会缺失
 			
-			itemIDs = dailyItem.getItemIDs(date);
+			itemIDs = entry.getValue();
 			if(itemIDs!=null) {
 				itemIDs.addAll(turtle.getItemIDsOfHolds());//加入在手的ID
 				for(String itemID : itemIDs) {
-					setDailyKdata(itemID, date); //放入beginDate之前的历史记录
-					setLatestKdata(itemID, date); //放入当前记录
-				}				
+					setDailyKdata(itemID, entry.getKey()); //放入beginDate之前的历史记录
+					setLatestKdata(itemID, entry.getKey()); //放入当前记录
+				}
 			}
 			System.out.println("");
 			turtle.doIt();

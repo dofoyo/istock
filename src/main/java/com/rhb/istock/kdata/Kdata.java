@@ -17,6 +17,27 @@ public class Kdata {
 		this.bars = new TreeMap<LocalDate,Kbar>();
 	}
 	
+	public BigDecimal getAvarageAmount() {
+		BigDecimal total = new BigDecimal(0);
+		for(Kbar kbar : bars.values()) {
+			total = total.add(kbar.getAmount());
+		}
+		return total.divide(new BigDecimal(bars.size()),BigDecimal.ROUND_HALF_UP);
+	}
+
+	
+	public Integer getHighLowGap() {
+		BigDecimal high = new BigDecimal(0);
+		BigDecimal low = new BigDecimal(10000);
+		for(Kbar kbar : bars.values()) {
+			high = high.compareTo(kbar.getHigh())==-1 ? kbar.getHigh() : high;
+			low = low.compareTo(kbar.getLow())==1 ? kbar.getLow() : low;
+		}
+		BigDecimal rate = high.subtract(low).divide(low,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100));
+
+		return rate.intValue();
+	}
+	
 	public BigDecimal getAvarageAmount(Integer count) {
 		BigDecimal total = new BigDecimal(0);
 		NavigableSet<LocalDate> dates = this.bars.descendingKeySet();

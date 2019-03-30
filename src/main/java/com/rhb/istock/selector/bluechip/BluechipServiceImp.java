@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -36,6 +37,7 @@ public class BluechipServiceImp implements BluechipService {
 	
 	@Override
 	public void generateBluechip() {
+		long beginTime=System.currentTimeMillis(); 
 		System.out.println("generate Bluechips begin ....");
 		
 		Map<String,BluechipEntity>bluechips = new HashMap<String,BluechipEntity>();
@@ -64,6 +66,8 @@ public class BluechipServiceImp implements BluechipService {
 		//System.out.println("there are " + dtos.size() + " OkfinanceStatementDtos.");
 		System.out.println("there are " + bluechips.size() + " bluechips.");
 		System.out.println("..................generate Bluechips end");
+		long used = (System.currentTimeMillis() - beginTime)/1000; 
+		System.out.println("用时：" + used + "秒");          
 	}
 	
 	private List<OkDto> getOks() {
@@ -222,5 +226,20 @@ public class BluechipServiceImp implements BluechipService {
 		public String toString() {
 			return "OkfinanceStatementDto [stockcode=" + stockcode + ", year=" + year + ", reportdate=" + reportdate + "]";
 		}
+	}
+
+	@Override
+	public List<String> getLatestBluechipIDs() {
+		LocalDate date = LocalDate.now();
+		return getBluechipIDs(date);
+	}
+
+	@Override
+	public TreeMap<LocalDate, List<String>> getBluechipIDs(LocalDate beginDate, LocalDate endDate) {
+		TreeMap<LocalDate, List<String>> ids = new TreeMap<LocalDate, List<String>>();
+		for(LocalDate date = beginDate; date.isBefore(endDate); date = date.plusDays(1)) {
+			ids.put(date, this.getBluechipIDs(date));
+		}
+		return ids;
 	}
 }

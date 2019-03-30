@@ -1,4 +1,4 @@
-package com.rhb.istock.selector.hlt;
+package com.rhb.istock.selector.aat;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -12,33 +12,33 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest
-public class HighLowTopServiceTest {
+public class AverageAmountTopServiceTest {
 	@Autowired
-	@Qualifier("highLowTopServiceImp")
-	HighLowTopService highLowTopService;
-	
-	//@Test
-	public void generateLatestHighLowTops() {
-		highLowTopService.generateLatestHighLowTops();
-	}
-	
-	//@Test
-	public void getLatestHighLowTops() {
-		List<String> ids = highLowTopService.getLatestHighLowTops(5);
-		System.out.println(ids);
-	}
-	
-	//@Test
-	public void generateHighLowTops() {
-		highLowTopService.generateHighLowTops();
-	}
+	@Qualifier("averageAmountTopServiceImp")
+	AverageAmountTopService averageAmountTopService;
 	
 	@Test
-	public void getHighLowTops() {
+	public void getLatestAverageAmountTops() {
+		List<String> ids = averageAmountTopService.getLatestAverageAmountTops(10);
+		System.out.println(ids);			
+	}
+	
+	//@Test
+	public void generateLatestAverageAmountTops() {
+		averageAmountTopService.generateLatestAverageAmountTops();
+	}
+	
+	//@Test
+	public void generateAverageAmountTops() {
+		averageAmountTopService.generateAverageAmountTops();
+	}
+	
+	//@Test
+	public void getBluechipIDs() {
 		LocalDate beginDate = LocalDate.parse("2019-03-01");
 		LocalDate endDate = LocalDate.parse("2019-03-21");
 		for(LocalDate date = beginDate; date.isBefore(endDate); date=date.plusDays(1)) {
-			List<String> ids = highLowTopService.getHighLowTops(10, date);
+			List<String> ids = averageAmountTopService.getAverageAmountTops(10, date);
 			System.out.println(ids);			
 		}
 	}

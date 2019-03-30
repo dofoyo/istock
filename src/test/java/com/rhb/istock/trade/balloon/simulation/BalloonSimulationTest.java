@@ -14,8 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.rhb.istock.kdata.KdataService;
-import com.rhb.istock.trade.turtle.simulation.DailyItem;
-import com.rhb.istock.trade.turtle.simulation.repository.TurtleSimulationRepository;
+import com.rhb.istock.selector.SelectorService;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest
@@ -29,23 +28,23 @@ public class BalloonSimulationTest {
 	KdataService kdataService;
 
 	@Autowired
-	@Qualifier("turtleSimulationRepositoryImp")
-	TurtleSimulationRepository turtleSimulationRepository;
+	@Qualifier("selectorServiceImp")
+	SelectorService selectorService;
 	
 	//@Test
 	public void simulateBySeperateYear() {
 		Map<LocalDate, Map<String,String>> results = new TreeMap<LocalDate,Map<String,String>>();
 
-		for(int year=2017; year<=2017; year++) {
+		for(int year=2010; year<=2018; year++) {
 			LocalDate beginDate = LocalDate.of(year, 1, 1);
 			LocalDate endDate = LocalDate.of(year+1, 1, 1);
 
-			//DailyItem dailyItem = simulationRepository.getAvarageAmountTops(13, beginDate, endDate);
-			//DailyItem dailyItem = this.getSpecifyItem("sz002107", beginDate, endDate);
-			DailyItem dailyItem = turtleSimulationRepository.getBluechips(300, beginDate, endDate);
-			//DailyItem dailyItem = simulationRepository.getDailyAmountTops(13, beginDate, endDate);
+			//TreeMap<LocalDate,List<String>> dailyItems = selectorService.getAverageAmountTops(13, beginDate, endDate);
+			TreeMap<LocalDate,List<String>> dailyItems = this.getSpecifyItem("sh600519", beginDate, endDate);
+			//TreeMap<LocalDate,List<String>> dailyItems = selectorService.getBluechipIDs(beginDate, endDate);
+			//TreeMap<LocalDate,List<String>> dailyItems= selectorService.getDailyAmountTops(13, beginDate, endDate);
 			
-			results.put(beginDate, balloonSimulation.simulate(dailyItem, null));
+			results.put(beginDate, balloonSimulation.simulate(dailyItems, null));
 			beginDate = beginDate.plusYears(1);
 			endDate = endDate.plusYears(1);
 			
@@ -69,20 +68,23 @@ public class BalloonSimulationTest {
 			LocalDate beginDate = LocalDate.of(2010, 1, 1);
 			LocalDate endDate = LocalDate.of(2019, 1, 1);
 
-			//DailyItem dailyItem = simulationRepository.getAvarageAmountTops(13, beginDate, endDate);
-			//DailyItem dailyItem = this.getSpecifyItem("sh603898", beginDate, endDate);
-			DailyItem dailyItem = turtleSimulationRepository.getBluechips(300, beginDate, endDate);
-			//DailyItem dailyItem = simulationRepository.getDailyAmountTops(13, beginDate, endDate);
+			//TreeMap<LocalDate,List<String>> dailyItems = selectorService.getAverageAmountTops(13, beginDate, endDate);
+			//TreeMap<LocalDate,List<String>> dailyItems = this.getSpecifyItem("sh600519", beginDate, endDate);
+			TreeMap<LocalDate,List<String>> dailyItems = selectorService.getBluechipIDs(beginDate, endDate);
+			//TreeMap<LocalDate,List<String>> dailyItems= selectorService.getDailyAmountTops(13, beginDate, endDate);
 			
-			balloonSimulation.simulate(dailyItem, null);
+			balloonSimulation.simulate(dailyItems, null);
 	}
 
 	
-	private DailyItem getSpecifyItem(String itemID,LocalDate beginDate, LocalDate endDate) {
-		DailyItem dailyItem = new DailyItem();
+	private TreeMap<LocalDate,List<String>> getSpecifyItem(String itemID,LocalDate beginDate, LocalDate endDate) {
+		TreeMap<LocalDate,List<String>> dailyItems = new TreeMap<LocalDate,List<String>>();
+		List<String> ids;
 		for(LocalDate date=beginDate; date.isBefore(endDate); date = date.plusDays(1)) {
-			dailyItem.putItemID(date, itemID);
+			ids = new ArrayList<String>();
+			ids.add(itemID);
+			dailyItems.put(date, ids);
 		}
-		return dailyItem;
+		return dailyItems;
 	}
 }

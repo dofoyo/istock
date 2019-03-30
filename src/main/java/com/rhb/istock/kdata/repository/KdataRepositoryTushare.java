@@ -20,9 +20,6 @@ public class KdataRepositoryTushare implements KdataRepository{
 	@Value("${tushareKdataPath}")
 	private String kdataPath;
 	
-	@Value("${avarageAmountTopsFile}")
-	private String avarageAmountTopsFile;
-	
 	@Override
 	@CacheEvict(value="tushareDailyKdatas",allEntries=true)
 	public void evictDailyKDataCache() {}

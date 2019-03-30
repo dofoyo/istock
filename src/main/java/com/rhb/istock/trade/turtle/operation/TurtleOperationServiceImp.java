@@ -54,6 +54,7 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 		long beginTime=System.currentTimeMillis(); 
 		System.out.println("TurtleOperationService init...");
 		turtle = new Turtle();
+		kdataService.evictDailyKDataCache();
 		System.out.println("TurtleOperationService init done!");
 		
 		long used = (System.currentTimeMillis() - beginTime)/1000; 
@@ -97,7 +98,7 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 
 	@Override
 	public List<TurtleView> getHighLowTops(Integer top) {
-		return getTurtleViews(selectorService.getHighLowTops(top));
+		return getTurtleViews(selectorService.getLatestHighLowTops(top),"high low tops");
 	}
 	
 	private void setDailyKdata(String itemID, boolean byCache) {
@@ -160,7 +161,7 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 	public List<TurtleView> getFavors() {
 		Map<String, String> favors = selectorService.getFavors();
 
-		List<TurtleView> views = getTurtleViews(new ArrayList<String>(favors.keySet()));
+		List<TurtleView> views = getTurtleViews(new ArrayList<String>(favors.keySet()),"favors");
 		
 		for(TurtleView view : views) {
 			view.setName(favors.get(view.getItemID()));
@@ -171,18 +172,18 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 
 	@Override
 	public List<TurtleView> getDailyTops(Integer top) {
-		return getTurtleViews(selectorService.getDailyAmountTops(top));
+		return getTurtleViews(selectorService.getLatestDailyAmountTops(top),"daily tops");
 	}
 
 	@Override
 	public List<TurtleView> getAvTops(Integer top) {
-		return getTurtleViews(selectorService.getAverageAmountTops(top));
+		return getTurtleViews(selectorService.getLatestAverageAmountTops(top),"av tops");
 		
 	}
 	
-	private List<TurtleView> getTurtleViews(List<String> itemIDs) {
+	private List<TurtleView> getTurtleViews(List<String> itemIDs, String name) {
 		long beginTime=System.currentTimeMillis(); 
-		System.out.println("getting turtle views ......");
+		System.out.println("getting " + name + " views ......");
 		
 		List<TurtleView> views = new ArrayList<TurtleView>();
 		
@@ -234,7 +235,7 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 			}
 		});	
 		
-		System.out.println("getting turtle views done!");
+		System.out.println("getting "+name+" views done!");
 		long used = (System.currentTimeMillis() - beginTime)/1000; 
 		System.out.println("用时：" + used + "秒");     
 		
@@ -245,7 +246,7 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 
 	@Override
 	public List<TurtleView> getBluechips() {
-		return getTurtleViews(selectorService.getBluechipIDs(LocalDate.now()));
+		return getTurtleViews(selectorService.getBluechipIDs(LocalDate.now()),"bluechips");
 	}
 
 	

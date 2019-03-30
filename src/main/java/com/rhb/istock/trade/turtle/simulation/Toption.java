@@ -2,7 +2,7 @@ package com.rhb.istock.trade.turtle.simulation;
 
 import java.math.BigDecimal;
 
-public class Option {
+public class Toption {
 	private BigDecimal deficitFactor;
 	private Integer openDuration;
 	private Integer dropDuration;

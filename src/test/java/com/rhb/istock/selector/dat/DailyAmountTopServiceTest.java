@@ -1,4 +1,4 @@
-package com.rhb.istock.selector.bluechip;
+package com.rhb.istock.selector.dat;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -12,24 +12,23 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest
-public class BluechipServiceTest {
+public class DailyAmountTopServiceTest {
 	@Autowired
-	@Qualifier("bluechipServiceImp")
-	BluechipService bluechipService;
+	@Qualifier("dailyAmountTopServiceImp")
+	DailyAmountTopService dailyAmountTopService;
 	
 	//@Test
-	public void generateBluechip() {
-		bluechipService.generateBluechip();
+	public void generateDailyAmountTops() {
+		dailyAmountTopService.generateDailyAmountTops();
 	}
 	
-	@Test
+	//@Test
 	public void getBluechipIDs() {
-		LocalDate beginDate = LocalDate.parse("2019-01-01");
+		LocalDate beginDate = LocalDate.parse("2019-03-01");
 		LocalDate endDate = LocalDate.parse("2019-03-21");
 		for(LocalDate date = beginDate; date.isBefore(endDate); date=date.plusDays(1)) {
-			List<String> ids = bluechipService.getBluechipIDs(date);
-			System.out.print(date + "," + ids.size() + ",");			
-			System.out.println(ids);
+			List<String> ids = dailyAmountTopService.getDailyAmountTops(10, date);
+			System.out.println(ids);			
 		}
 	}
 }

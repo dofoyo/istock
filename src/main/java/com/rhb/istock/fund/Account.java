@@ -133,6 +133,11 @@ public class Account {
 
 	public void refreshHoldsPrice(String itemID, BigDecimal price) {
 		prices.put(itemID, price);
+		for(Order order : holds.values()) {
+			if(order.getItemID().equals(itemID)) {
+				order.setLatest(price);
+			}
+		}
 	}
 	
 	public Set<String> getItemIDsOfHolds() {
@@ -179,6 +184,19 @@ public class Account {
 			}
 		}		
 		return price;
+	}
+	
+	public BigDecimal getHighestPriceOfHold(String itemID) {
+		BigDecimal highest = new BigDecimal(0);
+		for(Order order : holds.values()) {
+			if(order.getItemID().equals(itemID)) {
+				if(highest.compareTo(order.getHighest())==-1) {
+					highest = order.getHighest();
+				}
+			}
+		}		
+		
+		return highest;
 	}
 	
 	public Integer getWinRatio() {
@@ -334,6 +352,8 @@ public class Account {
 		private BigDecimal price;
 		private Integer quantity;	
 		private String note;
+		private BigDecimal latest;
+		private BigDecimal highest;
 		
 		public Order(String orderID,String itemID, LocalDate date, BigDecimal price, Integer quantity) {
 			this.orderID = orderID;
@@ -341,8 +361,25 @@ public class Account {
 			this.date = date;
 			this.price = price;
 			this.quantity = quantity;
+			this.latest = price;
+			this.highest = price;
 		}
 		
+		public BigDecimal getLatest() {
+			return latest;
+		}
+
+		public void setLatest(BigDecimal latest) {
+			this.latest = latest;
+			if(highest.compareTo(latest)==-1) {
+				highest = latest;
+			}
+		}
+
+		public BigDecimal getHighest() {
+			return highest;
+		}
+
 		public BigDecimal getAmount() {
 			return price.multiply(new BigDecimal(quantity));
 		}
