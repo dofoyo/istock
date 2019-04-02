@@ -47,7 +47,7 @@ public class Line {
 		BigDecimal h = getBigDecimal(high);
 		BigDecimal l = getBigDecimal(low);
 
-		Integer ratio = h.subtract(l).divide(l,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)).intValue();
+		Integer ratio = h.subtract(l).divide(l,BigDecimal.ROUND_DOWN).multiply(new BigDecimal(100)).intValue();
 		//System.out.println(ratio);
 		for(int i=0; i<ratio; i++) {
 			sb.append("-");

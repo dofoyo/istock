@@ -19,6 +19,8 @@ public class TurtleView {
 	private String line;
 	private String atr;
 	private String status;
+	private String area;
+	private String industry;
 
 	public TurtleView(Map<String, String> map) {
 		//System.out.println(map);
@@ -33,6 +35,8 @@ public class TurtleView {
 		this.hlgap = map.get("hlgap");
 		this.nhgap = map.get("nhgap");
 		this.status = map.get("status");
+		this.industry = map.get("industry");
+		this.area = map.get("area");		
 
 		// System.out.println(map.get("openHigh"));
 		// System.out.println(this.high);
@@ -141,6 +145,23 @@ public class TurtleView {
 
 	public void setStatus(String status) {
 		this.status = status;
+	}
+
+	
+	public String getArea() {
+		return area;
+	}
+
+	public void setArea(String area) {
+		this.area = area;
+	}
+
+	public String getIndustry() {
+		return industry;
+	}
+
+	public void setIndustry(String industry) {
+		this.industry = industry;
 	}
 
 	@Override

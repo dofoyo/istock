@@ -89,6 +89,9 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 			hold.setStopPrice(stopPrice);
 			hold.setDropPrice(feature.getDropLow());
 			hold.setReopenPrice(reopenPrice);
+			hold.setIndustry(item.getIndustry());
+			hold.setArea(item.getArea());
+	
 			
 			holds.add(hold);
 			
@@ -206,6 +209,8 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 					preyMap.put("itemID", id);
 					preyMap.put("code", item.getCode());
 					preyMap.put("name", item.getName());
+					preyMap.put("industry", item.getIndustry());
+					preyMap.put("area", item.getArea());
 					preyMap.put("low", df.format(feature.getOpenLow()));
 					preyMap.put("high", df.format(feature.getOpenHigh()));
 					preyMap.put("now", df.format(feature.getNow()));
@@ -224,11 +229,18 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 		Collections.sort(views, new Comparator<TurtleView>() {
 			@Override
 			public int compare(TurtleView o1, TurtleView o2) {
+				BigDecimal nh1 = new BigDecimal(o1.getNhgap());
+				BigDecimal nh2 = new BigDecimal(o2.getNhgap());
+				
 				BigDecimal hl1 = new BigDecimal(o1.getHlgap());
 				BigDecimal hl2 = new BigDecimal(o2.getHlgap());
 				
 				if(o1.getStatus().equals(o2.getStatus())) {
-					return (hl1).compareTo(hl2);
+					if(nh1.compareTo(nh2)==0) {
+						return hl1.compareTo(hl2);
+					}else {
+						return nh1.compareTo(nh2);
+					}
 				}else {
 					return (o2.getStatus()).compareTo(o1.getStatus());
 				}
@@ -240,8 +252,6 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 		System.out.println("用时：" + used + "秒");     
 		
 		return views;
-		
-		
 	}
 
 	@Override

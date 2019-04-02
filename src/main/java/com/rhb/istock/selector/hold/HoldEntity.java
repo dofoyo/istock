@@ -9,6 +9,7 @@ public class HoldEntity {
 	public HoldEntity(String itemID, BigDecimal price) {
 		this.itemID = itemID;
 		this.price = price;
+		
 	}
 
 	public String getItemID() {
@@ -26,6 +27,7 @@ public class HoldEntity {
 	public void setPrice(BigDecimal price) {
 		this.price = price;
 	}
+	
 
 	@Override
 	public String toString() {

@@ -10,6 +10,8 @@ public class HoldView {
 	private String itemID;
 	private String code;
 	private String name;
+	private String industry;
+	private String area;
 	private String atr;
 	private BigDecimal nowPrice;
 	private BigDecimal buyPrice;
@@ -86,7 +88,24 @@ public class HoldView {
 	public String getStatus() {
 		return nowPrice.compareTo(buyPrice)==1 ? "2" : "-2";
 	}
+	
 
+	public String getIndustry() {
+		return industry;
+	}
+
+	public void setIndustry(String industry) {
+		this.industry = industry;
+	}
+
+	public String getArea() {
+		return area;
+	}
+
+	public void setArea(String area) {
+		this.area = area;
+	}
+	
 	@Override
 	public String toString() {
 		return "HoldView [itemID=" + itemID + ", code=" + code + ", name=" + name + ", atr=" + atr + ", prices="

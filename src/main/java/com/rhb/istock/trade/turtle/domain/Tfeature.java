@@ -36,8 +36,8 @@ public class Tfeature {
 	
 	public void reset() {
 		try {
-			nhgap = now.subtract(openHigh).divide(openHigh,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)).intValue();
-			nlgap = now.subtract(openLow).divide(openLow,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)).intValue();
+			nhgap = now.subtract(openHigh).divide(openHigh,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)).abs().intValue();
+			nlgap = now.subtract(openLow).divide(openLow,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)).abs().intValue();
 		}catch(Exception e) {
 			System.out.println(this.toString());
 			e.printStackTrace();
@@ -122,8 +122,6 @@ public class Tfeature {
 	public void setStatus(Integer status) {
 		this.status = status;
 	}
-	
-	
 	
 	public String getItemID() {
 		return itemID;
