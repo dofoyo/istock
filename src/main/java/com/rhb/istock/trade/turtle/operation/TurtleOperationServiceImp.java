@@ -21,13 +21,13 @@ import com.rhb.istock.item.ItemService;
 import com.rhb.istock.kdata.Kbar;
 import com.rhb.istock.kdata.Kdata;
 import com.rhb.istock.kdata.KdataService;
+import com.rhb.istock.kdata.api.KdatasView;
 import com.rhb.istock.selector.SelectorService;
 import com.rhb.istock.selector.hold.HoldEntity;
 import com.rhb.istock.trade.turtle.domain.Tfeature;
 import com.rhb.istock.trade.turtle.domain.Tbar;
 import com.rhb.istock.trade.turtle.domain.Turtle;
 import com.rhb.istock.trade.turtle.operation.api.HoldView;
-import com.rhb.istock.trade.turtle.operation.api.KdatasView;
 import com.rhb.istock.trade.turtle.operation.api.TurtleView;
 
 @Service("turtleOperationServiceImp")
@@ -53,10 +53,10 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 	public void init() {
 		long beginTime=System.currentTimeMillis(); 
 		System.out.println("TurtleOperationService init...");
-		turtle = new Turtle();
-		kdataService.evictDailyKDataCache();
-		System.out.println("TurtleOperationService init done!");
 		
+		turtle = new Turtle();
+		
+		System.out.println("TurtleOperationService init done!");
 		long used = (System.currentTimeMillis() - beginTime)/1000; 
 		System.out.println("用时：" + used + "秒");          
 	}
@@ -179,9 +179,13 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 	}
 
 	@Override
+	public List<TurtleView> getAgTops(Integer top) {
+		return getTurtleViews(selectorService.getAmountGapTops(top),"ag tops");
+	}
+	
+	@Override
 	public List<TurtleView> getAvTops(Integer top) {
 		return getTurtleViews(selectorService.getLatestAverageAmountTops(top),"av tops");
-		
 	}
 	
 	private List<TurtleView> getTurtleViews(List<String> itemIDs, String name) {
@@ -196,6 +200,8 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 		Tfeature feature;
 		Item item;
 		
+		List<String> holds = selectorService.getHoldIDs();
+
 		int i=1;
 		for(String id : itemIDs) {
 			Progress.show(itemIDs.size(),i++,id);
@@ -207,7 +213,7 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 
 					preyMap = new HashMap<String,String>();
 					preyMap.put("itemID", id);
-					preyMap.put("code", item.getCode());
+					preyMap.put("code", holds.contains(id) ? "*" + item.getCode() : item.getCode());
 					preyMap.put("name", item.getName());
 					preyMap.put("industry", item.getIndustry());
 					preyMap.put("area", item.getArea());

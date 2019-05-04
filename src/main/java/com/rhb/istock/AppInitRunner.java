@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
-import com.rhb.istock.item.spider.ItemSpider;
+import com.rhb.istock.item.ItemService;
 import com.rhb.istock.kdata.KdataService;
 import com.rhb.istock.selector.SelectorService;
 import com.rhb.istock.trade.turtle.operation.TurtleOperationService;
@@ -14,8 +14,8 @@ import com.rhb.istock.trade.turtle.operation.TurtleOperationService;
 @Component
 public class AppInitRunner implements CommandLineRunner {
 	@Autowired
-	@Qualifier("itemSpiderTushare")
-	ItemSpider itemSpider;
+	@Qualifier("itemServiceImp")
+	ItemService itemService;
 	
 	@Autowired
 	@Qualifier("turtleOperationServiceImp")
@@ -31,11 +31,12 @@ public class AppInitRunner implements CommandLineRunner {
 	
     @Override
     public void run(String... args) throws Exception {
-		itemSpider.download();
+    	itemService.download();
     	kdataService.downKdatas();
-    	turtleOperationService.init();
     	selectorService.generateLatestAverageAmountTops();
     	selectorService.generateLatestHighLowTops();
+
+    	turtleOperationService.init();
     }
 
 }

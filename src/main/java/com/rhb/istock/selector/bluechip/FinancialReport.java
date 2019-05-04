@@ -23,7 +23,8 @@ public class FinancialReport {
 	public boolean isOK(int year){
 		//this.setYear(year);
 		boolean flag = false;
-		if(this.getRateOfOperatngRevenue(year)>0.44 //销售收入持续增长，且年均增长率大于20%(二年增长大于44%)
+		if(this.getGrossProfitMargin(year)>0.3 //毛利率大于30%
+			&& this.getRateOfOperatngRevenue(year)>0.44 //销售收入持续增长，且年均增长率大于20%(二年增长大于44%)
 			&& this.getRateOfProfit(year)>0.44  //利润持续增长，且年均增长率大于20%(二年增长大于44%)
 			&& this.getRateOfCashflow(year)>0.44  //经营活动现金流为正，且持续增长，且年均增长率大于20%(二年增长大于44%)
 			//&& this.getRateOfOperatngRevenue(year)>this.getRateOfAccountsReceivable(year) //应收账款的增长率小于销售收入的增长率
@@ -213,6 +214,22 @@ public class FinancialReport {
 		Double profit = ((ProfitStatement)this.profitstatements.get(periods[0])).getProfit();
 		return profit.intValue()==0 ? 0.0 : cash/profit;
 	}
+	
+	//毛利率
+	public Double getGrossProfitMargin(Integer year){
+		String period = Integer.toString(year) + "1231";
+		double d = 0.0;
+		ProfitStatement ps = (ProfitStatement)this.profitstatements.get(period);
+		if(ps!=null) {
+			Double revenue = ps.getOperatingRevenue();
+			Double profit = ps.getProfit();
+			
+			d = revenue.intValue()==0 ? 0.0 : profit/revenue;
+		}
+		
+		return d;
+	}
+	
 	
 	//应收占比 Receivable Ratio
 	public Double getReceivableRatio(Integer year){

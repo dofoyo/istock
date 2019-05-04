@@ -6,6 +6,8 @@ import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import com.rhb.istock.comm.util.FileUtil;
@@ -16,6 +18,7 @@ public class ItemRepositoryTushare implements ItemRepository{
 	private String itemsFile;
 	
 	@Override
+	@Cacheable("items")
 	public List<ItemEntity> getItemEntities() {
 		List<ItemEntity> entities = new ArrayList<ItemEntity>();
 		try {
@@ -42,7 +45,7 @@ public class ItemRepositoryTushare implements ItemRepository{
 		return entities;
 	}
 
-	@Override
+	//@Override
 	public ItemEntity getItemEntity(String itemID) {
 		ItemEntity itemEntity = null;
 		try {
@@ -94,5 +97,9 @@ public class ItemRepositoryTushare implements ItemRepository{
 		
 		return ids;
 	}
+
+	@Override
+	@CacheEvict(value="items",allEntries=true)
+	public void cacheEvict() {}
 
 }

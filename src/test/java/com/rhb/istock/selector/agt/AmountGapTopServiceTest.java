@@ -1,6 +1,4 @@
-package com.rhb.istock.item.repository;
-
-import java.util.List;
+package com.rhb.istock.selector.agt;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -11,17 +9,14 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest
-public class ItemRepositoryTest {
+public class AmountGapTopServiceTest {
 	@Autowired
-	@Qualifier("itemRepositoryTushare")
-	ItemRepository itemRepository;
+	@Qualifier("amountGapTopServiceImp")
+	AmountGapTopService amountGapTopService;
 	
-	//@Test
-	public void testGetItemEntities() {
-		List<ItemEntity> items = itemRepository.getItemEntities();
-		for(ItemEntity item : items) {
-			System.out.println(item);
-		}
+	@Test
+	public void test() {
+		amountGapTopService.generateAmountGaps();
+		System.out.println("done!");
 	}
-
 }

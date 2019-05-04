@@ -1,6 +1,7 @@
 package com.rhb.istock.selector;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -10,6 +11,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import com.rhb.istock.selector.aat.AverageAmountTopService;
+import com.rhb.istock.selector.agt.AmountGapTopService;
 import com.rhb.istock.selector.bluechip.BluechipService;
 import com.rhb.istock.selector.dat.DailyAmountTopService;
 import com.rhb.istock.selector.favor.FavorService;
@@ -42,6 +44,10 @@ public class SelectorServiceImp implements SelectorService{
 	@Autowired
 	@Qualifier("holdServiceImp")
 	HoldService holdService;
+
+	@Autowired
+	@Qualifier("amountGapTopServiceImp")
+	AmountGapTopService amountGapTopService;
 	
 	@Override
 	public List<HoldEntity> getHolds() {
@@ -141,6 +147,27 @@ public class SelectorServiceImp implements SelectorService{
 	@Override
 	public void generateHighLowTops() {
 		hlt.generateHighLowTops();
+	}
+
+	@Override
+	public List<String> getHoldIDs() {
+		List<HoldEntity> holds  = getHolds();
+		List<String> ids = new ArrayList<String>();
+		for(HoldEntity hold : holds) {
+			ids.add(hold.getItemID());
+		}
+		return ids;
+	}
+
+	@Override
+	public void generateAmountGaps() {
+		amountGapTopService.generateAmountGaps();
+		
+	}
+
+	@Override
+	public List<String> getAmountGapTops(Integer top) {
+		return amountGapTopService.getAmountGapTops(top);
 	}
 
 }

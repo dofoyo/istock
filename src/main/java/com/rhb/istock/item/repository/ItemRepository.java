@@ -5,5 +5,6 @@ import java.util.List;
 public interface ItemRepository {
 	public List<String> getItemIDs();
 	public List<ItemEntity> getItemEntities();
-	public ItemEntity getItemEntity(String itemID);
+	//public ItemEntity getItemEntity(String itemID);
+	public void cacheEvict();
 }

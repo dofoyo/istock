@@ -12,6 +12,7 @@ public interface SelectorService{
 	 * 用于operation
 	 */
 	public List<HoldEntity> getHolds();
+	public List<String> getHoldIDs();
 
 	/*
 	 * 用于operation
@@ -58,5 +59,8 @@ public interface SelectorService{
 	public TreeMap<LocalDate,List<String>> getDailyAmountTops(Integer top, LocalDate beginDate, LocalDate endDate);
 	public void generateDailyAmountTops();
 
+	
+	public void generateAmountGaps();
+	public List<String> getAmountGapTops(Integer top);
 
 }

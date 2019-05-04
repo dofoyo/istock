@@ -2,8 +2,8 @@ package com.rhb.istock.trade.turtle.operation;
 
 import java.util.List;
 
+import com.rhb.istock.kdata.api.KdatasView;
 import com.rhb.istock.trade.turtle.operation.api.HoldView;
-import com.rhb.istock.trade.turtle.operation.api.KdatasView;
 import com.rhb.istock.trade.turtle.operation.api.TurtleView;
 
 /*
@@ -24,7 +24,7 @@ public interface TurtleOperationService {
 	public List<TurtleView> getAvTops(Integer top);
 	public List<TurtleView> getBluechips();
 	public List<TurtleView> getHighLowTops(Integer top);
-	
+	public List<TurtleView> getAgTops(Integer top);
 	
 	/*
 	 * 一般每周1-5，每天上午9:00初始化一次。主要是导入之前的历史记录

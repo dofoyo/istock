@@ -20,6 +20,12 @@ public class TurtleApi{
 	@Qualifier("turtleOperationServiceImp")
 	TurtleOperationService ts;
 
+	@GetMapping("/turtle/agtops")
+	public ResponseContent<List<TurtleView>> getAgTops() {
+		List<TurtleView> views = ts.getAgTops(89);
+		return new ResponseContent<List<TurtleView>>(ResponseEnum.SUCCESS, views);
+	}
+	
 	@GetMapping("/turtle/avtops")
 	public ResponseContent<List<TurtleView>> getAvTops() {
 		List<TurtleView> views = ts.getAvTops(89);
@@ -62,9 +68,5 @@ public class TurtleApi{
 		return new ResponseContent<List<TurtleView>>(ResponseEnum.SUCCESS, views);
 	}
 	
-	@GetMapping("/kdatas/{itemID}")
-	public ResponseContent<KdatasView> getKdatas(@PathVariable(value="itemID") String itemID) {
-		KdatasView kdatas = ts.getKdatas(itemID);
-		return new ResponseContent<KdatasView>(ResponseEnum.SUCCESS, kdatas);
-	}
+
 }

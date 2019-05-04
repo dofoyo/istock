@@ -44,6 +44,11 @@ public class Turtle {
 	 * 止损策略：0--不止损； 1--标准止损； 2--双重止损
 	 */
 	private Integer stopStrategy;  
+
+	/*
+	 * 止赢策略：0--不止赢； 1--标准止赢
+	 */
+	private Integer winStrategy; 
 	
 	private Integer gap;  //30在2013-2015年化为35%
 	
@@ -56,10 +61,10 @@ public class Turtle {
 	private Account account;
 
 	public Turtle() {
-		deficitFactor  = new BigDecimal(0.01); 
+		deficitFactor  = new BigDecimal(0.005); 
 		openDuration = 89; 
 		dropDuration = 34; 
-		maxOfLot = 3; 
+		maxOfLot = 1; 
 		initCash = new BigDecimal(500000);
 		stopStrategy  = 1;
 		gap = 60;

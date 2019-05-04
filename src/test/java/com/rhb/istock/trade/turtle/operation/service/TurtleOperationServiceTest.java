@@ -9,9 +9,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import com.rhb.istock.kdata.api.KdatasView;
 import com.rhb.istock.trade.turtle.operation.TurtleOperationService;
 import com.rhb.istock.trade.turtle.operation.api.HoldView;
-import com.rhb.istock.trade.turtle.operation.api.KdatasView;
 import com.rhb.istock.trade.turtle.operation.api.TurtleView;
 
 @RunWith(SpringJUnit4ClassRunner.class)

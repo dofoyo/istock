@@ -31,8 +31,8 @@ public class TurtleSimulationTest {
 	@Qualifier("selectorServiceImp")
 	SelectorService selectorService;
 	
-	@Test
-	public void simulate() {
+	//@Test
+	public void simulate1() {
 		Map<LocalDate, Map<String,String>> results = new TreeMap<LocalDate,Map<String,String>>();
 		Integer beginYear = 2010;
 		LocalDate beginDate, endDate;
@@ -73,4 +73,21 @@ public class TurtleSimulationTest {
 		}
 		return dailyItems;
 	}
+	
+	@Test
+	public void simulate2() {
+		LocalDate beginDate, endDate;
+		beginDate = LocalDate.of(2019,2,11);
+		endDate = LocalDate.of(2019,4,5);
+
+		//TreeMap<LocalDate,List<String>> dailyItems = selectorService.getAverageAmountTops(13, beginDate, endDate);
+		//TreeMap<LocalDate,List<String>> dailyItems = this.getSpecifyItem("sh600309", beginDate, endDate);
+		//TreeMap<LocalDate,List<String>> dailyItems = selectorService.getBluechipIDs(beginDate, endDate);
+		//TreeMap<LocalDate,List<String>> dailyItems = selectorService.getDailyAmountTops(13, beginDate, endDate);
+		TreeMap<LocalDate,List<String>> dailyItems = selectorService.getHighLowTops(13, beginDate, endDate);
+			
+		turtleSimulation.simulate(dailyItems, null);
+
+	}
+
 }

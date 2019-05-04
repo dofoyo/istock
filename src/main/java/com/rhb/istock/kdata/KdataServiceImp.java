@@ -111,6 +111,9 @@ public class KdataServiceImp implements KdataService{
 			kdataSpider.downKdata(date);
 			System.out.println("downloaded "+ date +" kdatas from tushare.");
 		}
+		
+		evictDailyKDataCache();
+
 	}
 
 

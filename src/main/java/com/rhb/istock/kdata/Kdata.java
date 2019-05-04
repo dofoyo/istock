@@ -17,6 +17,24 @@ public class Kdata {
 		this.bars = new TreeMap<LocalDate,Kbar>();
 	}
 	
+	public Integer getSize() {
+		return this.bars.size();
+	}
+	
+	public BigDecimal[] getTotalAmounts() {
+		Integer half = this.bars.size()/2;
+		BigDecimal[] total = {new BigDecimal(0),new BigDecimal(0)};
+		int i=0;
+		for(Kbar bar : bars.values()) {
+			if(i++ < half) {
+				total[0] = total[0].add(bar.getAmount());
+			}else {
+				total[1] = total[1].add(bar.getAmount());
+			}
+		}
+		return total;
+	}
+	
 	public BigDecimal getAvarageAmount() {
 		BigDecimal total = new BigDecimal(0);
 		for(Kbar kbar : bars.values()) {

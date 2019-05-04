@@ -15,6 +15,7 @@ latestHighLowTopsFile: D:/dev/istock-data/latestHighLowTops.txt
 highLowTopsFile: D:/dev/istock-data/highLowTops.txt
 twinOpenListFile: D:/dev/istock-data/twinOpenList.txt
 twinDropListFile: D:/dev/istock-data/twinDropList.txt
+amountGapsFile: D:/dev/istock-data/amountGaps.txt
 
 
 
