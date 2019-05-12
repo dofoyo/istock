@@ -7,7 +7,6 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.rhb.istock.comm.api.ResponseContent;
@@ -20,6 +19,12 @@ public class TurtleApi{
 	@Qualifier("turtleOperationServiceImp")
 	TurtleOperationService ts;
 
+	@GetMapping("/turtle/breakers")
+	public ResponseContent<List<TurtleView>> getBreakers() {
+		List<TurtleView> views = ts.getBreakers();
+		return new ResponseContent<List<TurtleView>>(ResponseEnum.SUCCESS, views);
+	}
+	
 	@GetMapping("/turtle/agtops")
 	public ResponseContent<List<TurtleView>> getAgTops() {
 		List<TurtleView> views = ts.getAgTops(89);

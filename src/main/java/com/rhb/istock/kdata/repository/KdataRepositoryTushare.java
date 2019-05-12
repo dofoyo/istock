@@ -65,18 +65,19 @@ public class KdataRepositoryTushare implements KdataRepository{
 					nowFactor = factors.get(date);
 					if(preFactor==null) preFactor = nowFactor;
 					
-					//System.out.println(item);
-					//System.out.println(nowFactor);
-					//System.out.println(preFactor);
-					
-					open = getPrice(item.getBigDecimal(2),nowFactor,roof);
-					high = getPrice(item.getBigDecimal(3),nowFactor,roof);
-					low = getPrice(item.getBigDecimal(4),nowFactor,roof);
-					close = getPrice(item.getBigDecimal(5),nowFactor,roof);
-					amount = item.getBigDecimal(10);
-					quantity = item.getBigDecimal(9);
 
-					kdata.addBar(date,open,high,low,close,amount,quantity);
+					try {
+						open = getPrice(item.getBigDecimal(2),nowFactor,roof);
+						high = getPrice(item.getBigDecimal(3),nowFactor,roof);
+						low = getPrice(item.getBigDecimal(4),nowFactor,roof);
+						close = getPrice(item.getBigDecimal(5),nowFactor,roof);
+						amount = item.getBigDecimal(10);
+						quantity = item.getBigDecimal(9);						
+						kdata.addBar(date,open,high,low,close,amount,quantity);
+					}catch(Exception e) {
+						System.err.println(item);
+						System.err.println(nowFactor);
+						System.err.println(preFactor);					}
 				}
 			}
 		}

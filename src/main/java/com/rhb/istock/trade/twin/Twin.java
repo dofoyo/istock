@@ -80,7 +80,7 @@ public class Twin {
 		Wfeature feature = bdata.getFeature();
 		//System.out.println(feature);
 		if(feature!=null && feature.getStatus()<0) {
-			account.drop(itemID);
+			account.drop(itemID,"");
 		}
 	}
 	
@@ -95,7 +95,7 @@ public class Twin {
 			BigDecimal now = feature.getNowPrice();
 			boolean stop = now.subtract(openPrice).divide(openPrice,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)).intValue() < stopLossRatio;
 			if(stop) {
-				account.stopByItemID(itemID);
+				account.stopByItemID(itemID,"");
 			}
 		}
 	}
@@ -111,7 +111,7 @@ public class Twin {
 		if(!account.getItemIDsOfHolds().contains(itemID)) {
 			Integer quantity = getQuantity(itemID,price);
 			if(quantity>0) {
-				account.open(itemID, quantity);
+				account.open(itemID, quantity,"");
 			}
 		}		
 	}

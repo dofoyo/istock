@@ -6,5 +6,5 @@ import java.util.Map;
 import java.util.TreeMap;
 
 public interface TurtleSimulation {
-	public Map<String, String> simulate(TreeMap<LocalDate,List<String>> dailyItems, Toption option);
+	public Map<String, String> simulate(TreeMap<LocalDate,List<String>> dailyItems, Toption option, boolean byCache);
 }

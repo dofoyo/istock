@@ -29,6 +29,7 @@ public class Tfeature {
 	private BigDecimal now;
 	private BigDecimal atr;
 	private Integer status;
+	private BigDecimal dropPrice;  // 在dropduration期间的均价。当dropDuration为34时，几乎就是30日均线价。根据经验，跌破30日均线价，最好平仓出局。
 	
 	public Tfeature(String itemID) {
 		this.itemID = itemID;
@@ -52,8 +53,20 @@ public class Tfeature {
 		}else {
 			status = -2;
 		}
+		
+		if(now.compareTo(dropPrice)==-1 && status>0) {
+			status = -1;
+		}
 	}
 	
+	public BigDecimal getDropPrice() {
+		return dropPrice;
+	}
+
+	public void setDropPrice(BigDecimal dropPrice) {
+		this.dropPrice = dropPrice;
+	}
+
 	public BigDecimal getOpenHigh() {
 		return openHigh;
 	}
@@ -134,7 +147,7 @@ public class Tfeature {
 	@Override
 	public String toString() {
 		return "Feature [itemID=" + itemID + ", openHigh=" + openHigh + ", openLow=" + openLow + ", hlgap=" + hlgap
-				+ ", nhgap=" + nhgap + ", nlgap=" + nlgap + ", dropHigh=" + dropHigh + ", dropLow=" + dropLow + ", now="
+				+ ", nhgap=" + nhgap + ", nlgap=" + nlgap + ", dropHigh=" + dropHigh + ", dropLow=" + dropLow + ", dropPrice=" + dropPrice + ", now="
 				+ now + ", atr=" + atr + ", status=" + status + "]";
 	}
 	

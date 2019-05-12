@@ -53,6 +53,12 @@ public class IstockScheduledTask {
 		selectorService.generateLatestAverageAmountTops();
 		selectorService.generateLatestHighLowTops();
 		selectorService.generateAmountGaps();
+		selectorService.generateLatestBreakers();
+	}
+
+	@Scheduled(cron="0 30 15 ? * 1-5") 
+	public void dailyClose() throws Exception {
+		selectorService.generateBreakersWithLatestKdata();
 	}
 	
 	@Scheduled(cron="0 0 5 ? * *") //每日凌晨5点，下载最新年报，并生成bluechip

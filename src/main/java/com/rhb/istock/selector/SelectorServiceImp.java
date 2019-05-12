@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import com.rhb.istock.selector.aat.AverageAmountTopService;
 import com.rhb.istock.selector.agt.AmountGapTopService;
 import com.rhb.istock.selector.bluechip.BluechipService;
+import com.rhb.istock.selector.bt.BreakThroughService;
 import com.rhb.istock.selector.dat.DailyAmountTopService;
 import com.rhb.istock.selector.favor.FavorService;
 import com.rhb.istock.selector.hlt.HighLowTopService;
@@ -48,6 +49,10 @@ public class SelectorServiceImp implements SelectorService{
 	@Autowired
 	@Qualifier("amountGapTopServiceImp")
 	AmountGapTopService amountGapTopService;
+	
+	@Autowired
+	@Qualifier("breakThroughService")
+	BreakThroughService breakThroughService;
 	
 	@Override
 	public List<HoldEntity> getHolds() {
@@ -168,6 +173,42 @@ public class SelectorServiceImp implements SelectorService{
 	@Override
 	public List<String> getAmountGapTops(Integer top) {
 		return amountGapTopService.getAmountGapTops(top);
+	}
+
+	@Override
+	public void generateBreakers() {
+		breakThroughService.generateBreakers();
+		
+	}
+
+	@Override
+	public TreeMap<LocalDate, List<String>> getBreakers(LocalDate beginDate, LocalDate endDate) {
+		TreeMap<LocalDate, List<String>> ids = new TreeMap<LocalDate, List<String>>();
+		
+		Map<LocalDate, List<String>> breaks = breakThroughService.getBreakers();
+		
+		for(LocalDate date = beginDate; date.isBefore(endDate); date = date.plusDays(1)) {
+			if(breaks.containsKey(date)) {
+				ids.put(date, breaks.get(date));
+			}
+		}
+		
+		return ids;
+	}
+
+	@Override
+	public void generateLatestBreakers() {
+		breakThroughService.generateLatestBreakers();
+	}
+
+	@Override
+	public List<String> getLatestBreakers() {
+		return breakThroughService.getLatestBreakers();
+	}
+
+	@Override
+	public void generateBreakersWithLatestKdata() {
+		breakThroughService.generateLatestBreakersWithLatestKdata();		
 	}
 
 }

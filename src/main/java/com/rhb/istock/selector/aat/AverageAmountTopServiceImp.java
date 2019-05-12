@@ -125,9 +125,12 @@ public class AverageAmountTopServiceImp implements AverageAmountTopService{
 			Progress.show(items.size(), d++, item.getCode());
 			
 			kdata = kdataService.getDailyKdata(item.getItemID(), byCache);
+			//System.out.println(kdata.getString());
 			dates = new ArrayList<LocalDate>(kdata.getDates());
 			for(LocalDate date : dates) {
 				kdata = kdataService.getDailyKdata(item.getItemID(), date, duration, byCache);
+				//System.out.println(date + "," + duration);
+				//System.out.println(kdata.getString());
 				amount = new AverageAmount(date,item.getItemID(),kdata.getAvarageAmount());
 					
 				if(tops.containsKey(date)) {

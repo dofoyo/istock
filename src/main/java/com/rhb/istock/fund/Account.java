@@ -2,6 +2,7 @@ package com.rhb.istock.fund;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.Period;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -41,10 +42,22 @@ public class Account {
 		prices = new HashMap<String,BigDecimal>();
 	}
 	
-	public String reopen(String itemID, Integer quantity) {
+	public String getDailyLog() {
+		StringBuffer sb = new StringBuffer();
+		sb.append(endDate.toString());
+		sb.append(",");
+		sb.append(cash.toString());
+		sb.append(",");
+		sb.append(this.getValue().toString());
+		sb.append(",");
+		sb.append(this.getTotal().toString());
+		return sb.toString();
+	}
+	
+	public String reopen(String itemID, Integer quantity, String note) {
 		String orderID = UUID.randomUUID().toString();
 		Order order = new Order(orderID,itemID,LocalDate.parse(endDate.toString()),prices.get(itemID),quantity);
-		order.setNote("reopen");
+		order.setNote("reopen，" + note);
 		
 		System.out.println(order); //----------------------------------------------
 		
@@ -56,10 +69,10 @@ public class Account {
 		return orderID;
 	}
 	
-	public String open(String itemID, Integer quantity) {
+	public String open(String itemID, Integer quantity, String note) {
 		String orderID = UUID.randomUUID().toString();
 		Order order = new Order(orderID,itemID,LocalDate.parse(endDate.toString()),prices.get(itemID),quantity);
-		order.setNote("open");
+		order.setNote("open，" + note);
 
 		System.out.println(order); //----------------------------------------------
 
@@ -71,13 +84,13 @@ public class Account {
 		return orderID;
 	}
 	
-	public void drop(String itemID) {
+	public void drop(String itemID, String note) {
 		Order openOrder;
 		for(Iterator<Map.Entry<String, Order>> hands_it = holds.entrySet().iterator(); hands_it.hasNext();) {
 			openOrder = hands_it.next().getValue();
 			if(openOrder.getItemID().equals(itemID)) {
 				Order dropOrder = new Order(openOrder.getOrderID(),itemID, LocalDate.parse(endDate.toString()), prices.get(itemID), openOrder.getQuantity());
-				dropOrder.setNote("drop");
+				dropOrder.setNote("drop，" + note);
 
 				System.out.println(dropOrder); //----------------------------------------------
 			
@@ -90,13 +103,13 @@ public class Account {
 		}
 	}
 	
-	public void stopByItemID(String itemID) {
+	public void stopByItemID(String itemID, String note) {
 		Order openOrder;
 		for(Iterator<Map.Entry<String, Order>> hands_it = holds.entrySet().iterator(); hands_it.hasNext();) {
 			openOrder = hands_it.next().getValue();
 			if(openOrder.getItemID().equals(itemID)) {
 				Order stopOrder = new Order(openOrder.getOrderID(),itemID, LocalDate.parse(endDate.toString()), prices.get(itemID), openOrder.getQuantity());
-				stopOrder.setNote("stop");
+				stopOrder.setNote("stop，" + note);
 
 				System.out.println(stopOrder); //----------------------------------------------
 			
@@ -116,7 +129,22 @@ public class Account {
 			stopOrder.setNote("stop");
 
 			System.out.println(stopOrder); //----------------------------------------------
-		
+			
+			cash = cash.add(stopOrder.getAmount()); 			//卖出时，现金增加
+			value = value.subtract(stopOrder.getAmount());		//市值减少	
+			
+			holds.remove(orderID);
+			stops.put(stopOrder.getOrderID(), stopOrder);
+		}
+	}
+	
+	public void cancelByOrderID(String orderID) {
+		Order openOrder = holds.get(orderID);
+		if(openOrder!=null) {
+			Order stopOrder = new Order(openOrder.getOrderID(), openOrder.getItemID(), LocalDate.parse(endDate.toString()), prices.get(openOrder.getItemID()), openOrder.getQuantity());
+			stopOrder.setNote("cancel");
+
+			System.out.println(stopOrder); //----------------------------------------------
 			
 			cash = cash.add(stopOrder.getAmount()); 			//卖出时，现金增加
 			value = value.subtract(stopOrder.getAmount());		//市值减少	
@@ -145,6 +173,27 @@ public class Account {
 		for(Order order : holds.values()) {
 			ids.add(order.getItemID());
 		}
+		return ids;
+	}
+	
+	public boolean isStupid(String itemID, String orderID, Integer days) {
+		boolean flag = false;
+		Integer dd = Period.between(holds.get(orderID).getDate(), endDate).getDays();
+		if(Period.between(holds.get(orderID).getDate(), endDate).getDays() >= days && 
+				holds.get(orderID).getPrice().compareTo(prices.get(itemID))< 0
+				) {
+			flag = true;
+		}
+		return flag;
+	}
+	
+	public Set<String> getHoldOrderIDs(String itemID){
+		Set<String> ids = new HashSet<String>();
+		for(Order order : holds.values()) {
+			if(order.getItemID().equals(itemID)) {
+				ids.add(order.getOrderID());
+			}
+		}		
 		return ids;
 	}
 	

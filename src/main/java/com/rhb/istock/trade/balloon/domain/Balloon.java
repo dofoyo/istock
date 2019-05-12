@@ -142,7 +142,7 @@ public class Balloon {
 		
 		//止损或止盈
 		if(feature.getStatus() == -2) {
-			account.stopByItemID(feature.getItemID());
+			account.stopByItemID(feature.getItemID(),"");
 		}
 
 /*		//平仓
@@ -152,12 +152,12 @@ public class Balloon {
 		
 		//开新仓
 		if(feature.getStatus()==1) {
-			account.open(feature.getItemID(), getQuantity(feature.getItemID(),feature.getNow()));
+			account.open(feature.getItemID(), getQuantity(feature.getItemID(),feature.getNow()),"");
 		}
 		
 		//加仓
 		if(feature.getStatus()==2) {
-			account.reopen(feature.getItemID(), getQuantity(feature.getItemID(),feature.getNow()));
+			account.reopen(feature.getItemID(), getQuantity(feature.getItemID(),feature.getNow()), "");
 		}	
 		
 	}

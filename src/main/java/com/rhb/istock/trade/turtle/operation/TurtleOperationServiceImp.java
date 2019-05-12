@@ -174,6 +174,11 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 	}
 
 	@Override
+	public List<TurtleView> getBreakers() {
+		return getTurtleViews(selectorService.getLatestBreakers(),"breakers");
+	}
+	
+	@Override
 	public List<TurtleView> getDailyTops(Integer top) {
 		return getTurtleViews(selectorService.getLatestDailyAmountTops(top),"daily tops");
 	}

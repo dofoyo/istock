@@ -17,7 +17,7 @@ public class AverageAmountTopServiceTest {
 	@Qualifier("averageAmountTopServiceImp")
 	AverageAmountTopService averageAmountTopService;
 	
-	@Test
+	//@Test
 	public void getLatestAverageAmountTops() {
 		List<String> ids = averageAmountTopService.getLatestAverageAmountTops(10);
 		System.out.println(ids);			

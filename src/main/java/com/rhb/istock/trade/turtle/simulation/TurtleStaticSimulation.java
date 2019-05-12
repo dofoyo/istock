@@ -1,6 +1,8 @@
 package com.rhb.istock.trade.turtle.simulation;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -29,13 +31,15 @@ public class TurtleStaticSimulation implements TurtleSimulation{
 	@Qualifier("kdataServiceImp")
 	KdataService kdataService;
 
-	boolean byCache = true;
+	boolean cache = true;
 	
 	Turtle turtle = null;
 	
 	@Override
-	public Map<String, String> simulate(TreeMap<LocalDate,List<String>> dailyItems, Toption option) {
+	public Map<String, String> simulate(TreeMap<LocalDate,List<String>> dailyItems, Toption option, boolean cache) {
 		if(dailyItems==null || dailyItems.size()==0) return null;
+		
+		this.cache = cache;
 		
 		if(option==null) {
 			turtle = new Turtle();			
@@ -46,6 +50,7 @@ public class TurtleStaticSimulation implements TurtleSimulation{
 					option.getMaxOfLot(),
 					option.getInitCash(),
 					option.getStopStrategy(),
+					option.getCancels(),
 					option.getGap());
 		}
 		
@@ -67,7 +72,10 @@ public class TurtleStaticSimulation implements TurtleSimulation{
 				}
 			}
 			System.out.println("");
-			turtle.doIt();
+			//turtle.doIt(isGoodTime(entry.getKey(),30)); //以上证指数的30日均线为准绳，线上操作，线下休息，个股要止损，可加仓（增长率7%，盈率42%）
+			//turtle.doIt(isGoodTime1(entry.getKey()));  //以上证指数的是否突破和30日均线为准绳，突破操作，跌破30日均线休息，个股要止损，可加仓（增长率6%，盈率39%）
+			turtle.doIt(true); //不管大盘，个股可加仓、要止损。（增长率10%，盈率37%）
+			
 		}
 		
 		Map<String, String> result = turtle.result();
@@ -77,13 +85,14 @@ public class TurtleStaticSimulation implements TurtleSimulation{
 		System.out.println("total: " + result.get("total"));
 		System.out.println("CAGR: " + result.get("cagr"));
 		System.out.println("winRatio: " + result.get("winRatio"));
-		FileUtil.writeTextFile(reportPath + "/one_item_simulation_" + System.currentTimeMillis() + ".csv", result.get("CSV"), false);
+		FileUtil.writeTextFile(reportPath + "/one_item_simulation_detail" + System.currentTimeMillis() + ".csv", result.get("CSV"), false);
+		FileUtil.writeTextFile(reportPath + "/one_item_simulation_dailyLog" + System.currentTimeMillis() + ".csv", result.get("dailyLog"), false);
 		return result;
 	}
 
 	private void setDailyKdata(String itemID, LocalDate theDate) {
 		Kbar kbar;
-		Kdata kdata = kdataService.getDailyKdata(itemID, theDate, turtle.getOpenDuration(), byCache);
+		Kdata kdata = kdataService.getDailyKdata(itemID, theDate, turtle.getOpenDuration(), cache);
 		
 		List<LocalDate> dates = kdata.getDates();
 		//System.out.println(dates);
@@ -95,10 +104,81 @@ public class TurtleStaticSimulation implements TurtleSimulation{
 	}
 	
 	private Kbar setLatestKdata(String itemID, LocalDate theDate) {
-		Kbar kbar = kdataService.getKbar(itemID, theDate, byCache);
+		Kbar kbar = kdataService.getKbar(itemID, theDate, cache);
 		if(kbar!=null) {
 			turtle.addLatestData(itemID,theDate ,kbar.getOpen(), kbar.getHigh(), kbar.getLow(), kbar.getClose());
 		}
 		return kbar;
 	}
+	
+	
+	/*
+	 * 操作系统：线上操作，向下休息
+	 */
+	private boolean isGoodTime(LocalDate theDate, Integer duration) {
+		Kdata kdata = kdataService.getDailyKdata("sh000001", theDate, duration, true);
+		return kdata.isAboveAvaragePrice()==1 ? true : false; 
+	}
+	
+	
+	private boolean isGoodTime(LocalDate theDate) {
+		boolean flag = false;
+		Map<String, String> goodTimes = new HashMap<String,String>();
+		goodTimes.put("2006/06/01","2006/06/09");
+		goodTimes.put("2006/07/03","2006/07/31");
+		goodTimes.put("2006/10/09","2007/02/05");
+		goodTimes.put("2007/05/22","2007/06/04");
+		goodTimes.put("2007/07/26","2007/11/05");
+		goodTimes.put("2009/02/16","2009/02/27");
+		goodTimes.put("2009/04/01","2009/08/12");
+		goodTimes.put("2010/10/08","2010/11/16");
+		goodTimes.put("2011/04/08","2011/04/25");
+		goodTimes.put("2012/12/25","2013/02/21");
+		goodTimes.put("2014/07/28","2014/10/23");
+		goodTimes.put("2014/10/31","2015/02/02");
+		goodTimes.put("2015/03/16","2015/06/19");
+		goodTimes.put("2016/08/15","2016/09/12");
+		goodTimes.put("2016/11/08","2016/12/12");
+		goodTimes.put("2017/08/25","2017/11/03");
+		goodTimes.put("2017/11/13","2017/11/17");
+		goodTimes.put("2018/01/18","2018/02/06");
+		goodTimes.put("2019/02/22","2019/04/25");
+		
+		LocalDate bDate, eDate;
+		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd");
+		
+		for(Map.Entry<String, String> entry : goodTimes.entrySet()) {
+			bDate = LocalDate.parse(entry.getKey(), dtf).minusDays(1);
+			eDate = LocalDate.parse(entry.getValue(), dtf);
+			if(theDate.isAfter(bDate) && theDate.isBefore(eDate)) {
+				return true;
+			}
+		}
+		
+		return flag;
+	}
+
+	//牛市
+	private boolean isGoodTime1(LocalDate theDate) {
+		boolean flag = false;
+		Map<String, String> goodTimes = new HashMap<String,String>();
+		goodTimes.put("2005/12/09","2007/11/05");
+		goodTimes.put("2009/01/22","2009/08/12");
+		goodTimes.put("2014/07/22","2015/06/19");
+		goodTimes.put("2019/02/11","2019/04/25");
+		
+		LocalDate bDate, eDate;
+		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd");
+		
+		for(Map.Entry<String, String> entry : goodTimes.entrySet()) {
+			bDate = LocalDate.parse(entry.getKey(), dtf).minusDays(1);
+			eDate = LocalDate.parse(entry.getValue(), dtf);
+			if(theDate.isAfter(bDate) && theDate.isBefore(eDate)) {
+				return true;
+			}
+		}
+		
+		return flag;
+	}
+
 }

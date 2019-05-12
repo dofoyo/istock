@@ -83,6 +83,20 @@ public class Tdata {
 		return max;
 	}	
 	
+	private BigDecimal getDropPrice(Integer duration) {
+		BigDecimal dropPrice = null;
+		BigDecimal total = new BigDecimal(0);
+		Integer fromIndex = this.bars.size()>duration ? this.bars.size()-duration : 0;
+		Integer toIndex = this.bars.size();
+		List<Tbar> subBars = this.bars.subList(fromIndex, toIndex);
+		for(Tbar bar : subBars) {
+			total = total.add(bar.getClose());
+		}
+		dropPrice = total.divide(new BigDecimal(subBars.size()),BigDecimal.ROUND_HALF_UP);
+		
+		return dropPrice;
+	}
+	
 	
 	private BigDecimal[] getHighestAndLowest(Integer duration) {
 		Integer fromIndex = this.bars.size()>duration ? this.bars.size()-duration : 0;
@@ -123,7 +137,9 @@ public class Tdata {
 		hl = getHighestAndLowest(dropDuration);
 		this.feature.setDropHigh(hl[0]);
 		this.feature.setDropLow(hl[1]);
-
+		
+		this.feature.setDropPrice(getDropPrice(dropDuration));
+		
 		this.feature.setAtr(getATR());
 		
 		this.feature.reset();

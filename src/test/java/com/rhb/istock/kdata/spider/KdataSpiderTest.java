@@ -19,6 +19,10 @@ public class KdataSpiderTest {
 	@Autowired
 	@Qualifier("kdataSpiderTushare")
 	KdataSpider kdataSpiderTushare;
+
+	@Autowired
+	@Qualifier("kdataSpider163")
+	KdataSpider kdataSpider163;
 	
 	@Autowired
 	@Qualifier("itemRepositoryTushare")
@@ -40,7 +44,7 @@ public class KdataSpiderTest {
 		}
 	}
 
-	@Test
+	//@Test
 	public void testDwnKdataByDate() {
 		LocalDate date = LocalDate.parse("2019-03-19");
 		try {
@@ -50,6 +54,17 @@ public class KdataSpiderTest {
 		}
 		
 		System.out.println("done!");
+	}
+	
+	@Test
+	public void testDownKdataByIDFrom163() {
+		String id = "sh000001";
+		try {
+			kdataSpider163.downKdata(id);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 }

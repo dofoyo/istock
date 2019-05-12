@@ -28,16 +28,31 @@ public class KdataServiceImp implements KdataService{
 	@Qualifier("kdataSpiderTushare")
 	KdataSpider kdataSpider;
 
+	@Autowired
+	@Qualifier("kdataRepository163")
+	KdataRepository kdataRepository163;
+	
+	@Autowired
+	@Qualifier("kdataSpider163")
+	KdataSpider kdataSpider163;
+	
+	private String szzs = "sh000001"; //上证指数
+	
+	private KdataEntity getEntity(String itemID, boolean byCache) {
+		KdataEntity entity = null;
+		if(byCache) {
+			entity = szzs.equals(itemID)? kdataRepository163.getDailyKdataByCache(szzs): kdataRepository.getDailyKdataByCache(itemID);
+		}else {
+			entity = szzs.equals(itemID)? kdataRepository163.getDailyKdata(szzs): kdataRepository.getDailyKdata(itemID);
+		}
+		return entity;
+	}
+	
 	@Override
 	public Kdata getDailyKdata(String itemID, boolean byCache) {
 		Kdata kdata = new Kdata(itemID);
 		
-		KdataEntity entity = null;
-		if(byCache) {
-			entity = kdataRepository.getDailyKdataByCache(itemID);
-		}else {
-			entity = kdataRepository.getDailyKdata(itemID);
-		}
+		KdataEntity entity = this.getEntity(itemID, byCache);
 		
 		//System.out.println(entity.getBarSize());
 		LocalDate date;
@@ -57,13 +72,8 @@ public class KdataServiceImp implements KdataService{
 
 		KbarEntity bar;
 		LocalDate date = endDate.minusDays(1);
-		KdataEntity entity = null;
 		
-		if(byCache) {
-			entity = kdataRepository.getDailyKdataByCache(itemID);
-		}else {
-			entity = kdataRepository.getDailyKdata(itemID);
-		}
+		KdataEntity entity = this.getEntity(itemID, byCache);
 		
 		//System.out.println(entity.getBarSize());
 		
@@ -94,7 +104,6 @@ public class KdataServiceImp implements KdataService{
 		return kdataRealtimeSpider.getLatestMarketDate();
 	}
 
-
 	@Override
 	public void downKdatas() throws Exception {
 		System.out.println("KdataService.downKdatas..........");
@@ -112,6 +121,8 @@ public class KdataServiceImp implements KdataService{
 			System.out.println("downloaded "+ date +" kdatas from tushare.");
 		}
 		
+		kdataSpider163.downKdata(szzs);
+		
 		evictDailyKDataCache();
 
 	}
@@ -120,13 +131,7 @@ public class KdataServiceImp implements KdataService{
 	@Override
 	public Kbar getKbar(String itemID, LocalDate date, boolean byCache) {
 		Kbar kbar= null;
-		KdataEntity entity = null;
-		
-		if(byCache) {
-			entity = kdataRepository.getDailyKdataByCache(itemID);
-		}else {
-			entity = kdataRepository.getDailyKdata(itemID);
-		}
+		KdataEntity entity = this.getEntity(itemID, byCache);
 		
 		KbarEntity bar = entity.getBar(date);
 		if(bar!=null) {
@@ -141,6 +146,7 @@ public class KdataServiceImp implements KdataService{
 	@Override
 	public void evictDailyKDataCache() {
 		kdataRepository.evictDailyKDataCache();
+		kdataRepository163.evictDailyKDataCache();
 	}
 
 	@Override

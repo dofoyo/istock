@@ -9,8 +9,17 @@ public class Toption {
 	private Integer maxOfLot;
 	private BigDecimal initCash;
 	private Integer stopStrategy;
+	private Integer cancels; 	//多少天后，如果还不涨，取消持股
 	private Integer gap;
 
+	
+	
+	public Integer getCancels() {
+		return cancels;
+	}
+	public void setCancels(Integer cancels) {
+		this.cancels = cancels;
+	}
 	public BigDecimal getDeficitFactor() {
 		return deficitFactor;
 	}

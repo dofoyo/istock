@@ -17,7 +17,6 @@ import com.rhb.istock.fund.Account;
  * 最高的年化收益率16%
  * 
  * 调试时，通过构造器修改参数，确定参数后，将参数设为默认值。
- * 
  */
 public class Turtle {
 	/*
@@ -41,7 +40,7 @@ public class Turtle {
 	private Integer maxOfLot; 
 
 	/*
-	 * 止损策略：0--不止损； 1--标准止损； 2--双重止损
+	 * 止损策略：0--不止损； 1--标准止损； 2--双重止损; 3--三天不涨，止损
 	 */
 	private Integer stopStrategy;  
 
@@ -52,24 +51,27 @@ public class Turtle {
 	
 	private Integer gap;  //30在2013-2015年化为35%
 	
+	private Integer cancels;
+	
 	/*
 	 * 初始值现金。无所谓，一般不低于10万
 	 */
 	private BigDecimal initCash;
-	
-	private Map<String, Tdata> tdatas;
 	private Account account;
+	
+	private Map<String, Tdata> tdatas = new HashMap<String,Tdata>();
+	private StringBuffer dailyLog = new StringBuffer("date,cash,value,total\n");
 
 	public Turtle() {
 		deficitFactor  = new BigDecimal(0.005); 
 		openDuration = 89; 
 		dropDuration = 34; 
 		maxOfLot = 1; 
-		initCash = new BigDecimal(500000);
+		initCash = new BigDecimal(5000000);
 		stopStrategy  = 1;
 		gap = 60;
+		cancels = 2;
 		account = new Account(initCash);
-		tdatas = new HashMap<String,Tdata>();		
 	}
 	
 	public Turtle(BigDecimal deficitFactor, 
@@ -78,7 +80,8 @@ public class Turtle {
 				Integer maxOfLot, 
 				BigDecimal initCash, 
 				Integer stopStrategy,
-				Integer gap
+				Integer gap,
+				Integer cancels
 				) {
 		
 		this.deficitFactor = deficitFactor;
@@ -88,8 +91,8 @@ public class Turtle {
 		this.initCash = initCash;
 		this.stopStrategy = stopStrategy;
 		this.gap = gap;
+		this.cancels = cancels;
 		account = new Account(initCash);
-		tdatas = new HashMap<String,Tdata>();
 	}
 	
 	public Set<String> getItemIDsOfHolds(){
@@ -152,7 +155,7 @@ public class Turtle {
 	/*
 	 * 
 	 */
-	public void doIt() {
+	public void doIt(boolean isGoodTime) {
 		Tfeature f;
 		List<Tfeature> features = new ArrayList<Tfeature>();
 		for(Tdata tdata : tdatas.values()) {
@@ -176,11 +179,18 @@ public class Turtle {
 		});
 		
 		for(Tfeature feature : features) {
-			doIt(feature.getItemID());
+			if((account.getItemIDsOfHolds().contains(feature.getItemID())) 
+					|| (account.getCash().compareTo(new BigDecimal(10000))==1)) {
+				doIt(feature.getItemID(), isGoodTime);
+			}
 		}
+		
+		dailyLog.append(account.getDailyLog() + "\n");
+		
+		System.out.println("********* " + account.getDailyLog());
 	}
 
-	private void doIt(String itemID) {
+	private void doIt(String itemID, boolean isGoodTime) {
 		Tdata tdata = tdatas.get(itemID);
 		if(tdata == null) {
 			System.out.format("ERROR: tdata is null of %s.\n", itemID);
@@ -195,6 +205,9 @@ public class Turtle {
 			return;
 		}
 		
+		//几天后不涨，取消持仓
+		//cancel(itemID);
+		
 		//止损
 		if(stopStrategy==1) {
 			doStop(itemID);
@@ -203,13 +216,22 @@ public class Turtle {
 		}
 		
 		//平仓
-		doDrop(itemID);
+		doDrop(itemID, isGoodTime);
 		
 		//加仓
-		doReopen(itemID);
+		//doReopen(itemID, isGoodTime);
 		
 		//开新仓
-		doOpen(itemID);
+		doOpen(itemID, isGoodTime);
+	}
+	
+	private void cancel(String itemID) {
+		Set<String> orderIDs = account.getHoldOrderIDs(itemID);
+		for(String orderID : orderIDs) {
+			if(account.isStupid(itemID, orderID, cancels)) {
+				account.cancelByOrderID(orderID);
+			}
+		}
 	}
 	
 	//双重止损
@@ -259,58 +281,69 @@ public class Turtle {
 			System.out.println("stopPrice=" + stopPrice + ",now=" + now);
 			if(stopPrice.compareTo(now)==1) {
 				System.out.println("do stop!!");
-				account.stopByItemID(itemID);
+				account.stopByItemID(itemID, "");
 				System.out.println("cash=" + account.getCash());
-
 			}
 		}		
 	}
 	
-	private void doDrop(String itemID) {
+	private void doDrop(String itemID, boolean isGoodTime) {
 		Tdata tdata = tdatas.get(itemID);
 		Tfeature feature = tdata.getFeature();
 		Integer lots = account.getLots(tdata.getItemID());
-		if(lots>0 && feature.getStatus()<0) {
-			System.out.println("the lots " + lots + ">0, and status is "+feature.getStatus()+", do drop!!");//--------------
-			account.drop(itemID);
+		if((lots>0 && feature.getStatus()<0) || !isGoodTime) {
+			System.out.println("the lots " + lots + ">0, and status is "+feature.getStatus()+" and isGoodTime="+isGoodTime+", do drop!!");//--------------
+			account.drop(itemID, isGoodTime ? "" : "*");
 			System.out.println("cash=" + account.getCash());
 		}
 		
 	}
 	
-	private void doReopen(String itemID) {
+	private void doReopen(String itemID, boolean isGoodTime) {
 		Tdata tdata = tdatas.get(itemID);
 		Tfeature feature = tdata.getFeature();
 		Integer lots = account.getLots(tdata.getItemID());
-		if(feature.getStatus()==2 && lots>0 && lots<maxOfLot) {
+		if(feature.getStatus()==2 && lots>0 && lots<maxOfLot && isGoodTime) {
 			System.out.println("the lots " + lots + ">0, and < "+ maxOfLot +", should do reopen?");//--------------
 			
 			BigDecimal half_atr = feature.getAtr().divide(new BigDecimal(2),BigDecimal.ROUND_HALF_UP);
 			BigDecimal now = feature.getNow();
 			
 			BigDecimal reopenPrice = account.getLatestOpenPrice(itemID).add(half_atr);
+			Integer ratio = now.subtract(reopenPrice).divide(reopenPrice,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)).intValue();
 			if(reopenPrice.compareTo(now)==-1) {
-				System.out.println("reopenPrice "+ reopenPrice +" below now price "+now+", do reopen!!");
+			//if(reopenPrice.compareTo(now)==-1 && ratio<=10) {
+				System.out.println("reopenPrice "+ reopenPrice +" below now price "+now+" "+ratio+"%, do reopen!!");
 				//Integer unit = getPositionUnit(feature.getAtr(),getQuantityPerHand(itemID),deficitFactor);
 				//Integer quantity = getLot(itemID).multiply(new BigDecimal(unit)).intValue();
 				Integer quantity = getQuantity(feature.getAtr(),getQuantityPerHand(itemID),deficitFactor,feature.getNow());
-				account.reopen(itemID, quantity);
+				if(quantity>0) {
+					account.reopen(itemID, quantity, reopenPrice.toString());
+				}
 				System.out.println("cash=" + account.getCash());
 			}else {
-				System.out.println("reopenPrice "+ reopenPrice +" above now price "+now+", do NOT reopen!!");
+				System.out.println("reopenPrice "+ reopenPrice +" above now price "+now+ " "+ratio+"%, do NOT reopen!!");
 			}
 		}
 		
 	}
 	
-	private void doOpen(String itemID) {
+	private void doOpen(String itemID, boolean isGoodTime) {
 		Tdata tdata = tdatas.get(itemID);
 		Tfeature feature = tdata.getFeature();
 		Integer lots = account.getLots(tdata.getItemID());
-		if(feature.getStatus()==2 && lots==0 && feature.getHlgap()<=gap) {
+		//if(feature.getStatus()==2 && lots<maxOfLot && feature.getHlgap()<=gap && isGoodTime) {
+		if(feature.getStatus()==2 && lots==0 && isGoodTime) {
 			System.out.println("do open");//--------------
 			Integer quantity = getQuantity(feature.getAtr(),getQuantityPerHand(itemID),deficitFactor,feature.getNow());
-			account.open(itemID, quantity);
+			
+			if(quantity>0) {
+				account.open(itemID, quantity,lots.toString());
+			}
+			
+			
+			
+			//account.open(itemID, 0, ""); //第一次突破，买入为0，如果后面再突破，才真正买入
 			System.out.println("cash=" + account.getCash());
 		}
 		
@@ -350,6 +383,7 @@ public class Turtle {
 		result.put("total", account.getTotal().toString());
 		result.put("winRatio", account.getWinRatio().toString()); //赢率
 		result.put("cagr", account.getCAGR().toString());  //复合增长率的英文缩写为：CAGR（Compound Annual Growth Rate）
+		result.put("dailyLog", dailyLog.toString());
 		return result;
 	}
 	

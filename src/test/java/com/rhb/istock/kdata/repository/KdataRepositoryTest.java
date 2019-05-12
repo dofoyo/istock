@@ -9,9 +9,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import com.rhb.istock.kdata.Kdata;
-import com.rhb.istock.kdata.KdataService;
-
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest
 public class KdataRepositoryTest {
@@ -27,11 +24,16 @@ public class KdataRepositoryTest {
 	@Qualifier("kdataRepositoryTushare")
 	KdataRepository kdataRepositoryTushare;
 	
-	String id="sz300059";
-	LocalDate date = LocalDate.parse("2017-02-17");
+	@Autowired
+	@Qualifier("kdataRepository163")
+	KdataRepository kdataRepository163;
 	
-	@Test
+	
+	//@Test
 	public void testGetDailyKdata() {
+		String id="sz300059";
+		LocalDate date = LocalDate.parse("2017-02-17");
+
 		System.out.println("kdataRepositoryDzh");
 		KdataEntity kdata1 = kdataRepositoryDzh.getDailyKdata(id);
 		System.out.println(kdata1.getBar(date));
@@ -44,6 +46,16 @@ public class KdataRepositoryTest {
 		KdataEntity kdata3 = kdataRepositoryTushare.getDailyKdata(id);
 		System.out.println(kdata3.getBar(date));
 	
+	}
+	
+	@Test
+	public void testGetDailyKdataFrom163() {
+		String id="sh000001";
+		LocalDate date = LocalDate.parse("2017-02-17");
+
+		System.out.println("kdataRepository163");
+		KdataEntity kdata3 = kdataRepository163.getDailyKdata(id);
+		System.out.println(kdata3.getBar(date));		
 	}
 	
 }

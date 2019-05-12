@@ -36,11 +36,38 @@ public class Kdata {
 	}
 	
 	public BigDecimal getAvarageAmount() {
+		if(bars.size() == 0) {
+			return new BigDecimal(0);
+		}
+		
 		BigDecimal total = new BigDecimal(0);
 		for(Kbar kbar : bars.values()) {
 			total = total.add(kbar.getAmount());
 		}
+		
+
 		return total.divide(new BigDecimal(bars.size()),BigDecimal.ROUND_HALF_UP);
+	}
+	
+	public BigDecimal getAvaragePrice() {
+		if(bars.size() == 0) {
+			return new BigDecimal(0);
+		}
+		
+		BigDecimal total = new BigDecimal(0);
+		for(Kbar kbar : bars.values()) {
+			total = total.add(kbar.getClose());
+		}
+
+		return total.divide(new BigDecimal(bars.size()),BigDecimal.ROUND_HALF_UP);
+	}
+	
+	public Integer isAboveAvaragePrice() {
+		if(bars.size() == 0) {
+			return -1;
+		}		
+		BigDecimal price = this.bars.lastEntry().getValue().getClose();
+		return price.compareTo(this.getAvaragePrice());
 	}
 
 	
@@ -71,6 +98,24 @@ public class Kdata {
 		
 		return total.divide(new BigDecimal(count),BigDecimal.ROUND_HALF_UP);
 	}
+	
+	public boolean isBreaker(Integer count) {
+		BigDecimal now = this.bars.lastEntry().getValue().getClose();
+		BigDecimal highest = now;
+		
+		NavigableSet<LocalDate> dates = this.bars.descendingKeySet();
+
+		int i=0;
+		for(LocalDate date : dates) {
+			if(i++ < count) {
+				highest = highest.compareTo(this.bars.get(date).getHigh())==-1 ? this.bars.get(date).getHigh() : highest;
+			}else {
+				break;
+			}
+		}
+		
+		return highest.subtract(now).divide(now,BigDecimal.ROUND_HALF_UP).compareTo(new BigDecimal(0.1))<0;
+	}
 
 	
 	public Integer getHighLowGap(Integer count) {
@@ -89,6 +134,12 @@ public class Kdata {
 		BigDecimal rate = high.subtract(low).divide(low,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100));
 
 		return rate.intValue();
+	}
+	
+	public void addBar(LocalDate date,Kbar bar) {
+		if(bar!=null) {
+			this.bars.put(date, bar);
+		}
 	}
 	
 	public void addBar(LocalDate date,BigDecimal open,BigDecimal high,BigDecimal low,BigDecimal close,BigDecimal amount,BigDecimal quantity) {
