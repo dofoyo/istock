@@ -215,24 +215,26 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 				feature = turtle.getFeature(id);
 				if(feature!=null) {
 					item = itemService.getItem(id);
-
-					preyMap = new HashMap<String,String>();
-					preyMap.put("itemID", id);
-					preyMap.put("code", holds.contains(id) ? "*" + item.getCode() : item.getCode());
-					preyMap.put("name", item.getName());
-					preyMap.put("industry", item.getIndustry());
-					preyMap.put("area", item.getArea());
-					preyMap.put("low", df.format(feature.getOpenLow()));
-					preyMap.put("high", df.format(feature.getOpenHigh()));
-					preyMap.put("now", df.format(feature.getNow()));
-					preyMap.put("drop", df.format(feature.getDropLow()));
-					preyMap.put("hlgap", feature.getHlgap().toString());
-					preyMap.put("nhgap", feature.getNhgap().toString());
-					preyMap.put("atr", df.format(feature.getAtr()));	
-					preyMap.put("status", feature.getStatus().toString());	
-					
-					views.add(new TurtleView(preyMap));
-
+					if(item == null) {
+						System.err.println("item of " + id + " is null!!!");
+					}else {
+						preyMap = new HashMap<String,String>();
+						preyMap.put("itemID", id);
+						preyMap.put("code", (holds!=null && holds.contains(id)) ? "*" + item.getCode() : item.getCode());
+						preyMap.put("name", item.getName());
+						preyMap.put("industry", item.getIndustry());
+						preyMap.put("area", item.getArea());
+						preyMap.put("low", df.format(feature.getOpenLow()));
+						preyMap.put("high", df.format(feature.getOpenHigh()));
+						preyMap.put("now", df.format(feature.getNow()));
+						preyMap.put("drop", df.format(feature.getDropLow()));
+						preyMap.put("hlgap", feature.getHlgap().toString());
+						preyMap.put("nhgap", feature.getNhgap().toString());
+						preyMap.put("atr", df.format(feature.getAtr()));	
+						preyMap.put("status", feature.getStatus().toString());	
+						
+						views.add(new TurtleView(preyMap));						
+					}
 				}
 			}
 		}

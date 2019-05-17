@@ -29,18 +29,18 @@ public class KdataRepositoryTest {
 	KdataRepository kdataRepository163;
 	
 	
-	//@Test
+	@Test
 	public void testGetDailyKdata() {
-		String id="sz300059";
-		LocalDate date = LocalDate.parse("2017-02-17");
+		String id="sz000620";
+		LocalDate date = LocalDate.parse("2019-04-09");
 
-		System.out.println("kdataRepositoryDzh");
+/*		System.out.println("kdataRepositoryDzh");
 		KdataEntity kdata1 = kdataRepositoryDzh.getDailyKdata(id);
 		System.out.println(kdata1.getBar(date));
 
 		System.out.println("kdataRepositorySina");
 		KdataEntity kdata2 = kdataRepositorySina.getDailyKdata(id);
-		System.out.println(kdata2.getBar(date));
+		System.out.println(kdata2.getBar(date));*/
 
 		System.out.println("kdataRepositoryTushare");
 		KdataEntity kdata3 = kdataRepositoryTushare.getDailyKdata(id);
@@ -48,7 +48,7 @@ public class KdataRepositoryTest {
 	
 	}
 	
-	@Test
+	//@Test
 	public void testGetDailyKdataFrom163() {
 		String id="sh000001";
 		LocalDate date = LocalDate.parse("2017-02-17");

@@ -207,8 +207,8 @@ public class SelectorServiceImp implements SelectorService{
 	}
 
 	@Override
-	public void generateBreakersWithLatestKdata() {
-		breakThroughService.generateLatestBreakersWithLatestKdata();		
+	public void generateTmpLatestBreakers() {
+		breakThroughService.generateTmpLatestBreakers();		
 	}
 
 }

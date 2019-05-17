@@ -28,13 +28,13 @@ import com.rhb.istock.kdata.KdataService;
 public class BreakThroughService {
 	@Value("${breakersFile}")
 	private String breakersFile;
-	
-	@Value("${latestBreakersTmpFile}")
-	private String latestBreakersTmpFile;
 
 	@Value("${latestBreakersFile}")
 	private String latestBreakersFile;
 	
+	@Value("${tmpLatestBreakersFile}")
+	private String tmpLatestBreakersFile;
+
 	@Autowired
 	@Qualifier("itemServiceImp")
 	ItemService itemService;
@@ -47,13 +47,15 @@ public class BreakThroughService {
 		return Arrays.asList(FileUtil.readTextFile(latestBreakersFile).split(","));
 	}
 
-	public void generateLatestBreakersWithLatestKdata() {
+	public void generateTmpLatestBreakers() {
 		long beginTime=System.currentTimeMillis(); 
 		System.out.println("generate latest breakers with latest kdata......");
-
-		StringBuffer sb = new StringBuffer();
+		
+		List<String> news = new ArrayList<String>();
+		List<String> olds = new ArrayList<String>();
+		List<String> outs = this.getTmpLatestBreakers();
+		
 		LocalDate date;
-		Kbar kbar;
 		Kdata kdata;
 		Integer count = 89;
 		List<Item> items = itemService.getItems();
@@ -65,18 +67,40 @@ public class BreakThroughService {
 			if(kdata.getBar(date)==null) {
 				kdata.addBar(date, kdataService.getLatestMarketData(item.getItemID()));
 			}
+			
 			if(kdata.isBreaker(count)) {
-				sb.append(item.getItemID());
-				sb.append(",");				
+				if(outs.contains(item.getItemID())) {
+					olds.add(item.getItemID());
+				}else {
+					news.add(item.getItemID());
+				}
+				outs.remove(item.getItemID());
 			}
 		}
-		sb.deleteCharAt(sb.length()-1);
+		
+		StringBuffer sb = new StringBuffer();
+		sb.append(getLine("news",news));
+		sb.append(getLine("olds",olds));
+		sb.append(getLine("outs",outs));
+		
 		//System.out.println(sb.toString());
-		FileUtil.writeTextFile(latestBreakersTmpFile, sb.toString(), false);
+		FileUtil.writeTextFile(tmpLatestBreakersFile, sb.toString(), false);
 		
 		System.out.println("generate latest breakers with latest kdata done!");
 		long used = (System.currentTimeMillis() - beginTime)/1000; 
 		System.out.println("用时：" + used + "秒");          
+	}
+	
+	private String getLine(String str, List<String> ids) {
+		StringBuffer sb = new StringBuffer();
+		sb.append(str + ",");
+		for(String id : ids) {
+			sb.append(id);
+			sb.append(",");				
+		}
+		sb.deleteCharAt(sb.length()-1);
+		sb.append("\n");
+		return sb.toString();
 	}
 	
 	public void generateLatestBreakers() {
@@ -212,6 +236,22 @@ public class BreakThroughService {
 			breaks.put(date, ids);
 		}		
 		
+		return breaks;
+	}
+	
+	public List<String> getTmpLatestBreakers() {
+		List<String> breaks = new ArrayList<String>();
+		
+		String[] lines = FileUtil.readTextFile(tmpLatestBreakersFile).split("\n");
+		String[] columns;
+		for(String line : lines) {
+			columns = line.split(",");
+			if((columns[0].equals("news") || columns[0].equals("olds")) && columns.length>1) {
+				for(int i=1; i<columns.length; i++) {
+					breaks.add(columns[i]);
+				}
+			}
+		}		
 		return breaks;
 	}
 

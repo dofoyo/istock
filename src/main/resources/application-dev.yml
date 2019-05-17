@@ -19,7 +19,7 @@ twinDropListFile: D:/dev/istock-data/twinDropList.txt
 amountGapsFile: D:/dev/istock-data/amountGaps.txt
 breakersFile: D:/dev/istock-data/breakers.txt
 latestBreakersFile: D:/dev/istock-data/latestBreakers.txt
-latestBreakersTmpFile: D:/dev/istock-data/latestBreakersTmp.txt
+tmpLatestBreakersFile: D:/dev/istock-data/tmpLatestBreakers.txt
 
 
 

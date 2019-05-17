@@ -21,25 +21,26 @@ public class ItemRepositoryTushare implements ItemRepository{
 	@Cacheable("items")
 	public List<ItemEntity> getItemEntities() {
 		List<ItemEntity> entities = new ArrayList<ItemEntity>();
+		JSONArray item = null;
 		try {
 			JSONObject data = new JSONObject(FileUtil.readTextFile(itemsFile));
-			JSONArray items = data.getJSONArray("items");
-			if(items.length()>0) {
-				JSONArray item;
+			JSONArray theItems = data.getJSONArray("items");
+			if(theItems.length()>0) {
 				ItemEntity entity;
-				for(int i=0; i<items.length(); i++) {
-					item = items.getJSONArray(i);
+				for(int i=0; i<theItems.length(); i++) {
+					item = theItems.getJSONArray(i);
 					entity = new ItemEntity();
-					entity.setCode(item.getString(0));
-					entity.setName(item.getString(1));
-					entity.setArea(item.getString(2));
-					entity.setIndustry(item.getString(3));
-					entity.setIpo(item.getString(4));
+					entity.setCode(item.get(0).toString());
+					entity.setName(item.get(1).toString());
+					entity.setArea(item.get(2).toString());
+					entity.setIndustry(item.get(3).toString());
+					entity.setIpo(item.get(4).toString());
 					entities.add(entity);
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			System.err.println(item);
+			//e.printStackTrace();
 		}
 		
 		return entities;

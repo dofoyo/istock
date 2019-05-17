@@ -43,8 +43,9 @@ public class ItemServiceImp implements ItemService {
 	@Override
 	public Item getItem(String itemID) {
 		Item item = null;
-		
+		//System.out.println(itemRepository.getItemIDs().size());
 		List<ItemEntity> entities = itemRepository.getItemEntities();
+		//System.out.println(entities.size());
 		for(ItemEntity entity : entities) {
 			if(entity.getItemId().equals(itemID)) {
 				item = new Item();

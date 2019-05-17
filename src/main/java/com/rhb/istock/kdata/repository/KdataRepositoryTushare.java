@@ -39,16 +39,16 @@ public class KdataRepositoryTushare implements KdataRepository{
 		if(FileUtil.isExists(kdataFile) && FileUtil.isExists(factorFile)) {
 			BigDecimal f = null;
 			JSONObject factor = new JSONObject(FileUtil.readTextFile(factorFile));
-			Map<LocalDate,BigDecimal> factors = new TreeMap<LocalDate,BigDecimal>();
+			TreeMap<LocalDate,BigDecimal> factors = new TreeMap<LocalDate,BigDecimal>();
 			JSONArray items = factor.getJSONArray("items");
 			if(items.length()>0) {
 				JSONArray item;
 				for(int i=0; i<items.length(); i++) {
 					item = items.getJSONArray(i);
 					f = item.getBigDecimal(2);
-					if(roof==null || roof.compareTo(f)==-1) roof = f;
 					factors.put(LocalDate.parse(item.getString(1), DateTimeFormatter.ofPattern("yyyyMMdd")),f);
 				}
+				roof = factors.lastEntry().getValue();
 			}
 			
 			LocalDate date;
@@ -74,6 +74,10 @@ public class KdataRepositoryTushare implements KdataRepository{
 						amount = item.getBigDecimal(10);
 						quantity = item.getBigDecimal(9);						
 						kdata.addBar(date,open,high,low,close,amount,quantity);
+						
+						//System.out.printf("%tF: item.getBigDecimal(5) * nowFactor / preFactor = %f * %f / %f = %f\n" , date, item.getBigDecimal(5),nowFactor,roof,close);
+
+						
 					}catch(Exception e) {
 						System.err.println(item);
 						System.err.println(nowFactor);

@@ -22,8 +22,10 @@ public class HoldServiceImp implements HoldService {
 		String[] columns;
 		for(String line : lines) {
 			columns = line.split(",");
-			hold = new HoldEntity(columns[0], new BigDecimal(columns[1]));
-			holds.add(hold);
+			if(columns.length > 2) {
+				hold = new HoldEntity(columns[0], new BigDecimal(columns[1]));
+				holds.add(hold);				
+			}
 		}
 		return holds;
 	}

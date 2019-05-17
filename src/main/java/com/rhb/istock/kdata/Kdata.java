@@ -100,6 +100,8 @@ public class Kdata {
 	}
 	
 	public boolean isBreaker(Integer count) {
+		if(this.bars.size()<count || this.bars.lastEntry().getValue()==null) return false;
+		
 		BigDecimal now = this.bars.lastEntry().getValue().getClose();
 		BigDecimal highest = now;
 		
@@ -112,9 +114,19 @@ public class Kdata {
 			}else {
 				break;
 			}
+			
+/*			if(this.itemID.equals("sz000620")) {
+				System.out.println();
+				System.out.println("date: " + date + ", high=" + this.bars.get(date).getHigh() + ", highest=" + highest);
+			}*/
 		}
 		
-		return highest.subtract(now).divide(now,BigDecimal.ROUND_HALF_UP).compareTo(new BigDecimal(0.1))<0;
+		BigDecimal ratio = highest.subtract(now).divide(now,BigDecimal.ROUND_HALF_UP);
+		boolean isBreaker = highest.subtract(now).divide(now,BigDecimal.ROUND_HALF_UP).compareTo(new BigDecimal(0.1))<0;
+		
+		//System.out.println(", highest: " + highest + ", now: " + now + ", ratio: " + ratio + ", isBreaker=" + isBreaker);
+		
+		return isBreaker;
 	}
 
 	

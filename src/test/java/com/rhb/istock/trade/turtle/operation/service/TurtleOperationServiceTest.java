@@ -21,6 +21,14 @@ public class TurtleOperationServiceTest {
 	@Qualifier("turtleOperationServiceImp")
 	TurtleOperationService turtleService;
 
+	@Test
+	public void getBreakers() {
+		List<TurtleView> views = turtleService.getBreakers();
+		for(TurtleView view : views) {
+			System.out.println(view);
+		}		
+	}
+	
 	
 	//@Test
 	public void getAvTops() {

@@ -19,16 +19,22 @@ public class BreakThroughServiceTest {
 	BreakThroughService breakThroughService;
 
 	//@Test
+	public void testGetTmpLatestBreakers() {
+		List<String> breakers = breakThroughService.getTmpLatestBreakers();
+		System.out.println(breakers);
+	}
+	
+	//@Test
 	public void testGetLatestBreakers() {
 		System.out.println(breakThroughService.getLatestBreakers());
 	}
 	
 	@Test
 	public void testGenerateLatestBreakersWithLatestKdata() {
-		breakThroughService.generateLatestBreakersWithLatestKdata();
+		breakThroughService.generateTmpLatestBreakers();
 	}
 	
-	//@Test
+	@Test
 	public void testGenerateLatestBreakers() {
 		breakThroughService.generateLatestBreakers();
 	}
