@@ -204,6 +204,7 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 
 		Tfeature feature;
 		Item item;
+		String topic;
 		
 		List<String> holds = selectorService.getHoldIDs();
 
@@ -215,6 +216,7 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 				feature = turtle.getFeature(id);
 				if(feature!=null) {
 					item = itemService.getItem(id);
+					topic = itemService.getTopic(id);
 					if(item == null) {
 						System.err.println("item of " + id + " is null!!!");
 					}else {
@@ -232,6 +234,7 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 						preyMap.put("nhgap", feature.getNhgap().toString());
 						preyMap.put("atr", df.format(feature.getAtr()));	
 						preyMap.put("status", feature.getStatus().toString());	
+						preyMap.put("topic", topic);
 						
 						views.add(new TurtleView(preyMap));						
 					}

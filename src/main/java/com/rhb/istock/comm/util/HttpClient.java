@@ -164,6 +164,14 @@ public class HttpClient {
 
 		return resultString;
 	}
+	
+	public static void sleep(Integer seconds) {
+		try {
+			long times = (long) (Math.random() * seconds) * 1000;
+			System.out.println("wait " + times/1000 + " seconds.");
+			Thread.sleep(times);
+		} catch (InterruptedException e) {}
+	}
 
 	
 	

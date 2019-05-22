@@ -1,4 +1,4 @@
-package com.rhb.istock.item.spider;
+package com.rhb.istock.item;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -9,26 +9,17 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest
-public class ItemSpiderTest {
+public class ItemServiceTest {
 	@Autowired
-	@Qualifier("itemSpiderTushare")
-	ItemSpider itemSpider;
+	@Qualifier("itemServiceImp")
+	ItemService itemService;
 	
-	//@Test
-	public void test() {
-		try {
-			itemSpider.download();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		System.out.println("done!");
-	}
 	
 	@Test
 	public void getTopic() {
 		String itemID = "sz300022";
-		String topic = itemSpider.getTopic(itemID);
+		String topic = itemService.getTopic(itemID);
 		System.out.println(topic);
 	}
+	
 }

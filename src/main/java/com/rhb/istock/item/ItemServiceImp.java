@@ -1,12 +1,15 @@
 package com.rhb.istock.item;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import com.rhb.istock.comm.util.HttpClient;
 import com.rhb.istock.item.repository.ItemEntity;
 import com.rhb.istock.item.repository.ItemRepository;
 import com.rhb.istock.item.spider.ItemSpider;
@@ -20,6 +23,8 @@ public class ItemServiceImp implements ItemService {
 	@Autowired
 	@Qualifier("itemSpiderTushare")
 	ItemSpider itemSpider;
+	
+	private Map<String,String> topics = new HashMap<String,String>();
 	
 	@Override
 	public List<Item> getItems() {
@@ -69,6 +74,17 @@ public class ItemServiceImp implements ItemService {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}		
+	}
+
+	@Override
+	public String getTopic(String itemID) {
+		if(!topics.containsKey(itemID)) {
+			topics.put(itemID, itemSpider.getTopic(itemID));
+			
+			//为避免被反扒工具禁止，需要暂停一下
+			HttpClient.sleep(5);
+		}
+		return topics.get(itemID);
 	}
 
 }

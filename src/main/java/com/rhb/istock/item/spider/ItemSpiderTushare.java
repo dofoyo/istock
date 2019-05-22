@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import com.rhb.istock.comm.util.FileUtil;
 import com.rhb.istock.comm.util.HttpClient;
+import com.rhb.istock.comm.util.ParseString;
 
 @Service("itemSpiderTushare")
 public class ItemSpiderTushare implements ItemSpider {
@@ -27,6 +28,22 @@ public class ItemSpiderTushare implements ItemSpider {
 		FileUtil.writeTextFile(itemsFile, data.toString(), false);
 
 		System.out.println("download items done!");
+	}
+
+	@Override
+	public String getTopic(String itemID) {
+		System.out.print(" getting topic... ");
+
+		String code = itemID.substring(2);
+		String strUrl = "http://stockpage.10jqka.com.cn/"+code+"/";
+		String result = HttpClient.doGet(strUrl);
+		String topic = ParseString.subString(result, "<dd title=\"|\">");
+		topic = topic.replaceAll("概念",	 "");
+		
+		//System.out.println(strUrl);
+		System.out.println(topic);
+		
+		return topic;
 	}
 
 }

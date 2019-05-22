@@ -21,6 +21,7 @@ public class TurtleView {
 	private String status;
 	private String area;
 	private String industry;
+	private String topic;
 	private String note;
 
 	public TurtleView(Map<String, String> map) {
@@ -39,6 +40,7 @@ public class TurtleView {
 		this.industry = map.get("industry");
 		this.area = map.get("area");	
 		this.note = map.get("note");
+		this.topic = map.get("topic");
 
 		// System.out.println(map.get("openHigh"));
 		// System.out.println(this.high);
@@ -173,13 +175,21 @@ public class TurtleView {
 	public void setNote(String note) {
 		this.note = note;
 	}
+	
+	public String getTopic() {
+		return topic;
+	}
+
+	public void setTopic(String topic) {
+		this.topic = topic;
+	}
 
 	@Override
 	public String toString() {
 		return "TurtleView [itemID=" + itemID + ", code=" + code + ", name=" + name + ", high=" + high + ", low=" + low
 				+ ", now=" + now + ", drop=" + drop + ", hlgap=" + hlgap + ", nhgap=" + nhgap + ", line=" + line
-				+ ", atr=" + atr + ", status=" + status + ", area=" + area + ", industry=" + industry + ", note=" + note
-				+ "]";
+				+ ", atr=" + atr + ", status=" + status + ", area=" + area + ", industry=" + industry + ", topic="
+				+ topic + ", note=" + note + "]";
 	}
 
 }
