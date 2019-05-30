@@ -25,10 +25,15 @@ public class ItemSpiderTest {
 		System.out.println("done!");
 	}
 	
-	@Test
+	//@Test
 	public void getTopic() {
 		String itemID = "sz300022";
 		String topic = itemSpider.getTopic(itemID);
 		System.out.println(topic);
+	}
+	
+	@Test
+	public void getTopciTops() {
+		System.out.println(itemSpider.getTopicTops(5));
 	}
 }

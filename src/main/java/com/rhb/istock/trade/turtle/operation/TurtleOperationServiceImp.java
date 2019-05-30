@@ -205,6 +205,7 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 		Tfeature feature;
 		Item item;
 		String topic;
+		String[] tops = itemService.getTopicTops(3);
 		
 		List<String> holds = selectorService.getHoldIDs();
 
@@ -216,7 +217,8 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 				feature = turtle.getFeature(id);
 				if(feature!=null) {
 					item = itemService.getItem(id);
-					topic = itemService.getTopic(id);
+					topic = this.getTopic(id, tops);
+					
 					if(item == null) {
 						System.err.println("item of " + id + " is null!!!");
 					}else {
@@ -251,6 +253,9 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 				BigDecimal hl1 = new BigDecimal(o1.getHlgap());
 				BigDecimal hl2 = new BigDecimal(o2.getHlgap());
 				
+				return hl1.compareTo(hl2);
+
+				/*
 				if(o1.getStatus().equals(o2.getStatus())) {
 					if(nh1.compareTo(nh2)==0) {
 						return hl1.compareTo(hl2);
@@ -259,7 +264,7 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 					}
 				}else {
 					return (o2.getStatus()).compareTo(o1.getStatus());
-				}
+				}*/
 			}
 		});	
 		
@@ -268,6 +273,17 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 		System.out.println("用时：" + used + "秒");     
 		
 		return views;
+	}
+	
+	private String getTopic(String itemID, String[] tops) {
+		String topic = itemService.getTopic(itemID);
+		for(String top : tops) {
+			if(topic.indexOf(top)!=-1) {
+				topic = topic.replaceAll(top, "*"+top);
+			}
+		}
+		
+		return topic;
 	}
 
 	@Override

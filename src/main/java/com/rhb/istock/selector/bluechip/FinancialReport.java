@@ -14,7 +14,7 @@ public class FinancialReport {
 	private Map<String,CashFlow> cashflows;
 	private Map<String,ProfitStatement> profitstatements;
 	
-	//销售收入	销售收入持续增长，且年均增长率大于20%(二年增长大于44%)
+	//销售收入	销售收入持续增长，且年均增长率大于20%
 	//利润		利润持续增长，且年均增长率大于20%
 	//现金流		经营活动现金流为正，且持续增长，且年均增长率大于20%
 	//应收账款		应收账款的增长率小于销售收入的增长率
@@ -24,9 +24,9 @@ public class FinancialReport {
 		//this.setYear(year);
 		boolean flag = false;
 		if(this.getGrossProfitMargin(year)>0.3 //毛利率大于30%
-			&& this.getRateOfOperatngRevenue(year)>0.44 //销售收入持续增长，且年均增长率大于20%(二年增长大于44%)
-			&& this.getRateOfProfit(year)>0.44  //利润持续增长，且年均增长率大于20%(二年增长大于44%)
-			&& this.getRateOfCashflow(year)>0.44  //经营活动现金流为正，且持续增长，且年均增长率大于20%(二年增长大于44%)
+			&& this.getRateOfOperatngRevenue(year)>=0.2 //销售收入持续增长，且年均增长率大于20%
+			&& this.getRateOfProfit(year)>=0.2  //利润持续增长，且年均增长率大于20%
+			&& this.getRateOfCashflow(year)>=0.0  //经营活动现金流为正，且持续增长
 			//&& this.getRateOfOperatngRevenue(year)>this.getRateOfAccountsReceivable(year) //应收账款的增长率小于销售收入的增长率
 			&& this.getCPR(year)>=1  //现金流与利润的比率大于1
 			&& this.getReceivableRatio(year)<=0.2  //应收占比销售额的比例小于20%
@@ -110,7 +110,9 @@ public class FinancialReport {
 			double or3 = ((CashFlow)this.cashflows.get(periods[2])).getNetCashFlow();
 			
 			if(or1>or2 && or2>or3 && or3>0){
-				rate = (or1-or3)/or3;
+				//rate = (or1-or3)/or3;
+				rate = Math.sqrt(or1/or3)-1;
+				//rate = Math.pow(or1/or3, 1.0/2)-1;
 			}
 			
 		}
@@ -132,7 +134,9 @@ public class FinancialReport {
 			//double or2 = ((BalanceSheet)this.balancesheets.get(periods[1])).getAccountsReceivable();
 			double or3 = ((BalanceSheet)this.balancesheets.get(periods[2])).getAccountsReceivable();
 			
-			rate = (or1-or3)/or3;
+			//rate = (or1-or3)/or3;
+			rate = Math.sqrt(or1/or3)-1;
+			//rate = Math.pow(or1/or3, 1.0/2)-1;
 		}
 		return rate;
 	}
@@ -153,7 +157,9 @@ public class FinancialReport {
 			double or3 = ((ProfitStatement)this.profitstatements.get(periods[2])).getProfit();
 			
 			if(or1>or2 && or2>or3 && or3>0){
-				rate = (or1-or3)/or3;
+				//rate = (or1-or3)/or3;
+				rate = Math.sqrt(or1/or3)-1;
+				//rate = Math.pow(or1/or3, 1.0/2)-1;
 			}
 		}
 		return rate;
@@ -174,7 +180,9 @@ public class FinancialReport {
 			double or3 = ((ProfitStatement)this.profitstatements.get(periods[2])).getOperatingRevenue();
 					
 			if(or1>or2 && or2>or3 && or3>0){
-				rate = (or1-or3)/or3;
+				//rate = (or1-or3)/or3;
+				rate = Math.sqrt(or1/or3)-1;
+				//rate = Math.pow(or1/or3, 1.0/2)-1;
 			}
 		}
 		return rate;
@@ -208,11 +216,14 @@ public class FinancialReport {
 	public Double getCPR(Integer year){
 		String[] periods= new String[3];
 		periods[0] = Integer.toString(year) + "1231";
-		periods[1] = Integer.toString(year-1) + "1231";
-		periods[2] = Integer.toString(year-2) + "1231";
-		Double cash = ((CashFlow)this.cashflows.get(periods[0])).getNetCashFlow();
-		Double profit = ((ProfitStatement)this.profitstatements.get(periods[0])).getProfit();
-		return profit.intValue()==0 ? 0.0 : cash/profit;
+		
+		double d = 0.0;
+		if(this.cashflows.get(periods[0])!=null && this.profitstatements.get(periods[0])!=null){
+			Double cash = ((CashFlow)this.cashflows.get(periods[0])).getNetCashFlow();
+			Double profit = ((ProfitStatement)this.profitstatements.get(periods[0])).getProfit();
+			d =  profit.intValue()==0 ? 0.0 : cash/profit;
+		}
+		return d;
 	}
 	
 	//毛利率

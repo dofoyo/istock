@@ -17,15 +17,15 @@ public class BluechipServiceTest {
 	@Qualifier("bluechipServiceImp")
 	BluechipService bluechipService;
 	
-	@Test
+	//@Test
 	public void generateBluechip() {
 		bluechipService.generateBluechip();
 	}
 	
-	//@Test
+	@Test
 	public void getBluechipIDs() {
 		LocalDate beginDate = LocalDate.parse("2019-01-01");
-		LocalDate endDate = LocalDate.parse("2019-03-21");
+		LocalDate endDate = LocalDate.parse("2019-05-30");
 		for(LocalDate date = beginDate; date.isBefore(endDate); date=date.plusDays(1)) {
 			List<String> ids = bluechipService.getBluechipIDs(date);
 			System.out.print(date + "," + ids.size() + ",");			

@@ -87,4 +87,9 @@ public class ItemServiceImp implements ItemService {
 		return topics.get(itemID);
 	}
 
+	@Override
+	public String[] getTopicTops(Integer count) {
+		return itemSpider.getTopicTops(count);
+	}
+
 }

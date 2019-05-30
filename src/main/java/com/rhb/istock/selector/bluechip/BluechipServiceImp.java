@@ -43,7 +43,7 @@ public class BluechipServiceImp implements BluechipService {
 		Map<String,BluechipEntity>bluechips = new HashMap<String,BluechipEntity>();
 		BluechipEntity bluechip;
 		
-		int i=0;
+		int i=1;
 		List<OkDto> dtos = getOks();
 		for(OkDto dto : dtos){
 			Progress.show(dtos.size(), i++, dto.getStockcode());
