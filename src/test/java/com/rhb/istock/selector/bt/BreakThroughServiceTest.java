@@ -29,17 +29,17 @@ public class BreakThroughServiceTest {
 		System.out.println(breakThroughService.getLatestBreakers());
 	}
 	
-	@Test
+	//@Test
 	public void testGenerateLatestBreakersWithLatestKdata() {
 		breakThroughService.generateTmpLatestBreakers();
 	}
 	
-	@Test
+	//@Test
 	public void testGenerateLatestBreakers() {
 		breakThroughService.generateLatestBreakers();
 	}
 	
-	//@Test
+	@Test
 	public void testGenerateBreakers() {
 		breakThroughService.generateBreakers();
 	}

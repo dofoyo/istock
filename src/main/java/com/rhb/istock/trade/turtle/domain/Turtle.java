@@ -64,11 +64,11 @@ public class Turtle {
 
 	public Turtle() {
 		deficitFactor  = new BigDecimal(0.005); 
-		openDuration = 89; 
-		dropDuration = 34; 
+		openDuration = 55; 
+		dropDuration = 21; 
 		maxOfLot = 1; 
 		initCash = new BigDecimal(5000000);
-		stopStrategy  = 1;
+		stopStrategy  = 0;
 		gap = 60;
 		cancels = 2;
 		account = new Account(initCash);
@@ -219,7 +219,7 @@ public class Turtle {
 		doDrop(itemID, isGoodTime);
 		
 		//加仓
-		//doReopen(itemID, isGoodTime);
+		doReopen(itemID, isGoodTime);
 		
 		//开新仓
 		doOpen(itemID, isGoodTime);
@@ -292,6 +292,7 @@ public class Turtle {
 		Tfeature feature = tdata.getFeature();
 		Integer lots = account.getLots(tdata.getItemID());
 		if((lots>0 && feature.getStatus()<0) || !isGoodTime) {
+			System.out.println(feature);
 			System.out.println("the lots " + lots + ">0, and status is "+feature.getStatus()+" and isGoodTime="+isGoodTime+", do drop!!");//--------------
 			account.drop(itemID, isGoodTime ? "" : "*");
 			System.out.println("cash=" + account.getCash());

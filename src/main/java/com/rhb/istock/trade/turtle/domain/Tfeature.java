@@ -13,7 +13,7 @@ import java.math.BigDecimal;
  * status: 
  * 	2 -- 表示当前价位高于高点high，做多
  *  1 -- 表示当前价位低于高点high，高于dropLow,空头平仓
- * -1 -- 表示当前价位高于低点low，低于dropHigh，多头平仓
+ * -1 -- 表示当前价位高于低点low，低于dropHigh或低于dropPrice，多头平仓
  * -2 -- 表示当前价位低于低点low，做空
  * 
  */

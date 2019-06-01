@@ -17,7 +17,7 @@ public class DailyAmountTopServiceTest {
 	@Qualifier("dailyAmountTopServiceImp")
 	DailyAmountTopService dailyAmountTopService;
 	
-	//@Test
+	@Test
 	public void generateDailyAmountTops() {
 		dailyAmountTopService.generateDailyAmountTops();
 	}

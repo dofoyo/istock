@@ -66,7 +66,7 @@ public class BalloonSimulationTest {
 	@Test
 	public void simulateByContinuedYear() {
 			LocalDate beginDate = LocalDate.of(2010, 1, 1);
-			LocalDate endDate = LocalDate.of(2019, 1, 1);
+			LocalDate endDate = LocalDate.of(2019, 6, 1);
 
 			//TreeMap<LocalDate,List<String>> dailyItems = selectorService.getAverageAmountTops(13, beginDate, endDate);
 			//TreeMap<LocalDate,List<String>> dailyItems = this.getSpecifyItem("sh600519", beginDate, endDate);

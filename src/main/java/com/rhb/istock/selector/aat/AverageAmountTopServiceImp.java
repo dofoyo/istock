@@ -57,7 +57,7 @@ public class AverageAmountTopServiceImp implements AverageAmountTopService{
 		long beginTime=System.currentTimeMillis(); 
 		System.out.println("generate latest average amount tops ......");
 
-		Integer duration = 89;
+		Integer duration = 55;
 		List<String> ids = kdataService.getLatestDailyTop(100);
 		generateLatestAverageAmountTops(ids, duration);
 		
@@ -110,7 +110,7 @@ public class AverageAmountTopServiceImp implements AverageAmountTopService{
 		System.out.println("generate average amount tops ......");
 
 		Integer top = 100;
-		Integer duration = 89; //与openduration一致
+		Integer duration = 55; //与openduration一致
 		Map<LocalDate,TreeSet<AverageAmount>> tops = new HashMap<LocalDate,TreeSet<AverageAmount>>();
 		AverageAmount amount = null;
 		TreeSet<AverageAmount> amounts;

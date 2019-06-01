@@ -58,7 +58,7 @@ public class HighLowTopServiceImp implements HighLowTopService {
 		
 		List<HighLowGap> gaps = new ArrayList<HighLowGap>();
 		
-		Integer duration = 89;
+		Integer duration = 55;
 		Kdata kdata;
 		
 		List<Item> items = itemService.getItems();
@@ -153,7 +153,7 @@ public class HighLowTopServiceImp implements HighLowTopService {
 		System.out.println("generate high low tops ......");
 
 		Integer top = 100;
-		Integer duration = 89; //与openduration一致
+		Integer duration = 55; //与openduration一致
 		Map<LocalDate,TreeSet<HighLowGap>> tops = new HashMap<LocalDate,TreeSet<HighLowGap>>();
 		HighLowGap gap = null;
 		TreeSet<HighLowGap> gaps;

@@ -28,12 +28,12 @@ public class HighLowTopServiceTest {
 		System.out.println(ids);
 	}
 	
-	//@Test
+	@Test
 	public void generateHighLowTops() {
 		highLowTopService.generateHighLowTops();
 	}
 	
-	@Test
+	//@Test
 	public void getHighLowTops() {
 		LocalDate beginDate = LocalDate.parse("2019-03-01");
 		LocalDate endDate = LocalDate.parse("2019-03-21");

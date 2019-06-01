@@ -80,16 +80,16 @@ public class TurtleSimulationTest {
 	@Test
 	public void simulate2() {
 		LocalDate beginDate, endDate;
-		beginDate = LocalDate.of(2019,1,1);
-		endDate = LocalDate.of(2019,5,1);
-		boolean cache = false;
+		beginDate = LocalDate.of(2005,12,9);
+		endDate = LocalDate.of(2007,11,5);
+		boolean cache = true;
 
-		TreeMap<LocalDate,List<String>> dailyItems = selectorService.getBreakers(beginDate, endDate);
-		//TreeMap<LocalDate,List<String>> dailyItems = selectorService.getAverageAmountTops(13, beginDate, endDate);
+		//TreeMap<LocalDate,List<String>> dailyItems = selectorService.getBreakers(beginDate, endDate);
+		//TreeMap<LocalDate,List<String>> dailyItems = selectorService.getAverageAmountTops(21, beginDate, endDate);
+		TreeMap<LocalDate,List<String>> dailyItems = selectorService.getHighLowTops(21, beginDate, endDate);
+		//TreeMap<LocalDate,List<String>> dailyItems = selectorService.getDailyAmountTops(21, beginDate, endDate);
 		//TreeMap<LocalDate,List<String>> dailyItems = this.getSpecifyItem("sh000001", beginDate, endDate);
 		//TreeMap<LocalDate,List<String>> dailyItems = selectorService.getBluechipIDs(beginDate, endDate);
-		//TreeMap<LocalDate,List<String>> dailyItems = selectorService.getDailyAmountTops(13, beginDate, endDate);
-		//TreeMap<LocalDate,List<String>> dailyItems = selectorService.getHighLowTops(13, beginDate, endDate);
 			
 		turtleSimulation.simulate(dailyItems, null, cache);
 	}

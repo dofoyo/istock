@@ -72,9 +72,9 @@ public class TurtleStaticSimulation implements TurtleSimulation{
 				}
 			}
 			System.out.println("");
-			//turtle.doIt(isGoodTime(entry.getKey(),30)); //以上证指数的30日均线为准绳，线上操作，线下休息，个股要止损，可加仓（增长率7%，盈率42%）
-			//turtle.doIt(isGoodTime1(entry.getKey()));  //以上证指数的是否突破和30日均线为准绳，突破操作，跌破30日均线休息，个股要止损，可加仓（增长率6%，盈率39%）
-			turtle.doIt(true); //不管大盘，个股可加仓、要止损。（增长率10%，盈率37%）
+			//turtle.doIt(isGoodTime(entry.getKey(),30)); //以上证指数的30日均线为准绳，线上操作，线下休息，个股要止损，可加仓（年复合增长率7%，盈率42%）
+			//turtle.doIt(isGoodTime1(entry.getKey()));  //以上证指数的是否突破和30日均线为准绳，突破操作，跌破30日均线休息，个股要止损，可加仓（年复合增长率6%，盈率39%）
+			turtle.doIt(true); //不管大盘，个股可加仓、要止损。（年复合增长率10%，盈率37%）
 			
 		}
 		

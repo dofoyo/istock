@@ -35,8 +35,8 @@ public class AppInitRunner implements CommandLineRunner {
     	kdataService.downKdatas();
     	selectorService.generateLatestAverageAmountTops();
     	selectorService.generateLatestHighLowTops();
-		//selectorService.generateAmountGaps();
     	selectorService.generateLatestBreakers();
+		//selectorService.generateAmountGaps();
 
     	turtleOperationService.init();
     }

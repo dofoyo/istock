@@ -57,7 +57,7 @@ public class BreakThroughService {
 		
 		LocalDate date;
 		Kdata kdata;
-		Integer count = 89;
+		Integer count = 55;
 		List<Item> items = itemService.getItems();
 		int i=1;
 		for(Item item : items) {
@@ -110,7 +110,7 @@ public class BreakThroughService {
 		StringBuffer sb = new StringBuffer();
 
 		Kdata kdata;
-		Integer count = 89;
+		Integer count = 55;
 		List<Item> items = itemService.getItems();
 		int i=1;
 		for(Item item : items) {
@@ -177,7 +177,7 @@ public class BreakThroughService {
 	
 	class Box {
 		boolean redo = false;
-		Integer duration = 89;
+		Integer duration = 55;
 		BigDecimal highest = new BigDecimal(0);
 		List<Kbar> bars = new ArrayList<Kbar>();
 		public boolean addBar(Kbar bar) {

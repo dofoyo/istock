@@ -27,19 +27,19 @@ public class TurtleApi{
 	
 	@GetMapping("/turtle/agtops")
 	public ResponseContent<List<TurtleView>> getAgTops() {
-		List<TurtleView> views = ts.getAgTops(89);
+		List<TurtleView> views = ts.getAgTops(55);
 		return new ResponseContent<List<TurtleView>>(ResponseEnum.SUCCESS, views);
 	}
 	
 	@GetMapping("/turtle/avtops")
 	public ResponseContent<List<TurtleView>> getAvTops() {
-		List<TurtleView> views = ts.getAvTops(89);
+		List<TurtleView> views = ts.getAvTops(55);
 		return new ResponseContent<List<TurtleView>>(ResponseEnum.SUCCESS, views);
 	}
 	
 	@GetMapping("/turtle/dailytops")
 	public ResponseContent<List<TurtleView>> getDailyTops() {
-		List<TurtleView> views = ts.getDailyTops(89);
+		List<TurtleView> views = ts.getDailyTops(55);
 		return new ResponseContent<List<TurtleView>>(ResponseEnum.SUCCESS, views);
 	}
 	
@@ -69,7 +69,7 @@ public class TurtleApi{
 
 	@GetMapping("/turtle/hltops")
 	public ResponseContent<List<TurtleView>> getHlTops() {
-		List<TurtleView> views = ts.getHighLowTops(89);
+		List<TurtleView> views = ts.getHighLowTops(55);
 		return new ResponseContent<List<TurtleView>>(ResponseEnum.SUCCESS, views);
 	}
 	

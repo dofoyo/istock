@@ -37,7 +37,7 @@ public class AmountGapTopServiceImp implements AmountGapTopService {
 		System.out.println("generate amount tops ......");
 
 		Integer top = 100;
-		Integer duration = 34; //与openduration一致
+		Integer duration = 55; //与openduration一致
 
 		AmountGap amountGap = null;
 		TreeSet<AmountGap> amountGaps = new TreeSet<AmountGap>();
