@@ -67,7 +67,9 @@ public class HighLowTopServiceImp implements HighLowTopService {
 		for(Item item : items) {
 			Progress.show(items.size(),i++, item.getItemID());
 			kdata = kdataService.getDailyKdata(item.getItemID(),false);
-			gaps.add(new HighLowGap(item.getItemID(),kdata.getHighLowGap(duration)));
+			if(kdata.getSize()>=duration) {
+				gaps.add(new HighLowGap(item.getItemID(),kdata.getHighLowGap(duration)));
+			}
 		}
 		
 		Collections.sort(gaps);

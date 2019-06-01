@@ -96,7 +96,7 @@ public class KdataServiceImp implements KdataService{
 		
 		if(map==null) return null;
 		
-		return new Kbar(map.get("open"), map.get("high"), map.get("low"), map.get("close"), map.get("amount"), map.get("quantity"));
+		return new Kbar(map.get("open"), map.get("high"), map.get("low"), map.get("close"), map.get("amount"), map.get("quantity"),map.get("dateTime"));
 	}
 
 	@Override
@@ -135,7 +135,7 @@ public class KdataServiceImp implements KdataService{
 		
 		KbarEntity bar = entity.getBar(date);
 		if(bar!=null) {
-			kbar = new Kbar(bar.getOpen(), bar.getHigh(), bar.getLow(), bar.getClose(), bar.getAmount(), bar.getQuantity());
+			kbar = new Kbar(bar.getOpen(), bar.getHigh(), bar.getLow(), bar.getClose(), bar.getAmount(), bar.getQuantity(),date);
 		}else {
 			//System.out.println(" kbar is null");
 			//System.out.println(entity);

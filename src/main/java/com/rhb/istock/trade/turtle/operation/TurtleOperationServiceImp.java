@@ -153,7 +153,7 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 		for(Tbar tbar : tbars) {
 			kdata.addKdata(tbar.getDate(), tbar.getOpen(), tbar.getHigh(), tbar.getLow(), tbar.getClose());
 		}
-		
+
 		Tbar tbar = turtle.getLatestData(itemID);
 		kdata.addKdata(tbar.getDate(), tbar.getOpen(), tbar.getHigh(), tbar.getLow(), tbar.getClose());
 		
@@ -205,7 +205,7 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 		Tfeature feature;
 		Item item;
 		String topic;
-		String[] tops = itemService.getTopicTops(3);
+		String[] tops = itemService.getTopicTops(5);
 		
 		List<String> holds = selectorService.getHoldIDs();
 

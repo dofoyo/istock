@@ -155,11 +155,11 @@ public class Kdata {
 	}
 	
 	public void addBar(LocalDate date,BigDecimal open,BigDecimal high,BigDecimal low,BigDecimal close,BigDecimal amount,BigDecimal quantity) {
-		this.bars.put(date, new Kbar(open, high, low, close, amount, quantity));
+		this.bars.put(date, new Kbar(open, high, low, close, amount, quantity,date));
 	}
 	
 	public void addBar(String date,String open,String high,String low,String close,String amount, String quantity) {
-		this.bars.put(LocalDate.parse(date), new Kbar(new BigDecimal(open), new BigDecimal(high), new BigDecimal(low), new BigDecimal(close), new BigDecimal(amount), new BigDecimal(quantity)));
+		this.bars.put(LocalDate.parse(date), new Kbar(new BigDecimal(open), new BigDecimal(high), new BigDecimal(low), new BigDecimal(close), new BigDecimal(amount), new BigDecimal(quantity),LocalDate.parse(date)));
 	}
 	
 	public Kbar getBar(LocalDate date){
