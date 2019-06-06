@@ -1,6 +1,7 @@
 package com.rhb.istock.trade.turtle.domain;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 
 /**
@@ -13,6 +14,7 @@ import java.math.BigDecimal;
  * status: 
  * 	2 -- 表示当前价位高于高点high，做多
  *  1 -- 表示当前价位低于高点high，高于dropLow,空头平仓
+ *  0 -- 表示不动作
  * -1 -- 表示当前价位高于低点low，低于dropHigh或低于dropPrice，多头平仓
  * -2 -- 表示当前价位低于低点low，做空
  * 
@@ -20,6 +22,7 @@ import java.math.BigDecimal;
 public class Tfeature {
 	private String itemID;
 	private BigDecimal openHigh;
+	private LocalDate openHighDate;
 	private BigDecimal openLow;
 	private Integer hlgap;
 	private Integer nhgap;
@@ -27,6 +30,7 @@ public class Tfeature {
 	private BigDecimal dropHigh;
 	private BigDecimal dropLow;
 	private BigDecimal now;
+	private LocalDate nowDate;
 	private BigDecimal atr;
 	private Integer status;
 	private BigDecimal dropPrice;  // 在dropduration期间的均价。当dropDuration为34时，几乎就是30日均线价。根据经验，跌破30日均线价，最好平仓出局。
@@ -44,14 +48,19 @@ public class Tfeature {
 			e.printStackTrace();
 		}
 		
+		//前期高点与突破点之间的间隔至少3天以上才叫突破，才是买入点。
+		//那种连续上涨的，就不叫突破了。
+		//if(now.compareTo(openHigh)>=0 && nowDate.toEpochDay()-openHighDate.toEpochDay()>3) {
 		if(now.compareTo(openHigh)>=0) {
 			status = 2;
 		}else if(now.compareTo(openHigh)==-1 && now.compareTo(dropLow)>=0) {
 			status = 1;
 		}else if(now.compareTo(openLow)>=0 && now.compareTo(dropHigh)==-1) {
 			status = -1;
-		}else {
+		}else if(now.compareTo(openLow)==-1) {
 			status = -2;
+		}else {
+			status = 0;
 		}
 		
 		if(now.compareTo(dropPrice)==-1 && status>0) {
@@ -59,6 +68,22 @@ public class Tfeature {
 		}
 	}
 	
+	public LocalDate getOpenHighDate() {
+		return openHighDate;
+	}
+
+	public void setOpenHighDate(LocalDate openHighDate) {
+		this.openHighDate = openHighDate;
+	}
+
+	public LocalDate getNowDate() {
+		return nowDate;
+	}
+
+	public void setNowDate(LocalDate nowDate) {
+		this.nowDate = nowDate;
+	}
+
 	public BigDecimal getDropPrice() {
 		return dropPrice;
 	}

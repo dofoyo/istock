@@ -17,9 +17,13 @@ highLowTopsFile: D:/dev/istock-data/highLowTops.txt
 twinOpenListFile: D:/dev/istock-data/twinOpenList.txt
 twinDropListFile: D:/dev/istock-data/twinDropList.txt
 amountGapsFile: D:/dev/istock-data/amountGaps.txt
+latestPotentialsFile: D:/dev/istock-data/latestPotentials.txt
+tmpLatestPotentialsFile: D:/dev/istock-data/tmpLatestPotentials.txt
 breakersFile: D:/dev/istock-data/breakers.txt
-latestBreakersFile: D:/dev/istock-data/latestBreakers.txt
-tmpLatestBreakersFile: D:/dev/istock-data/tmpLatestBreakers.txt
+breakersSortByHLFile: D:/dev/istock-data/breakersSortByHL.txt
+breakersSortByDTFile: D:/dev/istock-data/breakersSortByDT.txt
+breakersSortByAVFile: D:/dev/istock-data/breakersSortByAV.txt
+fvaluesOfHLFile: D:/dev/istock-data/fvaluesOfHL.txt
 
 
 

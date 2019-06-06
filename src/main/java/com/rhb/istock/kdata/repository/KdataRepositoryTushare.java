@@ -3,6 +3,7 @@ package com.rhb.istock.kdata.repository;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -20,6 +21,8 @@ public class KdataRepositoryTushare implements KdataRepository{
 	@Value("${tushareKdataPath}")
 	private String kdataPath;
 	
+	//private Map<String,KdataEntity> kdatas = new HashMap<String,KdataEntity>();;
+	
 	@Override
 	@CacheEvict(value="tushareDailyKdatas",allEntries=true)
 	public void evictDailyKDataCache() {}
@@ -27,7 +30,9 @@ public class KdataRepositoryTushare implements KdataRepository{
 	@Override
 	public KdataEntity getDailyKdata(String itemID) {
 		//System.out.println("itemID: " + itemID);
-
+		
+		//if(kdatas.containsKey(itemID)) return kdatas.get(itemID);
+		
 		KdataEntity kdata = new KdataEntity(itemID);
 
 		String tushareID = itemID.indexOf("sh")==0 ? itemID.substring(2)+".SH" : itemID.substring(2)+".SZ";
@@ -85,6 +90,9 @@ public class KdataRepositoryTushare implements KdataRepository{
 				}
 			}
 		}
+		
+		//kdatas.put(itemID, kdata);
+		//System.out.println("kdatas.size()=" + kdatas.size());
 
 		return kdata;
 	}

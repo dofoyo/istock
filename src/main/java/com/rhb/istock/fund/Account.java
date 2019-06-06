@@ -1,6 +1,7 @@
 package com.rhb.istock.fund;
 
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.HashMap;
@@ -8,6 +9,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.UUID;
 
 import org.slf4j.Logger;
@@ -21,28 +23,30 @@ public class Account {
 	private BigDecimal cash = null;
 	private BigDecimal value = null;
 
-	private Map<String,Order> holds = null;
-	private Map<String,Order> opens = null;
-	private Map<String,Order> drops = null;
-	private Map<String,Order> stops = null;
-	private Map<String,BigDecimal> prices = null;
+	private TreeMap<Integer,Order> holds = null;
+	private TreeMap<Integer,Order> opens = null;
+	private TreeMap<Integer,Order> drops = null;
+	private TreeMap<Integer,Order> stops = null;
+	private TreeMap<String,BigDecimal> prices = null;
 	private LocalDate beginDate = null;
 	private LocalDate endDate = null;
-	
+	private Integer orderID=0;
+	DecimalFormat orderIDFormat = new DecimalFormat("0000"); 
+
 	public Account(BigDecimal cash) {
 		this.initCash = cash;
 		
 		this.cash = cash;
 		this.value = new BigDecimal(0);
 		
-		holds = new HashMap<String,Order>();
-		opens = new HashMap<String,Order>();
-		drops = new HashMap<String,Order>();
-		stops = new HashMap<String,Order>();
-		prices = new HashMap<String,BigDecimal>();
+		holds = new TreeMap<Integer,Order>();
+		opens = new TreeMap<Integer,Order>();
+		drops = new TreeMap<Integer,Order>();
+		stops = new TreeMap<Integer,Order>();
+		prices = new TreeMap<String,BigDecimal>();
 	}
 	
-	public String getDailyLog() {
+	public String getDailyAmount() {
 		StringBuffer sb = new StringBuffer();
 		sb.append(endDate.toString());
 		sb.append(",");
@@ -54,9 +58,12 @@ public class Account {
 		return sb.toString();
 	}
 	
-	public String reopen(String itemID, Integer quantity, String note) {
-		String orderID = UUID.randomUUID().toString();
-		Order order = new Order(orderID,itemID,LocalDate.parse(endDate.toString()),prices.get(itemID),quantity);
+	private Integer getOrderID() {
+		return orderID++;
+	}
+	
+	public void reopen(String itemID, Integer quantity, String note) {
+		Order order = new Order(this.getOrderID(),itemID,LocalDate.parse(endDate.toString()),prices.get(itemID),quantity);
 		order.setNote("reopen，" + note);
 		
 		System.out.println(order); //----------------------------------------------
@@ -65,13 +72,10 @@ public class Account {
 		value = value.add(order.getAmount()); // 市值增加
 		holds.put(order.getOrderID(), order);
 		opens.put(order.getOrderID(), order);
-		
-		return orderID;
 	}
 	
-	public String open(String itemID, Integer quantity, String note) {
-		String orderID = UUID.randomUUID().toString();
-		Order order = new Order(orderID,itemID,LocalDate.parse(endDate.toString()),prices.get(itemID),quantity);
+	public void open(String itemID, Integer quantity, String note) {
+		Order order = new Order(this.getOrderID(),itemID,LocalDate.parse(endDate.toString()),prices.get(itemID),quantity);
 		order.setNote("open，" + note);
 
 		System.out.println(order); //----------------------------------------------
@@ -80,13 +84,11 @@ public class Account {
 		value = value.add(order.getAmount()); // 市值增加
 		holds.put(order.getOrderID(), order);
 		opens.put(order.getOrderID(), order);
-		
-		return orderID;
 	}
 	
 	public void drop(String itemID, String note) {
 		Order openOrder;
-		for(Iterator<Map.Entry<String, Order>> hands_it = holds.entrySet().iterator(); hands_it.hasNext();) {
+		for(Iterator<Map.Entry<Integer, Order>> hands_it = holds.entrySet().iterator(); hands_it.hasNext();) {
 			openOrder = hands_it.next().getValue();
 			if(openOrder.getItemID().equals(itemID)) {
 				Order dropOrder = new Order(openOrder.getOrderID(),itemID, LocalDate.parse(endDate.toString()), prices.get(itemID), openOrder.getQuantity());
@@ -105,7 +107,7 @@ public class Account {
 	
 	public void stopByItemID(String itemID, String note) {
 		Order openOrder;
-		for(Iterator<Map.Entry<String, Order>> hands_it = holds.entrySet().iterator(); hands_it.hasNext();) {
+		for(Iterator<Map.Entry<Integer, Order>> hands_it = holds.entrySet().iterator(); hands_it.hasNext();) {
 			openOrder = hands_it.next().getValue();
 			if(openOrder.getItemID().equals(itemID)) {
 				Order stopOrder = new Order(openOrder.getOrderID(),itemID, LocalDate.parse(endDate.toString()), prices.get(itemID), openOrder.getQuantity());
@@ -154,6 +156,10 @@ public class Account {
 		}
 	}
 	
+	public LocalDate getEndDate() {
+		return this.endDate;
+	}
+	
 	public void setLatestDate(LocalDate date) {
 		if(this.beginDate==null) this.beginDate = date;
 		this.endDate = date;
@@ -191,7 +197,7 @@ public class Account {
 		Set<String> ids = new HashSet<String>();
 		for(Order order : holds.values()) {
 			if(order.getItemID().equals(itemID)) {
-				ids.add(order.getOrderID());
+				ids.add(orderIDFormat.format(order.getOrderID()));
 			}
 		}		
 		return ids;
@@ -212,7 +218,7 @@ public class Account {
 		
 		for(Order order : holds.values()) {
 			if(order.getItemID().equals(itemID)) {
-				ps.put(order.getOrderID(), order.getPrice());
+				ps.put(orderIDFormat.format(order.getOrderID()), order.getPrice());
 			}
 		}		
 		return ps;
@@ -254,7 +260,7 @@ public class Account {
 		Order openOrder;
 		Order dropOrder;
 		Order stopOrder;
-		for(Map.Entry<String,Order> entry : opens.entrySet()) {
+		for(Map.Entry<Integer,Order> entry : opens.entrySet()) {
 			openOrder = entry.getValue();
 			
 			dropOrder = drops.get(entry.getKey());
@@ -343,16 +349,16 @@ public class Account {
 	public String getCSV() {
 		Order openOrder, dsOrder;
 		StringBuffer sb = new StringBuffer(this.getCSVTitle());
-		for(Map.Entry<String,Order> entry : opens.entrySet()) {
+		for(Map.Entry<Integer,Order> entry : opens.entrySet()) {
 			openOrder = entry.getValue();
 			dsOrder = getDropOrStopOrder(entry.getKey());
 			if(dsOrder==null) {
 				dsOrder = new Order(openOrder.getOrderID(),openOrder.getItemID(),endDate,prices.get(openOrder.getItemID()),openOrder.getQuantity());
 				dsOrder.setNote("hold");
 			}
-			sb.append("'" + openOrder.getOrderID());
+			sb.append(openOrder.getOrderID());
 			sb.append(",");
-			sb.append("'" + openOrder.getItemID());
+			sb.append(openOrder.getItemID());
 			sb.append(",");
 			sb.append("");
 			sb.append(",");
@@ -385,7 +391,7 @@ public class Account {
 		return sb.toString();
 	}
 	
-	private Order getDropOrStopOrder(String orderID) {
+	private Order getDropOrStopOrder(Integer orderID) {
 		Order dropOrder = drops.get(orderID);
 		if(dropOrder == null) {
 			return stops.get(orderID);
@@ -395,7 +401,7 @@ public class Account {
 	}
 	
 	class Order {
-		private String orderID;
+		private Integer orderID;
 		private String itemID;
 		private LocalDate date;  
 		private BigDecimal price;
@@ -404,7 +410,7 @@ public class Account {
 		private BigDecimal latest;
 		private BigDecimal highest;
 		
-		public Order(String orderID,String itemID, LocalDate date, BigDecimal price, Integer quantity) {
+		public Order(Integer orderID,String itemID, LocalDate date, BigDecimal price, Integer quantity) {
 			this.orderID = orderID;
 			this.itemID = itemID;
 			this.date = date;
@@ -433,11 +439,11 @@ public class Account {
 			return price.multiply(new BigDecimal(quantity));
 		}
 
-		public String getOrderID() {
+		public Integer getOrderID() {
 			return orderID;
 		}
 
-		public void setOrderID(String orderID) {
+		public void setOrderID(Integer orderID) {
 			this.orderID = orderID;
 		}
 

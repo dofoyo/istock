@@ -6,20 +6,20 @@ import java.time.LocalDate;
 public class DailyAmount  implements Comparable<DailyAmount>{
 	@Override
 	public String toString() {
-		return "BarEntity [date=" + date + ", code=" + code + ", amount=" + amount + "]";
+		return "BarEntity [date=" + date + ", itemID=" + itemID + ", amount=" + amount + "]";
 	}
 
 	private LocalDate date;
-	private String code;
+	private String itemID;
 	private BigDecimal amount = new BigDecimal(0);
 	
-	public DailyAmount(String code) {
-		this.code = code;
+	public DailyAmount(String itemID) {
+		this.itemID = itemID;
 	}
 	
-	public DailyAmount(LocalDate date,String code, BigDecimal amount) {
+	public DailyAmount(LocalDate date,String itemID, BigDecimal amount) {
 		this.date = date;
-		this.code = code;
+		this.itemID = itemID;
 		this.amount = amount;
 	}
 
@@ -31,12 +31,12 @@ public class DailyAmount  implements Comparable<DailyAmount>{
 		this.date = date;
 	}
 
-	public String getCode() {
-		return code;
+	public String getItemID() {
+		return itemID;
 	}
 
-	public void setCode(String code) {
-		this.code = code;
+	public void setItemID(String itemID) {
+		this.itemID = itemID;
 	}
 
 	public BigDecimal getAmount() {

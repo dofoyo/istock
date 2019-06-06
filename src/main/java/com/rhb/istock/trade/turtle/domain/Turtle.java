@@ -60,10 +60,11 @@ public class Turtle {
 	private Account account;
 	
 	private Map<String, Tdata> tdatas = new HashMap<String,Tdata>();
-	private StringBuffer dailyLog = new StringBuffer("date,cash,value,total\n");
+	private StringBuffer dailyAmount = new StringBuffer("date,cash,value,total\n");
+	private StringBuffer breakers = new StringBuffer();
 
 	public Turtle() {
-		deficitFactor  = new BigDecimal(0.005); 
+		deficitFactor  = new BigDecimal(0.01); 
 		openDuration = 55; 
 		dropDuration = 21; 
 		maxOfLot = 1; 
@@ -170,27 +171,60 @@ public class Turtle {
 		Collections.sort(features, new Comparator<Tfeature>() {
 			@Override
 			public int compare(Tfeature o1, Tfeature o2) {
-				if(o1.getHlgap().equals(o2.getHlgap())) {
+/*				if(o1.getHlgap().equals(o2.getHlgap())) {
 					return o2.getNhgap().compareTo(o1.getNhgap());
 				}else {
 					return o1.getHlgap().compareTo(o2.getHlgap());
-				}
+				}*/
+				return o1.getHlgap().compareTo(o2.getHlgap());
 			}
 		});
 		
 		for(Tfeature feature : features) {
-			if((account.getItemIDsOfHolds().contains(feature.getItemID())) 
-					|| (account.getCash().compareTo(new BigDecimal(10000))==1)) {
-				doIt(feature.getItemID(), isGoodTime);
+			if((account.getItemIDsOfHolds().contains(feature.getItemID()))) {
+				this.doStopOrDrop(feature.getItemID(), isGoodTime);
 			}
 		}
 		
-		dailyLog.append(account.getDailyLog() + "\n");
+		StringBuffer sb = new StringBuffer();
+		breakers.append(account.getEndDate().toString() + ",");
+		for(Tfeature feature : features) {
+			if(feature.getStatus()==2) {
+				if((account.getCash().compareTo(new BigDecimal(10000))==1)) {
+					sb.append(feature.getItemID()+ "(" + feature.getHlgap() + "),");
+					this.doOpenOrReopen(feature.getItemID(), isGoodTime);
+				}				
+				breakers.append(feature.getItemID());
+				breakers.append(",");
+			}
+		}
+		breakers.deleteCharAt(breakers.length()-1);
+		breakers.append("\n");
 		
-		System.out.println("********* " + account.getDailyLog());
+		System.out.println(sb.toString());
+		
+		dailyAmount.append(account.getDailyAmount() + "\n");
+		
+		System.out.println("********* " + account.getDailyAmount());
+	}
+	
+	private void doStopOrDrop(String itemID, boolean isGoodTime) {
+		//几天后不涨，取消持仓
+		//cancel(itemID);
+		
+		//止损
+		if(stopStrategy==1) {
+			doStop(itemID);
+		}else if(stopStrategy==2) {
+			doDoubleStop(itemID);
+		}
+		
+		//平仓
+		doDrop(itemID, isGoodTime);
+		
 	}
 
-	private void doIt(String itemID, boolean isGoodTime) {
+	private void doOpenOrReopen(String itemID, boolean isGoodTime) {
 		Tdata tdata = tdatas.get(itemID);
 		if(tdata == null) {
 			System.out.format("ERROR: tdata is null of %s.\n", itemID);
@@ -204,19 +238,6 @@ public class Turtle {
 			System.out.println("INF: " + itemID + " 一字板，无法成交");
 			return;
 		}
-		
-		//几天后不涨，取消持仓
-		//cancel(itemID);
-		
-		//止损
-		if(stopStrategy==1) {
-			doStop(itemID);
-		}else if(stopStrategy==2) {
-			doDoubleStop(itemID);
-		}
-		
-		//平仓
-		doDrop(itemID, isGoodTime);
 		
 		//加仓
 		doReopen(itemID, isGoodTime);
@@ -342,8 +363,6 @@ public class Turtle {
 				account.open(itemID, quantity,lots.toString());
 			}
 			
-			
-			
 			//account.open(itemID, 0, ""); //第一次突破，买入为0，如果后面再突破，才真正买入
 			System.out.println("cash=" + account.getCash());
 		}
@@ -384,7 +403,8 @@ public class Turtle {
 		result.put("total", account.getTotal().toString());
 		result.put("winRatio", account.getWinRatio().toString()); //赢率
 		result.put("cagr", account.getCAGR().toString());  //复合增长率的英文缩写为：CAGR（Compound Annual Growth Rate）
-		result.put("dailyLog", dailyLog.toString());
+		result.put("dailyAmount", dailyAmount.toString());
+		result.put("breakers", breakers.toString());
 		return result;
 	}
 	

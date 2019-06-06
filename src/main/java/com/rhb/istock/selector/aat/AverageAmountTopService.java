@@ -28,5 +28,11 @@ public interface AverageAmountTopService {
 	 * 在测试前执行一次
 	 */
 	public void generateAverageAmountTops();
+	
+	/*
+	 * 排序从大到小排序
+	 */
+	public List<String> sort(List<String> itemIDs,LocalDate date, Integer duration, boolean byCache);
+
 
 }

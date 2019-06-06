@@ -13,12 +13,13 @@ import org.springframework.stereotype.Service;
 import com.rhb.istock.selector.aat.AverageAmountTopService;
 import com.rhb.istock.selector.agt.AmountGapTopService;
 import com.rhb.istock.selector.bluechip.BluechipService;
-import com.rhb.istock.selector.bt.BreakThroughService;
+import com.rhb.istock.selector.breaker.BreakerService;
 import com.rhb.istock.selector.dat.DailyAmountTopService;
 import com.rhb.istock.selector.favor.FavorService;
 import com.rhb.istock.selector.hlt.HighLowTopService;
 import com.rhb.istock.selector.hold.HoldEntity;
 import com.rhb.istock.selector.hold.HoldService;
+import com.rhb.istock.selector.potential.PotentialService;
 
 @Service("selectorServiceImp")
 public class SelectorServiceImp implements SelectorService{
@@ -51,8 +52,12 @@ public class SelectorServiceImp implements SelectorService{
 	AmountGapTopService amountGapTopService;
 	
 	@Autowired
-	@Qualifier("breakThroughService")
-	BreakThroughService breakThroughService;
+	@Qualifier("potentialService")
+	PotentialService potentialService;
+
+	@Autowired
+	@Qualifier("breakerService")
+	BreakerService breakerService;
 	
 	@Override
 	public List<HoldEntity> getHolds() {
@@ -177,7 +182,7 @@ public class SelectorServiceImp implements SelectorService{
 
 	@Override
 	public void generateBreakers() {
-		breakThroughService.generateBreakers();
+		breakerService.generateBreakers();
 		
 	}
 
@@ -185,7 +190,7 @@ public class SelectorServiceImp implements SelectorService{
 	public TreeMap<LocalDate, List<String>> getBreakers(LocalDate beginDate, LocalDate endDate) {
 		TreeMap<LocalDate, List<String>> ids = new TreeMap<LocalDate, List<String>>();
 		
-		Map<LocalDate, List<String>> breaks = breakThroughService.getBreakers();
+		Map<LocalDate, List<String>> breaks = breakerService.getBreakerIDs();
 		
 		for(LocalDate date = beginDate; date.isBefore(endDate); date = date.plusDays(1)) {
 			if(breaks.containsKey(date)) {
@@ -197,18 +202,18 @@ public class SelectorServiceImp implements SelectorService{
 	}
 
 	@Override
-	public void generateLatestBreakers() {
-		breakThroughService.generateLatestBreakers();
+	public void generateLatestPotentials() {
+		potentialService.generateLatestPotentials();
 	}
 
 	@Override
-	public List<String> getLatestBreakers() {
-		return breakThroughService.getLatestBreakers();
+	public List<String> getLatestPotentials() {
+		return potentialService.getLatestPotentials();
 	}
 
 	@Override
-	public void generateTmpLatestBreakers() {
-		breakThroughService.generateTmpLatestBreakers();		
+	public void generateTmpLatestPotentials() {
+		potentialService.generateTmpLatestPotentials();		
 	}
 
 }

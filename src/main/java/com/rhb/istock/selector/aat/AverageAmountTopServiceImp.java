@@ -187,5 +187,29 @@ public class AverageAmountTopServiceImp implements AverageAmountTopService{
 		return ids;
 	}
 
+	@Override
+	public List<String> sort(List<String> itemIDs, LocalDate date, Integer duration, boolean byCache) {
+		List<String> ids = new ArrayList<String>();
+		
+		Kdata kdata;
+		AverageAmount gap = null;
+		TreeSet<AverageAmount> gaps = new TreeSet<AverageAmount>();
+		
+		int d=1;
+		for(String id : itemIDs) {
+			kdata = kdataService.getDailyKdata(id, date, duration, byCache);
+			gap = new AverageAmount(date,id,kdata.getAvarageAmount());
+			gaps.add(gap);
+
+			Progress.show(itemIDs.size(), d++, id+","+kdata.getAvarageAmount().toString());
+		}
+		
+		for(AverageAmount hlg : gaps) {
+			ids.add(hlg.getItemID());
+		}
+		
+		return ids;
+	}
+
 
 }

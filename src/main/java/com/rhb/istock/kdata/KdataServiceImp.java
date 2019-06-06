@@ -154,4 +154,27 @@ public class KdataServiceImp implements KdataService{
 		return kdataRealtimeSpider.getLatestDailyTop(top);
 	}
 
+	@Override
+	public Kdata getDailyKdata(String itemID, LocalDate endDate, boolean byCache) {
+		if(endDate==null) return this.getDailyKdata(itemID, byCache);
+		
+		Kdata kdata = new Kdata(itemID);
+		
+		KdataEntity entity = this.getEntity(itemID, byCache);
+		
+		//System.out.println(entity.getBarSize());
+		LocalDate date;
+		KbarEntity bar;
+		for(Map.Entry<LocalDate, KbarEntity> entry : entity.getBars().entrySet()) {
+				date = entry.getKey();
+				bar = entry.getValue();
+				if(date.isBefore(endDate.plusDays(1))) {
+					kdata.addBar(date, bar.getOpen(), bar.getHigh(), bar.getLow(), bar.getClose(), bar.getAmount(), bar.getQuantity());
+				}
+		}
+		
+		return kdata;
+
+	}
+
 }

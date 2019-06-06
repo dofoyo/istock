@@ -21,6 +21,11 @@ public interface DailyAmountTopService {
 	 * 模拟前重新生成一次即可
 	 */
 	public void generateDailyAmountTops();
+	
+	/*
+	 * 排序从大到小排序
+	 */
+	public List<String> sort(List<String> itemIDs,LocalDate date, Integer duration, boolean byCache);
 
 
 }

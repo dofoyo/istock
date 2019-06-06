@@ -64,9 +64,9 @@ public interface SelectorService{
 	public List<String> getAmountGapTops(Integer top);
 	
 	public void generateBreakers();
-	public void generateTmpLatestBreakers();
+	public void generateTmpLatestPotentials();
 	public TreeMap<LocalDate, List<String>> getBreakers(LocalDate beginDate, LocalDate endDate);
-	public void generateLatestBreakers();
-	public List<String> getLatestBreakers();
+	public void generateLatestPotentials();
+	public List<String> getLatestPotentials();
 
 }

@@ -99,7 +99,7 @@ public class Kdata {
 		return total.divide(new BigDecimal(count),BigDecimal.ROUND_HALF_UP);
 	}
 	
-	public boolean isBreaker(Integer count) {
+	public boolean isPotential(Integer count) {
 		if(this.bars.size()<count || this.bars.lastEntry().getValue()==null) return false;
 		
 		BigDecimal now = this.bars.lastEntry().getValue().getClose();
@@ -122,11 +122,11 @@ public class Kdata {
 		}
 		
 		BigDecimal ratio = highest.subtract(now).divide(now,BigDecimal.ROUND_HALF_UP);
-		boolean isBreaker = highest.subtract(now).divide(now,BigDecimal.ROUND_HALF_UP).compareTo(new BigDecimal(0.1))<0;
+		boolean isPotential = ratio.compareTo(new BigDecimal(0.1))<0;
 		
 		//System.out.println(", highest: " + highest + ", now: " + now + ", ratio: " + ratio + ", isBreaker=" + isBreaker);
 		
-		return isBreaker;
+		return isPotential;
 	}
 
 	

@@ -25,5 +25,9 @@ public interface HighLowTopService {
 	 * 模拟测试前执行一次
 	 */
 	public void generateHighLowTops();
-
+	
+	/*
+	 * 排序从小到大排序
+	 */
+	public List<String> sort(List<String> itemIDs,LocalDate date, Integer duration, boolean byCache);
 }

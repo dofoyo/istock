@@ -21,9 +21,9 @@ public class TurtleOperationServiceTest {
 	@Qualifier("turtleOperationServiceImp")
 	TurtleOperationService turtleService;
 
-	@Test
+	//@Test
 	public void getBreakers() {
-		List<TurtleView> views = turtleService.getBreakers();
+		List<TurtleView> views = turtleService.getPotentials();
 		for(TurtleView view : views) {
 			System.out.println(view);
 		}		
@@ -38,7 +38,7 @@ public class TurtleOperationServiceTest {
 		}		
 	}
 
-	//@Test
+	@Test
 	public void testGetHolds() {
 		List<HoldView> views = turtleService.getHolds();
 		for(HoldView view : views) {

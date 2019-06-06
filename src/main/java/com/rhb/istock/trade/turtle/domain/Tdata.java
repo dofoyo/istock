@@ -3,7 +3,9 @@ package com.rhb.istock.trade.turtle.domain;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -98,7 +100,7 @@ public class Tdata {
 	}
 	
 	
-	private BigDecimal[] getHighestAndLowest(Integer duration) {
+/*	private BigDecimal[] getHighestAndLowest(Integer duration) {
 		Integer fromIndex = this.bars.size()>duration ? this.bars.size()-duration : 0;
 		Integer toIndex = this.bars.size();
 		List<Tbar> subBars = this.bars.subList(fromIndex, toIndex);
@@ -119,24 +121,59 @@ public class Tdata {
 		BigDecimal rate = highest.subtract(lowest).divide(lowest,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100));
 
 		return new BigDecimal[]{highest,lowest,rate}; 
+	}*/
+	
+	private Map<String,String> getHighestAndLowest(Integer duration) {
+		Map<String,String> result = new HashMap<String,String>();
+		
+		Integer fromIndex = this.bars.size()>duration ? this.bars.size()-duration : 0;
+		Integer toIndex = this.bars.size();
+		List<Tbar> subBars = this.bars.subList(fromIndex, toIndex);
+		
+		LocalDate highestDate = null;
+		BigDecimal highest = new BigDecimal(-1000000);
+		BigDecimal lowest = new BigDecimal(1000000);
+		for(Tbar bar : subBars) {
+			if(bar.getHigh().compareTo(highest)>0) {
+				highest = bar.getHigh();
+				highestDate = bar.getDate();
+			}
+			
+			if(bar.getLow().compareTo(lowest)<0
+					//&& bar.getLow().compareTo(new BigDecimal(0))==1
+					) {
+				lowest = bar.getLow();
+			}
+		}
+		BigDecimal rate = highest.subtract(lowest).divide(lowest,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100));
+		
+		result.put("highestPrice", highest.toString());
+		result.put("highestDate", highestDate.toString());
+		result.put("lowestPrice", lowest.toString());
+		result.put("rate", rate.toString());
+		
+		return result; 
 	}
+	
 	
 	public void setLatestBar(LocalDate date, BigDecimal open, BigDecimal high, BigDecimal low, BigDecimal close) {
 		latestBar = new Tbar(date,open,high,low,close);
-		feature.setNow(latestBar.getClose());
+		feature.setNow(close);
+		feature.setNowDate(date);
 	}
 	
 	public Tfeature getFeature() {
 		if(this.latestBar==null || this.bars.size()<openDuration) return null;
 		
-		BigDecimal[] hl = getHighestAndLowest(openDuration);
-		this.feature.setOpenHigh(hl[0]);
-		this.feature.setOpenLow(hl[1]);
-		this.feature.setHlgap(hl[2].intValue());
+		Map<String,String> hl = getHighestAndLowest(openDuration);
+		this.feature.setOpenHighDate(LocalDate.parse(hl.get("highestDate")));
+		this.feature.setOpenHigh(new BigDecimal(hl.get("highestPrice")));
+		this.feature.setOpenLow(new BigDecimal(hl.get("lowestPrice")));
+		this.feature.setHlgap(new BigDecimal(hl.get("rate")).intValue());
 		
 		hl = getHighestAndLowest(dropDuration);
-		this.feature.setDropHigh(hl[0]);
-		this.feature.setDropLow(hl[1]);
+		this.feature.setDropHigh(new BigDecimal(hl.get("highestPrice")));
+		this.feature.setDropLow(new BigDecimal(hl.get("lowestPrice")));
 		
 		this.feature.setDropPrice(getDropPrice(dropDuration));
 		

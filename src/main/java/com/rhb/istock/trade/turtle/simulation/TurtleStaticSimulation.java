@@ -2,6 +2,7 @@ package com.rhb.istock.trade.turtle.simulation;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,10 +15,16 @@ import org.springframework.stereotype.Service;
 
 import com.rhb.istock.comm.util.FileUtil;
 import com.rhb.istock.comm.util.Progress;
+import com.rhb.istock.item.ItemService;
 import com.rhb.istock.kdata.Kbar;
 import com.rhb.istock.kdata.Kdata;
 import com.rhb.istock.kdata.KdataService;
 import com.rhb.istock.trade.turtle.domain.Turtle;
+import com.rhb.istock.trade.turtle.simulation.api.AmountView;
+import com.rhb.istock.trade.turtle.simulation.api.BreakerView;
+import com.rhb.istock.trade.turtle.simulation.api.HoldView;
+import com.rhb.istock.trade.turtle.simulation.repository.AmountEntity;
+import com.rhb.istock.trade.turtle.simulation.repository.TurtleSimulationRepository;
 
 /*
  * 所谓static，即每天要交易的item是确定的，如上证50、每日交易量top50、日均交易量top50、等
@@ -31,6 +38,14 @@ public class TurtleStaticSimulation implements TurtleSimulation{
 	@Qualifier("kdataServiceImp")
 	KdataService kdataService;
 
+	@Autowired
+	@Qualifier("turtleSimulationRepository")
+	TurtleSimulationRepository turtleSimulationRepository;
+	
+	@Autowired
+	@Qualifier("itemServiceImp")
+	ItemService itemService;
+	
 	boolean cache = true;
 	
 	Turtle turtle = null;
@@ -85,8 +100,9 @@ public class TurtleStaticSimulation implements TurtleSimulation{
 		System.out.println("total: " + result.get("total"));
 		System.out.println("CAGR: " + result.get("cagr"));
 		System.out.println("winRatio: " + result.get("winRatio"));
-		FileUtil.writeTextFile(reportPath + "/one_item_simulation_detail" + System.currentTimeMillis() + ".csv", result.get("CSV"), false);
-		FileUtil.writeTextFile(reportPath + "/one_item_simulation_dailyLog" + System.currentTimeMillis() + ".csv", result.get("dailyLog"), false);
+		FileUtil.writeTextFile(reportPath + "/simulation_detail" + System.currentTimeMillis() + ".csv", result.get("CSV"), false);
+		FileUtil.writeTextFile(reportPath + "/simulation_dailyAmount" + System.currentTimeMillis() + ".csv", result.get("dailyAmount"), false);
+		FileUtil.writeTextFile(reportPath + "/simulation_breakers" + System.currentTimeMillis() + ".csv", result.get("breakers"), false);
 		return result;
 	}
 
@@ -179,6 +195,109 @@ public class TurtleStaticSimulation implements TurtleSimulation{
 		}
 		
 		return flag;
+	}
+	
+	@Override
+	public List<BreakerView> getBreakers(String type, String year, LocalDate date) {
+		List<BreakerView> views = new ArrayList<BreakerView>();
+		Map<LocalDate,List<String>> breakers = turtleSimulationRepository.getBreakers(type, year);
+		List<String> ids = breakers.get(date);
+		if(ids!=null && !ids.isEmpty()) {
+			for(String id : ids) {
+				views.add(new BreakerView(id,itemService.getItem(id).getName()));
+			}
+		}
+		return views;
+	}
+
+	@Override
+	public List<HoldView> getHolds(String type, String year, LocalDate date) {
+		List<HoldView> views = new ArrayList<HoldView>();
+		
+		Map<LocalDate,List<String>> buys = turtleSimulationRepository.getBuys(type, year);
+		Map<LocalDate,List<String>> sells = turtleSimulationRepository.getSells(type, year);
+		
+		List<String> ids = generateHolds(type,year,date);
+		//System.out.println("holds: " + ids);
+		if(ids!=null && !ids.isEmpty()) {
+			for(String id : ids) {
+				views.add(new HoldView(id,itemService.getItem(id).getName(),0));
+			}
+		}
+		
+		ids = buys.get(date);
+		//System.out.println("buys: " + ids);
+		if(ids!=null && !ids.isEmpty()) {
+			for(String id : ids) {
+				views.add(new HoldView(id,itemService.getItem(id).getName(),1));
+			}
+		}
+		
+		ids = sells.get(date);
+		if(ids!=null && !ids.isEmpty()) {
+			for(String id : ids) {
+				for(HoldView view : views) {
+					if(view.getItemID().equals(id)) {
+						view.setStatus(-1);
+					}
+				}
+			}
+		}	
+		
+		return views;
+	}
+	
+	private List<String> generateHolds(String type, String year, LocalDate date){
+		List<String> ids = new ArrayList<String>();
+		
+		Map<LocalDate,List<String>> buys = turtleSimulationRepository.getBuys(type, year);
+		Map<LocalDate,List<String>> sells = turtleSimulationRepository.getSells(type, year);
+		
+		for(Map.Entry<LocalDate,List<String>> entry : buys.entrySet()) {
+			if(entry.getKey().isBefore(date)) {
+				ids.addAll(entry.getValue());
+			}
+		}
+		
+		for(Map.Entry<LocalDate,List<String>> entry : sells.entrySet()) {
+			if(entry.getKey().isBefore(date)) {
+				ids.removeAll(entry.getValue());
+			}
+		}
+		
+		return ids;
+	}
+
+	@Override
+	public AmountView getAmount(String type, String year, LocalDate date) {
+		AmountView view = new AmountView(0,0);
+		
+		Map<LocalDate, AmountEntity> amounts = turtleSimulationRepository.getAmounts(type, year);
+		AmountEntity entity = amounts.get(date);
+		if(entity!=null) {
+			view = new AmountView(entity.getCash(), entity.getValue());
+		}
+		
+		return view;
+	}
+
+	@Override
+	public List<String> getDates(String type, String year) {
+		List<String> dates = new ArrayList<String>();
+		Map<LocalDate, AmountEntity> amounts = turtleSimulationRepository.getAmounts(type, year);
+		for(LocalDate date : amounts.keySet()) {
+			dates.add(date.toString());
+		}
+		return dates;
+	}
+
+	@Override
+	public void evictCache() {
+		System.out.println("evictCache");
+		turtleSimulationRepository.evictAmountsCache();
+		turtleSimulationRepository.evictBreakersCache();
+		turtleSimulationRepository.evictBuysCache();
+		turtleSimulationRepository.evictSellsCache();
 	}
 
 }

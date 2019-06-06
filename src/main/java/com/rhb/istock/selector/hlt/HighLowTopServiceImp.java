@@ -94,7 +94,8 @@ public class HighLowTopServiceImp implements HighLowTopService {
 	class HighLowGap implements Comparable<HighLowGap>{
 		String itemID;
 		Integer highLowGap;
-		
+		boolean ascend = true;
+
 		public HighLowGap(String itemID, Integer highLowGap) {
 			this.itemID = itemID;
 			this.highLowGap = highLowGap;
@@ -118,7 +119,11 @@ public class HighLowTopServiceImp implements HighLowTopService {
 
 		@Override
 		public int compareTo(HighLowGap o) {
-			return this.highLowGap.compareTo(o.getHighLowGap());
+			if(ascend) {
+				return this.highLowGap.compareTo(o.getHighLowGap());
+			}else {
+				return o.getHighLowGap().compareTo(this.highLowGap);
+			}
 		}
 
 		@Override
@@ -220,6 +225,30 @@ public class HighLowTopServiceImp implements HighLowTopService {
 		long used = (System.currentTimeMillis() - beginTime)/1000; 
 		System.out.println("用时：" + used + "秒");          
 		
+	}
+
+	@Override
+	public List<String> sort(List<String> itemIDs,LocalDate date, Integer duration, boolean byCache) {
+		List<String> ids = new ArrayList<String>();
+		
+		Kdata kdata;
+		HighLowGap gap = null;
+		TreeSet<HighLowGap> gaps = new TreeSet<HighLowGap>();
+		
+		int d=1;
+		for(String id : itemIDs) {
+			kdata = kdataService.getDailyKdata(id, date, duration, byCache);
+			gap = new HighLowGap(id,kdata.getHighLowGap());
+			gaps.add(gap);
+
+			Progress.show(itemIDs.size(), d++, id+","+kdata.getHighLowGap().toString());
+		}
+		
+		for(HighLowGap hlg : gaps) {
+			ids.add(hlg.getItemID());
+		}
+		
+		return ids;
 	}
 
 }

@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -20,6 +19,7 @@ import com.rhb.istock.comm.util.FileUtil;
 import com.rhb.istock.comm.util.Progress;
 import com.rhb.istock.item.Item;
 import com.rhb.istock.item.ItemService;
+import com.rhb.istock.kdata.Kbar;
 import com.rhb.istock.kdata.Kdata;
 import com.rhb.istock.kdata.KdataService;
 import com.rhb.istock.kdata.spider.KdataRealtimeSpider;
@@ -114,7 +114,7 @@ public class DailyAmountTopServiceImp implements DailyAmountTopService {
 				//System.out.print(theDate + "(" + ts.size() + "/" + top + "):");
 				for(Iterator<DailyAmount> i = amounts.iterator() ; i.hasNext();) {
 					amount = i.next();
-					sb.append(amount.getCode());
+					sb.append(amount.getItemID());
 					sb.append(",");
 					//System.out.print(bar.getCode() + "(" + bar.getAva() + "),");
 				}
@@ -140,6 +140,34 @@ public class DailyAmountTopServiceImp implements DailyAmountTopService {
 		for(LocalDate date = beginDate; date.isBefore(endDate); date = date.plusDays(1)) {
 			ids.put(date, this.getDailyAmountTops(top,date));
 		}
+		return ids;
+	}
+
+
+	@Override
+	public List<String> sort(List<String> itemIDs, LocalDate date, Integer duration, boolean byCache) {
+		List<String> ids = new ArrayList<String>();
+		
+		Kdata kdata;
+		Kbar kbar;
+		DailyAmount gap = null;
+		TreeSet<DailyAmount> das = new TreeSet<DailyAmount>();
+		
+		int d=1;
+		for(String id : itemIDs) {
+			
+			kbar = kdataService.getKbar(id, date, byCache);
+			if(kbar != null) {
+				gap = new DailyAmount(date,id,kbar.getAmount());
+				das.add(gap);				
+			}
+			Progress.show(itemIDs.size(), d++, id);
+		}
+		
+		for(DailyAmount da : das) {
+			ids.add(da.getItemID());
+		}
+		
 		return ids;
 	}
 

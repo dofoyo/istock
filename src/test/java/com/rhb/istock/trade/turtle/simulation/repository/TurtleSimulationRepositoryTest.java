@@ -1,0 +1,26 @@
+package com.rhb.istock.trade.turtle.simulation.repository;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+@RunWith(SpringJUnit4ClassRunner.class)
+@SpringBootTest
+public class TurtleSimulationRepositoryTest {
+	@Autowired
+	@Qualifier("turtleSimulationRepository")
+	TurtleSimulationRepository turtleSimulationRepository;
+	
+	//@Test
+	public void getBreakers() {
+		System.out.println(turtleSimulationRepository.getBreakers("av", "2019"));
+	}
+	
+	//@Test
+	public void getAmounts() {
+		System.out.println(turtleSimulationRepository.getAmounts("av", "2019"));
+	}
+}

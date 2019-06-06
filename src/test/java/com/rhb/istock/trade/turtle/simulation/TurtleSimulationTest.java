@@ -81,17 +81,32 @@ public class TurtleSimulationTest {
 	public void simulate2() {
 		LocalDate beginDate, endDate;
 		beginDate = LocalDate.of(2019,2,11);
-		endDate = LocalDate.of(2019,5,1);
+		endDate = LocalDate.of(2019,6,1);
 		boolean cache = true;
 
-		//TreeMap<LocalDate,List<String>> dailyItems = selectorService.getBreakers(beginDate, endDate);
-		TreeMap<LocalDate,List<String>> dailyItems = selectorService.getAverageAmountTops(21, beginDate, endDate);
-		//TreeMap<LocalDate,List<String>> dailyItems = selectorService.getHighLowTops(21, beginDate, endDate);
+		//TreeMap<LocalDate,List<String>> dailyItems = selectorService.getBreakers(beginDate, endDate); cache = false;
+		//TreeMap<LocalDate,List<String>> dailyItems = selectorService.getAverageAmountTops(21, beginDate, endDate);
+		TreeMap<LocalDate,List<String>> dailyItems = selectorService.getHighLowTops(21, beginDate, endDate);
 		//TreeMap<LocalDate,List<String>> dailyItems = selectorService.getDailyAmountTops(21, beginDate, endDate);
 		//TreeMap<LocalDate,List<String>> dailyItems = this.getSpecifyItem("sh000001", beginDate, endDate);
 		//TreeMap<LocalDate,List<String>> dailyItems = selectorService.getBluechipIDs(beginDate, endDate);
 			
 		turtleSimulation.simulate(dailyItems, null, cache);
 	}
+	
+	//@Test
+	public void getHolds() {
+		System.out.println(turtleSimulation.getHolds("av", "2019", LocalDate.of(2019,3,12)));
+	}
 
+	//@Test
+	public void getAmount() {
+		System.out.println(turtleSimulation.getAmount("av", "2019", LocalDate.of(2019,3,12)));
+	}
+	
+	//@Test
+	public void getDates() {
+		System.out.println(turtleSimulation.getDates("av", "2019"));
+	}
+	
 }

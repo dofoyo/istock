@@ -174,8 +174,8 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 	}
 
 	@Override
-	public List<TurtleView> getBreakers() {
-		return getTurtleViews(selectorService.getLatestBreakers(),"breakers");
+	public List<TurtleView> getPotentials() {
+		return getTurtleViews(selectorService.getLatestPotentials(),"potentials");
 	}
 	
 	@Override

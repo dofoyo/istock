@@ -52,13 +52,21 @@ public class IstockScheduledTask {
 		turtleOperationService.init();
 		selectorService.generateLatestAverageAmountTops();
 		selectorService.generateLatestHighLowTops();
+		selectorService.generateLatestPotentials();
+		//selectorService.generateLatestBreakers();
 		selectorService.generateAmountGaps();
-		selectorService.generateLatestBreakers();
+		
 	}
 
 	@Scheduled(cron="0 30 15 ? * 1-5") 
 	public void dailyClose() throws Exception {
-		selectorService.generateTmpLatestBreakers();
+		//上一交易日的收盘数据要等开盘前才能下载到，因为涉及到除权的调整
+		//因此收盘后的各统计用的是最后一天的实时行情，称之为tmp，如果某只股票正在除权，会失真
+		
+		selectorService.generateTmpLatestPotentials();
+		//selectorService.generateTmpLatestBreakers();
+		
+		
 	}
 	
 	//@Scheduled(cron="0 0 5 ? * *") //每日凌晨5点，下载最新年报，并生成bluechip

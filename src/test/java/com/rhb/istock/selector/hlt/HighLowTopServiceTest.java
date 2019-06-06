@@ -17,7 +17,7 @@ public class HighLowTopServiceTest {
 	@Qualifier("highLowTopServiceImp")
 	HighLowTopService highLowTopService;
 	
-	@Test
+	//@Test
 	public void generateLatestHighLowTops() {
 		highLowTopService.generateLatestHighLowTops();
 	}
@@ -28,7 +28,7 @@ public class HighLowTopServiceTest {
 		System.out.println(ids);
 	}
 	
-	//@Test
+	@Test
 	public void generateHighLowTops() {
 		highLowTopService.generateHighLowTops();
 	}

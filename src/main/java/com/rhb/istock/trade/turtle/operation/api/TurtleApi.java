@@ -19,9 +19,9 @@ public class TurtleApi{
 	@Qualifier("turtleOperationServiceImp")
 	TurtleOperationService ts;
 
-	@GetMapping("/turtle/breakers")
-	public ResponseContent<List<TurtleView>> getBreakers() {
-		List<TurtleView> views = ts.getBreakers();
+	@GetMapping("/turtle/potentials")
+	public ResponseContent<List<TurtleView>> getPotentials() {
+		List<TurtleView> views = ts.getPotentials();
 		return new ResponseContent<List<TurtleView>>(ResponseEnum.SUCCESS, views);
 	}
 	

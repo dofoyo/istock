@@ -47,6 +47,7 @@ public class ItemServiceImp implements ItemService {
 
 	@Override
 	public Item getItem(String itemID) {
+		//System.out.println(itemID);
 		Item item = null;
 		//System.out.println(itemRepository.getItemIDs().size());
 		List<ItemEntity> entities = itemRepository.getItemEntities();
@@ -62,6 +63,9 @@ public class ItemServiceImp implements ItemService {
 				break;
 			}
 		}
+		
+		//System.out.println(item);
+
 		return item;
 	}
 
@@ -90,6 +94,15 @@ public class ItemServiceImp implements ItemService {
 	@Override
 	public String[] getTopicTops(Integer count) {
 		return itemSpider.getTopicTops(count);
+	}
+
+	@Override
+	public List<String> getItemIDs() {
+		List<String> ids = new ArrayList<String>();
+		for(Item item : this.getItems()) {
+			ids.add(item.getItemID());
+		}
+		return ids;
 	}
 
 }

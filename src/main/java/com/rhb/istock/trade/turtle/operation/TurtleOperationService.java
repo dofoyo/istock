@@ -25,7 +25,7 @@ public interface TurtleOperationService {
 	public List<TurtleView> getBluechips();
 	public List<TurtleView> getHighLowTops(Integer top);
 	public List<TurtleView> getAgTops(Integer top);
-	public List<TurtleView> getBreakers();
+	public List<TurtleView> getPotentials();
 	
 	/*
 	 * 一般每周1-5，每天上午9:00初始化一次。主要是导入之前的历史记录
