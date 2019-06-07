@@ -193,6 +193,18 @@ public class Account {
 		return flag;
 	}
 	
+	public boolean isHold(String itemID){
+		for(Order order : holds.values()) {
+			if(order.getItemID().equals(itemID)) {
+				//System.out.println("is hold " + itemID);
+				return true;
+			}
+		}		
+		//System.out.println("NOT hold " + itemID);
+
+		return false;
+	}
+	
 	public Set<String> getHoldOrderIDs(String itemID){
 		Set<String> ids = new HashSet<String>();
 		for(Order order : holds.values()) {
@@ -255,7 +267,7 @@ public class Account {
 	}
 	
 	public Integer getWinRatio() {
-		Integer wins = 0;
+		Integer wins = 0;;
 		Integer all = opens.size();
 		Order openOrder;
 		Order dropOrder;

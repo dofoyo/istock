@@ -37,6 +37,13 @@ public class PotentialService {
 		return Arrays.asList(FileUtil.readTextFile(latestPotentialsFile).split(","));
 	}
 
+	
+	/*
+	 * 上一交易日的收盘数据要等开盘前才能下载到，因为涉及到除权的调整
+	 * 因此收盘后的各统计用的是最后一天的实时行情，称之为tmp，如果某只股票正在除权，会失真
+	 * tmpLatestPotentials仅供盘后分析用
+	 * 每日开盘后，系统会在9:30生成latestPotentials，供实盘操作用
+	 */
 	public void generateTmpLatestPotentials() {
 		long beginTime=System.currentTimeMillis(); 
 		System.out.println("generate latest potentials with latest kdata......");
@@ -96,24 +103,30 @@ public class PotentialService {
 	public void generateLatestPotentials() {
 		long beginTime=System.currentTimeMillis(); 
 		System.out.println("generate latest potentials ......");
-
-		StringBuffer sb = new StringBuffer();
-
-		Kdata kdata;
-		Integer count = 55;
-		List<Item> items = itemService.getItems();
-		int i=1;
-		for(Item item : items) {
-			Progress.show(items.size(),i++, item.getItemID());
-			kdata = kdataService.getDailyKdata(item.getItemID(),false);
-			if(kdata.isPotential(count)) {
-				sb.append(item.getItemID());
-				sb.append(",");				
-			}
-		}
-		sb.deleteCharAt(sb.length()-1);
 		
-		FileUtil.writeTextFile(latestPotentialsFile, sb.toString(), false);
+		LocalDate latestKdataDate = kdataService.getLatestDownDate();
+		LocalDate theDate = LocalDate.parse(this.getLatestPotentials().get(0));
+		if(theDate.isBefore(latestKdataDate)) {
+			StringBuffer sb = new StringBuffer(latestKdataDate.toString() + ",");
+
+			Kdata kdata;
+			Integer count = 55;
+			List<Item> items = itemService.getItems();
+			int i=1;
+			for(Item item : items) {
+				Progress.show(items.size(),i++, item.getItemID());
+				kdata = kdataService.getDailyKdata(item.getItemID(),false);
+				if(kdata.isPotential(count)) {
+					sb.append(item.getItemID());
+					sb.append(",");				
+				}
+			}
+			sb.deleteCharAt(sb.length()-1);
+			
+			FileUtil.writeTextFile(latestPotentialsFile, sb.toString(), false);
+		}else {
+			System.out.println("it has been generated! pass!");
+		}
 		
 		System.out.println("generate latest potentials done!");
 		long used = (System.currentTimeMillis() - beginTime)/1000; 

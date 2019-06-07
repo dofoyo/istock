@@ -31,14 +31,15 @@ public class AppInitRunner implements CommandLineRunner {
 	
     @Override
     public void run(String... args) throws Exception {
-/*    	itemService.download();
+    	itemService.init();
+    	itemService.download();
     	kdataService.downKdatas();
-    	selectorService.generateLatestAverageAmountTops();
-    	selectorService.generateLatestHighLowTops();
+    	//selectorService.generateLatestAverageAmountTops();
+    	//selectorService.generateLatestHighLowTops();
     	selectorService.generateLatestPotentials();
 		//selectorService.generateAmountGaps();
 
-    	turtleOperationService.init();*/
+    	turtleOperationService.init();
     }
 
 }

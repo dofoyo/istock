@@ -7,8 +7,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -175,7 +177,8 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 
 	@Override
 	public List<TurtleView> getPotentials() {
-		return getTurtleViews(selectorService.getLatestPotentials(),"potentials");
+		List<String> ids = selectorService.getLatestPotentials();  //首个是日期
+		return getTurtleViews(ids.subList(1, ids.size()),"potentials");
 	}
 	
 	@Override
@@ -204,7 +207,6 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 
 		Tfeature feature;
 		Item item;
-		String topic;
 		String[] tops = itemService.getTopicTops(5);
 		
 		List<String> holds = selectorService.getHoldIDs();
@@ -217,7 +219,6 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 				feature = turtle.getFeature(id);
 				if(feature!=null) {
 					item = itemService.getItem(id);
-					topic = this.getTopic(id, tops);
 					
 					if(item == null) {
 						System.err.println("item of " + id + " is null!!!");
@@ -236,7 +237,9 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 						preyMap.put("nhgap", feature.getNhgap().toString());
 						preyMap.put("atr", df.format(feature.getAtr()));	
 						preyMap.put("status", feature.getStatus().toString());	
-						preyMap.put("topic", topic);
+						preyMap.put("topic", this.getTopic(id, tops));
+						preyMap.put("label", this.getLabel(id));
+						
 						
 						views.add(new TurtleView(preyMap));						
 					}
@@ -250,10 +253,10 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 				BigDecimal nh1 = new BigDecimal(o1.getNhgap());
 				BigDecimal nh2 = new BigDecimal(o2.getNhgap());
 				
-				BigDecimal hl1 = new BigDecimal(o1.getHlgap());
-				BigDecimal hl2 = new BigDecimal(o2.getHlgap());
+				//BigDecimal hl1 = new BigDecimal(o1.getHlgap());
+				//BigDecimal hl2 = new BigDecimal(o2.getHlgap());
 				
-				return hl1.compareTo(hl2);
+				return nh1.compareTo(nh2);
 
 				/*
 				if(o1.getStatus().equals(o2.getStatus())) {
@@ -277,14 +280,39 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 	
 	private String getTopic(String itemID, String[] tops) {
 		String topic = itemService.getTopic(itemID);
+		int i=0;
+		String start = "*";
 		for(String top : tops) {
 			if(topic.indexOf(top)!=-1) {
-				topic = topic.replaceAll(top, "*"+top);
+				if(i==0) start="***";
+				if(i==1 || i==2) start="**";
+				topic = topic.replaceAll(top, start+top);
 			}
+			i++;
 		}
-		
 		return topic;
 	}
+	
+	private String getLabel(String itemID) {
+		Integer top = 21;
+		StringBuffer label = new StringBuffer();
+		if(isFavors(itemID)) label.append("," + "favor");
+		if(isBluechip(itemID)) label.append("," + "bluechip");
+		
+		return label.length()==0 ? "" : label.substring(1).toString();
+	}
+	
+
+	private boolean isBluechip(String itemID) {
+		Set<String> bluechips = new HashSet<String>(selectorService.getLatestBluechipIDs());
+		return bluechips.contains(itemID);
+	}
+	
+	private boolean isFavors(String itemID) {
+		Map<String, String> favors = selectorService.getFavors();
+		return favors.containsKey(itemID);
+	}
+	
 
 	@Override
 	public List<TurtleView> getBluechips() {

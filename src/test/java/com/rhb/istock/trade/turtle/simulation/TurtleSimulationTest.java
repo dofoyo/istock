@@ -15,6 +15,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.rhb.istock.kdata.KdataService;
 import com.rhb.istock.selector.SelectorService;
+import com.rhb.istock.selector.breaker.BreakerService;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest
@@ -30,6 +31,10 @@ public class TurtleSimulationTest {
 	@Autowired
 	@Qualifier("selectorServiceImp")
 	SelectorService selectorService;
+	
+	@Autowired
+	@Qualifier("breakerService")
+	BreakerService breakerService;
 	
 	//@Test
 	public void simulate1() {
@@ -79,18 +84,40 @@ public class TurtleSimulationTest {
 	
 	@Test
 	public void simulate2() {
-		LocalDate beginDate, endDate;
-		beginDate = LocalDate.of(2019,2,11);
-		endDate = LocalDate.of(2019,6,1);
 		boolean cache = true;
 
-		//TreeMap<LocalDate,List<String>> dailyItems = selectorService.getBreakers(beginDate, endDate); cache = false;
+		LocalDate beginDate, endDate;
+		//beginDate = LocalDate.of(2019,2,11);endDate = LocalDate.of(2019,5,1);
+		//beginDate = LocalDate.of(2014,7,22);endDate = LocalDate.of(2015,6,19);
+		//beginDate = LocalDate.of(2009,1,22);endDate = LocalDate.of(2009,8,12);
+		beginDate = LocalDate.of(2005,12,9);endDate = LocalDate.of(2007,11,5);
+
+		/*
+		 * 在breakers中分别按hl、dt、av排序，取前5名
+		 * 即在breakers中找hl、dt、av
+		 */
+		//TreeMap<LocalDate,List<String>> dailyItems = breakerService.getBreakersSortByAV(5, beginDate, endDate);
+		//TreeMap<LocalDate,List<String>> dailyItems = breakerService.getBreakersSortByHL(5, beginDate, endDate);
+		//TreeMap<LocalDate,List<String>> dailyItems = breakerService.getBreakersSortByDT(5, beginDate, endDate);
+
+		/*
+		 * 在排好序的hl、dt、av、bluechip中找出breakers
+		 */
 		//TreeMap<LocalDate,List<String>> dailyItems = selectorService.getAverageAmountTops(21, beginDate, endDate);
-		TreeMap<LocalDate,List<String>> dailyItems = selectorService.getHighLowTops(21, beginDate, endDate);
-		//TreeMap<LocalDate,List<String>> dailyItems = selectorService.getDailyAmountTops(21, beginDate, endDate);
-		//TreeMap<LocalDate,List<String>> dailyItems = this.getSpecifyItem("sh000001", beginDate, endDate);
+		//TreeMap<LocalDate,List<String>> dailyItems = selectorService.getHighLowTops(21, beginDate, endDate);
+		TreeMap<LocalDate,List<String>> dailyItems = selectorService.getDailyAmountTops(21, beginDate, endDate);
+		
+		
 		//TreeMap<LocalDate,List<String>> dailyItems = selectorService.getBluechipIDs(beginDate, endDate);
-			
+
+		/*
+		 * 仅跟踪个股
+		 */
+		//TreeMap<LocalDate,List<String>> dailyItems = this.getSpecifyItem("sh000001", beginDate, endDate);
+		
+		/*
+		 * dailyItems必须每个交易日都要有
+		 */
 		turtleSimulation.simulate(dailyItems, null, cache);
 	}
 	

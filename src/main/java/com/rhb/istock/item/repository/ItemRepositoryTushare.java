@@ -1,7 +1,9 @@
 package com.rhb.istock.item.repository;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -16,6 +18,9 @@ import com.rhb.istock.comm.util.FileUtil;
 public class ItemRepositoryTushare implements ItemRepository{
 	@Value("${tushareItemsFile}")
 	private String itemsFile;
+
+	@Value("${topicsFile}")
+	private String topicsFile;
 	
 	@Override
 	@Cacheable("items")
@@ -102,5 +107,24 @@ public class ItemRepositoryTushare implements ItemRepository{
 	@Override
 	@CacheEvict(value="items",allEntries=true)
 	public void cacheEvict() {}
+
+	@Override
+	public void saveTopic(String itemID, String topic) {
+		topic = topic.replaceAll(":", "：");
+		
+		FileUtil.writeTextFile(topicsFile, itemID + ":" + topic + "\n", true);
+	}
+
+	@Override
+	public Map<String, String> getTopics() {
+		Map<String,String> topics = new HashMap<String,String>();
+		String[] lines = FileUtil.readTextFile(topicsFile).split("\n");
+		String[] columns;
+		for(String line : lines) {
+			columns = line.split(":");
+			topics.put(columns[0], columns.length>1 ? columns[1] : "");
+		}
+		return topics;
+	}
 
 }

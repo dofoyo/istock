@@ -65,7 +65,7 @@ public class Kelly {
 	private StringBuffer breakers = new StringBuffer();
 
 	public Kelly() {
-		deficitFactor  = new BigDecimal(0.003); 
+		deficitFactor  = new BigDecimal(0.008); 
 		openDuration = 55; 
 		dropDuration = 21; 
 		maxOfLot = 1; 
@@ -154,27 +154,12 @@ public class Kelly {
 		return tdata.getLatestBar();
 	}
 	
-	/*
-	 * 
-	 */
-	public void doIt(TreeSet<String> itemIDs) {
-		Kefeature f;
-		List<Kefeature> features = new ArrayList<Kefeature>();
-		for(Kedata tdata : tdatas.values()) {
-			f = tdata.getFeature();
-			if(f != null) {
-				features.add(tdata.getFeature());
-			}
-		}
-		
-		if(features.size()==0) return;
-			
-		for(Kefeature feature : features) {
-			if((account.getItemIDsOfHolds().contains(feature.getItemID()))) {
-				this.doStopOrDrop(feature.getItemID());
-			}
-		}
-		
+	public void dailyReport() {
+		dailyAmount.append(account.getDailyAmount() + "\n");
+		System.out.println("\n********* " + account.getDailyAmount());
+	}
+	
+	public void doOpenOrReopen(List<String> itemIDs) {
 		breakers.append(account.getEndDate().toString() + ",");
 		for(String itemID : itemIDs) {
 			if((account.getCash().compareTo(new BigDecimal(10000))==1)) {
@@ -186,11 +171,12 @@ public class Kelly {
 
 		breakers.deleteCharAt(breakers.length()-1);
 		breakers.append("\n");
-		
-		
-		dailyAmount.append(account.getDailyAmount() + "\n");
-		
-		System.out.println("********* " + account.getDailyAmount());
+	}
+	
+	public void doStopOrDrop(Set<String> itemIDs) {
+		for(String itemID : itemIDs) {
+			this.doStopOrDrop(itemID);
+		}
 	}
 	
 	private void doStopOrDrop(String itemID) {
@@ -263,7 +249,6 @@ public class Kelly {
 					System.out.println("do stop!!");
 					account.stopByOrderID(entry.getKey());
 					System.out.println("cash=" + account.getCash());
-
 				}
 			}
 		}		
@@ -297,7 +282,7 @@ public class Kelly {
 		Kedata tdata = tdatas.get(itemID);
 		Kefeature feature = tdata.getFeature();
 		Integer lots = account.getLots(tdata.getItemID());
-		if((lots>0 && feature.getStatus()<0)) {
+		if((lots>0 && feature!=null && feature.getStatus()<0)) {
 			System.out.println(feature);
 			System.out.println("the lots " + lots + ">0, and status is "+feature.getStatus() + ", do drop!!");//--------------
 			account.drop(itemID,"doDrop");
@@ -341,7 +326,7 @@ public class Kelly {
 		Integer lots = account.getLots(tdata.getItemID());
 		//if(feature.getStatus()==2 && lots<maxOfLot && feature.getHlgap()<=gap && isGoodTime) {
 		if(feature.getStatus()==2 && lots==0 ) {
-			System.out.println("do open");//--------------
+			System.out.println("\n do open");//--------------
 			Integer quantity = getQuantity(feature.getAtr(),getQuantityPerHand(itemID),deficitFactor,feature.getNow());
 			
 			if(quantity>0) {

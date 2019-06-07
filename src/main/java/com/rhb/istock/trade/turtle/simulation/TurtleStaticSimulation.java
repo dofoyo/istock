@@ -4,8 +4,10 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,6 +74,7 @@ public class TurtleStaticSimulation implements TurtleSimulation{
 		long days = dailyItems.lastKey().toEpochDay()- dailyItems.firstKey().toEpochDay();
 		
 		List<String> itemIDs;
+		Set<String> tmp ;
 		int i = 0;
 		for(Map.Entry<LocalDate, List<String>> entry : dailyItems.entrySet()) {
 			Progress.show((int)days, i++, entry.getKey().toString());
@@ -79,18 +82,28 @@ public class TurtleStaticSimulation implements TurtleSimulation{
 			turtle.clearDatas(); //开始前清除历史记录，当某个item停牌几天，原记录可能会缺失
 			
 			itemIDs = entry.getValue();
-			if(itemIDs!=null) {
-				itemIDs.addAll(turtle.getItemIDsOfHolds());//加入在手的ID
+			tmp = new HashSet<String>();
+			tmp.addAll(itemIDs);
+			//System.out.println(tmp);
+			if(itemIDs!=null && !itemIDs.isEmpty()) {
+				for(String id :turtle.getItemIDsOfHolds()) {
+					//System.out.println("add " + id + "?");
+					if(!tmp.contains(id)) {
+						//System.out.println(" yes !");
+						itemIDs.add(id);   //加入在手的ID
+					}
+				}
+				
 				for(String itemID : itemIDs) {
 					setDailyKdata(itemID, entry.getKey()); //放入beginDate之前的历史记录
 					setLatestKdata(itemID, entry.getKey()); //放入当前记录
 				}
+				System.out.println("");
+				//turtle.doIt(isGoodTime(entry.getKey(),30)); //以上证指数的30日均线为准绳，线上操作，线下休息，个股要止损，可加仓（年复合增长率7%，盈率42%）
+				//turtle.doIt(isGoodTime1(entry.getKey()));  //以上证指数的是否突破和30日均线为准绳，突破操作，跌破30日均线休息，个股要止损，可加仓（年复合增长率6%，盈率39%）
+				//System.out.println(itemIDs);
+				turtle.doIt(itemIDs,true); //不管大盘，个股可加仓、要止损。（年复合增长率10%，盈率37%）
 			}
-			System.out.println("");
-			//turtle.doIt(isGoodTime(entry.getKey(),30)); //以上证指数的30日均线为准绳，线上操作，线下休息，个股要止损，可加仓（年复合增长率7%，盈率42%）
-			//turtle.doIt(isGoodTime1(entry.getKey()));  //以上证指数的是否突破和30日均线为准绳，突破操作，跌破30日均线休息，个股要止损，可加仓（年复合增长率6%，盈率39%）
-			turtle.doIt(true); //不管大盘，个股可加仓、要止损。（年复合增长率10%，盈率37%）
-			
 		}
 		
 		Map<String, String> result = turtle.result();

@@ -1,8 +1,10 @@
 package com.rhb.istock.trade.kelly.simulation;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -59,24 +61,40 @@ public class KellySimulation{
 		
 		long days = dailyItems.lastKey().toEpochDay()- dailyItems.firstKey().toEpochDay();
 		
-		TreeSet<String> itemIDs;
+		List<String> newIDs;
+		Set<String> holdIDs;
 		int i = 0;
 		for(Map.Entry<LocalDate, List<String>> entry : dailyItems.entrySet()) {
 			Progress.show((int)days, i++, entry.getKey().toString());
 			
 			kelly.clearDatas(); //开始前清除历史记录，当某个item停牌几天，原记录可能会缺失
 			
-			itemIDs = new TreeSet(entry.getValue());
-			if(itemIDs!=null) {
-				itemIDs.addAll(kelly.getItemIDsOfHolds());//加入在手的ID
-				for(String itemID : itemIDs) {
-					setDailyKdata(itemID, entry.getKey()); //放入beginDate之前的历史记录
-					setLatestKdata(itemID, entry.getKey()); //放入当前记录
+			newIDs = entry.getValue();
+			if(newIDs!=null && !newIDs.isEmpty()) {
+				//1、处理在手
+				holdIDs = kelly.getItemIDsOfHolds();
+				if(holdIDs!=null && !holdIDs.isEmpty()) {
+					for(String itemID : holdIDs) {
+						setDailyKdata(itemID, entry.getKey()); //放入beginDate之前的历史记录
+						setLatestKdata(itemID, entry.getKey()); //放入当前记录
+					}			
+					kelly.doStopOrDrop(holdIDs);				
 				}
+				
+				//2、新开仓
+				for(String itemID : newIDs) {
+					if(!holdIDs.contains(itemID)) {  //之前已放入了数据，就不用再放入了
+						setDailyKdata(itemID, entry.getKey()); //放入beginDate之前的历史记录
+						setLatestKdata(itemID, entry.getKey()); //放入当前记录						
+					}
+				}
+				kelly.doOpenOrReopen(newIDs); 
+				
+				
+				//3、生成日报
+				kelly.dailyReport();
+				
 			}
-			System.out.println("");
-			kelly.doIt(itemIDs); 
-			
 		}
 		
 		Map<String, String> result = kelly.result();

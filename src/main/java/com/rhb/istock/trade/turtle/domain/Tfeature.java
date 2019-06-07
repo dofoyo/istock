@@ -41,8 +41,8 @@ public class Tfeature {
 	
 	public void reset() {
 		try {
-			nhgap = now.subtract(openHigh).divide(openHigh,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)).abs().intValue();
-			nlgap = now.subtract(openLow).divide(openLow,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)).abs().intValue();
+			nhgap = openHigh.subtract(now).divide(openHigh,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)).intValue();
+			nlgap = openLow.subtract(now).divide(openLow,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)).intValue();
 		}catch(Exception e) {
 			System.out.println(this.toString());
 			e.printStackTrace();

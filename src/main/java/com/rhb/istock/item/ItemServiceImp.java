@@ -83,8 +83,9 @@ public class ItemServiceImp implements ItemService {
 	@Override
 	public String getTopic(String itemID) {
 		if(!topics.containsKey(itemID)) {
-			topics.put(itemID, itemSpider.getTopic(itemID));
-			
+			String topic = itemSpider.getTopic(itemID);
+			topics.put(itemID, topic);
+			itemRepository.saveTopic(itemID, topic);
 			//为避免被反扒工具禁止，需要暂停一下
 			HttpClient.sleep(5);
 		}
@@ -103,6 +104,13 @@ public class ItemServiceImp implements ItemService {
 			ids.add(item.getItemID());
 		}
 		return ids;
+	}
+
+	@Override
+	public void init() {
+		System.out.println("itemService init...");
+		topics.putAll(itemRepository.getTopics());
+		System.out.println("there are " + topics.size() + " topics ready!");
 	}
 
 }

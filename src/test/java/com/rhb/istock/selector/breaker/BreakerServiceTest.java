@@ -43,14 +43,14 @@ public class BreakerServiceTest {
 		}
 	}
 	
-	@Test
+	//@Test
 	public void generateBreakersSortByHL() {
 		LocalDate date = LocalDate.parse("2004-01-01");
 		breakerService.generateBreakersSortByHL(date);
 	}
 	
 
-	//@Test
+	@Test
 	public void generateBreakersSortByDT() {
 		LocalDate date = LocalDate.parse("2004-01-01");
 		breakerService.generateBreakersSortByDT(date);

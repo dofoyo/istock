@@ -47,14 +47,14 @@ public class IstockScheduledTask {
 	 */
 	@Scheduled(cron="0 30 9 ? * 1-5") 
 	public void dailyInit() throws Exception {
-		itemSpider.download();
-		kdataService.downKdatas();
+		itemSpider.download();		//下载最新股票代码
+		kdataService.downKdatas(); //上一交易日的收盘数据要等开盘前才能下载到
 		turtleOperationService.init();
-		selectorService.generateLatestAverageAmountTops();
-		selectorService.generateLatestHighLowTops();
-		selectorService.generateLatestPotentials();
-		//selectorService.generateLatestBreakers();
-		selectorService.generateAmountGaps();
+		//selectorService.generateLatestHighLowTops();  //上一交易日的收盘数据要等开盘前才能下载到，因为涉及到除权的调整，只有开盘后执行
+		//selectorService.generateLatestAverageAmountTops();		//
+		//selectorService.generateDailyAmountTops();
+		selectorService.generateLatestPotentials(); //要根据latestHighLow和close进行计算，因此也只有此时做
+		//selectorService.generateAmountGaps();
 		
 	}
 
@@ -62,9 +62,11 @@ public class IstockScheduledTask {
 	public void dailyClose() throws Exception {
 		//上一交易日的收盘数据要等开盘前才能下载到，因为涉及到除权的调整
 		//因此收盘后的各统计用的是最后一天的实时行情，称之为tmp，如果某只股票正在除权，会失真
+		//tmpLatestPotentials仅供盘后分析用
+		//每日开盘后，系统会在9:30生成latestPotentials，供实盘操作用
 		
 		selectorService.generateTmpLatestPotentials();
-		//selectorService.generateTmpLatestBreakers();
+		//selectorService.generateLatestDailyAmountTops();
 		
 		
 	}

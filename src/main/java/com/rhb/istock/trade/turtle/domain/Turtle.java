@@ -17,6 +17,10 @@ import com.rhb.istock.fund.Account;
  * 最高的年化收益率16%
  * 
  * 调试时，通过构造器修改参数，确定参数后，将参数设为默认值。
+ * 
+ * 买入前，先排序，最大的BUG
+ * 
+ * 
  */
 public class Turtle {
 	/*
@@ -64,7 +68,7 @@ public class Turtle {
 	private StringBuffer breakers = new StringBuffer();
 
 	public Turtle() {
-		deficitFactor  = new BigDecimal(0.01); 
+		deficitFactor  = new BigDecimal(0.005); 
 		openDuration = 55; 
 		dropDuration = 21; 
 		maxOfLot = 1; 
@@ -98,6 +102,10 @@ public class Turtle {
 	
 	public Set<String> getItemIDsOfHolds(){
 		return account.getItemIDsOfHolds();
+	}
+	
+	public boolean isHold(String itemID) {
+		return account.isHold(itemID);
 	}
 	
 	public void clearDatas() {
@@ -156,47 +164,30 @@ public class Turtle {
 	/*
 	 * 
 	 */
-	public void doIt(boolean isGoodTime) {
-		Tfeature f;
-		List<Tfeature> features = new ArrayList<Tfeature>();
-		for(Tdata tdata : tdatas.values()) {
-			f = tdata.getFeature();
-			if(f != null) {
-				features.add(tdata.getFeature());
-			}
-		}
-		
-		if(features.size()==0) return;
-		
-		Collections.sort(features, new Comparator<Tfeature>() {
-			@Override
-			public int compare(Tfeature o1, Tfeature o2) {
-/*				if(o1.getHlgap().equals(o2.getHlgap())) {
-					return o2.getNhgap().compareTo(o1.getNhgap());
-				}else {
-					return o1.getHlgap().compareTo(o2.getHlgap());
-				}*/
-				return o1.getHlgap().compareTo(o2.getHlgap());
-			}
-		});
-		
-		for(Tfeature feature : features) {
-			if((account.getItemIDsOfHolds().contains(feature.getItemID()))) {
-				this.doStopOrDrop(feature.getItemID(), isGoodTime);
+	public void doIt(List<String> itemIDs, boolean isGoodTime) {
+
+		for(String itemID : itemIDs) {
+			if((account.getItemIDsOfHolds().contains(itemID))) {
+				this.doStopOrDrop(itemID, isGoodTime);
 			}
 		}
 		
 		StringBuffer sb = new StringBuffer();
 		breakers.append(account.getEndDate().toString() + ",");
-		for(Tfeature feature : features) {
-			if(feature.getStatus()==2) {
-				if((account.getCash().compareTo(new BigDecimal(10000))==1)) {
-					sb.append(feature.getItemID()+ "(" + feature.getHlgap() + "),");
-					this.doOpenOrReopen(feature.getItemID(), isGoodTime);
+		Tfeature feature;
+		for(String itemID : itemIDs) {
+			if(tdatas.get(itemID)!=null && tdatas.get(itemID).getFeature()!=null) {
+				feature = tdatas.get(itemID).getFeature();
+				if(feature.getStatus()==2) {
+					if((account.getCash().compareTo(new BigDecimal(10000))==1)) {
+						sb.append(itemID + "(" + feature.getHlgap() + "),");
+						this.doOpenOrReopen(itemID, isGoodTime);
+					}				
+					breakers.append(itemID);
+					breakers.append(",");
 				}				
-				breakers.append(feature.getItemID());
-				breakers.append(",");
 			}
+
 		}
 		breakers.deleteCharAt(breakers.length()-1);
 		breakers.append("\n");
@@ -294,7 +285,7 @@ public class Turtle {
 		Integer lots = account.getLots(tdata.getItemID());
 		System.out.println("lots=" + lots);//--------------
 		
-		if(lots>0) {
+		if(lots>0 && feature!=null) {
 			System.out.println("the lots " + lots + ">0, should do stop?");//--------------
 			BigDecimal doubleAtr = feature.getAtr().multiply(new BigDecimal(2));
 			BigDecimal stopPrice = account.getLatestOpenPrice(itemID).subtract(doubleAtr);
@@ -312,7 +303,7 @@ public class Turtle {
 		Tdata tdata = tdatas.get(itemID);
 		Tfeature feature = tdata.getFeature();
 		Integer lots = account.getLots(tdata.getItemID());
-		if((lots>0 && feature.getStatus()<0) || !isGoodTime) {
+		if((lots>0 && feature!=null && feature.getStatus()<0) || !isGoodTime) {
 			System.out.println(feature);
 			System.out.println("the lots " + lots + ">0, and status is "+feature.getStatus()+" and isGoodTime="+isGoodTime+", do drop!!");//--------------
 			account.drop(itemID, isGoodTime ? "" : "*");
@@ -325,7 +316,7 @@ public class Turtle {
 		Tdata tdata = tdatas.get(itemID);
 		Tfeature feature = tdata.getFeature();
 		Integer lots = account.getLots(tdata.getItemID());
-		if(feature.getStatus()==2 && lots>0 && lots<maxOfLot && isGoodTime) {
+		if(feature!=null && feature.getStatus()==2 && lots>0 && lots<maxOfLot && isGoodTime) {
 			System.out.println("the lots " + lots + ">0, and < "+ maxOfLot +", should do reopen?");//--------------
 			
 			BigDecimal half_atr = feature.getAtr().divide(new BigDecimal(2),BigDecimal.ROUND_HALF_UP);
@@ -355,7 +346,7 @@ public class Turtle {
 		Tfeature feature = tdata.getFeature();
 		Integer lots = account.getLots(tdata.getItemID());
 		//if(feature.getStatus()==2 && lots<maxOfLot && feature.getHlgap()<=gap && isGoodTime) {
-		if(feature.getStatus()==2 && lots==0 && isGoodTime) {
+		if(feature!=null && feature.getStatus()==2 && lots==0 && isGoodTime) {
 			System.out.println("do open");//--------------
 			Integer quantity = getQuantity(feature.getAtr(),getQuantityPerHand(itemID),deficitFactor,feature.getNow());
 			

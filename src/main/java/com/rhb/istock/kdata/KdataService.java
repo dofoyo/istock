@@ -14,6 +14,8 @@ public interface KdataService {
 	public void evictDailyKDataCache();
 	
 	public LocalDate getLatestMarketDate(); 
+	public LocalDate getLatestDownDate();
+	
 	public Kbar getLatestMarketData(String itemID);
 	public List<String> getLatestDailyTop(Integer top); 
 	

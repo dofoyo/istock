@@ -22,6 +22,7 @@ public class TurtleView {
 	private String area;
 	private String industry;
 	private String topic;
+	private String label;
 	private String note;
 
 	public TurtleView(Map<String, String> map) {
@@ -41,6 +42,7 @@ public class TurtleView {
 		this.area = map.get("area");	
 		this.note = map.get("note");
 		this.topic = map.get("topic");
+		this.label = map.get("label");
 
 		// System.out.println(map.get("openHigh"));
 		// System.out.println(this.high);
@@ -52,6 +54,14 @@ public class TurtleView {
 		prices.put("drop", new BigDecimal(this.drop));
 		
 		this.line = Line.draw(prices);
+	}
+
+	public String getLabel() {
+		return label;
+	}
+
+	public void setLabel(String label) {
+		this.label = label;
 	}
 
 	public String getLine() {
@@ -189,7 +199,7 @@ public class TurtleView {
 		return "TurtleView [itemID=" + itemID + ", code=" + code + ", name=" + name + ", high=" + high + ", low=" + low
 				+ ", now=" + now + ", drop=" + drop + ", hlgap=" + hlgap + ", nhgap=" + nhgap + ", line=" + line
 				+ ", atr=" + atr + ", status=" + status + ", area=" + area + ", industry=" + industry + ", topic="
-				+ topic + ", note=" + note + "]";
+				+ topic + ", label=" + label + ", note=" + note + "]";
 	}
 
 }

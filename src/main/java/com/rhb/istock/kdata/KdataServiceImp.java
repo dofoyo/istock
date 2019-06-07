@@ -177,4 +177,9 @@ public class KdataServiceImp implements KdataService{
 
 	}
 
+	@Override
+	public LocalDate getLatestDownDate() {
+		return kdataRepository.getLatestDate();
+	}
+
 }
