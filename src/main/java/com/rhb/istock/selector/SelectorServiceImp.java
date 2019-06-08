@@ -19,6 +19,7 @@ import com.rhb.istock.selector.favor.FavorService;
 import com.rhb.istock.selector.hlt.HighLowTopService;
 import com.rhb.istock.selector.hold.HoldEntity;
 import com.rhb.istock.selector.hold.HoldService;
+import com.rhb.istock.selector.potential.Potential;
 import com.rhb.istock.selector.potential.PotentialService;
 
 @Service("selectorServiceImp")
@@ -207,13 +208,18 @@ public class SelectorServiceImp implements SelectorService{
 	}
 
 	@Override
-	public List<String> getLatestPotentials() {
+	public List<Potential> getLatestPotentials() {
 		return potentialService.getLatestPotentials();
 	}
 
 	@Override
 	public void generateTmpLatestPotentials() {
 		potentialService.generateTmpLatestPotentials();		
+	}
+
+	@Override
+	public List<String> getLatestPotentialIDs() {
+		return potentialService.getLatestPotentialIDs();
 	}
 
 }

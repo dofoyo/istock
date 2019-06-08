@@ -146,7 +146,7 @@ public class TurtleStaticSimulation implements TurtleSimulation{
 	 */
 	private boolean isGoodTime(LocalDate theDate, Integer duration) {
 		Kdata kdata = kdataService.getDailyKdata("sh000001", theDate, duration, true);
-		return kdata.isAboveAvaragePrice()==1 ? true : false; 
+		return kdata.isAboveAveragePrice()==1 ? true : false; 
 	}
 	
 	

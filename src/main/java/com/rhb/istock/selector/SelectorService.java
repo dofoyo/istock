@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import com.rhb.istock.selector.hold.HoldEntity;
+import com.rhb.istock.selector.potential.Potential;
 
 public interface SelectorService{
 	/*
@@ -67,6 +68,7 @@ public interface SelectorService{
 	public void generateTmpLatestPotentials();
 	public TreeMap<LocalDate, List<String>> getBreakers(LocalDate beginDate, LocalDate endDate);
 	public void generateLatestPotentials();
-	public List<String> getLatestPotentials();
+	public List<Potential> getLatestPotentials();
+	public List<String> getLatestPotentialIDs();
 
 }

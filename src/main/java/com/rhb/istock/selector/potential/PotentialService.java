@@ -1,9 +1,10 @@
 package com.rhb.istock.selector.potential;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -15,6 +16,7 @@ import com.rhb.istock.comm.util.Progress;
 import com.rhb.istock.item.Item;
 import com.rhb.istock.item.ItemService;
 import com.rhb.istock.kdata.Kdata;
+import com.rhb.istock.kdata.KdataMuster;
 import com.rhb.istock.kdata.KdataService;
 
 @Service("potentialService")
@@ -33,8 +35,69 @@ public class PotentialService {
 	@Qualifier("kdataServiceImp")
 	KdataService kdataService;
 	
-	public List<String> getLatestPotentials(){
-		return Arrays.asList(FileUtil.readTextFile(latestPotentialsFile).split(","));
+	List<Potential> latestPotentials = null;
+	LocalDate latestPotentialsDate = null;
+	
+	public void init() {
+		String source = FileUtil.readTextFile(latestPotentialsFile);
+		
+		if(source==null || source.isEmpty()) {
+			System.err.println("can NOT find " + latestPotentialsFile + "! or the file is empty!");
+			return;
+		}
+		
+		this.latestPotentials = new ArrayList<Potential>();
+		
+		String[] lines = source.split("\n");
+		this.latestPotentialsDate = LocalDate.parse(lines[0]);
+		
+		for(int i=1; i<lines.length; i++) {
+			this.latestPotentials.add(new Potential(lines[i]));
+		}			
+
+	}
+	
+	public LocalDate getLatestPotentialDate() {
+		if(this.latestPotentialsDate==null) {
+			this.init();
+		}
+		return this.latestPotentialsDate;
+	}
+	
+	public List<String> getLatestPotentialIDs(){
+		List<String> ids = new ArrayList<String>();
+
+		List<Potential> potentials = this.getLatestPotentials();
+		for(Potential p : potentials) {
+			ids.add(p.getItemID());
+		}
+		
+		return ids;
+	}
+	
+	public List<Potential> getLatestPotentials(){
+		List<Potential> potentials = new ArrayList<Potential>();
+		Potential potential;
+		
+		List<KdataMuster> musters = kdataService.getKdataMusters();
+		
+		for(KdataMuster item : musters) {
+			if(item.isPeriodCount()) {
+				potential =  new Potential(item.getItemID(),
+						item.getAmount(),
+						item.getAverageAmount(),
+						item.getHighest(),
+						item.getLowest(),
+						item.getPrice(),
+						item.getPrice());
+				if(potential.getHNGap()<10) {
+					//System.out.println(potential);
+					potentials.add(potential);	
+				}					
+			}
+		}
+
+		return potentials;
 	}
 
 	
@@ -52,6 +115,8 @@ public class PotentialService {
 		List<String> olds = new ArrayList<String>();
 		List<String> outs = this.getTmpLatestPotentials();
 		
+		Map<String,Object> features;
+
 		LocalDate date;
 		Kdata kdata;
 		Integer count = 55;
@@ -64,8 +129,9 @@ public class PotentialService {
 			if(kdata.getBar(date)==null) {
 				kdata.addBar(date, kdataService.getLatestMarketData(item.getItemID()));
 			}
-			
-			if(kdata.isPotential(count)) {
+			features = kdata.getPotentialFeatures(count);
+
+			if((Integer)features.get("hnGap")<10) {
 				if(outs.contains(item.getItemID())) {
 					olds.add(item.getItemID());
 				}else {
@@ -105,25 +171,34 @@ public class PotentialService {
 		System.out.println("generate latest potentials ......");
 		
 		LocalDate latestKdataDate = kdataService.getLatestDownDate();
-		LocalDate theDate = LocalDate.parse(this.getLatestPotentials().get(0));
-		if(theDate.isBefore(latestKdataDate)) {
-			StringBuffer sb = new StringBuffer(latestKdataDate.toString() + ",");
-
-			Kdata kdata;
-			Integer count = 55;
-			List<Item> items = itemService.getItems();
+		LocalDate theDate = this.getLatestPotentialDate();
+		Potential potential;
+		if(theDate==null || theDate.isBefore(latestKdataDate)) {
+			StringBuffer sb = new StringBuffer(latestKdataDate.toString() + "\n");
+			
+			List<KdataMuster> musters = kdataService.getKdataMusters();
+			
 			int i=1;
-			for(Item item : items) {
-				Progress.show(items.size(),i++, item.getItemID());
-				kdata = kdataService.getDailyKdata(item.getItemID(),false);
-				if(kdata.isPotential(count)) {
-					sb.append(item.getItemID());
-					sb.append(",");				
+			for(KdataMuster item : musters) {
+				Progress.show(musters.size(),i++, item.getItemID());//进度条
+				if(item.isPeriodCount()) {
+					potential =  new Potential(item.getItemID(),
+							item.getAmount(),
+							item.getAverageAmount(),
+							item.getHighest(),
+							item.getLowest(),
+							item.getPrice(),
+							item.getPrice());
+					if(potential.getHNGap()<10) {
+						sb.append(potential.toText());
+						sb.append("\n");	
+					}					
 				}
 			}
 			sb.deleteCharAt(sb.length()-1);
 			
 			FileUtil.writeTextFile(latestPotentialsFile, sb.toString(), false);
+			this.init();
 		}else {
 			System.out.println("it has been generated! pass!");
 		}

@@ -3,6 +3,7 @@ package com.rhb.istock.kdata.repository;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheEvict;
@@ -66,6 +67,30 @@ public class KdataRepositoryDzh implements KdataRepository{
 	public LocalDate getLatestDate() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public LocalDate getLatestMusterDate() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<KdataMusterEntity> getKdataMusters() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void saveLatestMusters(LocalDate date, List<KdataMusterEntity> entities, Integer period) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void evictKdataMustersCache() {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

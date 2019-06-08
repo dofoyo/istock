@@ -25,7 +25,7 @@ breakersSortByDTFile: D:/dev/istock-data/breakersSortByDT.txt
 breakersSortByAVFile: D:/dev/istock-data/breakersSortByAV.txt
 fvaluesOfHLFile: D:/dev/istock-data/fvaluesOfHL.txt
 topicsFile: D:/dev/istock-data/topics.txt
-
+kdataMusterFile: D:/dev/istock-data/kdata/kdataMuster.txt
 
 
 

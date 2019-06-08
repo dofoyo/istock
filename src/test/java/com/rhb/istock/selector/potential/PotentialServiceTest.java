@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import com.rhb.istock.kdata.KdataMuster;
 import com.rhb.istock.selector.potential.PotentialService;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -24,9 +25,14 @@ public class PotentialServiceTest {
 		System.out.println(breakers);
 	}
 	
-	//@Test
+	@Test
 	public void getLatestPotentials() {
-		System.out.println(potentialService.getLatestPotentials());
+		List<Potential> ps = potentialService.getLatestPotentials();
+		for(Potential p : ps) {
+			//System.out.println(p);
+		}
+		
+		System.out.println(ps.size());
 	}
 	
 	//@Test

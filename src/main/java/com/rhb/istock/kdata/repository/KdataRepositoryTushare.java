@@ -3,7 +3,9 @@ package com.rhb.istock.kdata.repository;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -15,11 +17,15 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import com.rhb.istock.comm.util.FileUtil;
+import com.rhb.istock.selector.potential.Potential;
 
 @Service("kdataRepositoryTushare")
 public class KdataRepositoryTushare implements KdataRepository{
 	@Value("${tushareKdataPath}")
 	private String kdataPath;
+
+	@Value("${kdataMusterFile}")
+	private String kdataMusterFile;
 	
 	//private Map<String,KdataEntity> kdatas = new HashMap<String,KdataEntity>();;
 	
@@ -114,6 +120,51 @@ public class KdataRepositoryTushare implements KdataRepository{
 		LocalDate date1 = getDailyKdata(itemID1).getLatestDate();
 		LocalDate date2 = getDailyKdata(itemID2).getLatestDate();
 		return date1.isAfter(date2) ? date1 : date2;
+	}
+
+	@Override
+	public LocalDate getLatestMusterDate() {
+		String source = FileUtil.readTextFile(kdataMusterFile);
+		
+		if(source==null || source.isEmpty()) {
+			System.err.println("can NOT find " + kdataMusterFile + "! or the file is empty!");
+			return null;
+		}
+
+		String[] lines = source.split("\n");
+		
+		return LocalDate.parse(lines[0].split(",")[0]);
+	}
+
+	@Override
+	@Cacheable("kdataMusters")
+	public List<KdataMusterEntity> getKdataMusters() {
+		List<KdataMusterEntity> entities = new ArrayList<KdataMusterEntity>();
+		
+		String source = FileUtil.readTextFile(kdataMusterFile);
+
+		String[] lines = source.split("\n");
+		for(int i=1; i<lines.length; i++) {
+			entities.add(new KdataMusterEntity(lines[i]));
+		}
+		
+		return entities;
+	}
+	@Override
+	@CacheEvict(value="kdataMusters",allEntries=true)
+	public void evictKdataMustersCache() {}
+	
+
+	@Override
+	public void saveLatestMusters(LocalDate date, List<KdataMusterEntity> entities, Integer period) {
+		StringBuffer sb = new StringBuffer(date.toString() + "," + period + "\n");
+		for(KdataMusterEntity entity : entities) {
+			sb.append(entity.toText());
+			sb.append("\n");
+		}
+		sb.deleteCharAt(sb.length()-1);
+		
+		FileUtil.writeTextFile(kdataMusterFile, sb.toString(), false);
 	}
 
 }

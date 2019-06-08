@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -22,6 +23,7 @@ import com.rhb.istock.comm.util.Progress;
 import com.rhb.istock.item.Item;
 import com.rhb.istock.item.ItemService;
 import com.rhb.istock.kdata.Kdata;
+import com.rhb.istock.kdata.KdataMuster;
 import com.rhb.istock.kdata.KdataService;
 import com.rhb.istock.selector.hlt.repository.HighLowTopRepository;
 
@@ -47,8 +49,22 @@ public class HighLowTopServiceImp implements HighLowTopService {
 	
 	@Override
 	public List<String> getLatestHighLowTops(Integer top) {
-		List<String> ids = Arrays.asList(FileUtil.readTextFile(latestHighLowTopsFile).split(","));
-		return ids.subList(0, Math.min(top, ids.size()));
+		List<String> tops = new ArrayList<String>();
+
+		List<KdataMuster> musters = kdataService.getKdataMusters();
+		Collections.sort(musters, new Comparator<KdataMuster>() {
+			@Override
+			public int compare(KdataMuster o1, KdataMuster o2) {
+				return o1.getHLGap().compareTo(o2.getHLGap());
+			}
+		});
+		
+		for(int i=0; i<top; i++) {
+			//System.out.println(musters.get(i).getItemID() + ": " + musters.get(i).getHLGap());
+			tops.add(musters.get(i).getItemID());
+		}
+		
+		return tops;
 	}
 
 	@Override

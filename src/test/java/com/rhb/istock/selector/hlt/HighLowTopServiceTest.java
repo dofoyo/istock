@@ -22,13 +22,13 @@ public class HighLowTopServiceTest {
 		highLowTopService.generateLatestHighLowTops();
 	}
 	
-	//@Test
+	@Test
 	public void getLatestHighLowTops() {
 		List<String> ids = highLowTopService.getLatestHighLowTops(5);
 		System.out.println(ids);
 	}
 	
-	@Test
+	//@Test
 	public void generateHighLowTops() {
 		highLowTopService.generateHighLowTops();
 	}

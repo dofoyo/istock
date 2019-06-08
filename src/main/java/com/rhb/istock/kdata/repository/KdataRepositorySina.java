@@ -97,5 +97,28 @@ public class KdataRepositorySina implements KdataRepository{
 		return null;
 	}
 
+	@Override
+	public LocalDate getLatestMusterDate() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<KdataMusterEntity> getKdataMusters() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	@Override
+	public void saveLatestMusters(LocalDate date, List<KdataMusterEntity> entities, Integer period) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void evictKdataMustersCache() {
+		// TODO Auto-generated method stub
+		
+	}
+
 
 }

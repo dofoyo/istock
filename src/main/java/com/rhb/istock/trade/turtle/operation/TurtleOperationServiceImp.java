@@ -26,6 +26,7 @@ import com.rhb.istock.kdata.KdataService;
 import com.rhb.istock.kdata.api.KdatasView;
 import com.rhb.istock.selector.SelectorService;
 import com.rhb.istock.selector.hold.HoldEntity;
+import com.rhb.istock.selector.potential.Potential;
 import com.rhb.istock.trade.turtle.domain.Tfeature;
 import com.rhb.istock.trade.turtle.domain.Tbar;
 import com.rhb.istock.trade.turtle.domain.Turtle;
@@ -49,6 +50,8 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 	@Qualifier("selectorServiceImp")
 	SelectorService selectorService;
 	
+	DecimalFormat df = new DecimalFormat("0.00"); 
+
 	Turtle turtle = null;
 	
 	@Override
@@ -177,8 +180,58 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 
 	@Override
 	public List<TurtleView> getPotentials() {
-		List<String> ids = selectorService.getLatestPotentials();  //首个是日期
-		return getTurtleViews(ids.subList(1, ids.size()),"potentials");
+		long beginTime=System.currentTimeMillis(); 
+		System.out.println("getting potential views ......");
+		
+		List<TurtleView> views = new ArrayList<TurtleView>();
+		TurtleView view;
+		
+		Item item;
+		Kbar kbar;
+		
+		List<String> holds = selectorService.getHoldIDs();
+		
+		List<Potential> potentials = this.getPotentialWithLatestMarketData();
+		int i=1;
+		for(Potential potential : potentials) {
+			Progress.show(potentials.size(), i++, potential.getItemID());
+
+			view = new TurtleView();
+			view.setItemID(potential.getItemID());
+			view.setHigh(df.format(potential.getHighest()));
+			view.setLow(df.format(potential.getLowest()));
+			view.setPclose(df.format(potential.getLatestPrice()));
+			view.setNow(df.format(potential.getNowPrice()));
+			view.setHlgap(df.format(potential.getHLGap()));
+			view.setNhgap(df.format(potential.getHNGap()));
+			view.setStatus(potential.getStatus());
+			view.setTopic(this.getTopic(potential.getItemID()));
+			view.setLabel(potential.getLabel());
+			
+			item = itemService.getItem(potential.getItemID());
+			view.setCode(holds!=null && holds.contains(potential.getItemID()) ? "*" + item.getCode() : item.getCode());
+			view.setName(item.getName());
+			view.setArea(item.getArea());
+			view.setIndustry(item.getIndustry());
+			
+			views.add(view);
+		}		
+
+		Collections.sort(views, new Comparator<TurtleView>() {
+			@Override
+			public int compare(TurtleView o1, TurtleView o2) {
+				BigDecimal nh1 = new BigDecimal(o1.getNhgap());
+				BigDecimal nh2 = new BigDecimal(o2.getNhgap());
+				
+				return nh1.compareTo(nh2);
+			}
+		});	
+		
+		System.out.println("getting potential views done!");
+		long used = (System.currentTimeMillis() - beginTime)/1000; 
+		System.out.println("用时：" + used + "秒");     
+		
+		return views;
 	}
 	
 	@Override
@@ -207,15 +260,14 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 
 		Tfeature feature;
 		Item item;
-		String[] tops = itemService.getTopicTops(5);
-		
+
 		List<String> holds = selectorService.getHoldIDs();
 
 		int i=1;
 		for(String id : itemIDs) {
 			Progress.show(itemIDs.size(),i++,id);
 			
-			if(this.setLatestKdata(id, true)) {
+			if(this.setLatestKdata(id, true)) {   //放入历史K线数据，很耗时
 				feature = turtle.getFeature(id);
 				if(feature!=null) {
 					item = itemService.getItem(id);
@@ -237,9 +289,8 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 						preyMap.put("nhgap", feature.getNhgap().toString());
 						preyMap.put("atr", df.format(feature.getAtr()));	
 						preyMap.put("status", feature.getStatus().toString());	
-						preyMap.put("topic", this.getTopic(id, tops));
+						preyMap.put("topic", this.getTopic(id));
 						preyMap.put("label", this.getLabel(id));
-						
 						
 						views.add(new TurtleView(preyMap));						
 					}
@@ -278,7 +329,8 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 		return views;
 	}
 	
-	private String getTopic(String itemID, String[] tops) {
+	private String getTopic(String itemID) {
+		String[] tops = itemService.getTopicTops(5);
 		String topic = itemService.getTopic(itemID);
 		int i=0;
 		String start = "*";
@@ -294,7 +346,6 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 	}
 	
 	private String getLabel(String itemID) {
-		Integer top = 21;
 		StringBuffer label = new StringBuffer();
 		if(isFavors(itemID)) label.append("," + "favor");
 		if(isBluechip(itemID)) label.append("," + "bluechip");
@@ -318,6 +369,106 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 	public List<TurtleView> getBluechips() {
 		return getTurtleViews(selectorService.getBluechipIDs(LocalDate.now()),"bluechips");
 	}
+	
+	private List<Potential> getPotentialWithLatestMarketData(){
+		List<Potential> potentials = selectorService.getLatestPotentials();
+		Kbar kbar;
+		for(Potential potential : potentials) {
+			kbar = kdataService.getLatestMarketData(potential.getItemID());
+			potential.setNowPrice(kbar.getClose());
+			potential.setAmount(kbar.getAmount());
+			potential.setHlb(this.getHLB(potential.getItemID()));
+			potential.setAvb(this.getAVB(potential.getItemID()));
+			potential.setDtb(this.getDTB(potential.getItemID()));
+		}
+		
+		potentials = this.refreshHL(potentials);
+		potentials = this.refreshDT(potentials);
+		potentials = this.refreshAV(potentials);
+		
+		return potentials;
+	}
+	
+	private Integer getHLB(String itemID) {
+		List<String> ids = selectorService.getLatestHighLowTops(21);
+		for(int i=0; i<ids.size(); i++) {
+			if(ids.get(i).equals(itemID)) {
+				return i+1;
+			}
+		}
+		return null;
+	}
+	
+	private Integer getAVB(String itemID) {
+		List<String> ids = selectorService.getLatestAverageAmountTops(21);
+		for(int i=0; i<ids.size(); i++) {
+			if(ids.get(i).equals(itemID)) {
+				return i+1;
+			}
+		}
+		return null;
+	}
+	
+	private Integer getDTB(String itemID) {
+		List<String> ids = selectorService.getLatestDailyAmountTops(21);
+		for(int i=0; i<ids.size(); i++) {
+			if(ids.get(i).equals(itemID)) {
+				return i+1;
+			}
+		}
+		return null;
+	}
+	
+	private List<Potential> refreshHL(List<Potential> potentials){
+		Collections.sort(potentials, new Comparator<Potential>() {
+			@Override
+			public int compare(Potential o1, Potential o2) {
+				return o1.getHLGap().compareTo(o2.getHLGap());
+			}
+		});
+		int i=1;
+		for(Potential potential : potentials) {
+			if(potential.getStatus()=="2") {
+				potential.setBhl(i++);
+			}
+			if(i>5) break;
+		}
+		return potentials;
+	}
+	
+	private List<Potential> refreshDT(List<Potential> potentials){
+		Collections.sort(potentials, new Comparator<Potential>() {
+			@Override
+			public int compare(Potential o1, Potential o2) {
+				return o2.getAmount().compareTo(o1.getAmount());
+			}
+		});
+		int i=1;
+		for(Potential potential : potentials) {
+			if(potential.getStatus()=="2") {
+				potential.setBdt(i++);
+			}
+			if(i>5) break;
+		}
+		
+		return potentials;
+	}
 
+	private List<Potential> refreshAV(List<Potential> potentials){
+		Collections.sort(potentials, new Comparator<Potential>() {
+			@Override
+			public int compare(Potential o1, Potential o2) {
+				return o2.getAverageAmount().compareTo(o1.getAverageAmount());
+			}
+		});
+		int i=1;
+		for(Potential potential : potentials) {
+			if(potential.getStatus()=="2") {
+				potential.setBav(i++);
+			}
+			if(i>5) break;
+		}
+		return potentials;
+	}
 	
 }

@@ -1,5 +1,7 @@
 package com.rhb.istock.kdata.service;
 
+import java.util.List;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +11,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.rhb.istock.comm.util.FileUtil;
 import com.rhb.istock.kdata.Kdata;
+import com.rhb.istock.kdata.KdataMuster;
 import com.rhb.istock.kdata.KdataService;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -26,6 +29,18 @@ public class KdataServiceTest {
 		Kdata data = kdataService.getDailyKdata(itemID,byCache);
 		String str = data.getString();
 		FileUtil.writeTextFile(path, str, false);
-		
+	}
+	
+	//@Test
+	public void generateLatestMuster() {
+		kdataService.generateLatestMuster();
+	}
+	
+	@Test
+	public void tests() {
+		List<KdataMuster> musters = kdataService.getKdataMusters();
+		for(KdataMuster muster : musters) {
+			System.out.println(muster);
+		}
 	}
 }

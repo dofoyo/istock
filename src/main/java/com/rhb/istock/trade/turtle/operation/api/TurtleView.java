@@ -12,6 +12,7 @@ public class TurtleView {
 	private String name;
 	private String high;
 	private String low;
+	private String pclose;
 	private String now;
 	private String drop;
 	private String hlgap;
@@ -25,6 +26,10 @@ public class TurtleView {
 	private String label;
 	private String note;
 
+	public TurtleView() {
+		
+	}
+	
 	public TurtleView(Map<String, String> map) {
 		//System.out.println(map);
 		this.itemID = map.get("itemID");
@@ -44,16 +49,6 @@ public class TurtleView {
 		this.topic = map.get("topic");
 		this.label = map.get("label");
 
-		// System.out.println(map.get("openHigh"));
-		// System.out.println(this.high);
-
-		Map<String, BigDecimal> prices = new HashMap<String, BigDecimal>();
-		prices.put("now", new BigDecimal(this.now));
-		prices.put("high", new BigDecimal(this.high));
-		prices.put("low", new BigDecimal(this.low));
-		prices.put("drop", new BigDecimal(this.drop));
-		
-		this.line = Line.draw(prices);
 	}
 
 	public String getLabel() {
@@ -65,6 +60,15 @@ public class TurtleView {
 	}
 
 	public String getLine() {
+		Map<String, BigDecimal> prices = new HashMap<String, BigDecimal>();
+		prices.put("now", new BigDecimal(this.now));
+		prices.put("high", new BigDecimal(this.high));
+		prices.put("low", new BigDecimal(this.low));
+		if(this.drop!=null) prices.put("drop", new BigDecimal(this.drop));
+		if(this.pclose!=null) prices.put("pclose", new BigDecimal(this.pclose));
+		
+		this.line = Line.draw(prices);
+
 		return line;
 	}
 
@@ -114,6 +118,14 @@ public class TurtleView {
 
 	public String getLow() {
 		return low;
+	}
+
+	public String getPclose() {
+		return pclose;
+	}
+
+	public void setPclose(String pclose) {
+		this.pclose = pclose;
 	}
 
 	public void setLow(String low) {

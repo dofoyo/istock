@@ -23,8 +23,7 @@ public class KdataEntity {
 	}
 	
 	public LocalDate getLatestDate() {
-		TreeMap<LocalDate,KbarEntity> bs = (TreeMap<LocalDate,KbarEntity>)this.bars;
-		return bs.lastKey();
+		return this.bars.lastKey();
 	}
 	
 	public KbarEntity getBar(LocalDate date){

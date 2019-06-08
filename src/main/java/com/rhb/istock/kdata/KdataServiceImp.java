@@ -1,6 +1,8 @@
 package com.rhb.istock.kdata;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -8,11 +10,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import com.rhb.istock.comm.util.Progress;
+import com.rhb.istock.item.Item;
+import com.rhb.istock.item.ItemService;
 import com.rhb.istock.kdata.repository.KbarEntity;
 import com.rhb.istock.kdata.repository.KdataEntity;
+import com.rhb.istock.kdata.repository.KdataMusterEntity;
 import com.rhb.istock.kdata.repository.KdataRepository;
 import com.rhb.istock.kdata.spider.KdataRealtimeSpider;
 import com.rhb.istock.kdata.spider.KdataSpider;
+import com.rhb.istock.selector.potential.Potential;
 
 @Service("kdataServiceImp")
 public class KdataServiceImp implements KdataService{
@@ -36,7 +43,13 @@ public class KdataServiceImp implements KdataService{
 	@Qualifier("kdataSpider163")
 	KdataSpider kdataSpider163;
 	
+	@Autowired
+	@Qualifier("itemServiceImp")
+	ItemService itemService;
+	
 	private String szzs = "sh000001"; //上证指数
+	private Integer period = 55;
+
 	
 	private KdataEntity getEntity(String itemID, boolean byCache) {
 		KdataEntity entity = null;
@@ -180,6 +193,120 @@ public class KdataServiceImp implements KdataService{
 	@Override
 	public LocalDate getLatestDownDate() {
 		return kdataRepository.getLatestDate();
+	}
+
+	@Override
+	public Kdata getLatestDailyKdata(String itemID, Integer count, boolean byCache) {
+		Kdata kdata = new Kdata(itemID);
+
+		KbarEntity bar;
+		
+		KdataEntity entity = this.getEntity(itemID, byCache);
+		
+		//System.out.println(entity.getBarSize());
+		LocalDate date = entity.getLatestDate();
+		
+		for(int i=0,j=0; i<count && j<entity.getBarSize(); j++) {
+			bar = entity.getBar(date);
+			if(bar!=null) {
+				kdata.addBar(date, bar.getOpen(), bar.getHigh(), bar.getLow(), bar.getClose(), bar.getAmount(), bar.getQuantity());
+				i++;
+			}
+			date = date.minusDays(1);
+		}
+		
+		return kdata;
+	}
+
+	@Override
+	public void generateLatestMuster() {
+		long beginTime=System.currentTimeMillis(); 
+		System.out.println("generate latest muster ......");
+		
+		LocalDate latestKdataDate = this.getLatestDownDate();
+		LocalDate theDate = kdataRepository.getLatestMusterDate();
+
+		if(theDate==null || theDate.isBefore(latestKdataDate)) {
+			List<KdataMusterEntity> entities = new ArrayList<KdataMusterEntity>();
+			KdataMusterEntity entity;
+			List<Item> items = itemService.getItems();
+			int i=1;
+			for(Item item : items) {
+				Progress.show(items.size(),i++, item.getItemID());//进度条
+				
+				entity = this.getKdataMusterEntity(item.getItemID());
+				if(entity!=null) {
+					entities.add(entity);	
+				}
+			}
+			
+			kdataRepository.saveLatestMusters(latestKdataDate, entities, period);
+			kdataRepository.evictKdataMustersCache();
+			
+		}else {
+			System.out.println("it has been generated! pass!");
+		}
+		
+		System.out.println("generate latest muster done!");
+		long used = (System.currentTimeMillis() - beginTime)/1000; 
+		System.out.println("用时：" + used + "秒");          
+	}
+
+	
+	private KdataMusterEntity getKdataMusterEntity(String itemID) {
+		Kdata kdata = this.getLatestDailyKdata(itemID,period,false);
+		
+		BigDecimal latestPrice = null;
+		BigDecimal highest = null;
+		BigDecimal lowest = null;
+
+		BigDecimal totalAmount = new BigDecimal(0);
+		BigDecimal amount = null;
+		
+		List<LocalDate> dates = kdata.getDates();
+
+		for(LocalDate date : dates) {
+			if(latestPrice==null) {
+				latestPrice = kdata.getBar(date).getClose();
+				highest = kdata.getBar(date).getHigh();
+				lowest = kdata.getBar(date).getLow();
+				amount = kdata.getBar(date).getAmount();
+			}else {
+				latestPrice = kdata.getBar(date).getClose();
+				highest = highest.compareTo(kdata.getBar(date).getHigh())==-1 ? kdata.getBar(date).getHigh() : highest;
+				lowest = lowest.compareTo(kdata.getBar(date).getLow())==1 ? kdata.getBar(date).getLow() : lowest;
+				amount = kdata.getBar(date).getAmount();
+			}
+			totalAmount = totalAmount.add(kdata.getBar(date).getAmount());
+		}
+		
+		BigDecimal averageAmount = totalAmount.divide(new BigDecimal(kdata.getSize()),BigDecimal.ROUND_HALF_UP);
+
+		return new KdataMusterEntity(itemID,amount,averageAmount,highest,lowest,latestPrice,period,kdata.getSize());
+		
+	}
+
+	@Override
+	public List<KdataMuster> getKdataMusters() {
+		List<KdataMuster> musters = new ArrayList<KdataMuster>();
+		KdataMuster muster;
+		
+		List<KdataMusterEntity> entities = kdataRepository.getKdataMusters();
+		for(KdataMusterEntity entity : entities) {
+			muster = new KdataMuster();
+			muster.setItemID(entity.getItemID());
+			muster.setAmount(entity.getAmount());
+			muster.setAverageAmount(entity.getAverageAmount());
+			muster.setHighest(entity.getHighest());
+			muster.setLowest(entity.getLowest());
+			muster.setPrice(entity.getPrice());
+			muster.setPeriod(entity.getPeriod());
+			muster.setCount(entity.getCount());
+			
+			musters.add(muster);
+		}
+		
+		return musters;
 	}
 
 }

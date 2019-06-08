@@ -93,8 +93,8 @@ public class KdataSpiderTushare implements KdataSpider {
 		
 		String str = HttpClient.doPostJson(url, args.toString());
 
-		//String kdataFile = kdataPath + "/" + date + ".json";
-		//FileUtil.writeTextFile(kdataFile, str, false);
+		String kdataFile = kdataPath + "/" + date + ".json";
+		FileUtil.writeTextFile(kdataFile, str, false);
 
 		JSONArray items = (new JSONObject(str)).getJSONObject("data").getJSONArray("items");	
 		
@@ -111,10 +111,7 @@ public class KdataSpiderTushare implements KdataSpider {
 		System.out.println("KdataSpiderTushare.downloadKdata of " + date + " done!");
 		long used = (System.currentTimeMillis() - beginTime)/1000; 
 		System.out.println("用时：" + used + "秒");          
-
-		
-		//String kdataFile = kdataPath + "/" + date.format(dtf) + ".json";
-		//FileUtil.writeTextFile(kdataFile, data.toString(), false);
+		FileUtil.writeTextFile(kdataFile, str, false);
 	}
 	
 	private void downloadFactor(LocalDate date) {
@@ -133,8 +130,8 @@ public class KdataSpiderTushare implements KdataSpider {
 		
 		String str = HttpClient.doPostJson(url, args.toString());
 		
-		//String kdataFile = kdataPath + "/" + date + "_factor.json";
-		//FileUtil.writeTextFile(kdataFile, str, false);
+		String kdataFile = kdataPath + "/" + date + "_factor.json";
+		FileUtil.writeTextFile(kdataFile, str, false);
 
 		
 		JSONArray items = (new JSONObject(str)).getJSONObject("data").getJSONArray("items");	

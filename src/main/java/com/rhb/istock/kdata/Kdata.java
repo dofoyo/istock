@@ -3,6 +3,7 @@ package com.rhb.istock.kdata;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NavigableSet;
@@ -35,7 +36,7 @@ public class Kdata {
 		return total;
 	}
 	
-	public BigDecimal getAvarageAmount() {
+	public BigDecimal getAverageAmount() {
 		if(bars.size() == 0) {
 			return new BigDecimal(0);
 		}
@@ -49,7 +50,7 @@ public class Kdata {
 		return total.divide(new BigDecimal(bars.size()),BigDecimal.ROUND_HALF_UP);
 	}
 	
-	public BigDecimal getAvaragePrice() {
+	public BigDecimal getAveragePrice() {
 		if(bars.size() == 0) {
 			return new BigDecimal(0);
 		}
@@ -62,12 +63,12 @@ public class Kdata {
 		return total.divide(new BigDecimal(bars.size()),BigDecimal.ROUND_HALF_UP);
 	}
 	
-	public Integer isAboveAvaragePrice() {
+	public Integer isAboveAveragePrice() {
 		if(bars.size() == 0) {
 			return -1;
 		}		
 		BigDecimal price = this.bars.lastEntry().getValue().getClose();
-		return price.compareTo(this.getAvaragePrice());
+		return price.compareTo(this.getAveragePrice());
 	}
 
 	
@@ -83,7 +84,7 @@ public class Kdata {
 		return rate.intValue();
 	}
 	
-	public BigDecimal getAvarageAmount(Integer count) {
+	public BigDecimal getAverageAmount(Integer count) {
 		BigDecimal total = new BigDecimal(0);
 		NavigableSet<LocalDate> dates = this.bars.descendingKeySet();
 		int i=0;
@@ -99,34 +100,46 @@ public class Kdata {
 		return total.divide(new BigDecimal(count),BigDecimal.ROUND_HALF_UP);
 	}
 	
-	public boolean isPotential(Integer count) {
-		if(this.bars.size()<count || this.bars.lastEntry().getValue()==null) return false;
+	public Map<String,Object> getPotentialFeatures(Integer count) {
+		if(this.bars.size()<count || this.bars.lastEntry().getValue()==null) return null;
+		
+		Map<String,Object> result = new HashMap<String,Object>();
 		
 		BigDecimal now = this.bars.lastEntry().getValue().getClose();
+
 		BigDecimal highest = now;
+		BigDecimal lowest = now;
+
+		BigDecimal totalAmount = new BigDecimal(0);
 		
 		NavigableSet<LocalDate> dates = this.bars.descendingKeySet();
 
 		int i=0;
 		for(LocalDate date : dates) {
 			if(i++ < count) {
+				//highest = highest.compareTo(this.bars.get(date).getHigh())==-1 ? this.bars.get(date).getHigh() : highest;
+				totalAmount = totalAmount.add(this.bars.get(date).getAmount());
 				highest = highest.compareTo(this.bars.get(date).getHigh())==-1 ? this.bars.get(date).getHigh() : highest;
+				lowest = lowest.compareTo(this.bars.get(date).getLow())==1 ? this.bars.get(date).getLow() : lowest;
 			}else {
 				break;
 			}
-			
-/*			if(this.itemID.equals("sz000620")) {
-				System.out.println();
-				System.out.println("date: " + date + ", high=" + this.bars.get(date).getHigh() + ", highest=" + highest);
-			}*/
 		}
 		
-		BigDecimal ratio = highest.subtract(now).divide(now,BigDecimal.ROUND_HALF_UP);
-		boolean isPotential = ratio.compareTo(new BigDecimal(0.1))<0;
+		BigDecimal averageAmount = totalAmount.divide(new BigDecimal(count),BigDecimal.ROUND_HALF_UP);
+		Integer hlGap = highest.subtract(lowest).divide(lowest,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)).intValue();
+		
+		Integer hnGap = highest.subtract(now).divide(now,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)).intValue();
+		//boolean isPotential = ratio.compareTo(new BigDecimal(0.1))<0;
 		
 		//System.out.println(", highest: " + highest + ", now: " + now + ", ratio: " + ratio + ", isBreaker=" + isBreaker);
 		
-		return isPotential;
+		result.put("averageAmount", averageAmount);
+		result.put("amount", this.bars.lastEntry().getValue().getAmount());
+		result.put("hlGap", hlGap);
+		result.put("hnGap", hnGap);
+		
+		return result;
 	}
 
 	
