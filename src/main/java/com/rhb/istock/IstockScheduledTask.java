@@ -49,13 +49,7 @@ public class IstockScheduledTask {
 	public void dailyInit() throws Exception {
 		itemSpider.download();		//下载最新股票代码
 		kdataService.downKdatas(); //上一交易日的收盘数据要等开盘前才能下载到
-		turtleOperationService.init();
-		//selectorService.generateLatestHighLowTops();  //上一交易日的收盘数据要等开盘前才能下载到，因为涉及到除权的调整，只有开盘后执行
-		//selectorService.generateLatestAverageAmountTops();		//
-		//selectorService.generateDailyAmountTops();
-		selectorService.generateLatestPotentials(); //要根据latestHighLow和close进行计算，因此也只有此时做
-		//selectorService.generateAmountGaps();
-		
+    	kdataService.generateLatestMuster();
 	}
 
 	@Scheduled(cron="0 30 15 ? * 1-5") 
@@ -66,9 +60,6 @@ public class IstockScheduledTask {
 		//每日开盘后，系统会在9:30生成latestPotentials，供实盘操作用
 		
 		selectorService.generateTmpLatestPotentials();
-		//selectorService.generateLatestDailyAmountTops();
-		
-		
 	}
 	
 	//@Scheduled(cron="0 0 5 ? * *") //每日凌晨5点，下载最新年报，并生成bluechip

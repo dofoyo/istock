@@ -2,6 +2,7 @@ package com.rhb.istock.trade.turtle.operation.api;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.rhb.istock.comm.util.Line;
@@ -57,6 +58,16 @@ public class TurtleView {
 
 	public void setLabel(String label) {
 		this.label = label;
+	}
+	
+	public void setLabels(List<String> ss) {
+		StringBuffer sb = new StringBuffer();
+		for(String s : ss) {
+			sb.append(s);
+			sb.append(",");
+		}
+		if(sb.length()>0) sb.deleteCharAt(sb.length()-1);
+		this.label = sb.toString();
 	}
 
 	public String getLine() {

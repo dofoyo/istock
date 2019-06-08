@@ -1,6 +1,8 @@
 package com.rhb.istock.selector.potential;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Potential {
 	private String itemID;
@@ -27,18 +29,15 @@ public class Potential {
 		this.nowPrice = nowPrice;
 	}
 	
-	public String getLabel() {
-		StringBuffer sb = new StringBuffer();
-		if(bhl!=null) sb.append("bhl(" + bhl + "),");
-		if(bdt!=null) sb.append("bdt(" + bdt + "),");
-		if(bav!=null) sb.append("bav(" + bav + "),");
-		if(hlb!=null) sb.append("hlb(" + hlb + "),");
-		if(dtb!=null) sb.append("dtb(" + dtb + "),");
-		if(avb!=null) sb.append("avb(" + avb + "),");
-		
-		if(sb.length()>0) sb.deleteCharAt(sb.length()-1);  //除去最后一个逗号 
-		
-		return sb.toString();
+	public List<String> getLabels() {
+		List<String> labels = new ArrayList<String>();
+		if(bhl!=null) labels.add("bhl(" + bhl + ")");
+		if(bdt!=null) labels.add("bdt(" + bdt + ")");
+		if(bav!=null) labels.add("bav(" + bav + ")");
+		if(hlb!=null) labels.add("hlb(" + hlb + ")");
+		if(dtb!=null) labels.add("dtb(" + dtb + ")");
+		if(avb!=null) labels.add("avb(" + avb + ")");
+		return labels;
 	}
 	
 	public BigDecimal getNowPrice() {

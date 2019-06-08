@@ -190,6 +190,7 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 		Kbar kbar;
 		
 		List<String> holds = selectorService.getHoldIDs();
+		List<String> labels;
 		
 		List<Potential> potentials = this.getPotentialWithLatestMarketData();
 		int i=1;
@@ -205,8 +206,12 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 			view.setHlgap(df.format(potential.getHLGap()));
 			view.setNhgap(df.format(potential.getHNGap()));
 			view.setStatus(potential.getStatus());
+			
 			view.setTopic(this.getTopic(potential.getItemID()));
-			view.setLabel(potential.getLabel());
+			
+			labels = potential.getLabels();
+			labels.addAll(this.getLabels(potential.getItemID()));
+			view.setLabels(labels);
 			
 			item = itemService.getItem(potential.getItemID());
 			view.setCode(holds!=null && holds.contains(potential.getItemID()) ? "*" + item.getCode() : item.getCode());
@@ -290,7 +295,7 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 						preyMap.put("atr", df.format(feature.getAtr()));	
 						preyMap.put("status", feature.getStatus().toString());	
 						preyMap.put("topic", this.getTopic(id));
-						preyMap.put("label", this.getLabel(id));
+						preyMap.put("label", "");
 						
 						views.add(new TurtleView(preyMap));						
 					}
@@ -345,12 +350,13 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 		return topic;
 	}
 	
-	private String getLabel(String itemID) {
-		StringBuffer label = new StringBuffer();
-		if(isFavors(itemID)) label.append("," + "favor");
-		if(isBluechip(itemID)) label.append("," + "bluechip");
+	private List<String> getLabels(String itemID) {
+		List<String> labels = new ArrayList<String>();
 		
-		return label.length()==0 ? "" : label.substring(1).toString();
+		if(isFavors(itemID)) labels.add("favor");
+		if(isBluechip(itemID)) labels.add("bluechip");
+		
+		return labels;
 	}
 	
 
