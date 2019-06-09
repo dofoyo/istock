@@ -1,9 +1,7 @@
 package com.rhb.istock.selector.hlt;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -29,9 +27,6 @@ import com.rhb.istock.selector.hlt.repository.HighLowTopRepository;
 
 @Service("highLowTopServiceImp")
 public class HighLowTopServiceImp implements HighLowTopService {
-	@Value("${latestHighLowTopsFile}")
-	private String latestHighLowTopsFile;
-	
 	@Value("${highLowTopsFile}")
 	private String highLowTopsFile;
 	
@@ -67,46 +62,6 @@ public class HighLowTopServiceImp implements HighLowTopService {
 		return tops;
 	}
 
-	@Override
-	public void generateLatestHighLowTops() {
-		long beginTime=System.currentTimeMillis(); 
-		System.out.println("generate latest high low tops ......");
-		
-		List<HighLowGap> gaps = new ArrayList<HighLowGap>();
-		
-		Integer duration = 55;
-		Kdata kdata;
-		
-		List<Item> items = itemService.getItems();
-		
-		int i=1;
-		for(Item item : items) {
-			Progress.show(items.size(),i++, item.getItemID());
-			kdata = kdataService.getDailyKdata(item.getItemID(),false);
-			if(kdata.getSize()>=duration) {
-				gaps.add(new HighLowGap(item.getItemID(),kdata.getHighLowGap(duration)));
-			}
-		}
-		
-		Collections.sort(gaps);
-		
-		HighLowGap gap;
-		StringBuffer sb = new StringBuffer();
-		for(Iterator<HighLowGap> it = gaps.iterator(); it.hasNext();) {
-			gap = it.next();
-			//System.out.println(gap);
-			sb.append(gap.getItemID());
-			sb.append(",");
-		}
-		sb.deleteCharAt(sb.length()-1);
-
-		FileUtil.writeTextFile(latestHighLowTopsFile, sb.toString(), false);
-		System.out.println("generate latest high low tops done!");
-		long used = (System.currentTimeMillis() - beginTime)/1000; 
-		System.out.println("用时：" + used + "秒");          
-
-	}
-	
 	class HighLowGap implements Comparable<HighLowGap>{
 		String itemID;
 		Integer highLowGap;

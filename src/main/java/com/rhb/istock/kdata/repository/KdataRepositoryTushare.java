@@ -1,5 +1,6 @@
 package com.rhb.istock.kdata.repository;
 
+import java.io.File;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -17,13 +18,15 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import com.rhb.istock.comm.util.FileUtil;
-import com.rhb.istock.selector.potential.Potential;
 
 @Service("kdataRepositoryTushare")
 public class KdataRepositoryTushare implements KdataRepository{
 	@Value("${tushareKdataPath}")
 	private String kdataPath;
 
+	@Value("${latestFactorsFile}")
+	private String latestFactorsFile;
+	
 	@Value("${kdataMusterFile}")
 	private String kdataMusterFile;
 	
@@ -114,11 +117,11 @@ public class KdataRepositoryTushare implements KdataRepository{
 	}
 
 	@Override
-	public LocalDate getLatestDate() {
+	public LocalDate getLastDate() {
 		String itemID1="sh601398"; //工商银行
 		String itemID2="sh601288"; //农业银行
-		LocalDate date1 = getDailyKdata(itemID1).getLatestDate();
-		LocalDate date2 = getDailyKdata(itemID2).getLatestDate();
+		LocalDate date1 = getDailyKdata(itemID1).getLastDate();
+		LocalDate date2 = getDailyKdata(itemID2).getLastDate();
 		return date1.isAfter(date2) ? date1 : date2;
 	}
 
@@ -166,5 +169,66 @@ public class KdataRepositoryTushare implements KdataRepository{
 		
 		FileUtil.writeTextFile(kdataMusterFile, sb.toString(), false);
 	}
+
+	@Override
+	public TreeMap<LocalDate, BigDecimal> getFactors(String itemID) {
+		TreeMap<LocalDate,BigDecimal> factors = new TreeMap<LocalDate,BigDecimal>();
+
+		String tushareID = itemID.indexOf("sh")==0 ? itemID.substring(2)+".SH" : itemID.substring(2)+".SZ";
+		String factorFile = kdataPath + "/" + tushareID + "_factor.json";
+/*		File file = new File(factorFile);
+		if(file.exists()) {
+			System.out.println(factorFile + " is exist!");
+		}else {
+			System.out.println(factorFile + " is NOT exist!");
+		}*/
+		JSONObject factor_json = new JSONObject(FileUtil.readTextFile(factorFile));
+		JSONArray items = factor_json.getJSONArray("items");
+		if(items.length()>0) {
+			BigDecimal factor = null;
+			JSONArray item;
+			for(int i=0; i<items.length(); i++) {
+				item = items.getJSONArray(i);
+				factor = item.getBigDecimal(2);
+				factors.put(LocalDate.parse(item.getString(1), DateTimeFormatter.ofPattern("yyyyMMdd")),factor);
+			}
+		}
+		
+		
+		return factors;
+	}
+
+	@Override
+	public void saveLatestFactors(Map<String, BigDecimal> factors) {
+		StringBuffer sb = new StringBuffer();
+		for(Map.Entry<String, BigDecimal> entry : factors.entrySet()) {
+			sb.append(entry.getKey());
+			sb.append(",");
+			sb.append(entry.getValue());
+			sb.append("\n");
+		}
+		FileUtil.writeTextFile(latestFactorsFile, sb.toString(), false);
+	}
+
+	@Override
+	@CacheEvict(value="latestFactors",allEntries=true)
+	public Map<String, BigDecimal> getLatestFactors() {
+		Map<String,BigDecimal> latestFactors = new HashMap<String, BigDecimal>();
+
+		String source = FileUtil.readTextFile(latestFactorsFile);
+		String[] lines = source.split("\n");
+		String[] columns;
+		for(String line : lines) {
+			columns = line.split(",");
+			if(columns!=null && columns.length>1) {
+				latestFactors.put(columns[0], new BigDecimal(columns[1]));
+			}
+		}
+		return latestFactors;
+	}
+
+	@Override
+	@CacheEvict(value="latestFactors",allEntries=true)
+	public void evictLatestFactorsCache() {}
 
 }

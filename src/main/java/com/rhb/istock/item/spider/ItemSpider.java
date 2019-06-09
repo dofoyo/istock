@@ -1,6 +1,5 @@
 package com.rhb.istock.item.spider;
 
-import java.util.List;
 
 public interface ItemSpider {
 	/*

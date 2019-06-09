@@ -22,7 +22,7 @@ public class KdataEntity {
 		this.bars.put(LocalDate.parse(date), new KbarEntity(new BigDecimal(open), new BigDecimal(high), new BigDecimal(low), new BigDecimal(close), new BigDecimal(amount), new BigDecimal(quantity)));
 	}
 	
-	public LocalDate getLatestDate() {
+	public LocalDate getLastDate() {
 		return this.bars.lastKey();
 	}
 	

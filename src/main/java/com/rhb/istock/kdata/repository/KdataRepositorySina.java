@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
@@ -92,7 +93,7 @@ public class KdataRepositorySina implements KdataRepository{
 	}
 
 	@Override
-	public LocalDate getLatestDate() {
+	public LocalDate getLastDate() {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -116,6 +117,30 @@ public class KdataRepositorySina implements KdataRepository{
 
 	@Override
 	public void evictKdataMustersCache() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public TreeMap<LocalDate, BigDecimal> getFactors(String itemID) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void saveLatestFactors(Map<String, BigDecimal> factors) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public Map<String, BigDecimal> getLatestFactors() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void evictLatestFactorsCache() {
 		// TODO Auto-generated method stub
 		
 	}

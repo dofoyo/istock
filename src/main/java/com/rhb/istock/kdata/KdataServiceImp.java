@@ -3,8 +3,12 @@ package com.rhb.istock.kdata;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.NavigableMap;
+import java.util.TreeMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -19,7 +23,6 @@ import com.rhb.istock.kdata.repository.KdataMusterEntity;
 import com.rhb.istock.kdata.repository.KdataRepository;
 import com.rhb.istock.kdata.spider.KdataRealtimeSpider;
 import com.rhb.istock.kdata.spider.KdataSpider;
-import com.rhb.istock.selector.potential.Potential;
 
 @Service("kdataServiceImp")
 public class KdataServiceImp implements KdataService{
@@ -108,8 +111,15 @@ public class KdataServiceImp implements KdataService{
 		Map<String, String> map = kdataRealtimeSpider.getLatestMarketData(itemID);
 		
 		if(map==null) return null;
+		Kbar bar = new Kbar(map.get("open"), map.get("high"), map.get("low"), map.get("close"), map.get("amount"), map.get("quantity"),map.get("dateTime"));
 		
-		return new Kbar(map.get("open"), map.get("high"), map.get("low"), map.get("close"), map.get("amount"), map.get("quantity"),map.get("dateTime"));
+		BigDecimal factor = this.getLatestFactors(itemID);
+		if(factor!=null) {
+			bar.setFactor(factor);
+		}
+			
+		
+		return bar;
 	}
 
 	@Override
@@ -121,7 +131,7 @@ public class KdataServiceImp implements KdataService{
 	public void downKdatas() throws Exception {
 		System.out.println("KdataService.downKdatas..........");
 		LocalDate latestDate = kdataRealtimeSpider.getLatestMarketDate();
-		LocalDate latestDownDate = kdataRepository.getLatestDate();
+		LocalDate latestDownDate = kdataRepository.getLastDate();
 		List<LocalDate> dates = kdataRealtimeSpider.getCalendar(latestDownDate,latestDate);
 		
 		System.out.println("latest trade date " + latestDate);
@@ -131,12 +141,15 @@ public class KdataServiceImp implements KdataService{
 		for(LocalDate date : dates) {
 			System.out.println("download "+ date +" kdatas from tushare, please wait....... ");
 			kdataSpider.downKdata(date);
+
+			kdataSpider163.downKdata(szzs);
+			
+			evictDailyKDataCache();
+			
+			this.generateMusters();
+			
 			System.out.println("downloaded "+ date +" kdatas from tushare.");
 		}
-		
-		kdataSpider163.downKdata(szzs);
-		
-		evictDailyKDataCache();
 
 	}
 
@@ -191,8 +204,8 @@ public class KdataServiceImp implements KdataService{
 	}
 
 	@Override
-	public LocalDate getLatestDownDate() {
-		return kdataRepository.getLatestDate();
+	public LocalDate getLastDownDate() {
+		return kdataRepository.getLastDate();
 	}
 
 	@Override
@@ -204,7 +217,7 @@ public class KdataServiceImp implements KdataService{
 		KdataEntity entity = this.getEntity(itemID, byCache);
 		
 		//System.out.println(entity.getBarSize());
-		LocalDate date = entity.getLatestDate();
+		LocalDate date = entity.getLastDate();
 		
 		for(int i=0,j=0; i<count && j<entity.getBarSize(); j++) {
 			bar = entity.getBar(date);
@@ -219,11 +232,11 @@ public class KdataServiceImp implements KdataService{
 	}
 
 	@Override
-	public void generateLatestMuster() {
+	public void generateMusters() {
 		long beginTime=System.currentTimeMillis(); 
-		System.out.println("generate latest muster ......");
+		System.out.println("generateMusters ......");
 		
-		LocalDate latestKdataDate = this.getLatestDownDate();
+		LocalDate latestKdataDate = this.getLastDownDate();
 		LocalDate theDate = kdataRepository.getLatestMusterDate();
 
 		if(theDate==null || theDate.isBefore(latestKdataDate)) {
@@ -247,7 +260,7 @@ public class KdataServiceImp implements KdataService{
 			System.out.println("it has been generated! pass!");
 		}
 		
-		System.out.println("generate latest muster done!");
+		System.out.println("generateMusters done!");
 		long used = (System.currentTimeMillis() - beginTime)/1000; 
 		System.out.println("用时：" + used + "秒");          
 	}
@@ -307,6 +320,58 @@ public class KdataServiceImp implements KdataService{
 		}
 		
 		return musters;
+	}
+
+	@Override
+	public void generateLatestFactors() {
+		long beginTime=System.currentTimeMillis(); 
+		System.out.println("generateLatestFactors ......");
+		//TO DO 通过加标签的方式显示执行某方法耗时多少秒
+
+		Map<String,BigDecimal> latestFactors = new HashMap<String, BigDecimal>();
+		
+		TreeMap<LocalDate,BigDecimal> factors;
+		LocalDate latestDate, previousDate;
+		BigDecimal latestFactor, previousFactor;
+		List<Item> items = itemService.getItems();
+		int i=1;
+		for(Item item : items) {
+			Progress.show(items.size(),i++, item.getItemID());//进度条
+
+			factors = kdataRepository.getFactors(item.getItemID());
+			latestDate = factors.lastKey();
+			latestFactor = factors.get(latestDate);
+			previousDate = factors.lowerKey(latestDate);
+			previousFactor = factors.get(previousDate);
+			
+			if(!latestFactor.equals(previousFactor)) {
+				latestFactors.put(item.getItemID(), latestFactor.divide(previousFactor,BigDecimal.ROUND_HALF_UP));
+			}
+		}
+		
+		kdataRepository.saveLatestFactors(latestFactors);
+		kdataRepository.evictLatestFactorsCache();
+		
+		System.out.println("generateLatestFactors done!");
+		long used = (System.currentTimeMillis() - beginTime)/1000; 
+		System.out.println("用时：" + used + "秒");          
+	}
+
+	@Override
+	public BigDecimal getLatestFactors(String itemID) {
+		return kdataRepository.getLatestFactors().get(itemID);
+	}
+
+	@Override
+	public void downLatestFactors() {
+		LocalDate latestDate = kdataRealtimeSpider.getLatestMarketDate();
+		try {
+			kdataSpider.downloadLatestFactors(latestDate);
+			this.generateLatestFactors();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
 	}
 
 }

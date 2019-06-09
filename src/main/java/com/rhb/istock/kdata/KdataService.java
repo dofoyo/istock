@@ -1,5 +1,6 @@
 package com.rhb.istock.kdata;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -15,13 +16,17 @@ public interface KdataService {
 	public void evictDailyKDataCache();
 	
 	public LocalDate getLatestMarketDate(); 
-	public LocalDate getLatestDownDate();
+	public LocalDate getLastDownDate();
 	
 	public Kbar getLatestMarketData(String itemID);
 	public List<String> getLatestDailyTop(Integer top); 
 	
 	public void downKdatas()  throws Exception ;
-	public void generateLatestMuster();
+	public void generateMusters();
 	public List<KdataMuster> getKdataMusters();
+	
+	public void downLatestFactors();
+	public void generateLatestFactors();
+	public BigDecimal getLatestFactors(String itemID);
 
 }

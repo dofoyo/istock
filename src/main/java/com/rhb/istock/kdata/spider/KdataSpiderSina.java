@@ -145,5 +145,23 @@ public class KdataSpiderSina implements KdataSpider {
 
 	}
 
+	@Override
+	public void downloadKdata(LocalDate date) throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void downloadFactor(LocalDate date) throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void downloadLatestFactors(LocalDate date) throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
+
 
 }

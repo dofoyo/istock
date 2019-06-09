@@ -22,7 +22,6 @@ public interface SelectorService{
 
 	
 	public List<String> getLatestHighLowTops(Integer top);
-	public void generateLatestHighLowTops();
 	public List<String> getHighLowTops(Integer top, LocalDate date);
 	public TreeMap<LocalDate,List<String>> getHighLowTops(Integer top, LocalDate beginDate, LocalDate endDate);
 	public void generateHighLowTops();
@@ -31,12 +30,6 @@ public interface SelectorService{
 	 * 用于operation
 	 */	
 	public List<String> getLatestAverageAmountTops(Integer top);
-	
-	/*
-	 * 用于operation
-	 * 每天收盘后执行一次
-	 */
-	public void generateLatestAverageAmountTops();
 	
 	/*
 	 * 用于simulation
@@ -58,17 +51,12 @@ public interface SelectorService{
 	public List<String> getLatestDailyAmountTops(Integer top);
 	public List<String> getDailyAmountTops(Integer top, LocalDate date);
 	public TreeMap<LocalDate,List<String>> getDailyAmountTops(Integer top, LocalDate beginDate, LocalDate endDate);
-	public void generateDailyAmountTops();
-
-	
-	public void generateAmountGaps();
-	public List<String> getAmountGapTops(Integer top);
 	
 	public void generateBreakers();
 	public void generateTmpLatestPotentials();
 	public TreeMap<LocalDate, List<String>> getBreakers(LocalDate beginDate, LocalDate endDate);
-	public void generateLatestPotentials();
+	
+	
 	public List<Potential> getLatestPotentials();
-	public List<String> getLatestPotentialIDs();
 
 }

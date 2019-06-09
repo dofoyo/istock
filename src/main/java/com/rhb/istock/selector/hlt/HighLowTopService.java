@@ -10,13 +10,6 @@ public interface HighLowTopService {
 	 */
 	public List<String> getLatestHighLowTops(Integer top);
 
-	/*
-	 * 用于operation
-	 * 下载新收盘数据后执行一次
-	 */
-	public void generateLatestHighLowTops();
-
-	
 	public List<String> getHighLowTops(Integer top, LocalDate date);
 	public TreeMap<LocalDate,List<String>> getHighLowTops(Integer top, LocalDate beginDate, LocalDate endDate);
 

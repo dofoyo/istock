@@ -4,6 +4,8 @@ import java.io.File;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheEvict;
@@ -67,8 +69,8 @@ public class KdataRepository163 implements KdataRepository {
 	public void evictDailyKDataCache() {}
 
 	@Override
-	public LocalDate getLatestDate() {
-		return this.getDailyKdataByCache("sh000001").getLatestDate();
+	public LocalDate getLastDate() {
+		return this.getDailyKdataByCache("sh000001").getLastDate();
 	}
 
 	@Override
@@ -91,6 +93,30 @@ public class KdataRepository163 implements KdataRepository {
 
 	@Override
 	public void evictKdataMustersCache() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public TreeMap<LocalDate, BigDecimal> getFactors(String itemID) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void saveLatestFactors(Map<String, BigDecimal> factors) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public Map<String, BigDecimal> getLatestFactors() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void evictLatestFactorsCache() {
 		// TODO Auto-generated method stub
 		
 	}

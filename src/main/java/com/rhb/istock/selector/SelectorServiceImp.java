@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import com.rhb.istock.selector.aat.AverageAmountTopService;
-import com.rhb.istock.selector.agt.AmountGapTopService;
 import com.rhb.istock.selector.bluechip.BluechipService;
 import com.rhb.istock.selector.breaker.BreakerService;
 import com.rhb.istock.selector.dat.DailyAmountTopService;
@@ -49,10 +48,6 @@ public class SelectorServiceImp implements SelectorService{
 	HoldService holdService;
 
 	@Autowired
-	@Qualifier("amountGapTopServiceImp")
-	AmountGapTopService amountGapTopService;
-	
-	@Autowired
 	@Qualifier("potentialService")
 	PotentialService potentialService;
 
@@ -71,18 +66,8 @@ public class SelectorServiceImp implements SelectorService{
 	}
 
 	@Override
-	public void generateLatestHighLowTops() {
-		hlt.generateLatestHighLowTops();
-	}
-
-	@Override
 	public List<String> getLatestAverageAmountTops(Integer top) {
 		return aat.getLatestAverageAmountTops(top);
-	}
-
-	@Override
-	public void generateLatestAverageAmountTops() {
-		aat.generateLatestAverageAmountTops();
 	}
 
 	@Override
@@ -108,11 +93,6 @@ public class SelectorServiceImp implements SelectorService{
 	@Override
 	public List<String> getDailyAmountTops(Integer top, LocalDate date) {
 		return dat.getDailyAmountTops(top, date);
-	}
-
-	@Override
-	public void generateDailyAmountTops() {
-		dat.generateDailyAmountTops();
 	}
 
 	@Override
@@ -171,17 +151,6 @@ public class SelectorServiceImp implements SelectorService{
 	}
 
 	@Override
-	public void generateAmountGaps() {
-		amountGapTopService.generateAmountGaps();
-		
-	}
-
-	@Override
-	public List<String> getAmountGapTops(Integer top) {
-		return amountGapTopService.getAmountGapTops(top);
-	}
-
-	@Override
 	public void generateBreakers() {
 		breakerService.generateBreakers();
 		
@@ -203,23 +172,12 @@ public class SelectorServiceImp implements SelectorService{
 	}
 
 	@Override
-	public void generateLatestPotentials() {
-		potentialService.generateLatestPotentials();
-	}
-
-	@Override
 	public List<Potential> getLatestPotentials() {
-		return potentialService.getLatestPotentials();
+		return potentialService.getPotentials();
 	}
 
 	@Override
 	public void generateTmpLatestPotentials() {
-		potentialService.generateTmpLatestPotentials();		
+		potentialService.generateLatestPotentials();		
 	}
-
-	@Override
-	public List<String> getLatestPotentialIDs() {
-		return potentialService.getLatestPotentialIDs();
-	}
-
 }

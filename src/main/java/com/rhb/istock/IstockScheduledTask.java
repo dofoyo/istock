@@ -6,6 +6,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import com.rhb.istock.fdata.FinancialStatementService;
+import com.rhb.istock.item.ItemService;
 import com.rhb.istock.item.repository.ItemRepository;
 import com.rhb.istock.item.spider.ItemSpider;
 import com.rhb.istock.kdata.KdataService;
@@ -15,21 +16,13 @@ import com.rhb.istock.trade.turtle.operation.TurtleOperationService;
 @Component
 public class IstockScheduledTask {
 	@Autowired
-	@Qualifier("itemRepositoryTushare")
-	ItemRepository itemRepository;
-
-	@Autowired
 	@Qualifier("kdataServiceImp")
 	KdataService kdataService;
 	
 	@Autowired
-	@Qualifier("itemSpiderTushare")
-	ItemSpider itemSpider;
-	
-	@Autowired
-	@Qualifier("turtleOperationServiceImp")
-	TurtleOperationService turtleOperationService;
-	
+	@Qualifier("itemServiceImp")
+	ItemService itemService;
+
 	@Autowired
 	@Qualifier("financialStatementServiceImp")
 	FinancialStatementService financialStatementService;
@@ -47,9 +40,9 @@ public class IstockScheduledTask {
 	 */
 	@Scheduled(cron="0 30 9 ? * 1-5") 
 	public void dailyInit() throws Exception {
-		itemSpider.download();		//下载最新股票代码
+		itemService.download();		//下载最新股票代码
 		kdataService.downKdatas(); //上一交易日的收盘数据要等开盘前才能下载到
-    	kdataService.generateLatestMuster();
+    	kdataService.generateMusters();
 	}
 
 	@Scheduled(cron="0 30 15 ? * 1-5") 

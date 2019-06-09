@@ -10,7 +10,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -184,7 +183,7 @@ public class Account {
 	
 	public boolean isStupid(String itemID, String orderID, Integer days) {
 		boolean flag = false;
-		Integer dd = Period.between(holds.get(orderID).getDate(), endDate).getDays();
+		//Integer dd = Period.between(holds.get(orderID).getDate(), endDate).getDays();
 		if(Period.between(holds.get(orderID).getDate(), endDate).getDays() >= days && 
 				holds.get(orderID).getPrice().compareTo(prices.get(itemID))< 0
 				) {

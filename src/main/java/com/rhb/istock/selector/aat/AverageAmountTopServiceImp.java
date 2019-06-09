@@ -1,9 +1,7 @@
 package com.rhb.istock.selector.aat;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -29,9 +27,6 @@ import com.rhb.istock.selector.aat.repository.AverageAmountTopRepository;
 
 @Service("averageAmountTopServiceImp")
 public class AverageAmountTopServiceImp implements AverageAmountTopService{
-	@Value("${latestAverageAmountTopsFile}")
-	private String latestAverageAmountTopsFile;
-	
 	@Value("${averageAmountTopsFile}")
 	private String averageAmountTopsFile;
 	
@@ -67,46 +62,6 @@ public class AverageAmountTopServiceImp implements AverageAmountTopService{
 		return tops;
 	}
 
-	@Override
-	public void generateLatestAverageAmountTops() {
-		long beginTime=System.currentTimeMillis(); 
-		System.out.println("generate latest average amount tops ......");
-
-		Integer duration = 55;
-		List<String> ids = kdataService.getLatestDailyTop(100);
-		generateLatestAverageAmountTops(ids, duration);
-		
-		
-		System.out.println("generate latest high low tops done!");
-		long used = (System.currentTimeMillis() - beginTime)/1000; 
-		System.out.println("用时：" + used + "秒");          
-	}
-	
-	
-	private void generateLatestAverageAmountTops(List<String> itemIDs, Integer duration) {
-		TreeSet<AverageAmount> tops = new TreeSet<AverageAmount>();
-		AverageAmount amount = null;
-		Kdata kdata;
-		BigDecimal av;
-		int d = 1;
-		for(String itemID : itemIDs) {
-			Progress.show(itemIDs.size(), d++, itemID);
-			kdata = kdataService.getDailyKdata(itemID,true);
-			av = kdata.getAverageAmount(duration);
-			amount = new AverageAmount(null,itemID,av);
-			tops.add(amount);
-		}
-		StringBuffer sb = new StringBuffer();
-		for(Iterator<AverageAmount> i = tops.iterator() ; i.hasNext();) {
-			amount = i.next();
-			sb.append(amount.getItemID());
-			sb.append(",");
-		}
-		sb.deleteCharAt(sb.length()-1);
-		
-		FileUtil.writeTextFile(latestAverageAmountTopsFile, sb.toString(), false);
-	}
-	
 	@Override
 	public List<String> getAverageAmountTops(Integer top, LocalDate date) {
 		List<String> tops = new ArrayList<String>();

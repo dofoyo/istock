@@ -11,13 +11,6 @@ public interface AverageAmountTopService {
 	public List<String> getLatestAverageAmountTops(Integer top);
 	
 	/*
-	 * 用于实操 operation
-	 * 下载新收盘数据后执行一次
-	 */
-	public void generateLatestAverageAmountTops();
-	
-	
-	/*
 	 * 用于模拟测试 simulation
 	 */
 	public List<String> getAverageAmountTops(Integer top, LocalDate date);

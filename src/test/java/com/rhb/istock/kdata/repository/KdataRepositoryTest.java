@@ -1,6 +1,10 @@
 package com.rhb.istock.kdata.repository;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Map;
+import java.util.NavigableMap;
+import java.util.TreeMap;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,8 +32,26 @@ public class KdataRepositoryTest {
 	@Qualifier("kdataRepository163")
 	KdataRepository kdataRepository163;
 	
-	
 	@Test
+	public void tt() {
+		String itemID = "SZ300538";
+		TreeMap<LocalDate,BigDecimal> factors = kdataRepositoryTushare.getFactors(itemID);
+
+		LocalDate latestDate, previousDate;
+		BigDecimal latestFactor, previousFactor;
+		
+		latestDate = factors.lastKey();
+		latestFactor = factors.get(latestDate);
+		previousDate = factors.lowerKey(latestDate);
+		previousFactor = factors.get(previousDate);
+		
+		System.out.println(latestDate + "," + latestFactor);
+		System.out.println(previousDate + "," + previousFactor);
+
+	}
+	
+	
+	//@Test
 	public void testGetDailyKdata() {
 		String id="sz000620";
 		LocalDate date = LocalDate.parse("2019-04-09");

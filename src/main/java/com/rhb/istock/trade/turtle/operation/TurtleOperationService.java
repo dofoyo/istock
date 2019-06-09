@@ -20,11 +20,6 @@ public interface TurtleOperationService {
 	 */
 	public List<HoldView> getHolds();
 	public List<TurtleView> getFavors();
-	public List<TurtleView> getDailyTops(Integer top);
-	public List<TurtleView> getAvTops(Integer top);
-	public List<TurtleView> getBluechips();
-	public List<TurtleView> getHighLowTops(Integer top);
-	public List<TurtleView> getAgTops(Integer top);
 	public List<TurtleView> getPotentials();
 	
 	/*

@@ -37,15 +37,6 @@ public class TurtleOperationServiceTest {
 		}		
 	}
 	
-	
-	//@Test
-	public void getAvTops() {
-		List<TurtleView> views = turtleService.getAvTops(50);
-		for(TurtleView view : views) {
-			System.out.println(view);
-		}		
-	}
-
 	//@Test
 	public void testGetHolds() {
 		List<HoldView> views = turtleService.getHolds();

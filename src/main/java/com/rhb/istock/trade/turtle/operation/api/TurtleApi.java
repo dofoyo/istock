@@ -25,30 +25,6 @@ public class TurtleApi{
 		return new ResponseContent<List<TurtleView>>(ResponseEnum.SUCCESS, views);
 	}
 	
-	@GetMapping("/turtle/agtops")
-	public ResponseContent<List<TurtleView>> getAgTops() {
-		List<TurtleView> views = ts.getAgTops(21);
-		return new ResponseContent<List<TurtleView>>(ResponseEnum.SUCCESS, views);
-	}
-	
-	@GetMapping("/turtle/avtops")
-	public ResponseContent<List<TurtleView>> getAvTops() {
-		List<TurtleView> views = ts.getAvTops(21);
-		return new ResponseContent<List<TurtleView>>(ResponseEnum.SUCCESS, views);
-	}
-	
-	@GetMapping("/turtle/dailytops")
-	public ResponseContent<List<TurtleView>> getDailyTops() {
-		List<TurtleView> views = ts.getDailyTops(21);
-		return new ResponseContent<List<TurtleView>>(ResponseEnum.SUCCESS, views);
-	}
-	
-	@GetMapping("/turtle/bluechips")
-	public ResponseContent<List<TurtleView>> getBluechips() {
-		List<TurtleView> views = ts.getBluechips();
-		return new ResponseContent<List<TurtleView>>(ResponseEnum.SUCCESS, views);
-	}
-	
 	@GetMapping("/turtle/favors")
 	public ResponseContent<List<TurtleView>> getFavors() {
 		List<TurtleView> favors = ts.getFavors();
@@ -66,12 +42,5 @@ public class TurtleApi{
 		});	
 		return new ResponseContent<List<HoldView>>(ResponseEnum.SUCCESS, holds);
 	}
-
-	@GetMapping("/turtle/hltops")
-	public ResponseContent<List<TurtleView>> getHlTops() {
-		List<TurtleView> views = ts.getHighLowTops(21);
-		return new ResponseContent<List<TurtleView>>(ResponseEnum.SUCCESS, views);
-	}
-	
 
 }

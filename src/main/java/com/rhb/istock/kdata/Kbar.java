@@ -12,6 +12,7 @@ public class Kbar {
 	private BigDecimal quantity;
 	private BigDecimal amount;
 	private LocalDate date;
+	private BigDecimal factor=new BigDecimal(1);
 
 	public Kbar(BigDecimal open, BigDecimal high, BigDecimal low, BigDecimal close, BigDecimal amount, BigDecimal quantity,LocalDate date) {
 		this.open = open;
@@ -39,6 +40,14 @@ public class Kbar {
 		}
 	}
 	
+	public BigDecimal getFactor() {
+		return factor;
+	}
+
+	public void setFactor(BigDecimal factor) {
+		this.factor = factor;
+	}
+
 	public LocalDate getDate() {
 		return date;
 	}
@@ -52,7 +61,7 @@ public class Kbar {
 	}
 	
 	public BigDecimal getOpen() {
-		return open;
+		return open.multiply(factor);
 	}
 
 	public void setOpen(BigDecimal open) {
@@ -60,7 +69,7 @@ public class Kbar {
 	}
 
 	public BigDecimal getHigh() {
-		return high;
+		return high.multiply(factor);
 	}
 
 	public void setHigh(BigDecimal high) {
@@ -68,7 +77,7 @@ public class Kbar {
 	}
 
 	public BigDecimal getLow() {
-		return low;
+		return low.multiply(factor);
 	}
 
 	public void setLow(BigDecimal low) {
@@ -76,7 +85,7 @@ public class Kbar {
 	}
 
 	public BigDecimal getClose() {
-		return close;
+		return close.multiply(factor);
 	}
 
 	public void setClose(BigDecimal close) {

@@ -4,7 +4,6 @@ tushareKdataPath: D:/dev/istock/data/kdata/tushare
 reportPath: D:/dev/istock/data/reports
 tushareItemsFile: D:/dev/istock/data/tushare_items.json
 holdsFile: D:/dev/istock/data/holds.txt
-preysFile: D:/dev/istock/data/preys.csv
 favorsFile: D:/dev/istock/data/favors.txt
 dailyAmountTopsFile: D:/dev/istock/data/dailyAmountTops.txt
 

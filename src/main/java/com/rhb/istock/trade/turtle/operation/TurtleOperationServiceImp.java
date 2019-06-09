@@ -14,7 +14,6 @@ import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.rhb.istock.comm.util.Progress;
@@ -35,9 +34,6 @@ import com.rhb.istock.trade.turtle.operation.api.TurtleView;
 
 @Service("turtleOperationServiceImp")
 public class TurtleOperationServiceImp implements TurtleOperationService {
-	@Value("${preysFile}")
-	private String preysFile;
-
 	@Autowired
 	@Qualifier("kdataServiceImp")
 	KdataService kdataService;
@@ -104,11 +100,6 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 		return holds;
 	}
 
-	@Override
-	public List<TurtleView> getHighLowTops(Integer top) {
-		return getTurtleViews(selectorService.getLatestHighLowTops(top),"high low tops");
-	}
-	
 	private void setDailyKdata(String itemID, boolean byCache) {
 		LocalDate endDate = kdataService.getLatestMarketDate();
 		
@@ -239,21 +230,6 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 		return views;
 	}
 	
-	@Override
-	public List<TurtleView> getDailyTops(Integer top) {
-		return getTurtleViews(selectorService.getLatestDailyAmountTops(top),"daily tops");
-	}
-
-	@Override
-	public List<TurtleView> getAgTops(Integer top) {
-		return getTurtleViews(selectorService.getAmountGapTops(top),"ag tops");
-	}
-	
-	@Override
-	public List<TurtleView> getAvTops(Integer top) {
-		return getTurtleViews(selectorService.getLatestAverageAmountTops(top),"av tops");
-	}
-	
 	private List<TurtleView> getTurtleViews(List<String> itemIDs, String name) {
 		long beginTime=System.currentTimeMillis(); 
 		System.out.println("getting " + name + " views ......");
@@ -370,16 +346,16 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 		return favors.containsKey(itemID);
 	}
 	
-
-	@Override
-	public List<TurtleView> getBluechips() {
-		return getTurtleViews(selectorService.getBluechipIDs(LocalDate.now()),"bluechips");
-	}
-	
 	private List<Potential> getPotentialWithLatestMarketData(){
+		long beginTime=System.currentTimeMillis(); 
+		System.out.println("getPotentialWithLatestMarketData ......");
+
 		List<Potential> potentials = selectorService.getLatestPotentials();
 		Kbar kbar;
+		int i=1;
 		for(Potential potential : potentials) {
+			Progress.show(potentials.size(),i++,potential.getItemID());
+			
 			kbar = kdataService.getLatestMarketData(potential.getItemID());
 			potential.setNowPrice(kbar.getClose());
 			potential.setAmount(kbar.getAmount());
@@ -391,6 +367,10 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 		potentials = this.refreshHL(potentials);
 		potentials = this.refreshDT(potentials);
 		potentials = this.refreshAV(potentials);
+
+		System.out.println("getPotentialWithLatestMarketData done!");
+		long used = (System.currentTimeMillis() - beginTime)/1000; 
+		System.out.println("用时：" + used + "秒");     
 		
 		return potentials;
 	}

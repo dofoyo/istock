@@ -32,9 +32,11 @@ public class AppInitRunner implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
     	itemService.init();
+    	
      	itemService.download();
-    	kdataService.downKdatas();
-    	kdataService.generateLatestMuster();
+    	kdataService.downKdatas();  //上一交易日的收盘数据下载完成后，执行generateMuster
+    	kdataService.downLatestFactors(); // 下载最新交易日的除权因子后，执行generateLatestFactors
+
     	turtleOperationService.init();
     }
 

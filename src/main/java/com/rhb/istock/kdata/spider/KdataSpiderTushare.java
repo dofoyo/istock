@@ -77,7 +77,8 @@ public class KdataSpiderTushare implements KdataSpider {
 		downloadFactor(date);
 	}
 
-	private void downloadKdata(LocalDate date) {
+	@Override
+	public void downloadKdata(LocalDate date) {
 		long beginTime=System.currentTimeMillis(); 
 		System.out.println("KdataSpiderTushare.downloadKdata of " + date + "....");
 
@@ -114,38 +115,27 @@ public class KdataSpiderTushare implements KdataSpider {
 		FileUtil.writeTextFile(kdataFile, str, false);
 	}
 	
-	private void downloadFactor(LocalDate date) {
+	@Override
+	public void downloadFactor(LocalDate date) {
 		long beginTime=System.currentTimeMillis(); 
 		System.out.println("KdataSpiderTushare.downloadFactor of " + date + "....");
-
-		String url = "http://api.tushare.pro";
-		JSONObject args = new JSONObject();
-		args.put("api_name", "adj_factor");
-		args.put("token", "175936caa4637bc9ac8e5e75ac92eff6887739ca6be771b81653f278");
 		
-		JSONObject params = new JSONObject();
-		params.put("trade_date", date.format(dtf));
+		String result = this.downFactor(date);
 		
-		args.put("params", params);
-		
-		String str = HttpClient.doPostJson(url, args.toString());
-		
-		String kdataFile = kdataPath + "/" + date + "_factor.json";
-		FileUtil.writeTextFile(kdataFile, str, false);
-
-		
-		JSONArray items = (new JSONObject(str)).getJSONObject("data").getJSONArray("items");	
-		if(items.length()>0) {
-			JSONArray item;
-			for(int i=0; i<items.length(); i++) {
-				item = items.getJSONArray(i);
-				
-				Progress.show(items.length(),i,item.getString(0));
-				
-				setFactor(item);
-			}
+		if(result!=null) {
+			JSONArray items = (new JSONObject(result)).getJSONObject("data").getJSONArray("items");	
+			if(items.length()>0) {
+				JSONArray item;
+				for(int i=0; i<items.length(); i++) {
+					item = items.getJSONArray(i);
+					
+					Progress.show(items.length(),i,item.getString(0));
+					
+					setFactor(item);
+				}
+			}			
 		}
-
+		
 		System.out.println("KdataSpiderTushare.downloadFactor of " + date + " done!");
 		long used = (System.currentTimeMillis() - beginTime)/1000; 
 		System.out.println("用时：" + used + "秒");          
@@ -236,6 +226,40 @@ public class KdataSpiderTushare implements KdataSpider {
 		System.out.println("用时：" + used + "秒");          
 		
 	}
+
+	@Override
+	public void downloadLatestFactors(LocalDate date) throws Exception {
+		this.downFactor(date);
+	}
+	
+	
+	private String downFactor(LocalDate date) {
+		String result = null;
+		
+		String kdataFile = kdataPath + "/" + date + "_factor.json";
+		
+		File factorFile = new File(kdataFile);
+		if(factorFile.exists()) {
+			System.out.println(kdataFile + " has been downloaded! pass!");
+		}else {
+			String url = "http://api.tushare.pro";
+			JSONObject args = new JSONObject();
+			args.put("api_name", "adj_factor");
+			args.put("token", "175936caa4637bc9ac8e5e75ac92eff6887739ca6be771b81653f278");
+			
+			JSONObject params = new JSONObject();
+			params.put("trade_date", date.format(dtf));
+			
+			args.put("params", params);
+			
+			result = HttpClient.doPostJson(url, args.toString());
+			
+			FileUtil.writeTextFile(kdataFile, result, false);
+		}
+		
+		return result;
+	}
+
 
 
 }

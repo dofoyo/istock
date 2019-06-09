@@ -17,11 +17,6 @@ public class HighLowTopServiceTest {
 	@Qualifier("highLowTopServiceImp")
 	HighLowTopService highLowTopService;
 	
-	//@Test
-	public void generateLatestHighLowTops() {
-		highLowTopService.generateLatestHighLowTops();
-	}
-	
 	@Test
 	public void getLatestHighLowTops() {
 		List<String> ids = highLowTopService.getLatestHighLowTops(5);

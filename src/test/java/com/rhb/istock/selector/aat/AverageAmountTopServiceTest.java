@@ -24,11 +24,6 @@ public class AverageAmountTopServiceTest {
 	}
 	
 	//@Test
-	public void generateLatestAverageAmountTops() {
-		averageAmountTopService.generateLatestAverageAmountTops();
-	}
-	
-	//@Test
 	public void generateAverageAmountTops() {
 		averageAmountTopService.generateAverageAmountTops();
 	}
