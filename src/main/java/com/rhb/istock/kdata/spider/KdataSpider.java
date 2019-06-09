@@ -13,7 +13,7 @@ public interface KdataSpider {
 	public void downKdata(LocalDate date) throws Exception ;
 	public void downloadKdata(LocalDate date) throws Exception ;
 	public void downloadFactor(LocalDate date) throws Exception ;
-	public void downloadLatestFactors(LocalDate date) throws Exception;
+	public String downloadLatestFactors(LocalDate date) throws Exception;
 
 	
 }

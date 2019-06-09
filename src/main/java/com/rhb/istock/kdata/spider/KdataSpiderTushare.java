@@ -228,8 +228,8 @@ public class KdataSpiderTushare implements KdataSpider {
 	}
 
 	@Override
-	public void downloadLatestFactors(LocalDate date) throws Exception {
-		this.downFactor(date);
+	public String downloadLatestFactors(LocalDate date) throws Exception {
+		return this.downFactor(date);
 	}
 	
 	

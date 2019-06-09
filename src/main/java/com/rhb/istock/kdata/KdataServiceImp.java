@@ -366,8 +366,8 @@ public class KdataServiceImp implements KdataService{
 	public void downLatestFactors() {
 		LocalDate latestDate = kdataRealtimeSpider.getLatestMarketDate();
 		try {
-			kdataSpider.downloadLatestFactors(latestDate);
-			this.generateLatestFactors();
+			String result = kdataSpider.downloadLatestFactors(latestDate);
+			if(result!=null) this.generateLatestFactors();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
