@@ -7,11 +7,8 @@ import org.springframework.stereotype.Component;
 
 import com.rhb.istock.fdata.FinancialStatementService;
 import com.rhb.istock.item.ItemService;
-import com.rhb.istock.item.repository.ItemRepository;
-import com.rhb.istock.item.spider.ItemSpider;
 import com.rhb.istock.kdata.KdataService;
 import com.rhb.istock.selector.SelectorService;
-import com.rhb.istock.trade.turtle.operation.TurtleOperationService;
 
 @Component
 public class IstockScheduledTask {
@@ -52,13 +49,14 @@ public class IstockScheduledTask {
 		//tmpLatestPotentials仅供盘后分析用
 		//每日开盘后，系统会在9:30生成latestPotentials，供实盘操作用
 		
-		selectorService.generateTmpLatestPotentials();
+		selectorService.generateLatestPotentials();
 	}
 	
-	//@Scheduled(cron="0 0 5 ? * *") //每日凌晨5点，下载最新年报，并生成bluechip
+	@Scheduled(cron="0 0 4 ? * *") //每日凌晨4点
 	public void downloadReports() {
-		financialStatementService.downloadReports();
-		selectorService.generateBluechip();
+		//financialStatementService.downloadReports();  //下载最新年报
+		//selectorService.generateBluechip();  //并生成bluechip
+		kdataService.generateMusters();   //生成muster，需要192分，即3个多小时
 	}
 
 }

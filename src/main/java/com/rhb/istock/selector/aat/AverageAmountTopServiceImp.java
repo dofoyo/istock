@@ -16,12 +16,12 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.rhb.istock.comm.util.FileUtil;
+import com.rhb.istock.comm.util.FileTools;
 import com.rhb.istock.comm.util.Progress;
 import com.rhb.istock.item.Item;
 import com.rhb.istock.item.ItemService;
 import com.rhb.istock.kdata.Kdata;
-import com.rhb.istock.kdata.KdataMuster;
+import com.rhb.istock.kdata.Muster;
 import com.rhb.istock.kdata.KdataService;
 import com.rhb.istock.selector.aat.repository.AverageAmountTopRepository;
 
@@ -46,10 +46,10 @@ public class AverageAmountTopServiceImp implements AverageAmountTopService{
 	public List<String> getLatestAverageAmountTops(Integer top) {
 		List<String> tops = new ArrayList<String>();
 
-		List<KdataMuster> musters = kdataService.getKdataMusters();
-		Collections.sort(musters, new Comparator<KdataMuster>() {
+		List<Muster> musters = kdataService.getLastMusters();
+		Collections.sort(musters, new Comparator<Muster>() {
 			@Override
-			public int compare(KdataMuster o1, KdataMuster o2) {
+			public int compare(Muster o1, Muster o2) {
 				return o2.getAverageAmount().compareTo(o1.getAverageAmount());
 			}
 		});
@@ -94,11 +94,11 @@ public class AverageAmountTopServiceImp implements AverageAmountTopService{
 		for(Item item : items) {
 			Progress.show(items.size(), d++, item.getCode());
 			
-			kdata = kdataService.getDailyKdata(item.getItemID(), byCache);
+			kdata = kdataService.getKdata(item.getItemID(), byCache);
 			//System.out.println(kdata.getString());
 			dates = new ArrayList<LocalDate>(kdata.getDates());
 			for(LocalDate date : dates) {
-				kdata = kdataService.getDailyKdata(item.getItemID(), date, duration, byCache);
+				kdata = kdataService.getKdata(item.getItemID(), date, duration, byCache);
 				//System.out.println(date + "," + duration);
 				//System.out.println(kdata.getString());
 				amount = new AverageAmount(date,item.getItemID(),kdata.getAverageAmount());
@@ -115,7 +115,7 @@ public class AverageAmountTopServiceImp implements AverageAmountTopService{
 					amounts.pollLast();
 				}
 			}
-			kdataService.evictDailyKDataCache();
+			kdataService.evictKDataCache();
 		}
 		
 		StringBuffer sb = new StringBuffer();
@@ -140,7 +140,7 @@ public class AverageAmountTopServiceImp implements AverageAmountTopService{
 			}
 		}
 		
-		FileUtil.writeTextFile(averageAmountTopsFile, sb.toString(), false);
+		FileTools.writeTextFile(averageAmountTopsFile, sb.toString(), false);
 
 		System.out.println("generate average amount tops done!");
 		long used = (System.currentTimeMillis() - beginTime)/1000; 
@@ -167,7 +167,7 @@ public class AverageAmountTopServiceImp implements AverageAmountTopService{
 		
 		int d=1;
 		for(String id : itemIDs) {
-			kdata = kdataService.getDailyKdata(id, date, duration, byCache);
+			kdata = kdataService.getKdata(id, date, duration, byCache);
 			gap = new AverageAmount(date,id,kdata.getAverageAmount());
 			gaps.add(gap);
 

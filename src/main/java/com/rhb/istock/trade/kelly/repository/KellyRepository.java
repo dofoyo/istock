@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
-import com.rhb.istock.comm.util.FileUtil;
+import com.rhb.istock.comm.util.FileTools;
 
 @Service("kellyRepository")
 public class KellyRepository {
@@ -31,7 +31,7 @@ public class KellyRepository {
 			sb.append(df.format(entry.getValue()));
 			sb.append("\n");
 		}
-		FileUtil.writeTextFile(fileName, sb.toString(), false);
+		FileTools.writeTextFile(fileName, sb.toString(), false);
 		
 	}
 	
@@ -44,7 +44,7 @@ public class KellyRepository {
 	private TreeMap<LocalDate, BigDecimal> getValues(String fileName) {
 		TreeMap<LocalDate, BigDecimal> values = new TreeMap<LocalDate,BigDecimal>();
 		
-		String[] lines = FileUtil.readTextFile(fileName).split("\n");
+		String[] lines = FileTools.readTextFile(fileName).split("\n");
 		String[] columns;
 		LocalDate date;
 		BigDecimal value;

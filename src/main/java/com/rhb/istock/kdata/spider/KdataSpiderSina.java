@@ -13,7 +13,7 @@ import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.rhb.istock.comm.util.FileUtil;
+import com.rhb.istock.comm.util.FileTools;
 import com.rhb.istock.comm.util.Progress;
 
 /*
@@ -66,7 +66,7 @@ public class KdataSpiderSina implements KdataSpider {
 		}
 		//System.out.println(sb.toString());
 		
-		FileUtil.writeTextFile(file, sb.toString(), false);
+		FileTools.writeTextFile(file, sb.toString(), false);
 	}
 
 	@Override
@@ -80,7 +80,7 @@ public class KdataSpiderSina implements KdataSpider {
 			year = yjs[i].substring(0,4);
 			jidu = yjs[i].substring(5,6);
 			file = kdataPath + "/" + id + "_" + year + "_" + jidu + ".txt";
-			if(i==0 || !FileUtil.isExists(file)) {
+			if(i==0 || !FileTools.isExists(file)) {
 				try {
 					downKdatas(id,year,jidu);
 					times = (long) (Math.random() * 10) * 1000;

@@ -172,12 +172,12 @@ public class SelectorServiceImp implements SelectorService{
 	}
 
 	@Override
-	public List<Potential> getLatestPotentials() {
-		return potentialService.getPotentials();
+	public List<Potential> getLastPotentials() {
+		return potentialService.getLastPotentials();
 	}
 
 	@Override
-	public void generateTmpLatestPotentials() {
+	public void generateLatestPotentials() {
 		potentialService.generateLatestPotentials();		
 	}
 }

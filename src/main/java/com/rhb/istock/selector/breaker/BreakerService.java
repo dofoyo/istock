@@ -202,7 +202,7 @@ public class BreakerService {
 		int i=1;
 		for(Item item : items) {
 			Progress.show(items.size(),i++, item.getItemID());
-			kdata = kdataService.getDailyKdata(item.getItemID(), byCache);
+			kdata = kdataService.getKdata(item.getItemID(), byCache);
 			dates = kdata.getDates();
 			box = new Box();
 			for(LocalDate date : dates) {

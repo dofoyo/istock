@@ -15,7 +15,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.rhb.istock.comm.util.FileUtil;
+import com.rhb.istock.comm.util.FileTools;
 import com.rhb.istock.comm.util.Progress;
 import com.rhb.istock.item.ItemService;
 import com.rhb.istock.kdata.Kbar;
@@ -113,15 +113,15 @@ public class TurtleStaticSimulation implements TurtleSimulation{
 		System.out.println("total: " + result.get("total"));
 		System.out.println("CAGR: " + result.get("cagr"));
 		System.out.println("winRatio: " + result.get("winRatio"));
-		FileUtil.writeTextFile(reportPath + "/simulation_detail" + System.currentTimeMillis() + ".csv", result.get("CSV"), false);
-		FileUtil.writeTextFile(reportPath + "/simulation_dailyAmount" + System.currentTimeMillis() + ".csv", result.get("dailyAmount"), false);
-		FileUtil.writeTextFile(reportPath + "/simulation_breakers" + System.currentTimeMillis() + ".csv", result.get("breakers"), false);
+		FileTools.writeTextFile(reportPath + "/simulation_detail" + System.currentTimeMillis() + ".csv", result.get("CSV"), false);
+		FileTools.writeTextFile(reportPath + "/simulation_dailyAmount" + System.currentTimeMillis() + ".csv", result.get("dailyAmount"), false);
+		FileTools.writeTextFile(reportPath + "/simulation_breakers" + System.currentTimeMillis() + ".csv", result.get("breakers"), false);
 		return result;
 	}
 
 	private void setDailyKdata(String itemID, LocalDate theDate) {
 		Kbar kbar;
-		Kdata kdata = kdataService.getDailyKdata(itemID, theDate, turtle.getOpenDuration(), cache);
+		Kdata kdata = kdataService.getKdata(itemID, theDate, turtle.getOpenDuration(), cache);
 		
 		List<LocalDate> dates = kdata.getDates();
 		//System.out.println(dates);
@@ -145,7 +145,7 @@ public class TurtleStaticSimulation implements TurtleSimulation{
 	 * 操作系统：线上操作，向下休息
 	 */
 	private boolean isGoodTime(LocalDate theDate, Integer duration) {
-		Kdata kdata = kdataService.getDailyKdata("sh000001", theDate, duration, true);
+		Kdata kdata = kdataService.getKdata("sh000001", theDate, duration, true);
 		return kdata.isAboveAveragePrice()==1 ? true : false; 
 	}
 	

@@ -47,7 +47,7 @@ public class KdataAPI {
 		kdatas.setCode(item.getCode());
 		kdatas.setName(item.getName());
 		
-		List<LocalDate> dates = kdataService.getDailyKdata(itemID, theEndDate, true).getDates();
+		List<LocalDate> dates = kdataService.getKdata(itemID, theEndDate, true).getDates();
 		Kbar bar;
 		for(LocalDate date : dates) {
 			bar = kdataService.getKbar(itemID, date, true);

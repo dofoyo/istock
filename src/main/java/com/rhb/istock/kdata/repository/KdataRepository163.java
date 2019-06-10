@@ -12,7 +12,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
-import com.rhb.istock.comm.util.FileUtil;
+import com.rhb.istock.comm.util.FileTools;
 import com.rhb.istock.comm.util.ParseString;
 
 @Service("kdataRepository163")
@@ -22,12 +22,12 @@ public class KdataRepository163 implements KdataRepository {
 	
 	@Override
 	@Cacheable("dailyKdata163")
-	public KdataEntity getDailyKdataByCache(String itemID) {
-		return this.getDailyKdata(itemID);
+	public KdataEntity getKdataByCache(String itemID) {
+		return this.getKdata(itemID);
 	}
 
 	@Override
-	public KdataEntity getDailyKdata(String itemID) {
+	public KdataEntity getKdata(String itemID) {
 		KdataEntity kdata = new KdataEntity(itemID);
 
 		String kdataFile = kdataPath + "/" + itemID + ".csv";
@@ -41,7 +41,7 @@ public class KdataRepository163 implements KdataRepository {
 		LocalDate date;
 		BigDecimal open,high,low,close,amount,quantity;
 		String[] columns = null;
-		String[] lines = FileUtil.readTextFile(kdataFile).split("\n");
+		String[] lines = FileTools.readTextFile(kdataFile).split("\n");
 		for(int i=lines.length-1; i>0; i--){  //文档是倒序，要变成顺序,排除第一行
 			columns = lines[i].split(","); 
 			
@@ -66,33 +66,28 @@ public class KdataRepository163 implements KdataRepository {
 
 	@Override
 	@CacheEvict(value="dailyKdata163",allEntries=true)
-	public void evictDailyKDataCache() {}
+	public void evictKDataCache() {}
 
 	@Override
 	public LocalDate getLastDate() {
-		return this.getDailyKdataByCache("sh000001").getLastDate();
+		return this.getKdataByCache("sh000001").getLastDate();
 	}
 
 	@Override
-	public LocalDate getLatestMusterDate() {
+	public LocalDate getLastMusterDate() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
-	public List<KdataMusterEntity> getKdataMusters() {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 	@Override
-	public void saveLatestMusters(LocalDate date, List<KdataMusterEntity> entities, Integer period) {
+	public void saveMusters(LocalDate date, List<MusterEntity> entities, Integer openPeriod, Integer dropPeriod) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void evictKdataMustersCache() {
+	public void evictMustersCache() {
 		// TODO Auto-generated method stub
 		
 	}
@@ -117,6 +112,30 @@ public class KdataRepository163 implements KdataRepository {
 
 	@Override
 	public void evictLatestFactorsCache() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public List<MusterEntity> getMusters(LocalDate date) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void saveMuster(LocalDate date, MusterEntity entity, Integer openPeriod, Integer dropPeriod) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public boolean isMustersExist(LocalDate date) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void cleanMusters() {
 		// TODO Auto-generated method stub
 		
 	}

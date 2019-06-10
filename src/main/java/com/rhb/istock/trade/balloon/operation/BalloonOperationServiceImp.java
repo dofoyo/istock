@@ -79,7 +79,7 @@ public class BalloonOperationServiceImp implements BalloonOperationService {
 		boolean byCache = true;  
 		
 		Kbar kbar;
-		Kdata kdata = kdataService.getDailyKdata(itemID, endDate, balloon.getMidDuration(), byCache);
+		Kdata kdata = kdataService.getKdata(itemID, endDate, balloon.getMidDuration(), byCache);
 		List<LocalDate> dates = kdata.getDates();
 		for(LocalDate date : dates) {
 			kbar = kdata.getBar(date);

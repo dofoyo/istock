@@ -12,7 +12,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
-import com.rhb.istock.comm.util.FileUtil;
+import com.rhb.istock.comm.util.FileTools;
 
 @Service("turtleSimulationRepository")
 public class TurtleSimulationRepository {
@@ -25,7 +25,7 @@ public class TurtleSimulationRepository {
 		
 		String theFile = reportPath + "/" + type + "_" + year + "_simulation_breakers.csv"; 
 		//System.out.println(theFile);
-		String[] lines = FileUtil.readTextFile(theFile).split("\n");
+		String[] lines = FileTools.readTextFile(theFile).split("\n");
 		String[] columns;
 		LocalDate date;
 		List<String> ids;
@@ -49,7 +49,7 @@ public class TurtleSimulationRepository {
 		
 		String theFile = reportPath + "/" + type + "_" + year + "_simulation_detail.csv"; 
 		//System.out.println(theFile);
-		String[] lines = FileUtil.readTextFile(theFile).split("\n");
+		String[] lines = FileTools.readTextFile(theFile).split("\n");
 		String[] columns;
 		LocalDate buyDate;
 		List<String> ids ;
@@ -75,7 +75,7 @@ public class TurtleSimulationRepository {
 		
 		String theFile = reportPath + "/" + type + "_" + year + "_simulation_detail.csv"; 
 		//System.out.println(theFile);
-		String[] lines = FileUtil.readTextFile(theFile).split("\n");
+		String[] lines = FileTools.readTextFile(theFile).split("\n");
 		String[] columns;
 		LocalDate sellDate;
 		List<String> ids;
@@ -101,7 +101,7 @@ public class TurtleSimulationRepository {
 		
 		String theFile = reportPath + "/" + type + "_" + year + "_simulation_dailyAmount.csv"; 
 		//System.out.println(theFile);
-		String[] lines = FileUtil.readTextFile(theFile).split("\n");
+		String[] lines = FileTools.readTextFile(theFile).split("\n");
 		String[] columns;
 		LocalDate date;
 		for(int j=1; j<lines.length; j++) {

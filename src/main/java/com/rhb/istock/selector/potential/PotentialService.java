@@ -10,12 +10,12 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.rhb.istock.comm.util.FileUtil;
+import com.rhb.istock.comm.util.FileTools;
 import com.rhb.istock.comm.util.Progress;
 import com.rhb.istock.item.Item;
 import com.rhb.istock.item.ItemService;
 import com.rhb.istock.kdata.Kdata;
-import com.rhb.istock.kdata.KdataMuster;
+import com.rhb.istock.kdata.Muster;
 import com.rhb.istock.kdata.KdataService;
 
 @Service("potentialService")
@@ -31,26 +31,24 @@ public class PotentialService {
 	@Qualifier("kdataServiceImp")
 	KdataService kdataService;
 	
-	public List<Potential> getPotentials(){
+	public List<Potential> getLastPotentials(){
 		List<Potential> potentials = new ArrayList<Potential>();
 		Potential potential;
 		
-		List<KdataMuster> musters = kdataService.getKdataMusters();
+		List<Muster> musters = kdataService.getLastMusters();
 		
-		for(KdataMuster item : musters) {
-			if(item.isPeriodCount()) {
-				potential =  new Potential(item.getItemID(),
-						item.getAmount(),
-						item.getAverageAmount(),
-						item.getHighest(),
-						item.getLowest(),
-						item.getPrice(),
-						item.getPrice());
-				if(potential.getHNGap()<10) {
-					//System.out.println(potential);
-					potentials.add(potential);	
-				}					
-			}
+		for(Muster item : musters) {
+			potential =  new Potential(item.getItemID(),
+					item.getAmount(),
+					item.getAverageAmount(),
+					item.getHighest(),
+					item.getLowest(),
+					item.getPrice(),
+					item.getPrice());
+			if(potential.getHNGap()<10) {
+				//System.out.println(potential);
+				potentials.add(potential);	
+			}					
 		}
 
 		return potentials;
@@ -80,7 +78,7 @@ public class PotentialService {
 		int i=1;
 		for(Item item : items) {
 			Progress.show(items.size(),i++, item.getItemID());
-			kdata = kdataService.getDailyKdata(item.getItemID(),false);
+			kdata = kdataService.getKdata(item.getItemID(),false);
 			date = kdataService.getLatestMarketDate();
 			if(kdata.getBar(date)==null) {
 				kdata.addBar(date, kdataService.getLatestMarketData(item.getItemID()));
@@ -103,7 +101,7 @@ public class PotentialService {
 		sb.append(getLine("outs",outs));
 		
 		//System.out.println(sb.toString());
-		FileUtil.writeTextFile(latestPotentialsFile, sb.toString(), false);
+		FileTools.writeTextFile(latestPotentialsFile, sb.toString(), false);
 		
 		System.out.println("generate latest potentials with latest kdata done!");
 		long used = (System.currentTimeMillis() - beginTime)/1000; 
@@ -126,7 +124,7 @@ public class PotentialService {
 	public List<String> getLatestPotentials() {
 		List<String> potentials = new ArrayList<String>();
 		
-		String[] lines = FileUtil.readTextFile(latestPotentialsFile).split("\n");
+		String[] lines = FileTools.readTextFile(latestPotentialsFile).split("\n");
 		String[] columns;
 		for(String line : lines) {
 			columns = line.split(",");

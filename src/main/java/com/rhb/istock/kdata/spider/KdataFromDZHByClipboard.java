@@ -4,7 +4,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import com.rhb.istock.comm.util.ClipboardPicker;
-import com.rhb.istock.comm.util.FileUtil;
+import com.rhb.istock.comm.util.FileTools;
 
 public class KdataFromDZHByClipboard   extends TimerTask{
 	String page_o = null;
@@ -17,7 +17,7 @@ public class KdataFromDZHByClipboard   extends TimerTask{
 			page_o = page;
 			String code = page.substring(1,7);
 			String filename = code + ".txt";
-			FileUtil.writeTextFile(path+filename, page, false);
+			FileTools.writeTextFile(path+filename, page, false);
 			
 			System.out.println(path+filename + " saved!");
 			

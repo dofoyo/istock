@@ -104,7 +104,7 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 		LocalDate endDate = kdataService.getLatestMarketDate();
 		
 		Kbar kbar;
-		Kdata kdata = kdataService.getDailyKdata(itemID, endDate, turtle.getOpenDuration(), byCache);
+		Kdata kdata = kdataService.getKdata(itemID, endDate, turtle.getOpenDuration(), byCache);
 		List<LocalDate> dates = kdata.getDates();
 		for(LocalDate date : dates) {
 			kbar = kdata.getBar(date);
@@ -350,7 +350,7 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 		long beginTime=System.currentTimeMillis(); 
 		System.out.println("getPotentialWithLatestMarketData ......");
 
-		List<Potential> potentials = selectorService.getLatestPotentials();
+		List<Potential> potentials = selectorService.getLastPotentials();
 		Kbar kbar;
 		int i=1;
 		for(Potential potential : potentials) {

@@ -32,7 +32,7 @@ public class KdataRepositoryTest {
 	@Qualifier("kdataRepository163")
 	KdataRepository kdataRepository163;
 	
-	@Test
+	//@Test
 	public void tt() {
 		String itemID = "SZ300538";
 		TreeMap<LocalDate,BigDecimal> factors = kdataRepositoryTushare.getFactors(itemID);
@@ -65,7 +65,7 @@ public class KdataRepositoryTest {
 		System.out.println(kdata2.getBar(date));*/
 
 		System.out.println("kdataRepositoryTushare");
-		KdataEntity kdata3 = kdataRepositoryTushare.getDailyKdata(id);
+		KdataEntity kdata3 = kdataRepositoryTushare.getKdata(id);
 		System.out.println(kdata3.getBar(date));
 	
 	}
@@ -76,8 +76,13 @@ public class KdataRepositoryTest {
 		LocalDate date = LocalDate.parse("2017-02-17");
 
 		System.out.println("kdataRepository163");
-		KdataEntity kdata3 = kdataRepository163.getDailyKdata(id);
+		KdataEntity kdata3 = kdataRepository163.getKdata(id);
 		System.out.println(kdata3.getBar(date));		
+	}
+	
+	//@Test
+	public void cleanMusters() {
+		kdataRepositoryTushare.cleanMusters();
 	}
 	
 }

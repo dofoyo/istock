@@ -11,7 +11,7 @@ import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FileUtil {
+public class FileTools {
 	private static final String SEP = System.getProperty("line.separator");
 	public static List<String> readAsLines(String fileName, String encoding) {
 		List<String> lines = new ArrayList<String>();
@@ -109,8 +109,7 @@ public class FileUtil {
 			}
 			reader.close();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			// e.printStackTrace();
+			e.printStackTrace();
 		}
 		return buffer.toString();
 	}

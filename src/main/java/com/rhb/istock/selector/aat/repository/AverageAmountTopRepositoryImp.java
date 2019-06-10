@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
-import com.rhb.istock.comm.util.FileUtil;
+import com.rhb.istock.comm.util.FileTools;
 
 @Service("averageAmountTopRepositoryImp")
 public class AverageAmountTopRepositoryImp implements AverageAmountTopRepository {
@@ -23,7 +23,7 @@ public class AverageAmountTopRepositoryImp implements AverageAmountTopRepository
 	public Map<LocalDate, List<String>> getAverageAmountTops() {
 		Map<LocalDate, List<String>> tops = new HashMap<LocalDate, List<String>>();
 		
-		String[] lines = FileUtil.readTextFile(averageAmountTopsFile).split("\n");
+		String[] lines = FileTools.readTextFile(averageAmountTopsFile).split("\n");
 		String[] columns;
 		LocalDate date;
 		List<String> ids;

@@ -1,6 +1,7 @@
 package com.rhb.istock.kdata.repository;
 
 import java.io.File;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -10,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.apache.commons.io.FileUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,7 +19,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
-import com.rhb.istock.comm.util.FileUtil;
+import com.rhb.istock.comm.util.FileTools;
 
 @Service("kdataRepositoryTushare")
 public class KdataRepositoryTushare implements KdataRepository{
@@ -27,17 +29,17 @@ public class KdataRepositoryTushare implements KdataRepository{
 	@Value("${latestFactorsFile}")
 	private String latestFactorsFile;
 	
-	@Value("${kdataMusterFile}")
-	private String kdataMusterFile;
+	@Value("${musterPath}")
+	private String musterPath;
 	
 	//private Map<String,KdataEntity> kdatas = new HashMap<String,KdataEntity>();;
 	
 	@Override
 	@CacheEvict(value="tushareDailyKdatas",allEntries=true)
-	public void evictDailyKDataCache() {}
+	public void evictKDataCache() {}
 	
 	@Override
-	public KdataEntity getDailyKdata(String itemID) {
+	public KdataEntity getKdata(String itemID) {
 		//System.out.println("itemID: " + itemID);
 		
 		//if(kdatas.containsKey(itemID)) return kdatas.get(itemID);
@@ -50,9 +52,9 @@ public class KdataRepositoryTushare implements KdataRepository{
 
 		//System.out.println(kdataFile);//----------------
 		BigDecimal roof = null;
-		if(FileUtil.isExists(kdataFile) && FileUtil.isExists(factorFile)) {
+		if(FileTools.isExists(kdataFile) && FileTools.isExists(factorFile)) {
 			BigDecimal f = null;
-			JSONObject factor = new JSONObject(FileUtil.readTextFile(factorFile));
+			JSONObject factor = new JSONObject(FileTools.readTextFile(factorFile));
 			TreeMap<LocalDate,BigDecimal> factors = new TreeMap<LocalDate,BigDecimal>();
 			JSONArray items = factor.getJSONArray("items");
 			if(items.length()>0) {
@@ -68,7 +70,7 @@ public class KdataRepositoryTushare implements KdataRepository{
 			LocalDate date;
 			BigDecimal open,high,low,close,amount,quantity;
 			BigDecimal preFactor=null,nowFactor;
-			JSONObject data = new JSONObject(FileUtil.readTextFile(kdataFile));
+			JSONObject data = new JSONObject(FileTools.readTextFile(kdataFile));
 			items = data.getJSONArray("items");
 			if(items.length()>0) {
 				JSONArray item;
@@ -112,25 +114,25 @@ public class KdataRepositoryTushare implements KdataRepository{
 
 	@Override
 	@Cacheable("tushareDailyKdatas")
-	public KdataEntity getDailyKdataByCache(String itemID) {
-		return this.getDailyKdata(itemID);
+	public KdataEntity getKdataByCache(String itemID) {
+		return this.getKdata(itemID);
 	}
 
 	@Override
 	public LocalDate getLastDate() {
 		String itemID1="sh601398"; //工商银行
 		String itemID2="sh601288"; //农业银行
-		LocalDate date1 = getDailyKdata(itemID1).getLastDate();
-		LocalDate date2 = getDailyKdata(itemID2).getLastDate();
+		LocalDate date1 = getKdata(itemID1).getLastDate();
+		LocalDate date2 = getKdata(itemID2).getLastDate();
 		return date1.isAfter(date2) ? date1 : date2;
 	}
 
 	@Override
-	public LocalDate getLatestMusterDate() {
-		String source = FileUtil.readTextFile(kdataMusterFile);
+	public LocalDate getLastMusterDate() {
+		String source = FileTools.readTextFile(musterPath);
 		
 		if(source==null || source.isEmpty()) {
-			System.err.println("can NOT find " + kdataMusterFile + "! or the file is empty!");
+			System.err.println("can NOT find " + musterPath + "! or the file is empty!");
 			return null;
 		}
 
@@ -140,34 +142,43 @@ public class KdataRepositoryTushare implements KdataRepository{
 	}
 
 	@Override
-	@Cacheable("kdataMusters")
-	public List<KdataMusterEntity> getKdataMusters() {
-		List<KdataMusterEntity> entities = new ArrayList<KdataMusterEntity>();
+	//@Cacheable("musters")
+	public List<MusterEntity> getMusters(LocalDate date) {
+		List<MusterEntity> entities = new ArrayList<MusterEntity>();
 		
-		String source = FileUtil.readTextFile(kdataMusterFile);
-
+		String pathAndFile = musterPath + "/" + date.format(DateTimeFormatter.ofPattern("yyyyMMdd")) +  "_55_21_musters.txt";
+		//System.out.println(pathAndFile);
+		String source = FileTools.readTextFile(pathAndFile);
+		//System.out.println(source);
 		String[] lines = source.split("\n");
 		for(int i=1; i<lines.length; i++) {
-			entities.add(new KdataMusterEntity(lines[i]));
+			entities.add(new MusterEntity(lines[i]));
 		}
 		
 		return entities;
 	}
+	
 	@Override
-	@CacheEvict(value="kdataMusters",allEntries=true)
-	public void evictKdataMustersCache() {}
+	@CacheEvict(value="musters",allEntries=true)
+	public void evictMustersCache() {}
 	
 
 	@Override
-	public void saveLatestMusters(LocalDate date, List<KdataMusterEntity> entities, Integer period) {
-		StringBuffer sb = new StringBuffer(date.toString() + "," + period + "\n");
-		for(KdataMusterEntity entity : entities) {
+	public void saveMusters(LocalDate date, List<MusterEntity> entities, Integer openPeriod, Integer dropPeriod) {
+		StringBuffer sb = new StringBuffer(date.toString() + "," + openPeriod + "\n");
+		for(MusterEntity entity : entities) {
 			sb.append(entity.toText());
 			sb.append("\n");
 		}
 		sb.deleteCharAt(sb.length()-1);
 		
-		FileUtil.writeTextFile(kdataMusterFile, sb.toString(), false);
+		FileTools.writeTextFile(musterPath, sb.toString(), false);
+	}
+	
+	@Override
+	public void saveMuster(LocalDate date, MusterEntity entity, Integer openPeriod, Integer dropPeriod) {
+		String pathAndFile = musterPath + "/" + date.format(DateTimeFormatter.ofPattern("yyyyMMdd")) +  "_55_21_musters.txt";
+		FileTools.writeTextFile(pathAndFile, entity.toText(), true);
 	}
 
 	@Override
@@ -182,7 +193,7 @@ public class KdataRepositoryTushare implements KdataRepository{
 		}else {
 			System.out.println(factorFile + " is NOT exist!");
 		}*/
-		JSONObject factor_json = new JSONObject(FileUtil.readTextFile(factorFile));
+		JSONObject factor_json = new JSONObject(FileTools.readTextFile(factorFile));
 		JSONArray items = factor_json.getJSONArray("items");
 		if(items.length()>0) {
 			BigDecimal factor = null;
@@ -193,8 +204,6 @@ public class KdataRepositoryTushare implements KdataRepository{
 				factors.put(LocalDate.parse(item.getString(1), DateTimeFormatter.ofPattern("yyyyMMdd")),factor);
 			}
 		}
-		
-		
 		return factors;
 	}
 
@@ -207,7 +216,7 @@ public class KdataRepositoryTushare implements KdataRepository{
 			sb.append(entry.getValue());
 			sb.append("\n");
 		}
-		FileUtil.writeTextFile(latestFactorsFile, sb.toString(), false);
+		FileTools.writeTextFile(latestFactorsFile, sb.toString(), false);
 	}
 
 	@Override
@@ -215,7 +224,7 @@ public class KdataRepositoryTushare implements KdataRepository{
 	public Map<String, BigDecimal> getLatestFactors() {
 		Map<String,BigDecimal> latestFactors = new HashMap<String, BigDecimal>();
 
-		String source = FileUtil.readTextFile(latestFactorsFile);
+		String source = FileTools.readTextFile(latestFactorsFile);
 		String[] lines = source.split("\n");
 		String[] columns;
 		for(String line : lines) {
@@ -230,5 +239,24 @@ public class KdataRepositoryTushare implements KdataRepository{
 	@Override
 	@CacheEvict(value="latestFactors",allEntries=true)
 	public void evictLatestFactorsCache() {}
+
+	@Override
+	public boolean isMustersExist(LocalDate date) {
+		String pathAndFile = musterPath + "/" + date.format(DateTimeFormatter.ofPattern("yyyyMMdd")) +  "_55_21_musters.txt";
+		File file = new File(pathAndFile);
+		return file.exists();
+	}
+
+	@Override
+	public void cleanMusters() {
+		//FileUtils.deleteQuietly(new File(musterPath));
+		try {
+			FileUtils.cleanDirectory(new File(musterPath));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
 
 }

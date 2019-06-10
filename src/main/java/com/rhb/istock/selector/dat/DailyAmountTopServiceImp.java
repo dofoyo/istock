@@ -15,7 +15,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.rhb.istock.comm.util.FileUtil;
+import com.rhb.istock.comm.util.FileTools;
 import com.rhb.istock.comm.util.Progress;
 import com.rhb.istock.item.Item;
 import com.rhb.istock.item.ItemService;
@@ -84,7 +84,7 @@ public class DailyAmountTopServiceImp implements DailyAmountTopService {
 		for(Item item : items) {
 			Progress.show(items.size(), d++, item.getCode());
 			
-			kdata = kdataService.getDailyKdata(item.getItemID(), byCache);
+			kdata = kdataService.getKdata(item.getItemID(), byCache);
 
 			dates = new ArrayList<LocalDate>(kdata.getDates());
 			for(LocalDate date : dates) {
@@ -125,7 +125,7 @@ public class DailyAmountTopServiceImp implements DailyAmountTopService {
 			}
 		}
 		
-		FileUtil.writeTextFile(dailyAmountTopsFile, sb.toString(), false);
+		FileTools.writeTextFile(dailyAmountTopsFile, sb.toString(), false);
 	
 		System.out.println("generate daily amount tops done!");
 		long used = (System.currentTimeMillis() - beginTime)/1000; 

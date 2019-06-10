@@ -48,7 +48,7 @@ public class BalloonSimulationTest {
 			beginDate = beginDate.plusYears(1);
 			endDate = endDate.plusYears(1);
 			
-			kdataService.evictDailyKDataCache();
+			kdataService.evictKDataCache();
 		}
 		
 		for(Map.Entry<LocalDate, Map<String,String>> result : results.entrySet()) {

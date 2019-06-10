@@ -7,7 +7,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.rhb.istock.comm.util.FileUtil;
+import com.rhb.istock.comm.util.FileTools;
 
 @Service("holdServiceImp")
 public class HoldServiceImp implements HoldService {
@@ -18,7 +18,7 @@ public class HoldServiceImp implements HoldService {
 	public List<HoldEntity> getHolds() {
 		List<HoldEntity> holds = new ArrayList<HoldEntity>();
 		HoldEntity hold;
-		String[] lines = FileUtil.readTextFile(holdsFile).split("\n");
+		String[] lines = FileTools.readTextFile(holdsFile).split("\n");
 		String[] columns;
 		for(String line : lines) {
 			columns = line.split(",");

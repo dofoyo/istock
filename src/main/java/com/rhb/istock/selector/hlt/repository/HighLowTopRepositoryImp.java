@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
-import com.rhb.istock.comm.util.FileUtil;
+import com.rhb.istock.comm.util.FileTools;
 
 @Service("highLowTopRepositoryImp")
 public class HighLowTopRepositoryImp implements HighLowTopRepository {
@@ -23,7 +23,7 @@ public class HighLowTopRepositoryImp implements HighLowTopRepository {
 	public Map<LocalDate, List<String>> getHighLowTops() {
 		Map<LocalDate, List<String>> tops = new HashMap<LocalDate, List<String>>();
 		
-		String[] lines = FileUtil.readTextFile(highLowTopsFile).split("\n");
+		String[] lines = FileTools.readTextFile(highLowTopsFile).split("\n");
 		String[] columns;
 		LocalDate date;
 		List<String> ids;

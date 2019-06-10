@@ -2,36 +2,18 @@ package com.rhb.istock.kdata;
 
 import java.math.BigDecimal;
 
-public class KdataMuster {
+public class Muster {
 	private String itemID;
 	private BigDecimal amount;
 	private BigDecimal averageAmount;
 	private BigDecimal highest;
 	private BigDecimal lowest;
 	private BigDecimal price;
-	private Integer period;
-	private Integer count;
 	
 	public Integer getHLGap() {
 		return highest.subtract(lowest).divide(lowest,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)).intValue();
 	}
 	
-	public boolean isPeriodCount() {
-		return this.period==this.count;
-	}
-	
-	public Integer getCount() {
-		return count;
-	}
-	public void setCount(Integer count) {
-		this.count = count;
-	}
-	public Integer getPeriod() {
-		return period;
-	}
-	public void setPeriod(Integer period) {
-		this.period = period;
-	}
 	public String getItemID() {
 		return itemID;
 	}
@@ -70,9 +52,8 @@ public class KdataMuster {
 	}
 	@Override
 	public String toString() {
-		return "KdataMuster [itemID=" + itemID + ", amount=" + amount + ", averageAmount=" + averageAmount
-				+ ", highest=" + highest + ", lowest=" + lowest + ", price=" + price + ", period=" + period + ", count="
-				+ count + "]";
+		return "Muster [itemID=" + itemID + ", amount=" + amount + ", averageAmount=" + averageAmount + ", highest="
+				+ highest + ", lowest=" + lowest + ", price=" + price + "]";
 	}
 	
 	

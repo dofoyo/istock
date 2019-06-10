@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
-import com.rhb.istock.comm.util.FileUtil;
+import com.rhb.istock.comm.util.FileTools;
 
 @Service("breakerRepository")
 public class BreakerRepository {
@@ -55,7 +55,7 @@ public class BreakerRepository {
 			sb.deleteCharAt(sb.length()-1);
 			sb.append("\n");
 		}
-		FileUtil.writeTextFile(fileName, sb.toString(), false);
+		FileTools.writeTextFile(fileName, sb.toString(), false);
 		
 	}
 	
@@ -82,7 +82,7 @@ public class BreakerRepository {
 	private TreeMap<LocalDate, List<String>> getBreakerIDs(String fileName) {
 		TreeMap<LocalDate, List<String>> breakers = new TreeMap<LocalDate, List<String>>();
 		
-		String[] lines = FileUtil.readTextFile(fileName).split("\n");
+		String[] lines = FileTools.readTextFile(fileName).split("\n");
 		String[] columns;
 		LocalDate date;
 		List<String> ids;

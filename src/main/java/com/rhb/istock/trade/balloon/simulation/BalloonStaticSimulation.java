@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.rhb.istock.comm.util.FileUtil;
+import com.rhb.istock.comm.util.FileTools;
 import com.rhb.istock.comm.util.Progress;
 import com.rhb.istock.kdata.Kbar;
 import com.rhb.istock.kdata.Kdata;
@@ -71,13 +71,13 @@ public class BalloonStaticSimulation implements BalloonSimulation{
 		System.out.println("total: " + result.get("total"));
 		System.out.println("CAGR: " + result.get("cagr"));
 		System.out.println("winRatio: " + result.get("winRatio"));
-		FileUtil.writeTextFile(reportPath + "/one_item_simulation_" + System.currentTimeMillis() + ".csv", result.get("CSV"), false);
+		FileTools.writeTextFile(reportPath + "/one_item_simulation_" + System.currentTimeMillis() + ".csv", result.get("CSV"), false);
 		return result;
 	}
 
 	private void setDailyKdata(String itemID, LocalDate theDate) {
 		Kbar kbar;
-		Kdata kdata = kdataService.getDailyKdata(itemID, theDate, balloon.getMidDuration(), byCache);
+		Kdata kdata = kdataService.getKdata(itemID, theDate, balloon.getMidDuration(), byCache);
 		
 		List<LocalDate> dates = kdata.getDates();
 		//System.out.println(dates);

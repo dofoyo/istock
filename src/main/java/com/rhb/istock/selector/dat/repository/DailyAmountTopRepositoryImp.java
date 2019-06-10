@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
-import com.rhb.istock.comm.util.FileUtil;
+import com.rhb.istock.comm.util.FileTools;
 
 @Service("dailyAmountTopRepositoryImp")
 public class DailyAmountTopRepositoryImp implements DailyAmountTopRepository {
@@ -23,7 +23,7 @@ public class DailyAmountTopRepositoryImp implements DailyAmountTopRepository {
 	public Map<LocalDate, List<String>> getDailyAmountTops() {
 		Map<LocalDate, List<String>> tops = new HashMap<LocalDate, List<String>>();
 		
-		String[] lines = FileUtil.readTextFile(dailyAmountTopsFile).split("\n");
+		String[] lines = FileTools.readTextFile(dailyAmountTopsFile).split("\n");
 		String[] columns;
 		LocalDate date;
 		List<String> ids;

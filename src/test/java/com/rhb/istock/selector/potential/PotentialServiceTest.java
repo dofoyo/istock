@@ -18,15 +18,9 @@ public class PotentialServiceTest {
 	@Qualifier("potentialService")
 	PotentialService potentialService;
 
-	//@Test
-	public void getTmpLatestPotentials() {
-		List<String> breakers = potentialService.getLatestPotentials();
-		System.out.println(breakers);
-	}
-	
 	@Test
 	public void getLatestPotentials() {
-		List<Potential> ps = potentialService.getPotentials();
+		List<Potential> ps = potentialService.getLastPotentials();
 		for(Potential p : ps) {
 			//System.out.println(p);
 		}
@@ -35,7 +29,7 @@ public class PotentialServiceTest {
 	}
 	
 	//@Test
-	public void generateTmpLatestPotentials() {
+	public void generateLatestPotentials() {
 		potentialService.generateLatestPotentials();
 	}
 	

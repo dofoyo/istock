@@ -12,7 +12,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
-import com.rhb.istock.comm.util.FileUtil;
+import com.rhb.istock.comm.util.FileTools;
 
 @Service("itemRepositoryTushare")
 public class ItemRepositoryTushare implements ItemRepository{
@@ -28,7 +28,7 @@ public class ItemRepositoryTushare implements ItemRepository{
 		List<ItemEntity> entities = new ArrayList<ItemEntity>();
 		JSONArray item = null;
 		try {
-			JSONObject data = new JSONObject(FileUtil.readTextFile(itemsFile));
+			JSONObject data = new JSONObject(FileTools.readTextFile(itemsFile));
 			JSONArray theItems = data.getJSONArray("items");
 			if(theItems.length()>0) {
 				ItemEntity entity;
@@ -55,7 +55,7 @@ public class ItemRepositoryTushare implements ItemRepository{
 	public ItemEntity getItemEntity(String itemID) {
 		ItemEntity itemEntity = null;
 		try {
-			JSONObject data = new JSONObject(FileUtil.readTextFile(itemsFile));
+			JSONObject data = new JSONObject(FileTools.readTextFile(itemsFile));
 			JSONArray items = data.getJSONArray("items");
 			if(items.length()>0) {
 				JSONArray item;
@@ -86,7 +86,7 @@ public class ItemRepositoryTushare implements ItemRepository{
 	public List<String> getItemIDs() {
 		List<String> ids = new ArrayList<String>();
 		try {
-			JSONObject data = new JSONObject(FileUtil.readTextFile(itemsFile));
+			JSONObject data = new JSONObject(FileTools.readTextFile(itemsFile));
 			JSONArray items = data.getJSONArray("items");
 			if(items.length()>0) {
 				JSONArray item;
@@ -112,13 +112,13 @@ public class ItemRepositoryTushare implements ItemRepository{
 	public void saveTopic(String itemID, String topic) {
 		topic = topic.replaceAll(":", "：");
 		
-		FileUtil.writeTextFile(topicsFile, itemID + ":" + topic + "\n", true);
+		FileTools.writeTextFile(topicsFile, itemID + ":" + topic + "\n", true);
 	}
 
 	@Override
 	public Map<String, String> getTopics() {
 		Map<String,String> topics = new HashMap<String,String>();
-		String[] lines = FileUtil.readTextFile(topicsFile).split("\n");
+		String[] lines = FileTools.readTextFile(topicsFile).split("\n");
 		String[] columns;
 		for(String line : lines) {
 			columns = line.split(":");

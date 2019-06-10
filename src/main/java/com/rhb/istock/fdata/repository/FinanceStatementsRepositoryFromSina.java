@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.rhb.istock.comm.util.FileUtil;
+import com.rhb.istock.comm.util.FileTools;
 import com.rhb.istock.comm.util.ParseString;
 import com.rhb.istock.fdata.BalanceSheet;
 import com.rhb.istock.fdata.CashFlow;
@@ -40,13 +40,13 @@ public class FinanceStatementsRepositoryFromSina implements FinanceStatementsRep
 		
 		String pf = fdataPath + subPath + stockid + "_balancesheet.xls";
 		
-		if(!FileUtil.isExists(pf)){
+		if(!FileTools.isExists(pf)){
 			System.out.println(pf + " do NOT exist!!");
 			downloadFinancialStatements.downloadBalanceSheet(stockid);
 			System.out.println(pf + " DONW!");
 		}
 		
-		String str = FileUtil.readTextFile(pf);
+		String str = FileTools.readTextFile(pf);
 		
 		if(str.trim().isEmpty()){
 			System.out.println(pf + " is EMPTY!!");
@@ -125,13 +125,13 @@ public class FinanceStatementsRepositoryFromSina implements FinanceStatementsRep
 		Map<String,CashFlow> cashflows = new TreeMap<String,CashFlow>();
 		
 		String pf = fdataPath + subPath + stockid + "_cashflow.xls";
-		if(!FileUtil.isExists(pf)){
+		if(!FileTools.isExists(pf)){
 			System.out.println(pf + " do NOT exist!!");
 			downloadFinancialStatements.downloadCashFlow(stockid);
 			System.out.println(pf + " DONW!");
 		}
 		
-		String str = FileUtil.readTextFile(pf);
+		String str = FileTools.readTextFile(pf);
 		if(str.trim().isEmpty()){
 			System.out.println(pf + " is EMPTY!!");
 			return cashflows;
@@ -197,13 +197,13 @@ public class FinanceStatementsRepositoryFromSina implements FinanceStatementsRep
 		Map<String,ProfitStatement> profitstatements = new TreeMap<String,ProfitStatement>();
 		
 		String pf = fdataPath + subPath + stockid + "_profitstatement.xls";
-		if(!FileUtil.isExists(pf)){
+		if(!FileTools.isExists(pf)){
 			System.out.println(pf + " do NOT exist!!");
 			downloadFinancialStatements.downloadProfitStatement(stockid);
 			System.out.println(pf + " DONW!");
 		}
 		
-		String str = FileUtil.readTextFile(pf);
+		String str = FileTools.readTextFile(pf);
 		if(str.trim().isEmpty()){
 			System.out.println(pf + " is EMPTY!!");
 			return profitstatements;

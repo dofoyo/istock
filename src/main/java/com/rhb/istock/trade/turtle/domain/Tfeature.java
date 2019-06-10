@@ -48,9 +48,6 @@ public class Tfeature {
 			e.printStackTrace();
 		}
 		
-		//前期高点与突破点之间的间隔至少3天以上才叫突破，才是买入点。
-		//那种连续上涨的，就不叫突破了。
-		//if(now.compareTo(openHigh)>=0 && nowDate.toEpochDay()-openHighDate.toEpochDay()>3) {
 		if(now.compareTo(openHigh)>=0) {
 			status = 2;
 		}else if(now.compareTo(openHigh)==-1 && now.compareTo(dropLow)>=0) {

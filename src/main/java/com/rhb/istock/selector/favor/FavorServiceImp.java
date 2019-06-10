@@ -6,7 +6,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.rhb.istock.comm.util.FileUtil;
+import com.rhb.istock.comm.util.FileTools;
 
 @Service("favorServiceImp")
 public class FavorServiceImp implements FavorService {
@@ -17,7 +17,7 @@ public class FavorServiceImp implements FavorService {
 	@Override
 	public Map<String, String> getFavors() {
 		Map<String,String> articles = new HashMap<String,String> ();
-		String source = FileUtil.readTextFile(favorsFile);
+		String source = FileTools.readTextFile(favorsFile);
 		//System.out.println(source);
 		String[] lines = source.split("\n");
 		for(String str : lines) {

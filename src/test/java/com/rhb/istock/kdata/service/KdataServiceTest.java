@@ -10,9 +10,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import com.rhb.istock.comm.util.FileUtil;
+import com.rhb.istock.comm.util.FileTools;
 import com.rhb.istock.kdata.Kdata;
-import com.rhb.istock.kdata.KdataMuster;
+import com.rhb.istock.kdata.Muster;
 import com.rhb.istock.kdata.KdataService;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -32,7 +32,7 @@ public class KdataServiceTest {
 		}
 	}
 
-	@Test
+	//@Test
 	public void getLatestFactors() {
 		String itemID = "sz300538";
 		BigDecimal factor = kdataService.getLatestFactors(itemID);
@@ -46,14 +46,19 @@ public class KdataServiceTest {
 	}
 	
 	//@Test
-	public void generateLatestMuster() {
+	public void generateMusters() {
 		kdataService.generateMusters();
 	}
 	
+	@Test
+	public void generateLastMusters() {
+		kdataService.generateLastMusters();
+	}
+	
 	//@Test
-	public void getKdataMusters() {
-		List<KdataMuster> musters = kdataService.getKdataMusters();
-		for(KdataMuster muster : musters) {
+	public void getLastMusters() {
+		List<Muster> musters = kdataService.getLastMusters();
+		for(Muster muster : musters) {
 			System.out.println(muster);
 		}
 	}

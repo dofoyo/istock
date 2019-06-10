@@ -9,7 +9,7 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.rhb.istock.comm.util.FileUtil;
+import com.rhb.istock.comm.util.FileTools;
 import com.rhb.istock.comm.util.HttpClient;
 import com.rhb.istock.comm.util.ParseString;
 
@@ -30,7 +30,7 @@ public class ItemSpiderTushare implements ItemSpider {
 		
 		String str = HttpClient.doPostJson(url, params.toString());
 		JSONObject data = (new JSONObject(str)).getJSONObject("data");
-		FileUtil.writeTextFile(itemsFile, data.toString(), false);
+		FileTools.writeTextFile(itemsFile, data.toString(), false);
 
 		System.out.println("download items done!");
 	}

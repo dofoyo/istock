@@ -10,7 +10,7 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.rhb.istock.comm.util.FileUtil;
+import com.rhb.istock.comm.util.FileTools;
 import com.rhb.istock.comm.util.HttpClient;
 import com.rhb.istock.comm.util.Progress;
 
@@ -50,7 +50,7 @@ public class KdataSpiderTushare implements KdataSpider {
 		JSONObject data = (new JSONObject(str)).getJSONObject("data");
 		
 		String kdataFile = kdataPath + "/" + id + ".json";
-		FileUtil.writeTextFile(kdataFile, data.toString(), false);
+		FileTools.writeTextFile(kdataFile, data.toString(), false);
 	}
 	
 	private void downloadFactor(String id) {
@@ -68,7 +68,7 @@ public class KdataSpiderTushare implements KdataSpider {
 		JSONObject data = (new JSONObject(str)).getJSONObject("data");
 		
 		String kdataFile = kdataPath + "/" + id + "_factor.json";
-		FileUtil.writeTextFile(kdataFile, data.toString(), false);
+		FileTools.writeTextFile(kdataFile, data.toString(), false);
 	}
 
 	@Override
@@ -95,7 +95,7 @@ public class KdataSpiderTushare implements KdataSpider {
 		String str = HttpClient.doPostJson(url, args.toString());
 
 		String kdataFile = kdataPath + "/" + date + ".json";
-		FileUtil.writeTextFile(kdataFile, str, false);
+		FileTools.writeTextFile(kdataFile, str, false);
 
 		JSONArray items = (new JSONObject(str)).getJSONObject("data").getJSONArray("items");	
 		
@@ -112,7 +112,7 @@ public class KdataSpiderTushare implements KdataSpider {
 		System.out.println("KdataSpiderTushare.downloadKdata of " + date + " done!");
 		long used = (System.currentTimeMillis() - beginTime)/1000; 
 		System.out.println("用时：" + used + "秒");          
-		FileUtil.writeTextFile(kdataFile, str, false);
+		FileTools.writeTextFile(kdataFile, str, false);
 	}
 	
 	@Override
@@ -149,7 +149,7 @@ public class KdataSpiderTushare implements KdataSpider {
 			String kdataFile = kdataPath + "/" + id+ ".json";
 			File file = new File(kdataFile);
 			if(file.exists()) {
-				data = new JSONObject(FileUtil.readTextFile(kdataFile));
+				data = new JSONObject(FileTools.readTextFile(kdataFile));
 				dataItems = data.getJSONArray("items");
 			}else {
 				//"fields":["ts_code","trade_date","open","high","low","close","pre_close","change","pct_chg","vol","amount"],
@@ -175,7 +175,7 @@ public class KdataSpiderTushare implements KdataSpider {
 				data.put("items", dataItems);
 			}
 			dataItems.put(item);
-			FileUtil.writeTextFile(kdataFile, data.toString(), false);
+			FileTools.writeTextFile(kdataFile, data.toString(), false);
 		}
 	}
 	
@@ -187,7 +187,7 @@ public class KdataSpiderTushare implements KdataSpider {
 			String factorFile = kdataPath + "/" + id+ "_factor.json";
 			File file = new File(factorFile);
 			if(file.exists()) {
-				data = new JSONObject(FileUtil.readTextFile(factorFile));
+				data = new JSONObject(FileTools.readTextFile(factorFile));
 				dataItems = data.getJSONArray("items");
 			}else {
 				//"fields":["ts_code","trade_date","adj_factor"],
@@ -203,7 +203,7 @@ public class KdataSpiderTushare implements KdataSpider {
 				data.put("items", dataItems);
 			}
 			dataItems.put(item);
-			FileUtil.writeTextFile(factorFile, data.toString(), false);
+			FileTools.writeTextFile(factorFile, data.toString(), false);
 		}
 		
 	}
@@ -254,7 +254,7 @@ public class KdataSpiderTushare implements KdataSpider {
 			
 			result = HttpClient.doPostJson(url, args.toString());
 			
-			FileUtil.writeTextFile(kdataFile, result, false);
+			FileTools.writeTextFile(kdataFile, result, false);
 		}
 		
 		return result;

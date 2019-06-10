@@ -2,29 +2,26 @@ package com.rhb.istock.kdata.repository;
 
 import java.math.BigDecimal;
 
-public class KdataMusterEntity {
+public class MusterEntity {
 	private String itemID;
 	private BigDecimal amount;
 	private BigDecimal averageAmount;
 	private BigDecimal highest;
 	private BigDecimal lowest;
 	private BigDecimal price;
-	private Integer period;
-	private Integer count;
+	private BigDecimal dropPrice;
 
-	public KdataMusterEntity(String itemID, BigDecimal averageAmount, BigDecimal amount, BigDecimal highest, BigDecimal lowest, BigDecimal price, Integer period, Integer count) {
+	public MusterEntity(String itemID, BigDecimal amount, BigDecimal averageAmount, BigDecimal highest, BigDecimal lowest, BigDecimal price, BigDecimal dropPrice) {
 		this.itemID = itemID;
 		this.amount = amount;
 		this.averageAmount = averageAmount;
 		this.highest = highest;
 		this.lowest = lowest;
 		this.price = price;
-		this.period = period;
-		this.count = count;
-		
+		this.dropPrice = dropPrice;
 	}
 	
-	public KdataMusterEntity(String txt) {
+	public MusterEntity(String txt) {
 		String[] ss = txt.split(",");
 		this.itemID = ss[0];
 		this.amount = new BigDecimal(ss[1]);
@@ -32,28 +29,19 @@ public class KdataMusterEntity {
 		this.highest = new BigDecimal(ss[3]);
 		this.lowest = new BigDecimal(ss[4]);
 		this.price = new BigDecimal(ss[5]);
-		this.period = Integer.parseInt(ss[6]);
-		this.count = Integer.parseInt(ss[7]);
+		this.dropPrice = new BigDecimal(ss[6]);
 	}
 	
 	public String toText() {
-		return this.itemID + "," + this.amount + "," + this.averageAmount + "," + this.highest + "," + this.lowest + "," + this.price + "," + this.period + "," + this.count;
+		return this.itemID + "," + this.amount + "," + this.averageAmount + "," + this.highest + "," + this.lowest + "," + this.price + "," + this.dropPrice + "\n";
 	}
 
-	public Integer getCount() {
-		return count;
+	public BigDecimal getDropPrice() {
+		return dropPrice;
 	}
 
-	public void setCount(Integer count) {
-		this.count = count;
-	}
-
-	public Integer getPeriod() {
-		return period;
-	}
-
-	public void setPeriod(Integer period) {
-		this.period = period;
+	public void setDropPrice(BigDecimal dropPrice) {
+		this.dropPrice = dropPrice;
 	}
 
 	public String getItemID() {
@@ -92,12 +80,11 @@ public class KdataMusterEntity {
 	public void setPrice(BigDecimal price) {
 		this.price = price;
 	}
+
 	@Override
 	public String toString() {
-		return "KdataMusterEntity [itemID=" + itemID + ", amount=" + amount + ", averageAmount=" + averageAmount
-				+ ", highest=" + highest + ", lowest=" + lowest + ", price=" + price + ", period=" + period + ", count="
-				+ count + "]";
+		return "MusterEntity [itemID=" + itemID + ", amount=" + amount + ", averageAmount=" + averageAmount
+				+ ", highest=" + highest + ", lowest=" + lowest + ", price=" + price + ", dropPrice=" + dropPrice + "]";
 	}
-	
 	
 }

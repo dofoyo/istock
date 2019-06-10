@@ -53,10 +53,10 @@ public interface SelectorService{
 	public TreeMap<LocalDate,List<String>> getDailyAmountTops(Integer top, LocalDate beginDate, LocalDate endDate);
 	
 	public void generateBreakers();
-	public void generateTmpLatestPotentials();
+	public void generateLatestPotentials();
 	public TreeMap<LocalDate, List<String>> getBreakers(LocalDate beginDate, LocalDate endDate);
 	
 	
-	public List<Potential> getLatestPotentials();
+	public List<Potential> getLastPotentials();
 
 }
