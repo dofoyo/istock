@@ -47,12 +47,6 @@ public class KdataSpider163 implements KdataSpider {
 	}
 
 	@Override
-	public void downKdatasAndFactors(LocalDate date) throws Exception {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
 	public void downKdatas(LocalDate date) throws Exception {
 		// TODO Auto-generated method stub
 		
@@ -65,9 +59,16 @@ public class KdataSpider163 implements KdataSpider {
 	}
 
 	@Override
-	public String downLatestFactors(LocalDate date) throws Exception {
+	public void downFactor(String id) throws Exception {
 		// TODO Auto-generated method stub
-		return null;
+		
 	}
+
+	@Override
+	public void downFactors(List<String> ids) throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
+
 
 }

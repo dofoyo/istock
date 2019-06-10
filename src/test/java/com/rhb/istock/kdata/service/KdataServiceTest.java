@@ -33,19 +33,6 @@ public class KdataServiceTest {
 	}
 
 	//@Test
-	public void getLatestFactors() {
-		String itemID = "sz300538";
-		BigDecimal factor = kdataService.getLatestFactors(itemID);
-		System.out.println(factor);
-	}
-	
-	
-	//@Test
-	public void generateLatestFactors() {
-		kdataService.generateLatestFactors();
-	}
-	
-	//@Test
 	public void generateMusters() {
 		kdataService.generateMusters();
 	}

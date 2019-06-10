@@ -27,14 +27,8 @@ public class KdataSpiderTushare implements KdataSpider {
 	private DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyyMMdd");
 
 	@Override
-	public void downKdata(String id)  throws Exception {
-		String tushareID = id.indexOf("sh")==0 ? id.substring(2)+".SH" : id.substring(2)+".SZ";
-
-		downloadKdata(tushareID);
-		downloadFactor(tushareID);
-	}
-	
-	private void downloadKdata(String id) {
+	public void downKdata(String itemID) {
+		String tushareID = itemID.indexOf("sh")==0 ? itemID.substring(2)+".SH" : itemID.substring(2)+".SZ";
 		
 		String url = "http://api.tushare.pro";
 		JSONObject args = new JSONObject();
@@ -42,39 +36,35 @@ public class KdataSpiderTushare implements KdataSpider {
 		args.put("token", "175936caa4637bc9ac8e5e75ac92eff6887739ca6be771b81653f278");
 		
 		JSONObject params = new JSONObject();
-		params.put("ts_code", id);
+		params.put("ts_code", tushareID);
 		
 		args.put("params", params);
 		
 		String str = HttpClient.doPostJson(url, args.toString());
 		JSONObject data = (new JSONObject(str)).getJSONObject("data");
 		
-		String kdataFile = kdataPath + "/" + id + ".json";
+		String kdataFile = kdataPath + "/" + tushareID + ".json";
 		FileTools.writeTextFile(kdataFile, data.toString(), false);
 	}
 	
-	private void downloadFactor(String id) {
+	@Override
+	public void downFactor(String itemID) {
+		String tushareID = itemID.indexOf("sh")==0 ? itemID.substring(2)+".SH" : itemID.substring(2)+".SZ";
 		String url = "http://api.tushare.pro";
 		JSONObject args = new JSONObject();
 		args.put("api_name", "adj_factor");
 		args.put("token", "175936caa4637bc9ac8e5e75ac92eff6887739ca6be771b81653f278");
 		
 		JSONObject params = new JSONObject();
-		params.put("ts_code", id);
+		params.put("ts_code", tushareID);
 		
 		args.put("params", params);
 		
 		String str = HttpClient.doPostJson(url, args.toString());
 		JSONObject data = (new JSONObject(str)).getJSONObject("data");
 		
-		String kdataFile = kdataPath + "/" + id + "_factor.json";
+		String kdataFile = kdataPath + "/" + tushareID + "_factor.json";
 		FileTools.writeTextFile(kdataFile, data.toString(), false);
-	}
-
-	@Override
-	public void downKdatasAndFactors(LocalDate date) throws Exception {
-		downKdatas(date);
-		downFactors(date);
 	}
 
 	@Override
@@ -244,38 +234,22 @@ public class KdataSpiderTushare implements KdataSpider {
 	}
 
 	@Override
-	public String downLatestFactors(LocalDate date) throws Exception {
-		return this.downFactor(date);
-	}
-	
-	
-	private String downFactor(LocalDate date) {
-		String result = null;
-		
-		String kdataFile = kdataPath + "/" + date + "_factor.json";
-		
-		File factorFile = new File(kdataFile);
-		if(factorFile.exists()) {
-			System.out.println(kdataFile + " has been downloaded! pass!");
-		}else {
-			String url = "http://api.tushare.pro";
-			JSONObject args = new JSONObject();
-			args.put("api_name", "adj_factor");
-			args.put("token", "175936caa4637bc9ac8e5e75ac92eff6887739ca6be771b81653f278");
-			
-			JSONObject params = new JSONObject();
-			params.put("trade_date", date.format(dtf));
-			
-			args.put("params", params);
-			
-			result = HttpClient.doPostJson(url, args.toString());
-			
-			FileTools.writeTextFile(kdataFile, result, false);
+	public void downFactors(List<String> ids) throws Exception {
+		long beginTime=System.currentTimeMillis(); 
+		System.out.println("KdataSpiderTushare downFactors...");
+
+		int i=0;
+		for(String id : ids) {
+			Progress.show(ids.size(),i++,id);
+			this.downFactor(id);
+			Thread.sleep(300); //一分钟200次
 		}
 		
-		return result;
+		System.out.println("KdataSpiderTushare downFactors done!");
+		
+		long used = (System.currentTimeMillis() - beginTime)/1000; 
+		System.out.println("用时：" + used + "秒");          
+		
 	}
-
-
 
 }

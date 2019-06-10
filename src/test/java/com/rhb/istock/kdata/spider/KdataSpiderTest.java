@@ -36,6 +36,7 @@ public class KdataSpiderTest {
 			System.out.format(" %d/%d \n", i++, items.size());
 			try {
 				kdataSpiderTushare.downKdata(item.getItemId());
+				kdataSpiderTushare.downFactor(item.getItemId());
 				Thread.sleep(300); //一分钟200个
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
@@ -48,7 +49,9 @@ public class KdataSpiderTest {
 	public void testDwnKdataByDate() {
 		LocalDate date = LocalDate.parse("2019-03-19");
 		try {
-			kdataSpiderTushare.downKdatasAndFactors(date);
+			kdataSpiderTushare.downKdatas(date);
+			kdataSpiderTushare.downFactors(date); //此处仅供测试，正式使用时，factor的日期要比kdata的日期提前一个交易日
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

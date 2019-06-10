@@ -122,12 +122,6 @@ public class KdataSpiderSina implements KdataSpider {
 	}
 
 	@Override
-	public void downKdatasAndFactors(LocalDate date) throws Exception {
-		// TODO Auto-generated method stub
-		throw new Exception("sina do not supply down kdata by date!");
-	}
-
-	@Override
 	public void downKdata(List<String> ids) throws Exception {
 		long beginTime=System.currentTimeMillis(); 
 		System.out.println("KdataSpiderSina downKdata...");
@@ -158,9 +152,15 @@ public class KdataSpiderSina implements KdataSpider {
 	}
 
 	@Override
-	public String downLatestFactors(LocalDate date) throws Exception {
+	public void downFactor(String id) throws Exception {
 		// TODO Auto-generated method stub
-		return null;
+		
+	}
+
+	@Override
+	public void downFactors(List<String> ids) throws Exception {
+		// TODO Auto-generated method stub
+		
 	}
 
 

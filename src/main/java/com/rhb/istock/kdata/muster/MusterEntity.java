@@ -1,4 +1,4 @@
-package com.rhb.istock.kdata.repository;
+package com.rhb.istock.kdata.muster;
 
 import java.math.BigDecimal;
 

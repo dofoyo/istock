@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import com.rhb.istock.comm.util.FileTools;
 import com.rhb.istock.comm.util.ParseString;
+import com.rhb.istock.kdata.muster.MusterEntity;
 
 @Service("kdataRepository163")
 public class KdataRepository163 implements KdataRepository {
@@ -73,71 +74,5 @@ public class KdataRepository163 implements KdataRepository {
 		return this.getKdataByCache("sh000001").getLastDate();
 	}
 
-	@Override
-	public LocalDate getLastMusterDate() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
-	@Override
-	public void saveMusters(LocalDate date, List<MusterEntity> entities, Integer openPeriod, Integer dropPeriod) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void evictMustersCache() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public TreeMap<LocalDate, BigDecimal> getFactors(String itemID) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void saveLatestFactors(Map<String, BigDecimal> factors) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public Map<String, BigDecimal> getLatestFactors() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void evictLatestFactorsCache() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public List<MusterEntity> getMusters(LocalDate date) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void saveMuster(LocalDate date, MusterEntity entity, Integer openPeriod, Integer dropPeriod) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public boolean isMustersExist(LocalDate date) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public void cleanMusters() {
-		// TODO Auto-generated method stub
-		
-	}
 
 }

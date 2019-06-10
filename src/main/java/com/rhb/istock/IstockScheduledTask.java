@@ -39,7 +39,6 @@ public class IstockScheduledTask {
 	public void dailyInit() throws Exception {
 		itemService.download();		//下载最新股票代码
 		kdataService.downKdatasAndFactors(); //上一交易日的收盘数据要等开盘前才能下载到
-    	kdataService.generateLastMusters();
 	}
 
 	@Scheduled(cron="0 30 15 ? * 1-5") 
