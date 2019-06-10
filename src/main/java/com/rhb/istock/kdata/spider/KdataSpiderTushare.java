@@ -72,13 +72,13 @@ public class KdataSpiderTushare implements KdataSpider {
 	}
 
 	@Override
-	public void downKdata(LocalDate date) throws Exception {
-		downloadKdata(date);
-		downloadFactor(date);
+	public void downKdatasAndFactors(LocalDate date) throws Exception {
+		downKdatas(date);
+		downFactors(date);
 	}
 
 	@Override
-	public void downloadKdata(LocalDate date) {
+	public void downKdatas(LocalDate date) {
 		long beginTime=System.currentTimeMillis(); 
 		System.out.println("KdataSpiderTushare.downloadKdata of " + date + "....");
 
@@ -116,11 +116,27 @@ public class KdataSpiderTushare implements KdataSpider {
 	}
 	
 	@Override
-	public void downloadFactor(LocalDate date) {
+	public void downFactors(LocalDate date) {
 		long beginTime=System.currentTimeMillis(); 
 		System.out.println("KdataSpiderTushare.downloadFactor of " + date + "....");
 		
-		String result = this.downFactor(date);
+		String result = null;
+		
+		String kdataFile = kdataPath + "/" + date + "_factor.json";
+		
+		String url = "http://api.tushare.pro";
+		JSONObject args = new JSONObject();
+		args.put("api_name", "adj_factor");
+		args.put("token", "175936caa4637bc9ac8e5e75ac92eff6887739ca6be771b81653f278");
+		
+		JSONObject params = new JSONObject();
+		params.put("trade_date", date.format(dtf));
+		
+		args.put("params", params);
+		
+		result = HttpClient.doPostJson(url, args.toString());
+		
+		FileTools.writeTextFile(kdataFile, result, false);
 		
 		if(result!=null) {
 			JSONArray items = (new JSONObject(result)).getJSONObject("data").getJSONArray("items");	
@@ -228,7 +244,7 @@ public class KdataSpiderTushare implements KdataSpider {
 	}
 
 	@Override
-	public String downloadLatestFactors(LocalDate date) throws Exception {
+	public String downLatestFactors(LocalDate date) throws Exception {
 		return this.downFactor(date);
 	}
 	

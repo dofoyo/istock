@@ -130,7 +130,7 @@ public class KdataServiceImp implements KdataService{
 	}
 
 	@Override
-	public void downKdatas() throws Exception {
+	public void downKdatasAndFactors() throws Exception {
 		System.out.println("KdataService.downKdatas..........");
 		LocalDate latestDate = kdataRealtimeSpider.getLatestMarketDate();
 		LocalDate lastDownDate = kdataRepository.getLastDate();
@@ -142,7 +142,9 @@ public class KdataServiceImp implements KdataService{
 		
 		for(LocalDate date : dates) {
 			System.out.println("download "+ date +" kdatas from tushare, please wait....... ");
-			kdataSpider.downKdata(date);
+			//kdataSpider.downKdatasAndFactors(date);
+			kdataSpider.downKdatas(date);
+			kdataSpider.downFactors(date);
 
 			kdataSpider163.downKdata(szzs);
 			
@@ -151,6 +153,10 @@ public class KdataServiceImp implements KdataService{
 			this.generateLastMusters();
 			
 			System.out.println("downloaded "+ date +" kdatas from tushare.");
+		}
+		
+		if(dates.size()>0) {
+			kdataSpider.downFactors(latestDate);  //执行了这一步后，不需要再对收盘数据额外的复权处理了
 		}
 
 	}
@@ -255,7 +261,7 @@ public class KdataServiceImp implements KdataService{
 			int j=1;
 			for(LocalDate date : dates) {
 				//Progress.show(dates.size(),j++, date.toString());//进度条
-				entity = this.getMusterEntity(item.getItemID(), date, true);
+				entity = this.getMusterEntity(item.getItemID(), date.plusDays(1), true);
 				if(entity!=null) kdataRepository.saveMuster(date, entity, openPeriod, dropPeriod);
 
 				//if(j++>2) return;
@@ -384,12 +390,11 @@ public class KdataServiceImp implements KdataService{
 	public void downLatestFactors() {
 		LocalDate latestDate = kdataRealtimeSpider.getLatestMarketDate();
 		try {
-			String result = kdataSpider.downloadLatestFactors(latestDate);
+			String result = kdataSpider.downLatestFactors(latestDate);
 			if(result!=null) this.generateLatestFactors();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
 	}
 
 	@Override
@@ -408,7 +413,7 @@ public class KdataServiceImp implements KdataService{
 			for(Item item : items) {
 				Progress.show(items.size(),i++, item.getItemID());//进度条
 				
-				entity = this.getMusterEntity(item.getItemID(), date, false);
+				entity = this.getMusterEntity(item.getItemID(), date.plusDays(1), false);
 				if(entity!=null) kdataRepository.saveMuster(date, entity, openPeriod, dropPeriod);
 
 			}

@@ -25,7 +25,7 @@ public class KdataServiceTest {
 	//@Test
 	public void downKdatas() {
 		try {
-			kdataService.downKdatas();
+			kdataService.downKdatasAndFactors();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

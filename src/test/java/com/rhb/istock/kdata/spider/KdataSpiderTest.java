@@ -48,7 +48,7 @@ public class KdataSpiderTest {
 	public void testDwnKdataByDate() {
 		LocalDate date = LocalDate.parse("2019-03-19");
 		try {
-			kdataSpiderTushare.downKdata(date);
+			kdataSpiderTushare.downKdatasAndFactors(date);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -56,7 +56,7 @@ public class KdataSpiderTest {
 		System.out.println("done!");
 	}
 	
-	@Test
+	//@Test
 	public void testDownKdataByIDFrom163() {
 		String id = "sh000001";
 		try {

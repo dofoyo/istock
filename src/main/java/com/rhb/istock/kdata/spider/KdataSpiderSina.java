@@ -122,7 +122,7 @@ public class KdataSpiderSina implements KdataSpider {
 	}
 
 	@Override
-	public void downKdata(LocalDate date) throws Exception {
+	public void downKdatasAndFactors(LocalDate date) throws Exception {
 		// TODO Auto-generated method stub
 		throw new Exception("sina do not supply down kdata by date!");
 	}
@@ -146,19 +146,19 @@ public class KdataSpiderSina implements KdataSpider {
 	}
 
 	@Override
-	public void downloadKdata(LocalDate date) throws Exception {
+	public void downKdatas(LocalDate date) throws Exception {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void downloadFactor(LocalDate date) throws Exception {
+	public void downFactors(LocalDate date) throws Exception {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public String downloadLatestFactors(LocalDate date) throws Exception {
+	public String downLatestFactors(LocalDate date) throws Exception {
 		// TODO Auto-generated method stub
 		return null;
 	}

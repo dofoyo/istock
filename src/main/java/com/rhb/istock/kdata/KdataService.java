@@ -21,7 +21,7 @@ public interface KdataService {
 	public Kbar getLatestMarketData(String itemID);
 	public List<String> getLatestDailyTop(Integer top); 
 	
-	public void downKdatas()  throws Exception ;
+	public void downKdatasAndFactors()  throws Exception ;
 	
 	public void generateMusters();
 	public void generateLastMusters();
