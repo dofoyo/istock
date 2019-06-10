@@ -43,15 +43,11 @@ public class IstockScheduledTask {
 
 	@Scheduled(cron="0 30 15 ? * 1-5") 
 	public void dailyClose() throws Exception {
-		//上一交易日的收盘数据要等开盘前才能下载到，因为涉及到除权的调整
-		//因此收盘后的各统计用的是最后一天的实时行情，称之为tmp，如果某只股票正在除权，会失真
-		//tmpLatestPotentials仅供盘后分析用
-		//每日开盘后，系统会在9:30生成latestPotentials，供实盘操作用
-		
+		//latestPotentials仅供盘后分析用
 		selectorService.generateLatestPotentials();
 	}
 	
-	@Scheduled(cron="0 0 4 ? * *") //每日凌晨4点
+	@Scheduled(cron="0 5 16 ? * 1-5") //每日凌晨10点
 	public void downloadReports() {
 		//financialStatementService.downloadReports();  //下载最新年报
 		//selectorService.generateBluechip();  //并生成bluechip

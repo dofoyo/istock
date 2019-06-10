@@ -9,36 +9,23 @@ import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 
 import com.rhb.istock.comm.util.FileTools;
 import com.rhb.istock.kdata.muster.MusterEntity;
 
-@Service("musterRepositoryOfSimulation")
-public class MusterRepositoryOfSimulation implements MusterRepository{
+@Service("musterRepositoryImp")
+public class MusterRepositoryImp implements MusterRepository{
 	@Value("${tushareKdataPath}")
 	private String kdataPath;
 
-	@Value("${simulationMusterPath}")
+	@Value("${musterPath}")
 	private String musterPath;
 	
+	@Value("${tmpMusterPath}")
+	private String tmpMusterPath;
+	
 	@Override
-	public LocalDate getLastMusterDate() {
-		String source = FileTools.readTextFile(musterPath);
-		
-		if(source==null || source.isEmpty()) {
-			System.err.println("can NOT find " + musterPath + "! or the file is empty!");
-			return null;
-		}
-
-		String[] lines = source.split("\n");
-		
-		return LocalDate.parse(lines[0].split(",")[0]);
-	}
-
-	@Override
-	//@Cacheable("musters")
 	public List<MusterEntity> getMusters(LocalDate date) {
 		List<MusterEntity> entities = new ArrayList<MusterEntity>();
 		
@@ -52,23 +39,6 @@ public class MusterRepositoryOfSimulation implements MusterRepository{
 		}
 		
 		return entities;
-	}
-	
-	@Override
-	@CacheEvict(value="musters",allEntries=true)
-	public void evictMustersCache() {}
-	
-
-	@Override
-	public void saveMusters(LocalDate date, List<MusterEntity> entities, Integer openPeriod, Integer dropPeriod) {
-		StringBuffer sb = new StringBuffer(date.toString() + "," + openPeriod + "\n");
-		for(MusterEntity entity : entities) {
-			sb.append(entity.toText());
-			sb.append("\n");
-		}
-		sb.deleteCharAt(sb.length()-1);
-		
-		FileTools.writeTextFile(musterPath, sb.toString(), false);
 	}
 	
 	@Override
@@ -86,14 +56,27 @@ public class MusterRepositoryOfSimulation implements MusterRepository{
 	}
 
 	@Override
-	public void cleanMusters() {
-		//FileUtils.deleteQuietly(new File(musterPath));
+	public void cleanTmpMusters() {
 		try {
-			FileUtils.cleanDirectory(new File(musterPath));
+			FileUtils.cleanDirectory(new File(tmpMusterPath));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+	}
+
+	@Override
+	public void saveTmpMuster(LocalDate date, MusterEntity entity, Integer openPeriod, Integer dropPeriod) {
+		String pathAndFile = tmpMusterPath + "/" + date.format(DateTimeFormatter.ofPattern("yyyyMMdd")) +  "_55_21_musters.txt";
+		FileTools.writeTextFile(pathAndFile, entity.toText(), true);
+	}
+
+	@Override
+	public void copyTmpMusters() {
+		try {
+			FileUtils.copyDirectory(new File(tmpMusterPath), new File(musterPath));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 }

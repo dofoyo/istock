@@ -4,8 +4,8 @@ dzhKdataPath: D:/dev/istock-data/kdata/dzh
 tushareKdataPath: D:/dev/istock-data/kdata/tushare
 kdataPath163: D:/dev/istock-data/kdata/163
 reportPath: D:/dev/istock-data/reports
-operationMusterPath: d:/dev/istock-data/kdata/omuster
-simulationMusterPath: d:/dev/istock-data/kdata/smuster
+musterPath: d:/dev/istock-data/kdata/muster
+tmpMusterPath: d:/dev/istock-data/kdata/muster_tmp
 tushareItemsFile: D:/dev/istock-data/tushare_items.json
 holdsFile: D:/dev/istock-data/holds.txt
 favorsFile: D:/dev/istock-data/favors.txt

@@ -53,12 +53,8 @@ public class KdataServiceImp implements KdataService{
 	ItemService itemService;
 	
 	@Autowired
-	@Qualifier("musterRepositoryOfSimulation")
-	MusterRepository musterRepositoryOfSimulation;
-
-	@Autowired
-	@Qualifier("musterRepositoryOfOperation")
-	MusterRepository musterRepositoryOfOperation;
+	@Qualifier("musterRepositoryImp")
+	MusterRepository musterRepositoryImp;
 	
 	private String szzs = "sh000001"; //上证指数
 	private Integer openPeriod = 55;
@@ -247,7 +243,7 @@ public class KdataServiceImp implements KdataService{
 		long beginTime=System.currentTimeMillis(); 
 		System.out.println("generateMusters ......");
 		
-		musterRepositoryOfSimulation.cleanMusters();
+		musterRepositoryImp.cleanTmpMusters();
 		
 		Kdata kdata;
 		List<LocalDate> dates;
@@ -265,13 +261,15 @@ public class KdataServiceImp implements KdataService{
 			for(LocalDate date : dates) {
 				//Progress.show(dates.size(),j++, date.toString());//进度条
 				entity = this.getMusterEntity(item.getItemID(), date.plusDays(1), true);
-				if(entity!=null) musterRepositoryOfSimulation.saveMuster(date, entity, openPeriod, dropPeriod);
+				if(entity!=null) musterRepositoryImp.saveTmpMuster(date, entity, openPeriod, dropPeriod);
 
 				//if(j++>2) return;
 			}
 			
 			this.evictKDataCache();
 		}
+		
+		musterRepositoryImp.copyTmpMusters();
 		
 		System.out.println("generateMusters done!");
 		long used = (System.currentTimeMillis() - beginTime)/1000; 
@@ -333,7 +331,7 @@ public class KdataServiceImp implements KdataService{
 		
 		LocalDate lastDate = kdataRepository.getLastDate();
 
-		List<MusterEntity> entities = musterRepositoryOfOperation.getMusters(lastDate);
+		List<MusterEntity> entities = musterRepositoryImp.getMusters(lastDate);
 		for(MusterEntity entity : entities) {
 			muster = new Muster();
 			muster.setItemID(entity.getItemID());
@@ -356,7 +354,7 @@ public class KdataServiceImp implements KdataService{
 		System.out.println("generateLastMusters ......");
 
 		LocalDate date = kdataRepository.getLastDate();
-		if(musterRepositoryOfOperation.isMustersExist(date)) {
+		if(musterRepositoryImp.isMustersExist(date)) {
 			System.out.println("The last musters of " + date + " has already exists! pass!");
 		}else {
 			MusterEntity entity;
@@ -367,7 +365,7 @@ public class KdataServiceImp implements KdataService{
 				Progress.show(items.size(),i++, item.getItemID());//进度条
 				
 				entity = this.getMusterEntity(item.getItemID(), date.plusDays(1), false);
-				if(entity!=null) musterRepositoryOfOperation.saveMuster(date, entity, openPeriod, dropPeriod);
+				if(entity!=null) musterRepositoryImp.saveMuster(date, entity, openPeriod, dropPeriod);
 
 			}
 		}
