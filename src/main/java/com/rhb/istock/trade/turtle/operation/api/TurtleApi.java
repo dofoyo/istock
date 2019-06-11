@@ -19,6 +19,12 @@ public class TurtleApi{
 	@Qualifier("turtleOperationServiceImp")
 	TurtleOperationService ts;
 
+	@GetMapping("/turtle/topics")
+	public ResponseContent<String[]> getTopics() {
+		String[] topis = ts.getTopics();
+		return new ResponseContent<String[]>(ResponseEnum.SUCCESS, topis);
+	}
+	
 	@GetMapping("/turtle/potentials")
 	public ResponseContent<List<TurtleView>> getPotentials() {
 		List<TurtleView> views = ts.getPotentials();
@@ -41,6 +47,13 @@ public class TurtleApi{
 			}
 		});	
 		return new ResponseContent<List<HoldView>>(ResponseEnum.SUCCESS, holds);
+	}
+	
+	class TopicView{
+		private String text;
+		private String value;
+		
+		
 	}
 
 }

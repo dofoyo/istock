@@ -16,11 +16,11 @@ public class TurtleSimulationRepositoryTest {
 	
 	//@Test
 	public void getBreakers() {
-		System.out.println(turtleSimulationRepository.getBreakers("av", "2019"));
+		System.out.println(turtleSimulationRepository.getBreakers("av"));
 	}
 	
 	//@Test
 	public void getAmounts() {
-		System.out.println(turtleSimulationRepository.getAmounts("av", "2019"));
+		System.out.println(turtleSimulationRepository.getAmounts("av"));
 	}
 }

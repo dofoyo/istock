@@ -31,11 +31,15 @@ public class MusterRepositoryImp implements MusterRepository{
 		
 		String pathAndFile = musterPath + "/" + date.format(DateTimeFormatter.ofPattern("yyyyMMdd")) +  "_55_21_musters.txt";
 		//System.out.println(pathAndFile);
-		String source = FileTools.readTextFile(pathAndFile);
-		//System.out.println(source);
-		String[] lines = source.split("\n");
-		for(int i=1; i<lines.length; i++) {
-			entities.add(new MusterEntity(lines[i]));
+		
+		File f = new File(pathAndFile);
+		if(f.exists()) {
+			String source = FileTools.readTextFile(pathAndFile);
+			//System.out.println(source);
+			String[] lines = source.split("\n");
+			for(int i=1; i<lines.length; i++) {
+				entities.add(new MusterEntity(lines[i]));
+			}			
 		}
 		
 		return entities;

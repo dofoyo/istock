@@ -43,11 +43,9 @@ public class IstockScheduledTask {
 
 	@Scheduled(cron="0 30 15 ? * 1-5") 
 	public void dailyClose() throws Exception {
-		//latestPotentials仅供盘后分析用
-		selectorService.generateLatestPotentials();
 	}
 	
-	@Scheduled(cron="0 5 16 ? * 1-5") //每日凌晨10点
+	@Scheduled(cron="0 45 0 ? * 1-5") //每日凌晨0点
 	public void downloadReports() {
 		//financialStatementService.downloadReports();  //下载最新年报
 		//selectorService.generateBluechip();  //并生成bluechip

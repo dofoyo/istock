@@ -14,8 +14,9 @@ public class MusterRepositoryTest {
 	@Qualifier("musterRepositoryImp")
 	MusterRepository musterRepositoryImp;
 	
-	@Test
+	//@Test
 	public void copyTmpMusters() {
 		musterRepositoryImp.copyTmpMusters();
 	}
+
 }

@@ -121,19 +121,19 @@ public class TurtleSimulationTest {
 		turtleSimulation.simulate(dailyItems, null, cache);
 	}
 	
-	//@Test
+/*	//@Test
 	public void getHolds() {
-		System.out.println(turtleSimulation.getHolds("av", "2019", LocalDate.of(2019,3,12)));
+		System.out.println(turtleSimulation.getHolds("av", LocalDate.of(2019,3,12)));
 	}
 
 	//@Test
 	public void getAmount() {
-		System.out.println(turtleSimulation.getAmount("av", "2019", LocalDate.of(2019,3,12)));
+		System.out.println(turtleSimulation.getAmount("av", LocalDate.of(2019,3,12)));
 	}
 	
 	//@Test
 	public void getDates() {
-		System.out.println(turtleSimulation.getDates("av", "2019"));
-	}
+		System.out.println(turtleSimulation.getDates("av"));
+	}*/
 	
 }

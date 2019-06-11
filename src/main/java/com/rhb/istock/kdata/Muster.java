@@ -8,12 +8,46 @@ public class Muster {
 	private BigDecimal averageAmount;
 	private BigDecimal highest;
 	private BigDecimal lowest;
-	private BigDecimal price;
+	private BigDecimal close;
+	private BigDecimal dropPrice;
+	private BigDecimal latestPrice;
+
+	public boolean isUpLimited() {
+		return latestPrice.subtract(close).divide(close,BigDecimal.ROUND_HALF_UP).compareTo(new BigDecimal(0.1))==1;
+	}
+
+	public boolean isDownLimited() {
+		return latestPrice.subtract(close).divide(close,BigDecimal.ROUND_HALF_UP).compareTo(new BigDecimal(-0.1))==-1;
+	}
 	
+	public boolean isDrop() {
+		return latestPrice.compareTo(dropPrice)==-1;
+	}
+	
+	public boolean isBreaker() {
+		return latestPrice.compareTo(highest)==1; 
+	}
+	
+	public BigDecimal getLatestPrice() {
+		return latestPrice;
+	}
+
+	public void setLatestPrice(BigDecimal latestPrice) {
+		this.latestPrice = latestPrice;
+	}
+
 	public Integer getHLGap() {
 		return highest.subtract(lowest).divide(lowest,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)).intValue();
 	}
 	
+	public BigDecimal getDropPrice() {
+		return dropPrice;
+	}
+
+	public void setDropPrice(BigDecimal dropPrice) {
+		this.dropPrice = dropPrice;
+	}
+
 	public String getItemID() {
 		return itemID;
 	}
@@ -44,16 +78,17 @@ public class Muster {
 	public void setLowest(BigDecimal lowest) {
 		this.lowest = lowest;
 	}
-	public BigDecimal getPrice() {
-		return price;
+	public BigDecimal getClose() {
+		return close;
 	}
-	public void setPrice(BigDecimal price) {
-		this.price = price;
+	public void setClose(BigDecimal close) {
+		this.close = close;
 	}
 	@Override
 	public String toString() {
 		return "Muster [itemID=" + itemID + ", amount=" + amount + ", averageAmount=" + averageAmount + ", highest="
-				+ highest + ", lowest=" + lowest + ", price=" + price + "]";
+				+ highest + ", lowest=" + lowest + ", close=" + close + ", dropPrice=" + dropPrice + ", latestPrice="
+				+ latestPrice + "]";
 	}
 	
 	

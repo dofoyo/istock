@@ -28,9 +28,4 @@ public class PotentialServiceTest {
 		System.out.println(ps.size());
 	}
 	
-	//@Test
-	public void generateLatestPotentials() {
-		potentialService.generateLatestPotentials();
-	}
-	
 }

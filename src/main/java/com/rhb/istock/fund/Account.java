@@ -65,7 +65,7 @@ public class Account {
 		Order order = new Order(this.getOrderID(),itemID,LocalDate.parse(endDate.toString()),prices.get(itemID),quantity);
 		order.setNote("reopen，" + note);
 		
-		System.out.println(order); //----------------------------------------------
+		//System.out.println(order); //----------------------------------------------
 		
 		cash = cash.subtract(order.getAmount());  // 买入时，现金减少
 		value = value.add(order.getAmount()); // 市值增加
@@ -73,27 +73,30 @@ public class Account {
 		opens.put(order.getOrderID(), order);
 	}
 	
-	public void open(String itemID, Integer quantity, String note) {
-		Order order = new Order(this.getOrderID(),itemID,LocalDate.parse(endDate.toString()),prices.get(itemID),quantity);
+	public void open(String itemID, Integer quantity, String note, BigDecimal price) {
+		Order order = new Order(this.getOrderID(),itemID,LocalDate.parse(endDate.toString()),price,quantity);
 		order.setNote("open，" + note);
 
-		System.out.println(order); //----------------------------------------------
+		//System.out.println(order); //----------------------------------------------
 
 		cash = cash.subtract(order.getAmount());  // 买入时，现金减少
 		value = value.add(order.getAmount()); // 市值增加
 		holds.put(order.getOrderID(), order);
 		opens.put(order.getOrderID(), order);
+	}	
+	public void open(String itemID, Integer quantity, String note) {
+		this.open(itemID, quantity, note, prices.get(itemID));
 	}
-	
-	public void drop(String itemID, String note) {
+
+	public void drop(String itemID, String note, BigDecimal price) {
 		Order openOrder;
 		for(Iterator<Map.Entry<Integer, Order>> hands_it = holds.entrySet().iterator(); hands_it.hasNext();) {
 			openOrder = hands_it.next().getValue();
 			if(openOrder.getItemID().equals(itemID)) {
-				Order dropOrder = new Order(openOrder.getOrderID(),itemID, LocalDate.parse(endDate.toString()), prices.get(itemID), openOrder.getQuantity());
+				Order dropOrder = new Order(openOrder.getOrderID(),itemID, LocalDate.parse(endDate.toString()), price, openOrder.getQuantity());
 				dropOrder.setNote("drop，" + note);
 
-				System.out.println(dropOrder); //----------------------------------------------
+				//System.out.println(dropOrder); //----------------------------------------------
 			
 				cash = cash.add(dropOrder.getAmount()); 			//卖出时，现金增加
 				value = value.subtract(dropOrder.getAmount());		//市值减少
@@ -104,6 +107,10 @@ public class Account {
 		}
 	}
 	
+	public void drop(String itemID, String note) {
+		this.drop(itemID, note, prices.get(itemID));
+	}
+	
 	public void stopByItemID(String itemID, String note) {
 		Order openOrder;
 		for(Iterator<Map.Entry<Integer, Order>> hands_it = holds.entrySet().iterator(); hands_it.hasNext();) {
@@ -112,7 +119,7 @@ public class Account {
 				Order stopOrder = new Order(openOrder.getOrderID(),itemID, LocalDate.parse(endDate.toString()), prices.get(itemID), openOrder.getQuantity());
 				stopOrder.setNote("stop，" + note);
 
-				System.out.println(stopOrder); //----------------------------------------------
+				//System.out.println(stopOrder); //----------------------------------------------
 			
 				cash = cash.add(stopOrder.getAmount()); 			//卖出时，现金增加
 				value = value.subtract(stopOrder.getAmount());		//市值减少
@@ -129,7 +136,7 @@ public class Account {
 			Order stopOrder = new Order(openOrder.getOrderID(), openOrder.getItemID(), LocalDate.parse(endDate.toString()), prices.get(openOrder.getItemID()), openOrder.getQuantity());
 			stopOrder.setNote("stop");
 
-			System.out.println(stopOrder); //----------------------------------------------
+			//System.out.println(stopOrder); //----------------------------------------------
 			
 			cash = cash.add(stopOrder.getAmount()); 			//卖出时，现金增加
 			value = value.subtract(stopOrder.getAmount());		//市值减少	
@@ -145,7 +152,7 @@ public class Account {
 			Order stopOrder = new Order(openOrder.getOrderID(), openOrder.getItemID(), LocalDate.parse(endDate.toString()), prices.get(openOrder.getItemID()), openOrder.getQuantity());
 			stopOrder.setNote("cancel");
 
-			System.out.println(stopOrder); //----------------------------------------------
+			//System.out.println(stopOrder); //----------------------------------------------
 			
 			cash = cash.add(stopOrder.getAmount()); 			//卖出时，现金增加
 			value = value.subtract(stopOrder.getAmount());		//市值减少	

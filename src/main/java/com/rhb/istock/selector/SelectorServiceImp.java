@@ -150,34 +150,9 @@ public class SelectorServiceImp implements SelectorService{
 		return ids;
 	}
 
-	@Override
-	public void generateBreakers() {
-		breakerService.generateBreakers();
-		
-	}
-
-	@Override
-	public TreeMap<LocalDate, List<String>> getBreakers(LocalDate beginDate, LocalDate endDate) {
-		TreeMap<LocalDate, List<String>> ids = new TreeMap<LocalDate, List<String>>();
-		
-		Map<LocalDate, List<String>> breaks = breakerService.getBreakerIDs();
-		
-		for(LocalDate date = beginDate; date.isBefore(endDate); date = date.plusDays(1)) {
-			if(breaks.containsKey(date)) {
-				ids.put(date, breaks.get(date));
-			}
-		}
-		
-		return ids;
-	}
 
 	@Override
 	public List<Potential> getLastPotentials() {
 		return potentialService.getLastPotentials();
-	}
-
-	@Override
-	public void generateLatestPotentials() {
-		potentialService.generateLatestPotentials();		
 	}
 }

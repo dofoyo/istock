@@ -1,13 +1,19 @@
 package com.rhb.istock.trade.turtle.simulation.repository;
 
+import java.math.BigDecimal;
+
 public class AmountEntity {
 	private String cash;
 	private String value;
-	
+
 	public AmountEntity(String cash, String value) {
 		super();
 		this.cash = cash;
 		this.value = value;
+	}
+	
+	public BigDecimal getTotal() {
+		return (new BigDecimal(cash)).add(new BigDecimal(value));
 	}
 	
 	public String getCash() {

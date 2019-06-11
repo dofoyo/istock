@@ -10,8 +10,8 @@ public class Potential {
 	private BigDecimal averageAmount;
 	private BigDecimal highest;
 	private BigDecimal lowest;
+	private BigDecimal close;
 	private BigDecimal latestPrice;
-	private BigDecimal nowPrice;
 	private Integer bhl;
 	private Integer bdt;
 	private Integer bav;
@@ -19,14 +19,14 @@ public class Potential {
 	private Integer dtb;
 	private Integer avb;
 	
-	public Potential(String itemID, BigDecimal averageAmount, BigDecimal amount, BigDecimal highest, BigDecimal lowest, BigDecimal latestPrice,BigDecimal nowPrice) {
+	public Potential(String itemID, BigDecimal averageAmount, BigDecimal amount, BigDecimal highest, BigDecimal lowest, BigDecimal close,BigDecimal latestPrice) {
 		this.itemID = itemID;
 		this.amount = amount;
 		this.averageAmount = averageAmount;
 		this.highest = highest;
 		this.lowest = lowest;
+		this.close = close;
 		this.latestPrice = latestPrice;
-		this.nowPrice = nowPrice;
 	}
 	
 	public List<String> getLabels() {
@@ -40,16 +40,16 @@ public class Potential {
 		return labels;
 	}
 	
-	public BigDecimal getNowPrice() {
-		return nowPrice;
+	public BigDecimal getLatestPrice() {
+		return latestPrice;
 	}
 
-	public void setNowPrice(BigDecimal nowPrice) {
-		this.nowPrice = nowPrice;
+	public void setLatestPrice(BigDecimal latestPrice) {
+		this.latestPrice = latestPrice;
 	}
 
 	public String getStatus() {
-		return nowPrice.compareTo(highest)==1 ? "2" : "0";
+		return latestPrice.compareTo(highest)==1 ? "2" : "0";
 	}
 	
 	public Integer getHLGap() {
@@ -57,7 +57,7 @@ public class Potential {
 	}
 	
 	public Integer getHNGap() {
-		return highest.subtract(nowPrice).divide(nowPrice,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)).intValue();
+		return highest.subtract(latestPrice).divide(latestPrice,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)).intValue();
 	}
 
 	public String getItemID() {
@@ -100,32 +100,18 @@ public class Potential {
 		this.lowest = lowest;
 	}
 
-	public BigDecimal getLatestPrice() {
-		return latestPrice;
+	public BigDecimal getClose() {
+		return close;
 	}
 
-	public void setLatestPrice(BigDecimal latestPrice) {
-		this.latestPrice = latestPrice;
-	}
-	
-	public String toText() {
-		return this.itemID + "," + this.amount + "," + this.averageAmount + "," + this.highest + "," + this.lowest + "," + this.latestPrice;
+	public void setClose(BigDecimal close) {
+		this.close = close;
 	}
 
-	public Potential(String txt) {
-		String[] ss = txt.split(",");
-		this.itemID = ss[0];
-		this.amount = new BigDecimal(ss[1]);
-		this.averageAmount = new BigDecimal(ss[2]);
-		this.highest = new BigDecimal(ss[3]);
-		this.lowest = new BigDecimal(ss[4]);
-		this.latestPrice = new BigDecimal(ss[5]);
-	}
-	
 	@Override
 	public String toString() {
 		return "Potential [itemID=" + itemID + ", amount=" + amount + ", averageAmount=" + averageAmount + ", highest="
-				+ highest + ", lowest=" + lowest + ", latestPrice=" + latestPrice + ", nowPrice=" + nowPrice + ", bhl="
+				+ highest + ", lowest=" + lowest + ", close=" + close + ", latestPrice=" + latestPrice + ", bhl="
 				+ bhl + ", bdt=" + bdt + ", bav=" + bav + ", hlb=" + hlb + ", dtb=" + dtb + ", avb=" + avb
 				+ ", getHLGap()=" + getHLGap() + ", getHNGap()=" + getHNGap() + "]";
 	}

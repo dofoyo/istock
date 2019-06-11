@@ -21,6 +21,7 @@ public interface TurtleOperationService {
 	public List<HoldView> getHolds();
 	public List<TurtleView> getFavors();
 	public List<TurtleView> getPotentials();
+	public String[] getTopics();
 	
 	/*
 	 * 一般每周1-5，每天上午9:00初始化一次。主要是导入之前的历史记录

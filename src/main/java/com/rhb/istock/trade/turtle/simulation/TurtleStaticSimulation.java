@@ -210,10 +210,9 @@ public class TurtleStaticSimulation implements TurtleSimulation{
 		return flag;
 	}
 	
-	@Override
 	public List<BreakerView> getBreakers(String type, String year, LocalDate date) {
 		List<BreakerView> views = new ArrayList<BreakerView>();
-		Map<LocalDate,List<String>> breakers = turtleSimulationRepository.getBreakers(type, year);
+		Map<LocalDate,List<String>> breakers = turtleSimulationRepository.getBreakers(type);
 		List<String> ids = breakers.get(date);
 		if(ids!=null && !ids.isEmpty()) {
 			for(String id : ids) {
@@ -223,12 +222,11 @@ public class TurtleStaticSimulation implements TurtleSimulation{
 		return views;
 	}
 
-	@Override
 	public List<HoldView> getHolds(String type, String year, LocalDate date) {
 		List<HoldView> views = new ArrayList<HoldView>();
 		
-		Map<LocalDate,List<String>> buys = turtleSimulationRepository.getBuys(type, year);
-		Map<LocalDate,List<String>> sells = turtleSimulationRepository.getSells(type, year);
+		Map<LocalDate,List<String>> buys = turtleSimulationRepository.getBuys(type);
+		Map<LocalDate,List<String>> sells = turtleSimulationRepository.getSells(type);
 		
 		List<String> ids = generateHolds(type,year,date);
 		//System.out.println("holds: " + ids);
@@ -263,8 +261,8 @@ public class TurtleStaticSimulation implements TurtleSimulation{
 	private List<String> generateHolds(String type, String year, LocalDate date){
 		List<String> ids = new ArrayList<String>();
 		
-		Map<LocalDate,List<String>> buys = turtleSimulationRepository.getBuys(type, year);
-		Map<LocalDate,List<String>> sells = turtleSimulationRepository.getSells(type, year);
+		Map<LocalDate,List<String>> buys = turtleSimulationRepository.getBuys(type);
+		Map<LocalDate,List<String>> sells = turtleSimulationRepository.getSells(type);
 		
 		for(Map.Entry<LocalDate,List<String>> entry : buys.entrySet()) {
 			if(entry.getKey().isBefore(date)) {
@@ -281,11 +279,10 @@ public class TurtleStaticSimulation implements TurtleSimulation{
 		return ids;
 	}
 
-	@Override
 	public AmountView getAmount(String type, String year, LocalDate date) {
 		AmountView view = new AmountView(0,0);
 		
-		Map<LocalDate, AmountEntity> amounts = turtleSimulationRepository.getAmounts(type, year);
+		Map<LocalDate, AmountEntity> amounts = turtleSimulationRepository.getAmounts(type);
 		AmountEntity entity = amounts.get(date);
 		if(entity!=null) {
 			view = new AmountView(entity.getCash(), entity.getValue());
@@ -294,17 +291,15 @@ public class TurtleStaticSimulation implements TurtleSimulation{
 		return view;
 	}
 
-	@Override
 	public List<String> getDates(String type, String year) {
 		List<String> dates = new ArrayList<String>();
-		Map<LocalDate, AmountEntity> amounts = turtleSimulationRepository.getAmounts(type, year);
+		Map<LocalDate, AmountEntity> amounts = turtleSimulationRepository.getAmounts(type);
 		for(LocalDate date : amounts.keySet()) {
 			dates.add(date.toString());
 		}
 		return dates;
 	}
 
-	@Override
 	public void evictCache() {
 		System.out.println("evictCache");
 		turtleSimulationRepository.evictAmountsCache();

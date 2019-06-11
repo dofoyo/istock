@@ -178,8 +178,7 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 		TurtleView view;
 		
 		Item item;
-		Kbar kbar;
-		
+
 		List<String> holds = selectorService.getHoldIDs();
 		List<String> labels;
 		
@@ -192,8 +191,8 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 			view.setItemID(potential.getItemID());
 			view.setHigh(df.format(potential.getHighest()));
 			view.setLow(df.format(potential.getLowest()));
-			view.setPclose(df.format(potential.getLatestPrice()));
-			view.setNow(df.format(potential.getNowPrice()));
+			view.setPclose(df.format(potential.getClose()));
+			view.setNow(df.format(potential.getLatestPrice()));
 			view.setHlgap(df.format(potential.getHLGap()));
 			view.setNhgap(df.format(potential.getHNGap()));
 			view.setStatus(potential.getStatus());
@@ -357,7 +356,7 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 			Progress.show(potentials.size(),i++,potential.getItemID());
 			
 			kbar = kdataService.getLatestMarketData(potential.getItemID());
-			potential.setNowPrice(kbar.getClose());
+			potential.setLatestPrice(kbar.getClose());
 			potential.setAmount(kbar.getAmount());
 			potential.setHlb(this.getHLB(potential.getItemID()));
 			potential.setAvb(this.getAVB(potential.getItemID()));
@@ -455,6 +454,11 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 			if(i>5) break;
 		}
 		return potentials;
+	}
+
+	@Override
+	public String[] getTopics() {
+		return itemService.getTopicTops(5);
 	}
 	
 }

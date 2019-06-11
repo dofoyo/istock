@@ -19,11 +19,17 @@ public class TurtleSimulationRepository {
 	@Value("${reportPath}")
 	private String reportPath;
 	
+	public void save(String type, String breakers, String details, String dailyAmounts) {
+		FileTools.writeTextFile(reportPath + "/" + type + "_simulation_breakers.csv", breakers, false);
+		FileTools.writeTextFile(reportPath + "/" + type + "_simulation_detail.csv", details, false);
+		FileTools.writeTextFile(reportPath + "/" + type + "_simulation_dailyAmount.csv", dailyAmounts, false);
+	}
+	
 	@Cacheable("breakers")
-	public Map<LocalDate, List<String>>  getBreakers(String type, String year){
+	public Map<LocalDate, List<String>>  getBreakers(String type){
 		Map<LocalDate, List<String>> breakers = new TreeMap<LocalDate, List<String>>();
 		
-		String theFile = reportPath + "/" + type + "_" + year + "_simulation_breakers.csv"; 
+		String theFile = reportPath + "/" + type + "_simulation_breakers.csv"; 
 		//System.out.println(theFile);
 		String[] lines = FileTools.readTextFile(theFile).split("\n");
 		String[] columns;
@@ -44,10 +50,10 @@ public class TurtleSimulationRepository {
 	}
 	
 	@Cacheable("buys")
-	public Map<LocalDate, List<String>>  getBuys(String type, String year){
+	public Map<LocalDate, List<String>>  getBuys(String type){
 		Map<LocalDate, List<String>> buys = new TreeMap<LocalDate, List<String>>();
 		
-		String theFile = reportPath + "/" + type + "_" + year + "_simulation_detail.csv"; 
+		String theFile = reportPath + "/" + type + "_simulation_detail.csv"; 
 		//System.out.println(theFile);
 		String[] lines = FileTools.readTextFile(theFile).split("\n");
 		String[] columns;
@@ -70,10 +76,10 @@ public class TurtleSimulationRepository {
 	}
 
 	@Cacheable("sells")
-	public Map<LocalDate, List<String>>  getSells(String type, String year){
+	public Map<LocalDate, List<String>>  getSells(String type){
 		Map<LocalDate, List<String>> sells = new TreeMap<LocalDate, List<String>>();
 		
-		String theFile = reportPath + "/" + type + "_" + year + "_simulation_detail.csv"; 
+		String theFile = reportPath + "/" + type + "_simulation_detail.csv"; 
 		//System.out.println(theFile);
 		String[] lines = FileTools.readTextFile(theFile).split("\n");
 		String[] columns;
@@ -96,10 +102,10 @@ public class TurtleSimulationRepository {
 	}
 	
 	@Cacheable("amounts")
-	public Map<LocalDate, AmountEntity>  getAmounts(String type, String year){
+	public Map<LocalDate, AmountEntity>  getAmounts(String type){
 		Map<LocalDate, AmountEntity> amounts = new TreeMap<LocalDate, AmountEntity>();
 		
-		String theFile = reportPath + "/" + type + "_" + year + "_simulation_dailyAmount.csv"; 
+		String theFile = reportPath + "/" + type + "_simulation_dailyAmount.csv"; 
 		//System.out.println(theFile);
 		String[] lines = FileTools.readTextFile(theFile).split("\n");
 		String[] columns;

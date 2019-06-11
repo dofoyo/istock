@@ -23,6 +23,7 @@ public interface KdataService {
 	public void downKdatasAndFactors()  throws Exception ;
 	
 	public void generateMusters();  //用于simulation
+	public List<Muster> getMusters(LocalDate date); //用于simulation
 	public void generateLastMusters();  //用于operation
 	public List<Muster> getLastMusters();//用于operation
 	
