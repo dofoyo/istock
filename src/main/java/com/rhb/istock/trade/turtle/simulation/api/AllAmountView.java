@@ -12,6 +12,9 @@ public class AllAmountView {
 	private List<String> bhls;
 	private List<String> bavs;
 	private List<String> bdts;
+	private List<String> hlbs;
+	private List<String> avbs;
+	private List<String> dtbs;
 	DecimalFormat df = new DecimalFormat("#.00");
 
 	public AllAmountView() {
@@ -19,20 +22,29 @@ public class AllAmountView {
 		bhls = new ArrayList<String>();
 		bavs = new ArrayList<String>();
 		bdts = new ArrayList<String>();
+		hlbs = new ArrayList<String>();
+		avbs = new ArrayList<String>();
+		dtbs = new ArrayList<String>();
 	}
 	
-	public void add(String date, String bhl, String bav, String bdt) {
+	public void add(String date, String bhl, String bav, String bdt, String hlb, String avb, String dtb) {
 		dates.add(date);
 		bhls.add(bhl);
 		bavs.add(bav);
 		bdts.add(bdt);
+		hlbs.add(hlb);
+		avbs.add(avb);
+		dtbs.add(dtb);
 	}
 	
-	public void add(LocalDate date, BigDecimal bhl, BigDecimal bav, BigDecimal bdt) {
+	public void add(LocalDate date, BigDecimal bhl, BigDecimal bav, BigDecimal bdt, BigDecimal hlb, BigDecimal avb, BigDecimal dtb) {
 		dates.add(date.toString());
 		bhls.add(df.format(bhl));
 		bavs.add(df.format(bav));
 		bdts.add(df.format(bdt));
+		hlbs.add(df.format(hlb));
+		avbs.add(df.format(avb));
+		dtbs.add(df.format(dtb));
 	}
 
 	public String getMin() {
@@ -73,6 +85,34 @@ public class AllAmountView {
 
 	public void setBdts(List<String> bdts) {
 		this.bdts = bdts;
+	}
+
+	public List<String> getHlbs() {
+		return hlbs;
+	}
+
+	public void setHlbs(List<String> hlbs) {
+		this.hlbs = hlbs;
+	}
+
+	public List<String> getAvbs() {
+		return avbs;
+	}
+
+	public void setAvbs(List<String> avbs) {
+		this.avbs = avbs;
+	}
+
+	public List<String> getDtbs() {
+		return dtbs;
+	}
+
+	public void setDtbs(List<String> dtbs) {
+		this.dtbs = dtbs;
+	}
+
+	public void setMin(String min) {
+		this.min = min;
 	}
 
 	

@@ -57,20 +57,32 @@ public class TurtleSimulationApi {
 	@GetMapping("/turtle/simulation/allamounts/{date}")
 	public ResponseContent<AllAmountView> getAmounts(
 			@PathVariable(value="date") String date){
+		
 		BigDecimal min = null;
+		
 		AllAmountView view = new AllAmountView();
 		Map<LocalDate, AmountEntity> bhl = turtleSimulationRepository.getAmounts("bhl");
 		Map<LocalDate, AmountEntity> bav = turtleSimulationRepository.getAmounts("bav");
 		Map<LocalDate, AmountEntity> bdt = turtleSimulationRepository.getAmounts("bdt");
+		Map<LocalDate, AmountEntity> hlb = turtleSimulationRepository.getAmounts("hlb");
+		Map<LocalDate, AmountEntity> avb = turtleSimulationRepository.getAmounts("avb");
+		Map<LocalDate, AmountEntity> dtb = turtleSimulationRepository.getAmounts("dtb");
+
 		for(LocalDate theDate : bhl.keySet()) {
 			if(theDate.isBefore(LocalDate.parse(date)) || theDate.equals(LocalDate.parse(date))) {
-				view.add(theDate, bhl.get(theDate).getTotal(), bav.get(theDate).getTotal(), bdt.get(theDate).getTotal());
+				view.add(theDate, bhl.get(theDate).getTotal(), bav.get(theDate).getTotal(), bdt.get(theDate).getTotal(),
+						hlb.get(theDate).getTotal(), avb.get(theDate).getTotal(), dtb.get(theDate).getTotal());
+				
 				if(min==null) {
 					min = bhl.get(theDate).getTotal();
 				}
+				
 				min = min.compareTo(bhl.get(theDate).getTotal())==1 ? bhl.get(theDate).getTotal() : min;
 				min = min.compareTo(bav.get(theDate).getTotal())==1 ? bav.get(theDate).getTotal() : min;
 				min = min.compareTo(bdt.get(theDate).getTotal())==1 ? bdt.get(theDate).getTotal() : min;
+				min = min.compareTo(hlb.get(theDate).getTotal())==1 ? hlb.get(theDate).getTotal() : min;
+				min = min.compareTo(avb.get(theDate).getTotal())==1 ? avb.get(theDate).getTotal() : min;
+				min = min.compareTo(dtb.get(theDate).getTotal())==1 ? dtb.get(theDate).getTotal() : min;
 			}
 		}
 		view.setMin(min);
