@@ -38,14 +38,25 @@ public class IstockScheduledTask {
 	@Scheduled(cron="0 30 9 ? * 1-5") 
 	public void dailyInit() throws Exception {
 		itemService.download();		//下载最新股票代码
-		kdataService.downKdatasAndFactors(); //上一交易日的收盘数据要等开盘前才能下载到
+		kdataService.downKdatasAndFactors(); //上一交易日的收盘数据要等开盘前才能下载到, 大约需要15分钟
 	}
 
-	@Scheduled(cron="0 30 15 ? * 1-5") 
-	public void dailyClose() throws Exception {
+	@Scheduled(cron="0 */5 10-11 ? * 1-5")  //周一至周五，每日10点-11点，每5分钟刷新一次 
+	public void updateLatestMusters1() throws Exception {
+		kdataService.updateLatestMusters();
+	}
+
+	@Scheduled(cron="0 5-30/5 11 ? * 1-5")  //周一至周五，每日11点-11点30，每5分钟刷新一次 
+	public void updateLatestMusters2() throws Exception {
+		kdataService.updateLatestMusters();
 	}
 	
-	@Scheduled(cron="0 45 0 ? * 1-5") //每日凌晨0点
+	@Scheduled(cron="0 */5 13-15 ? * 1-5")  //周一至周五，每日13点-15点，每5分钟刷新一次 
+	public void updateLatestMusters3() throws Exception {
+		kdataService.updateLatestMusters();
+	}
+	
+	@Scheduled(cron="0 0 10 ? * 1-5") //周一至周五，每日10:00点
 	public void downloadReports() {
 		//financialStatementService.downloadReports();  //下载最新年报
 		//selectorService.generateBluechip();  //并生成bluechip

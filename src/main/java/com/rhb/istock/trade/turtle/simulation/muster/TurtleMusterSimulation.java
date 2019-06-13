@@ -54,7 +54,7 @@ public class TurtleMusterSimulation {
 		
 		long days = endDate.toEpochDay()- beginDate.toEpochDay();
 		int i=1;
-		for(LocalDate date = beginDate; date.isBefore(endDate); date = date.plusDays(1)) {
+		for(LocalDate date = beginDate; (date.isBefore(endDate) || date.equals(endDate)); date = date.plusDays(1)) {
 			Progress.show((int)days, i++, date.toString());
 			
 			musters = kdataService.getMusters(date);

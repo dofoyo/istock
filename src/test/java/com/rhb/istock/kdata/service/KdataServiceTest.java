@@ -34,14 +34,19 @@ public class KdataServiceTest {
 		kdataService.generateMusters();
 	}
 	
+	//@Test
+	public void generateLatestMusters() {
+		kdataService.generateLatestMusters();
+	}
+
 	@Test
-	public void generateLastMusters() {
-		kdataService.generateLastMusters();
+	public void updateLatestMusters() {
+		kdataService.updateLatestMusters();
 	}
 	
 	//@Test
 	public void getLastMusters() {
-		List<Muster> musters = kdataService.getLastMusters();
+		List<Muster> musters = kdataService.getLatestMusters();
 		for(Muster muster : musters) {
 			System.out.println(muster);
 		}

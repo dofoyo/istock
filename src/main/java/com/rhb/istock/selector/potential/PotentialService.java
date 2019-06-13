@@ -25,7 +25,7 @@ public class PotentialService {
 		List<Potential> potentials = new ArrayList<Potential>();
 		Potential potential;
 		
-		List<Muster> musters = kdataService.getLastMusters();
+		List<Muster> musters = kdataService.getLatestMusters();
 		
 		for(Muster item : musters) {
 			potential =  new Potential(item.getItemID(),
@@ -34,7 +34,7 @@ public class PotentialService {
 					item.getHighest(),
 					item.getLowest(),
 					item.getClose(),
-					item.getClose());
+					item.getLatestPrice());
 			if(potential.getHNGap()<10) {
 				//System.out.println(potential);
 				potentials.add(potential);	

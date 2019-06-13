@@ -36,9 +36,9 @@ public class KdataAPI {
 		//System.out.println(endDate);
 		
 		LocalDate theEndDate = null;
-		if(endDate!=null && !endDate.isEmpty()) {
+		/*if(endDate!=null && !endDate.isEmpty()) {
 			theEndDate = LocalDate.parse(endDate, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-		}
+		}*/
 		
 		KdatasView kdatas = new KdatasView();
 		
@@ -52,7 +52,6 @@ public class KdataAPI {
 		for(LocalDate date : dates) {
 			bar = kdataService.getKbar(itemID, date, true);
 			kdatas.addKdata(date, bar.getOpen(), bar.getHigh(), bar.getLow(), bar.getClose());
-
 		}
 		if(theEndDate==null) {
 			bar = kdataService.getLatestMarketData(itemID);

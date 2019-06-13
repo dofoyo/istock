@@ -3,6 +3,7 @@ package com.rhb.istock.trade.turtle.simulation.repository;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -49,9 +50,63 @@ public class TurtleSimulationRepository {
 		return breakers;
 	}
 	
+	public Map<String, String>  getAllBuys(String itemID){
+		Map<String, String> buys = new HashMap<String, String>();
+		
+		buys.putAll(this.getAllBuysOfType("bhl", itemID));
+		buys.putAll(this.getAllBuysOfType("bav", itemID));
+		buys.putAll(this.getAllBuysOfType("bdt", itemID));
+		buys.putAll(this.getAllBuysOfType("hlb", itemID));
+		buys.putAll(this.getAllBuysOfType("avb", itemID));
+		buys.putAll(this.getAllBuysOfType("dtb", itemID));
+		
+		return buys;
+	}
+	
+	private Map<String, String> getAllBuysOfType(String type, String itemID){
+		Map<String, String> buys = new HashMap<String, String>();
+		String theFile = reportPath + "/" + type + "_simulation_detail.csv"; 
+		String[] lines = FileTools.readTextFile(theFile).split("\n");
+		String[] columns;
+		for(int j=1; j<lines.length; j++) {
+			columns = lines[j].split(",");
+			if(columns.length>4 && columns[1].equals(itemID)) {
+				buys.put(columns[3], columns[4]);
+			}
+		}		
+		return buys;
+	}
+	
+	public Map<String, String>  getAllSells(String itemID){
+		Map<String, String> sells = new HashMap<String, String>();
+		
+		sells.putAll(this.getAllSellsOfType("bhl", itemID));
+		sells.putAll(this.getAllSellsOfType("bav", itemID));
+		sells.putAll(this.getAllSellsOfType("bdt", itemID));
+		sells.putAll(this.getAllSellsOfType("hlb", itemID));
+		sells.putAll(this.getAllSellsOfType("avb", itemID));
+		sells.putAll(this.getAllSellsOfType("dtb", itemID));
+		
+		return sells;
+	}
+	
+	private Map<String, String> getAllSellsOfType(String type, String itemID){
+		Map<String, String> sells = new HashMap<String, String>();
+		String theFile = reportPath + "/" + type + "_simulation_detail.csv"; 
+		String[] lines = FileTools.readTextFile(theFile).split("\n");
+		String[] columns;
+		for(int j=1; j<lines.length; j++) {
+			columns = lines[j].split(",");
+			if(columns.length>9 && columns[1].equals(itemID) && !"hold".equals(columns[11])) {
+				sells.put(columns[8], columns[9]);
+			}
+		}		
+		return sells;
+	}
+	
 	@Cacheable("buys")
-	public Map<LocalDate, List<String>>  getBuys(String type){
-		Map<LocalDate, List<String>> buys = new TreeMap<LocalDate, List<String>>();
+	public TreeMap<LocalDate, List<String>>  getBuys(String type){
+		TreeMap<LocalDate, List<String>> buys = new TreeMap<LocalDate, List<String>>();
 		
 		String theFile = reportPath + "/" + type + "_simulation_detail.csv"; 
 		//System.out.println(theFile);
@@ -89,21 +144,23 @@ public class TurtleSimulationRepository {
 			//System.out.println(line);
 			columns = lines[j].split(",");
 			sellDate = LocalDate.parse(columns[8],DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-			if(sells.containsKey(sellDate)) {
-				ids = sells.get(sellDate);
-			}else {
-				ids = new ArrayList<String>(); 
-				sells.put(sellDate, ids);
+			if(!"hold".equals(columns[11])) {
+				if(sells.containsKey(sellDate)) {
+					ids = sells.get(sellDate);
+				}else {
+					ids = new ArrayList<String>(); 
+					sells.put(sellDate, ids);
+				}
+				ids.add(columns[1]);
 			}
-			ids.add(columns[1]);
 		}		
 		
 		return sells;
 	}
 	
 	@Cacheable("amounts")
-	public Map<LocalDate, AmountEntity>  getAmounts(String type){
-		Map<LocalDate, AmountEntity> amounts = new TreeMap<LocalDate, AmountEntity>();
+	public TreeMap<LocalDate, AmountEntity>  getAmounts(String type){
+		TreeMap<LocalDate, AmountEntity> amounts = new TreeMap<LocalDate, AmountEntity>();
 		
 		String theFile = reportPath + "/" + type + "_simulation_dailyAmount.csv"; 
 		//System.out.println(theFile);

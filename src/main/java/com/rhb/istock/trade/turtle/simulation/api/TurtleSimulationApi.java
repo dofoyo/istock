@@ -2,6 +2,7 @@ package com.rhb.istock.trade.turtle.simulation.api;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -10,11 +11,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.rhb.istock.comm.api.ResponseContent;
 import com.rhb.istock.comm.api.ResponseEnum;
+import com.rhb.istock.item.Item;
 import com.rhb.istock.item.ItemService;
+import com.rhb.istock.kdata.Kbar;
+import com.rhb.istock.kdata.KdataService;
+import com.rhb.istock.kdata.api.KdatasView;
 import com.rhb.istock.trade.turtle.simulation.muster.TurtleMusterSimulation;
 import com.rhb.istock.trade.turtle.simulation.repository.AmountEntity;
 import com.rhb.istock.trade.turtle.simulation.repository.TurtleSimulationRepository;
@@ -33,34 +39,92 @@ public class TurtleSimulationApi {
 	@Qualifier("itemServiceImp")
 	ItemService itemService;
 	
-	@GetMapping("/turtle/simulate/{bdate}/{edate}")
+	@Autowired
+	@Qualifier("kdataServiceImp")
+	KdataService kdataService;
+	
+	@GetMapping("/turtle/simulation/kdatas/{itemID}")
+	public ResponseContent<KdatasView> getKdatas(@PathVariable(value="itemID") String itemID,
+			@RequestParam(value="endDate") String endDate
+			) {
+
+		BSKdatasView kdatas = new BSKdatasView();
+
+		LocalDate theEndDate = null;
+		try{
+			theEndDate = LocalDate.parse(endDate, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+		}catch(Exception e){
+			return new ResponseContent<KdatasView>(ResponseEnum.ERROR, kdatas);
+		}
+		
+		if(theEndDate != null) {
+			Item item = itemService.getItem(itemID);
+			kdatas.setItemID(itemID);
+			kdatas.setCode(item.getCode());
+			kdatas.setName(item.getName());
+			
+			LocalDate latestDate = kdataService.getLatestMarketDate();
+			List<LocalDate> dates = kdataService.getKdata(itemID, theEndDate, true).getDates();
+			Kbar bar;
+			for(LocalDate date : dates) {
+				bar = kdataService.getKbar(itemID, date, true);
+				kdatas.addKdata(date, bar.getOpen(), bar.getHigh(), bar.getLow(), bar.getClose());
+			}
+			
+			if(theEndDate.equals(latestDate)) {
+				bar = kdataService.getLatestMarketData(itemID);
+				kdatas.addKdata(theEndDate, bar.getOpen(), bar.getHigh(), bar.getLow(), bar.getClose());
+			}			
+			
+			kdatas.addBuys(turtleSimulationRepository.getAllBuys(itemID));
+			kdatas.addSells(turtleSimulationRepository.getAllSells(itemID));
+		}
+		
+		return new ResponseContent<KdatasView>(ResponseEnum.SUCCESS, kdatas);
+	}
+	
+	
+	
+	@GetMapping("/turtle/simulation/run/{bdate}/{edate}")
 	public ResponseContent<String> simulate(
 			@PathVariable(value="bdate") String bdate,
 			@PathVariable(value="edate") String edate){
 		
-		//System.out.println(bdate);
-		//System.out.println(edate);
+		LocalDate theBeginDate = null;
+		LocalDate theEndDate = null;
+		try{
+			theBeginDate = LocalDate.parse(bdate, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+			theEndDate = LocalDate.parse(edate, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+		}catch(Exception e){
+			return new ResponseContent<String>(ResponseEnum.ERROR, " NO date!");
+		}
 		
-		turtleMusterSimulation.simulate(LocalDate.parse(bdate), LocalDate.parse(edate));
+		turtleMusterSimulation.simulate(theBeginDate, theEndDate);
 
 		turtleSimulationRepository.evictAmountsCache();
 		turtleSimulationRepository.evictBreakersCache();
 		turtleSimulationRepository.evictBuysCache();
 		turtleSimulationRepository.evictSellsCache();
 
+		return new ResponseContent<String>(ResponseEnum.SUCCESS, "");
 		
-		String msg = "just finished simulate!";
-		
-		return new ResponseContent<String>(ResponseEnum.SUCCESS, msg);
 	}	
 	
 	@GetMapping("/turtle/simulation/allamounts/{date}")
 	public ResponseContent<AllAmountView> getAmounts(
-			@PathVariable(value="date") String date){
-		
+			@PathVariable(value="date") String endDate){
+
+		AllAmountView view = new AllAmountView();
+
+		LocalDate theEndDate = null;
+		try{
+			theEndDate = LocalDate.parse(endDate, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+		}catch(Exception e){
+			return new ResponseContent<AllAmountView>(ResponseEnum.ERROR, view);
+		}
+
 		BigDecimal min = null;
 		
-		AllAmountView view = new AllAmountView();
 		Map<LocalDate, AmountEntity> bhl = turtleSimulationRepository.getAmounts("bhl");
 		Map<LocalDate, AmountEntity> bav = turtleSimulationRepository.getAmounts("bav");
 		Map<LocalDate, AmountEntity> bdt = turtleSimulationRepository.getAmounts("bdt");
@@ -69,7 +133,7 @@ public class TurtleSimulationApi {
 		Map<LocalDate, AmountEntity> dtb = turtleSimulationRepository.getAmounts("dtb");
 
 		for(LocalDate theDate : bhl.keySet()) {
-			if(theDate.isBefore(LocalDate.parse(date)) || theDate.equals(LocalDate.parse(date))) {
+			if(theDate.isBefore(theEndDate) || theDate.equals(theEndDate)) {
 				view.add(theDate, bhl.get(theDate).getTotal(), bav.get(theDate).getTotal(), bdt.get(theDate).getTotal(),
 						hlb.get(theDate).getTotal(), avb.get(theDate).getTotal(), dtb.get(theDate).getTotal());
 				
@@ -86,7 +150,7 @@ public class TurtleSimulationApi {
 			}
 		}
 		view.setMin(min);
-		
+	
 		return new ResponseContent<AllAmountView>(ResponseEnum.SUCCESS, view);
 	}
 
@@ -96,8 +160,16 @@ public class TurtleSimulationApi {
 			@PathVariable(value="type") String type,
 			@PathVariable(value="date") String date
 			) {
-		
+
 		List<BreakerView> views = new ArrayList<BreakerView>();
+
+		try{
+			LocalDate theDate = LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+		}catch(Exception e){
+			new ResponseContent<List<BreakerView>>(ResponseEnum.ERROR, views);
+		}
+		
+		
 		Map<LocalDate,List<String>> breakers = turtleSimulationRepository.getBreakers(type);
 		List<String> ids = breakers.get(LocalDate.parse(date));
 		if(ids!=null && !ids.isEmpty()) {
@@ -116,11 +188,18 @@ public class TurtleSimulationApi {
 			) {
 		
 		List<HoldView> views = new ArrayList<HoldView>();
+		LocalDate theDate = null;
+		try{
+			theDate = LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+		}catch(Exception e){
+			new ResponseContent<List<HoldView>>(ResponseEnum.ERROR, views);
+		}
+
 		
 		Map<LocalDate,List<String>> buys = turtleSimulationRepository.getBuys(type);
 		Map<LocalDate,List<String>> sells = turtleSimulationRepository.getSells(type);
 		
-		List<String> ids = this.generateHolds(type,LocalDate.parse(date));
+		List<String> ids = this.generateHolds(type,theDate);
 		//System.out.println("holds: " + ids);
 		if(ids!=null && !ids.isEmpty()) {
 			for(String id : ids) {
@@ -128,7 +207,7 @@ public class TurtleSimulationApi {
 			}
 		}
 		
-		ids = buys.get(LocalDate.parse(date));
+		ids = buys.get(theDate);
 		//System.out.println("buys: " + ids);
 		if(ids!=null && !ids.isEmpty()) {
 			for(String id : ids) {
@@ -136,7 +215,7 @@ public class TurtleSimulationApi {
 			}
 		}
 		
-		ids = sells.get(LocalDate.parse(date));
+		ids = sells.get(theDate);
 		if(ids!=null && !ids.isEmpty()) {
 			for(String id : ids) {
 				for(HoldView view : views) {
@@ -157,9 +236,17 @@ public class TurtleSimulationApi {
 			) {
 		
 		AmountView view = new AmountView(0,0);
+
+		LocalDate theDate = null;
+		try{
+			theDate = LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+		}catch(Exception e){
+			new ResponseContent<AmountView>(ResponseEnum.ERROR, view);
+		}
+
 		
 		Map<LocalDate, AmountEntity> amounts = turtleSimulationRepository.getAmounts(type);
-		AmountEntity entity = amounts.get(LocalDate.parse(date));
+		AmountEntity entity = amounts.get(theDate);
 		if(entity!=null) {
 			view = new AmountView(entity.getCash(), entity.getValue());
 		}
@@ -173,6 +260,7 @@ public class TurtleSimulationApi {
 			) {
 		
 		List<String> dates = new ArrayList<String>();
+		
 		Map<LocalDate, AmountEntity> amounts = turtleSimulationRepository.getAmounts(type);
 		for(LocalDate date : amounts.keySet()) {
 			dates.add(date.toString());

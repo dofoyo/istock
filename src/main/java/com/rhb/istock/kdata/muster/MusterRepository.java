@@ -6,8 +6,10 @@ import java.util.List;
 import com.rhb.istock.kdata.muster.MusterEntity;
 
 public interface MusterRepository {
-	public void saveMuster(LocalDate date, MusterEntity entity, Integer openPeriod, Integer dropPeriod);
-	public void saveTmpMuster(LocalDate date, MusterEntity entity, Integer openPeriod, Integer dropPeriod);
+	public void saveMusters(LocalDate date,List<MusterEntity> musterEntities);
+	
+	public void saveMuster(LocalDate date, MusterEntity entity);
+	public void saveTmpMuster(LocalDate date, MusterEntity entity);
 	
 	public boolean isMustersExist(LocalDate date);
 	

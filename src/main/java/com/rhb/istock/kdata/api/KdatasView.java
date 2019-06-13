@@ -9,9 +9,9 @@ public class KdatasView {
 	private String itemID;
 	private String code;
 	private String name;
+	
 	List<Kdata> kdatas = new ArrayList<Kdata>();
 
-	
 	public String getItemID() {
 		return itemID;
 	}

@@ -24,8 +24,11 @@ public interface KdataService {
 	
 	public void generateMusters();  //用于simulation
 	public List<Muster> getMusters(LocalDate date); //用于simulation
-	public void generateLastMusters();  //用于operation
-	public List<Muster> getLastMusters();//用于operation
+	
+	public void generateLatestMusters();  //用于operation，每天开盘前，根据上一交易日的收盘价和最新的除权因子计算
+	public List<Muster> getLatestMusters();//用于operation，提供给前端显示。和updateLatestMusters配合，可以提升操作体验
+	public void updateLatestMusters();//用于operation, 在交易时间无限循环对其中的potential刷新latestPrice，
+	
 	
 
 }

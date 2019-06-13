@@ -134,25 +134,29 @@ public class KdataServiceImp implements KdataService{
 		System.out.println("latest down date " + lastDownDate);
 		System.out.println("dates bewteen latest trade date and down date " + dates);
 		
-		for(LocalDate date : dates) {
+		LocalDate date;
+		for(int i=0; i<dates.size(); i++) {
+			date = dates.get(i);
 			System.out.println("download "+ date +" kdatas from tushare, please wait....... ");
-			//kdataSpider.downKdatasAndFactors(date);
 			kdataSpider.downKdatas(date);
-			kdataSpider.downFactors(date);
-
-			kdataSpider163.downKdata(szzs);
-			
-			evictKDataCache();
-			
-			this.generateLastMusters();
-			
 			System.out.println("downloaded "+ date +" kdatas from tushare.");
+		}
+		
+		for(int i=1; i<dates.size(); i++) { //因为factor比收盘数据早得到（开盘前就得到factor，收盘后才得到kdata）,
+			date = dates.get(i);
+			System.out.println("download "+ date +" factors from tushare, please wait....... ");
+			kdataSpider.downFactors(date);
+			System.out.println("downloaded "+ date +" factors from tushare.");
 		}
 		
 		if(dates.size()>0) {
 			kdataSpider.downFactors(latestDate);  //执行了这一步后，不需要再对收盘数据额外的复权处理了
+			
+			kdataSpider163.downKdata(szzs);
+			evictKDataCache();
+			
+			this.generateLatestMusters(); //此方法每天开盘时执行一次
 		}
-
 	}
 
 
@@ -256,7 +260,7 @@ public class KdataServiceImp implements KdataService{
 			for(LocalDate date : dates) {
 				//Progress.show(dates.size(),j++, date.toString());//进度条
 				entity = this.getMusterEntity(item.getItemID(), date, true);
-				if(entity!=null) musterRepositoryImp.saveTmpMuster(date, entity, openPeriod, dropPeriod);
+				if(entity!=null) musterRepositoryImp.saveTmpMuster(date, entity);
 
 				//if(j++>2) return;
 			}
@@ -322,14 +326,14 @@ public class KdataServiceImp implements KdataService{
 	}
 
 	@Override
-	public List<Muster> getLastMusters() {
+	public List<Muster> getLatestMusters() {
 		LocalDate date = kdataRealtimeSpider.getLatestMarketDate();
 		return this.getMusters(date);
 	}
 
 
 	@Override
-	public void generateLastMusters() {
+	public void generateLatestMusters() {
 		long beginTime=System.currentTimeMillis(); 
 		System.out.println("generateLastMusters ......");
 		
@@ -347,7 +351,7 @@ public class KdataServiceImp implements KdataService{
 				Progress.show(items.size(),i++, item.getItemID());//进度条
 				
 				entity = this.getMusterEntity(item.getItemID(), date, false);
-				if(entity!=null) musterRepositoryImp.saveMuster(date, entity, openPeriod, dropPeriod);
+				if(entity!=null) musterRepositoryImp.saveMuster(date, entity);
 
 			}
 		}
@@ -381,6 +385,39 @@ public class KdataServiceImp implements KdataService{
 		}
 		
 		return musters;
+	}
+
+	@Override
+	public void updateLatestMusters() {
+		long beginTime=System.currentTimeMillis(); 
+		System.out.println("updateLatestMusters ......");
+
+		Kbar kbar;
+		LocalDate date = this.getLatestMarketDate();
+		List<Muster> musters = this.getLatestMusters();
+		List<MusterEntity> entities = new ArrayList<MusterEntity>();
+		int i=1;
+		for(Muster muster : musters) {
+			Progress.show(musters.size(),i++, muster.getItemID());
+
+			kbar = this.getLatestMarketData(muster.getItemID());
+			if(kbar!=null) {
+				entities.add(new MusterEntity(muster.getItemID(), 
+						kbar.getAmount(), 
+						muster.getAverageAmount(), 
+						muster.getHighest(), 
+						muster.getLowest(), 
+						muster.getClose(), 
+						muster.getDropPrice(), 
+						kbar.getClose()));
+			}
+		}
+		musterRepositoryImp.saveMusters(date,entities);
+
+		System.out.println("updateLatestMusters done!");
+		long used = (System.currentTimeMillis() - beginTime)/1000; 
+		System.out.println("用时：" + used + "秒");     
+
 	}
 
 }

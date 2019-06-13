@@ -355,9 +355,9 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 		for(Potential potential : potentials) {
 			Progress.show(potentials.size(),i++,potential.getItemID());
 			
-			kbar = kdataService.getLatestMarketData(potential.getItemID());
-			potential.setLatestPrice(kbar.getClose());
-			potential.setAmount(kbar.getAmount());
+			//kbar = kdataService.getLatestMarketData(potential.getItemID());
+			//potential.setLatestPrice(kbar.getClose());
+			//potential.setAmount(kbar.getAmount());
 			potential.setHlb(this.getHLB(potential.getItemID()));
 			potential.setAvb(this.getAVB(potential.getItemID()));
 			potential.setDtb(this.getDTB(potential.getItemID()));

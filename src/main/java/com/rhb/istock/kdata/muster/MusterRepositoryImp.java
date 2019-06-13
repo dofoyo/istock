@@ -46,7 +46,7 @@ public class MusterRepositoryImp implements MusterRepository{
 	}
 	
 	@Override
-	public void saveMuster(LocalDate date, MusterEntity entity, Integer openPeriod, Integer dropPeriod) {
+	public void saveMuster(LocalDate date, MusterEntity entity) {
 		String pathAndFile = musterPath + "/" + date.format(DateTimeFormatter.ofPattern("yyyyMMdd")) +  "_55_21_musters.txt";
 		FileTools.writeTextFile(pathAndFile, entity.toText(), true);
 	}
@@ -69,7 +69,7 @@ public class MusterRepositoryImp implements MusterRepository{
 	}
 
 	@Override
-	public void saveTmpMuster(LocalDate date, MusterEntity entity, Integer openPeriod, Integer dropPeriod) {
+	public void saveTmpMuster(LocalDate date, MusterEntity entity) {
 		String pathAndFile = tmpMusterPath + "/" + date.format(DateTimeFormatter.ofPattern("yyyyMMdd")) +  "_55_21_musters.txt";
 		FileTools.writeTextFile(pathAndFile, entity.toText(), true);
 	}
@@ -81,6 +81,18 @@ public class MusterRepositoryImp implements MusterRepository{
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	@Override
+	public void saveMusters(LocalDate date,List<MusterEntity> musterEntities) {
+		String pathAndFile = musterPath + "/" + date.format(DateTimeFormatter.ofPattern("yyyyMMdd")) +  "_55_21_musters.txt";
+		
+		FileUtils.deleteQuietly(new File(pathAndFile));
+		
+		for(MusterEntity entity : musterEntities) {
+			this.saveMuster(date, entity);
+		}
+		
 	}
 
 }
