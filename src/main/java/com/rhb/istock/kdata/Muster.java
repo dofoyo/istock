@@ -13,11 +13,11 @@ public class Muster {
 	private BigDecimal latestPrice;
 
 	public boolean isUpLimited() {
-		return latestPrice.subtract(close).divide(close,BigDecimal.ROUND_HALF_UP).compareTo(new BigDecimal(0.1))==1;
+		return latestPrice.subtract(close).divide(close,BigDecimal.ROUND_HALF_UP).compareTo(new BigDecimal(0.095))>=0;
 	}
 
 	public boolean isDownLimited() {
-		return latestPrice.subtract(close).divide(close,BigDecimal.ROUND_HALF_UP).compareTo(new BigDecimal(-0.1))==-1;
+		return latestPrice.subtract(close).divide(close,BigDecimal.ROUND_HALF_UP).compareTo(new BigDecimal(-0.095))<=0;
 	}
 	
 	public boolean isDrop() {
@@ -26,6 +26,10 @@ public class Muster {
 	
 	public boolean isBreaker() {
 		return latestPrice.compareTo(highest)==1; 
+	}
+	
+	public boolean isDown() {
+		return latestPrice.compareTo(close) == -1;
 	}
 	
 	public BigDecimal getLatestPrice() {

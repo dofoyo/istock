@@ -11,8 +11,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import com.rhb.istock.selector.breaker.BreakerService;
-
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest
 public class KellySimulationTest {
@@ -20,9 +18,6 @@ public class KellySimulationTest {
 	@Qualifier("kellySimulation")
 	KellySimulation kellySimulation;
 	
-	@Autowired
-	@Qualifier("breakerService")
-	BreakerService breakerService;
 	
 	@Test
 	public void simulate() {
@@ -38,9 +33,9 @@ public class KellySimulationTest {
 		
 		//TreeMap<LocalDate,List<String>> dailyItems = breakerService.getBreakersSortByHL(5, beginDate, endDate);
 		//TreeMap<LocalDate,List<String>> dailyItems = breakerService.getBreakersSortByDT(5, beginDate, endDate);
-		TreeMap<LocalDate,List<String>> dailyItems = breakerService.getBreakersSortByAV(5, beginDate, endDate);
+		//TreeMap<LocalDate,List<String>> dailyItems = breakerService.getBreakersSortByAV(5, beginDate, endDate);
 			
-		kellySimulation.simulate(dailyItems, null, cache);
+		//kellySimulation.simulate(dailyItems, null, cache);
 	}
 	
 	

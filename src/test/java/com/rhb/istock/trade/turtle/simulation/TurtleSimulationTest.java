@@ -15,7 +15,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.rhb.istock.kdata.KdataService;
 import com.rhb.istock.selector.SelectorService;
-import com.rhb.istock.selector.breaker.BreakerService;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest
@@ -31,10 +30,6 @@ public class TurtleSimulationTest {
 	@Autowired
 	@Qualifier("selectorServiceImp")
 	SelectorService selectorService;
-	
-	@Autowired
-	@Qualifier("breakerService")
-	BreakerService breakerService;
 	
 	//@Test
 	public void simulate1() {

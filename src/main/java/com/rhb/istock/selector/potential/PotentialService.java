@@ -1,7 +1,9 @@
 package com.rhb.istock.selector.potential;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -21,13 +23,13 @@ public class PotentialService {
 	@Qualifier("kdataServiceImp")
 	KdataService kdataService;
 	
-	public List<Potential> getLastPotentials(){
-		List<Potential> potentials = new ArrayList<Potential>();
+	public Map<String,Potential> getLastPotentials(){
+		Map<String,Potential> potentials = new HashMap<String,Potential>();
 		Potential potential;
 		
-		List<Muster> musters = kdataService.getLatestMusters();
+		Map<String,Muster> musters = kdataService.getLatestMusters();
 		
-		for(Muster item : musters) {
+		for(Muster item : musters.values()) {
 			potential =  new Potential(item.getItemID(),
 					item.getAmount(),
 					item.getAverageAmount(),
@@ -37,7 +39,7 @@ public class PotentialService {
 					item.getLatestPrice());
 			if(potential.getHNGap()<10) {
 				//System.out.println(potential);
-				potentials.add(potential);	
+				potentials.put(potential.getItemID(),potential);	
 			}					
 		}
 

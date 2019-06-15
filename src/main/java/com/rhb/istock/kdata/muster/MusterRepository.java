@@ -2,6 +2,7 @@ package com.rhb.istock.kdata.muster;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 import com.rhb.istock.kdata.muster.MusterEntity;
 
@@ -13,7 +14,7 @@ public interface MusterRepository {
 	
 	public boolean isMustersExist(LocalDate date);
 	
-	public List<MusterEntity> getMusters(LocalDate date);
+	public Map<String,MusterEntity> getMusters(LocalDate date);
 	
 	public void cleanTmpMusters();
 	public void copyTmpMusters();

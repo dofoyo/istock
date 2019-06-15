@@ -1,19 +1,25 @@
 package com.rhb.istock.trade.turtle.simulation.muster;
 
+import java.awt.datatransfer.SystemFlavorMap;
+import java.io.File;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import com.rhb.istock.comm.util.FileTools;
 import com.rhb.istock.comm.util.Progress;
 import com.rhb.istock.kdata.KdataService;
 import com.rhb.istock.kdata.Muster;
@@ -21,6 +27,9 @@ import com.rhb.istock.trade.turtle.simulation.repository.TurtleSimulationReposit
 
 @Service("turtleMusterSimulation")
 public class TurtleMusterSimulation {
+	@Value("${musterPath}")
+	private String musterPath;
+	
 	@Autowired
 	@Qualifier("kdataServiceImp")
 	KdataService kdataService;
@@ -49,8 +58,7 @@ public class TurtleMusterSimulation {
 		Paul dtbPaul = new Paul(initCash, quota);
 		Paul hlbPaul = new Paul(initCash, quota);
 		
-		List<Muster> musters;
-		Map<String,Muster> musterMap;
+		Map<String,Muster> musters;
 		
 		long days = endDate.toEpochDay()- beginDate.toEpochDay();
 		int i=1;
@@ -59,15 +67,13 @@ public class TurtleMusterSimulation {
 			
 			musters = kdataService.getMusters(date);
 			if(musters!=null && musters.size()>0) {
-				musterMap = musters.stream().collect(Collectors.toMap(Muster::getItemID, Function.identity()));
+				bavPaul.doIt(musters, this.getBxxTops(new ArrayList<Muster>(musters.values()), "bav"), date);
+				bhlPaul.doIt(musters, this.getBxxTops(new ArrayList<Muster>(musters.values()), "bhl"), date);
+				bdtPaul.doIt(musters, this.getBxxTops(new ArrayList<Muster>(musters.values()), "bdt"), date);
 				
-				bavPaul.doIt(musterMap, this.getBxxTops(musters, "bav"), date);
-				bhlPaul.doIt(musterMap, this.getBxxTops(musters, "bhl"), date);
-				bdtPaul.doIt(musterMap, this.getBxxTops(musters, "bdt"), date);
-				
-				avbPaul.doIt(musterMap, this.getxxBTops(musters, "avb"), date);
-				hlbPaul.doIt(musterMap, this.getxxBTops(musters, "hlb"), date);
-				dtbPaul.doIt(musterMap, this.getxxBTops(musters, "dtb"), date);
+				avbPaul.doIt(musters, this.getxxBTops(new ArrayList<Muster>(musters.values()), "avb"), date);
+				hlbPaul.doIt(musters, this.getxxBTops(new ArrayList<Muster>(musters.values()), "hlb"), date);
+				dtbPaul.doIt(musters, this.getxxBTops(new ArrayList<Muster>(musters.values()), "dtb"), date);
 			}
 		}
 		
@@ -151,4 +157,101 @@ public class TurtleMusterSimulation {
 			return breakers;
 		}
 	}
+	
+	public TreeMap<LocalDate, Ratio> calculateSecondDayWinRatio(String type) {
+		long beginTime=System.currentTimeMillis(); 
+		System.out.println("calculateSecondDayWinRatio ......");
+
+		TreeMap<LocalDate, Ratio> ratios = new TreeMap<LocalDate,Ratio>();
+		Ratio ratio;
+		Integer r;
+		
+		List<LocalDate> dates = new ArrayList<LocalDate>();
+		LocalDate date;
+		List<File> files = FileTools.getFiles(musterPath, null, true);
+		for(File file : files) {
+			date = LocalDate.parse(file.getName().substring(0, 8), DateTimeFormatter.ofPattern("yyyyMMdd"));
+			dates.add(date);
+			//System.out.println(date);
+		}
+		
+		Collections.sort(dates, new Comparator<LocalDate>() {
+			@Override
+			public int compare(LocalDate o1, LocalDate o2) {
+				return o1.compareTo(o2);
+			}
+		});
+		
+		Map<String,Muster> thisMusters;
+		List<Muster> thisTops ;
+		//Muster pre;
+		
+		Map<String,Muster> buyDateMusters;
+		List<Muster> buyDateTops;
+		//Muster buy;
+		
+		Map<String,Muster> nextMusters;
+		List<Muster> nextTops;
+		Muster next;
+		
+		int j=0;
+		for(int i=2; i<dates.size(); i++) {
+			Progress.show(dates.size(), j++, dates.get(i).toString());
+			
+			ratio = new Ratio();
+			
+			nextMusters = kdataService.getMusters(dates.get(i));
+			//nextTops = this.getBxxTops(new ArrayList<Muster>(nextMusters.values()), type);
+			nextTops = this.getxxBTops(new ArrayList<Muster>(nextMusters.values()), type);
+
+			buyDateMusters = kdataService.getMusters(dates.get(i-1));
+			//buyDateTops = this.getBxxTops(new ArrayList<Muster>(buyDateMusters.values()), type);
+			buyDateTops = this.getxxBTops(new ArrayList<Muster>(buyDateMusters.values()), type);
+			
+			thisMusters = kdataService.getMusters(dates.get(i-2));
+			//thisTops = this.getBxxTops(new ArrayList<Muster>(thisMusters.values()), type);
+			thisTops = this.getxxBTops(new ArrayList<Muster>(thisMusters.values()), type);
+			
+			for(Muster buy : buyDateTops) {
+				if(buy!=null && buy.isBreaker() && !buy.isUpLimited()) {
+					next = nextMusters.get(buy.getItemID());
+					if(next!=null) {
+						r = next.getLatestPrice().subtract(buy.getLatestPrice()).divide(buy.getLatestPrice(),BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)).intValue();
+						System.out.format("%s %s buy price %f, next day close price %f, ratio is %d.\n", 
+								dates.get(i-1).toString(), buy.getItemID(), buy.getLatestPrice(), next.getLatestPrice(), r);
+						ratio.put(r);
+					}
+				}
+			}
+			
+			ratios.put(dates.get(i), ratio);
+		}
+		
+		System.out.println("calculateSecondDayWinRatio done!");
+		long used = (System.currentTimeMillis() - beginTime)/1000; 
+		System.out.println("用时：" + used + "秒");          
+		
+		return ratios;
+	}
+	
+	class Ratio{
+		TreeMap<Integer, Integer> rc = new TreeMap<Integer,Integer>();  // ratio,count
+		public void put(Integer ratio) {
+			if(rc.containsKey(ratio)) {
+				rc.put(ratio, rc.get(ratio)+1);
+			}else {
+				rc.put(ratio, 1);
+			}			
+		}
+		
+		public Integer getResult() {
+			Integer total = 0;
+			for(Map.Entry<Integer, Integer> entry : rc.entrySet()) {
+				//System.out.println(entry.getValue());
+				total = total + entry.getKey()*entry.getValue();
+			}
+			return total;
+		}
+	}
+	
 }

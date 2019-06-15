@@ -46,7 +46,7 @@ public class AverageAmountTopServiceImp implements AverageAmountTopService{
 	public List<String> getLatestAverageAmountTops(Integer top) {
 		List<String> tops = new ArrayList<String>();
 
-		List<Muster> musters = kdataService.getLatestMusters();
+		List<Muster> musters = new ArrayList<Muster>(kdataService.getLatestMusters().values());
 		Collections.sort(musters, new Comparator<Muster>() {
 			@Override
 			public int compare(Muster o1, Muster o2) {

@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 
 import com.rhb.istock.selector.aat.AverageAmountTopService;
 import com.rhb.istock.selector.bluechip.BluechipService;
-import com.rhb.istock.selector.breaker.BreakerService;
 import com.rhb.istock.selector.dat.DailyAmountTopService;
 import com.rhb.istock.selector.favor.FavorService;
 import com.rhb.istock.selector.hlt.HighLowTopService;
@@ -51,10 +50,6 @@ public class SelectorServiceImp implements SelectorService{
 	@Qualifier("potentialService")
 	PotentialService potentialService;
 
-	@Autowired
-	@Qualifier("breakerService")
-	BreakerService breakerService;
-	
 	@Override
 	public List<HoldEntity> getHolds() {
 		return holdService.getHolds();
@@ -152,7 +147,7 @@ public class SelectorServiceImp implements SelectorService{
 
 
 	@Override
-	public List<Potential> getLastPotentials() {
+	public Map<String,Potential> getLastPotentials() {
 		return potentialService.getLastPotentials();
 	}
 }

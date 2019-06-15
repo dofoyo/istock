@@ -56,7 +56,7 @@ public class KdataRepositoryTushare implements KdataRepository{
 			
 			LocalDate date;
 			BigDecimal open,high,low,close,amount,quantity;
-			BigDecimal preFactor=null,nowFactor;
+			BigDecimal nowFactor = null;
 			JSONObject data = new JSONObject(FileTools.readTextFile(kdataFile));
 			items = data.getJSONArray("items");
 			if(items.length()>0) {
@@ -66,7 +66,8 @@ public class KdataRepositoryTushare implements KdataRepository{
 					
 					date = LocalDate.parse(item.getString(1),DateTimeFormatter.ofPattern("yyyyMMdd"));
 					nowFactor = factors.get(date);
-					if(preFactor==null) preFactor = nowFactor;
+					//System.out.println("date=" + date + ", nowFactor=" + nowFactor);
+					//if(preFactor==null) preFactor = nowFactor;
 					
 
 					try {
@@ -84,7 +85,8 @@ public class KdataRepositoryTushare implements KdataRepository{
 					}catch(Exception e) {
 						System.err.println(item);
 						System.err.println(nowFactor);
-						System.err.println(preFactor);					}
+						System.err.println(roof);					
+					}
 				}
 			}
 		}
@@ -109,8 +111,8 @@ public class KdataRepositoryTushare implements KdataRepository{
 	public LocalDate getLastDate() {
 		String itemID1="sh601398"; //工商银行
 		String itemID2="sh601288"; //农业银行
-		LocalDate date1 = getKdata(itemID1).getLastDate();
-		LocalDate date2 = getKdata(itemID2).getLastDate();
+		LocalDate date1 = this.getKdata(itemID1).getLastDate();
+		LocalDate date2 = this.getKdata(itemID2).getLastDate();
 		return date1.isAfter(date2) ? date1 : date2;
 	}
 

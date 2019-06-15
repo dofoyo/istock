@@ -1,6 +1,7 @@
 package com.rhb.istock.selector.potential;
 
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,8 +21,8 @@ public class PotentialServiceTest {
 
 	@Test
 	public void getLatestPotentials() {
-		List<Potential> ps = potentialService.getLastPotentials();
-		for(Potential p : ps) {
+		Map<String,Potential> ps = potentialService.getLastPotentials();
+		for(Potential p : ps.values()) {
 			//System.out.println(p);
 		}
 		

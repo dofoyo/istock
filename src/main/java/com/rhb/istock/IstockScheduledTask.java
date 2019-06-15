@@ -56,7 +56,7 @@ public class IstockScheduledTask {
 		kdataService.updateLatestMusters();
 	}
 	
-	@Scheduled(cron="0 0 10 ? * 1-5") //周一至周五，每日10:00点
+	@Scheduled(cron="0 10 16 ? * 1-5") //周一至周五，每日10:00点
 	public void downloadReports() {
 		//financialStatementService.downloadReports();  //下载最新年报
 		//selectorService.generateBluechip();  //并生成bluechip

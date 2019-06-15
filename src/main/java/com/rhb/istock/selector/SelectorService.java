@@ -52,6 +52,6 @@ public interface SelectorService{
 	public List<String> getDailyAmountTops(Integer top, LocalDate date);
 	public TreeMap<LocalDate,List<String>> getDailyAmountTops(Integer top, LocalDate beginDate, LocalDate endDate);
 	
-	public List<Potential> getLastPotentials();
+	public Map<String,Potential> getLastPotentials();
 
 }

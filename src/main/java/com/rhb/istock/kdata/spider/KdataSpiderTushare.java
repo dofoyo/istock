@@ -63,7 +63,7 @@ public class KdataSpiderTushare implements KdataSpider {
 		String str = HttpClient.doPostJson(url, args.toString());
 		JSONObject data = (new JSONObject(str)).getJSONObject("data");
 		
-		String kdataFile = kdataPath + "/" + tushareID + "_factor.json";
+		String kdataFile = kdataPath + "/kdatas" + tushareID + ".json";
 		FileTools.writeTextFile(kdataFile, data.toString(), false);
 	}
 
@@ -102,7 +102,8 @@ public class KdataSpiderTushare implements KdataSpider {
 		System.out.println("KdataSpiderTushare.downloadKdata of " + date + " done!");
 		long used = (System.currentTimeMillis() - beginTime)/1000; 
 		System.out.println("用时：" + used + "秒");          
-		FileTools.writeTextFile(kdataFile, str, false);
+		
+		//FileTools.writeTextFile(kdataFile, str, false);
 	}
 	
 	@Override
@@ -112,7 +113,7 @@ public class KdataSpiderTushare implements KdataSpider {
 		
 		String result = null;
 		
-		String kdataFile = kdataPath + "/" + date + "_factor.json";
+		String kdataFile = kdataPath + "/factor_s" + date + ".json";
 		
 		String url = "http://api.tushare.pro";
 		JSONObject args = new JSONObject();

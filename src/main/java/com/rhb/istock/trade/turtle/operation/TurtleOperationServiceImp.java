@@ -50,6 +50,8 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 
 	Turtle turtle = null;
 	
+	List<Potential> potentials = null;
+	
 	@Override
 	public void init() {
 		long beginTime=System.currentTimeMillis(); 
@@ -92,7 +94,6 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 			hold.setReopenPrice(reopenPrice);
 			hold.setIndustry(item.getIndustry());
 			hold.setArea(item.getArea());
-	
 			
 			holds.add(hold);
 			
@@ -182,10 +183,15 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 		List<String> holds = selectorService.getHoldIDs();
 		List<String> labels;
 		
-		List<Potential> potentials = this.getPotentialWithLatestMarketData();
+		if(this.potentials == null) {
+			this.createPotentialsWithLatestMarketData();			
+		}else {
+			this.refreshPotentialsWithLatestMarketDate();
+		}
+		
 		int i=1;
 		for(Potential potential : potentials) {
-			Progress.show(potentials.size(), i++, potential.getItemID());
+			Progress.show(potentials.size(), i++, "assembling view... " + potential.getItemID());
 
 			view = new TurtleView();
 			view.setItemID(potential.getItemID());
@@ -345,33 +351,51 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 		return favors.containsKey(itemID);
 	}
 	
-	private List<Potential> getPotentialWithLatestMarketData(){
+	private void refreshPotentialsWithLatestMarketDate() {
 		long beginTime=System.currentTimeMillis(); 
-		System.out.println("getPotentialWithLatestMarketData ......");
+		System.out.println("refreshPotentialsWithLatestMarketDate ......");
 
-		List<Potential> potentials = selectorService.getLastPotentials();
-		Kbar kbar;
+		Map<String, Potential> ps= selectorService.getLastPotentials();
+		
+		int i=1;
+		for(Potential potential : this.potentials) {
+			Progress.show(this.potentials.size(),i++, " update latest price and amount ... " + potential.getItemID());
+			potential.setLatestPrice(ps.get(potential.getItemID()).getLatestPrice());
+			potential.setAmount(ps.get(potential.getItemID()).getAmount());
+		}
+		
+		this.setBHL();
+		this.setBDT();
+		this.setBAV();
+
+		System.out.println("refreshPotentialsWithLatestMarketDate done!");
+		long used = (System.currentTimeMillis() - beginTime)/1000; 
+		System.out.println("用时：" + used + "秒");     
+	}
+	
+	private void createPotentialsWithLatestMarketData(){
+		long beginTime=System.currentTimeMillis(); 
+		System.out.println("createPotentialsWithLatestMarketData ......");
+
+		this.potentials = new ArrayList<Potential>(selectorService.getLastPotentials().values());
+
 		int i=1;
 		for(Potential potential : potentials) {
-			Progress.show(potentials.size(),i++,potential.getItemID());
+			Progress.show(potentials.size(),i++, " sorting by hl/av/dt... " + potential.getItemID());
 			
-			//kbar = kdataService.getLatestMarketData(potential.getItemID());
-			//potential.setLatestPrice(kbar.getClose());
-			//potential.setAmount(kbar.getAmount());
 			potential.setHlb(this.getHLB(potential.getItemID()));
 			potential.setAvb(this.getAVB(potential.getItemID()));
 			potential.setDtb(this.getDTB(potential.getItemID()));
 		}
 		
-		potentials = this.refreshHL(potentials);
-		potentials = this.refreshDT(potentials);
-		potentials = this.refreshAV(potentials);
+		this.setBHL();
+		this.setBDT();
+		this.setBAV();
 
-		System.out.println("getPotentialWithLatestMarketData done!");
+		System.out.println("createPotentialsWithLatestMarketData done!");
 		long used = (System.currentTimeMillis() - beginTime)/1000; 
 		System.out.println("用时：" + used + "秒");     
 		
-		return potentials;
 	}
 	
 	private Integer getHLB(String itemID) {
@@ -404,56 +428,58 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 		return null;
 	}
 	
-	private List<Potential> refreshHL(List<Potential> potentials){
-		Collections.sort(potentials, new Comparator<Potential>() {
+	private void setBHL(){
+		Collections.sort(this.potentials, new Comparator<Potential>() {
 			@Override
 			public int compare(Potential o1, Potential o2) {
 				return o1.getHLGap().compareTo(o2.getHLGap());
 			}
 		});
 		int i=1;
-		for(Potential potential : potentials) {
+		for(Potential potential : this.potentials) {
 			if(potential.getStatus()=="2") {
 				potential.setBhl(i++);
 			}
-			if(i>5) break;
+			if(i>5) {
+				potential.setBhl(null);
+			};
 		}
-		return potentials;
 	}
 	
-	private List<Potential> refreshDT(List<Potential> potentials){
-		Collections.sort(potentials, new Comparator<Potential>() {
+	private void setBDT(){
+		Collections.sort(this.potentials, new Comparator<Potential>() {
 			@Override
 			public int compare(Potential o1, Potential o2) {
 				return o2.getAmount().compareTo(o1.getAmount());
 			}
 		});
 		int i=1;
-		for(Potential potential : potentials) {
+		for(Potential potential : this.potentials) {
 			if(potential.getStatus()=="2") {
 				potential.setBdt(i++);
 			}
-			if(i>5) break;
+			if(i>5) {
+				potential.setBdt(null);
+			}
 		}
-		
-		return potentials;
 	}
 
-	private List<Potential> refreshAV(List<Potential> potentials){
-		Collections.sort(potentials, new Comparator<Potential>() {
+	private void setBAV(){
+		Collections.sort(this.potentials, new Comparator<Potential>() {
 			@Override
 			public int compare(Potential o1, Potential o2) {
 				return o2.getAverageAmount().compareTo(o1.getAverageAmount());
 			}
 		});
 		int i=1;
-		for(Potential potential : potentials) {
+		for(Potential potential : this.potentials) {
 			if(potential.getStatus()=="2") {
 				potential.setBav(i++);
 			}
-			if(i>5) break;
+			if(i>5) {
+				potential.setBav(null);
+			};
 		}
-		return potentials;
 	}
 
 	@Override

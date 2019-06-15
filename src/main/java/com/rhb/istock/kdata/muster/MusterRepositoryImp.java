@@ -5,7 +5,9 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,8 +28,8 @@ public class MusterRepositoryImp implements MusterRepository{
 	private String tmpMusterPath;
 	
 	@Override
-	public List<MusterEntity> getMusters(LocalDate date) {
-		List<MusterEntity> entities = new ArrayList<MusterEntity>();
+	public Map<String, MusterEntity> getMusters(LocalDate date) {
+		Map<String, MusterEntity> entities = new HashMap<String, MusterEntity>();
 		
 		String pathAndFile = musterPath + "/" + date.format(DateTimeFormatter.ofPattern("yyyyMMdd")) +  "_55_21_musters.txt";
 		//System.out.println(pathAndFile);
@@ -36,9 +38,11 @@ public class MusterRepositoryImp implements MusterRepository{
 		if(f.exists()) {
 			String source = FileTools.readTextFile(pathAndFile);
 			//System.out.println(source);
+			String[] columns;
 			String[] lines = source.split("\n");
 			for(int i=1; i<lines.length; i++) {
-				entities.add(new MusterEntity(lines[i]));
+				columns = lines[i].split(",");
+				entities.put(columns[0], new MusterEntity(lines[i]));
 			}			
 		}
 		

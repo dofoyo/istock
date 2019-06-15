@@ -29,7 +29,14 @@ public class KdataSpiderTest {
 	ItemRepository itemRepository;
 	
 	//@Test
-	public void testDwnKdataByID() {
+	public void testDwnKdataByID() throws Exception {
+		String itemID = "sz000852";
+		kdataSpiderTushare.downKdata(itemID);
+		kdataSpiderTushare.downFactor(itemID);
+	}
+	
+	@Test
+	public void testDwnKdataByIDs() {
 		List<ItemEntity> items = itemRepository.getItemEntities();
 		int i=1;
 		for(ItemEntity item : items){
@@ -47,9 +54,9 @@ public class KdataSpiderTest {
 
 	//@Test
 	public void testDwnKdataByDate() {
-		LocalDate date = LocalDate.parse("2019-03-19");
+		LocalDate date = LocalDate.parse("2019-06-13");
 		try {
-			kdataSpiderTushare.downKdatas(date);
+			//kdataSpiderTushare.downKdatas(date);
 			kdataSpiderTushare.downFactors(date); //此处仅供测试，正式使用时，factor的日期要比kdata的日期提前一个交易日
 			
 		} catch (Exception e) {

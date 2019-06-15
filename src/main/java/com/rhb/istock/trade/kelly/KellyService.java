@@ -17,15 +17,10 @@ import org.springframework.stereotype.Service;
 import com.rhb.istock.comm.util.Progress;
 import com.rhb.istock.kdata.Kbar;
 import com.rhb.istock.kdata.KdataService;
-import com.rhb.istock.selector.breaker.BreakerService;
 import com.rhb.istock.trade.kelly.repository.KellyRepository;
 
 @Service("kellyService")
 public class KellyService {
-	@Autowired
-	@Qualifier("breakerService")
-	BreakerService breakerService;
-	
 	@Autowired
 	@Qualifier("kdataServiceImp")
 	KdataService kdataService;
@@ -37,65 +32,6 @@ public class KellyService {
 	private Integer top = 3;
 	private Integer maxOfOrders = 9;
 	
-	public void caculateFValuesByHL() {
-		long beginTime=System.currentTimeMillis(); 
-		System.out.println("caculateFValuesByHL ......");
-
-		TreeMap<LocalDate,BigDecimal> fs = new TreeMap<LocalDate,BigDecimal>();
-		
-		Map<LocalDate,List<String>> breakerIDs = breakerService.getBreakersSortByHL();
-		List<String> newIDs;
-		Set<String> holdIDs;
-		Kbar bar;
-		Formula formula = new Formula();
-		BigDecimal fvalue = null;
-		DecimalFormat df = new DecimalFormat("0.00");
-		int i=1;
-		for(Map.Entry<LocalDate, List<String>> entry : breakerIDs.entrySet()) {
-			if(entry.getKey().isAfter(LocalDate.parse("2018-01-01"))) {
-				//放入新价格
-				holdIDs = formula.getHoldIDs();
-				for(String id : holdIDs) {
-					bar = kdataService.getKbar(id, entry.getKey(), false);
-					if(bar != null) {
-						formula.setLatestPrice(id, bar.getClose());
-					}
-				}
-				
-				//获得f值
-				fvalue = formula.getF();
-				if(fvalue != null) {
-					fs.put(entry.getKey(), fvalue);
-				}
-				
-				//用最新价格替换原价
-				formula.refresh();
-				
-				
-				//放入新记录
-				newIDs = entry.getValue();
-				int count = 0;
-				for(String id : newIDs) {
-					bar = kdataService.getKbar(id, entry.getKey(), false);
-					if(bar != null && formula.add(id, entry.getKey(), bar.getClose())) {
-						count++;
-						if(count > top) {
-							break;
-						}
-					}
-				}
-				
-			}
-			Progress.show(breakerIDs.size(),i++, entry.getKey().toString() + ", " + (fvalue==null? "" : df.format(fvalue)));
-		}
-		
-		kellyRepository.saveFvaluesOfHL(fs);
-		
-		System.out.println("\ncaculateFValuesByHL done!");
-		long used = (System.currentTimeMillis() - beginTime)/1000; 
-		System.out.println("用时：" + used + "秒");          
-
-	}
 	
 	class Formula{
 		List<Order> orders = new ArrayList<Order>();

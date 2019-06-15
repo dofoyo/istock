@@ -3,6 +3,7 @@ package com.rhb.istock.kdata;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -126,12 +127,14 @@ public class KdataServiceImp implements KdataService{
 	@Override
 	public void downKdatasAndFactors() throws Exception {
 		System.out.println("KdataService.downKdatas..........");
-		LocalDate latestDate = kdataRealtimeSpider.getLatestMarketDate();
-		LocalDate lastDownDate = kdataRepository.getLastDate();
-		List<LocalDate> dates = kdataRealtimeSpider.getCalendar(lastDownDate,latestDate);
 		
+		LocalDate latestDate = kdataRealtimeSpider.getLatestMarketDate();
 		System.out.println("latest trade date " + latestDate);
-		System.out.println("latest down date " + lastDownDate);
+
+		LocalDate lastDownDate = kdataRepository.getLastDate();
+		System.out.println("last down date " + lastDownDate);
+
+		List<LocalDate> dates = kdataRealtimeSpider.getCalendar(lastDownDate,latestDate);
 		System.out.println("dates bewteen latest trade date and down date " + dates);
 		
 		LocalDate date;
@@ -145,7 +148,7 @@ public class KdataServiceImp implements KdataService{
 		for(int i=1; i<dates.size(); i++) { //因为factor比收盘数据早得到（开盘前就得到factor，收盘后才得到kdata）,
 			date = dates.get(i);
 			System.out.println("download "+ date +" factors from tushare, please wait....... ");
-			kdataSpider.downFactors(date);
+			//kdataSpider.downFactors(date);
 			System.out.println("downloaded "+ date +" factors from tushare.");
 		}
 		
@@ -256,7 +259,7 @@ public class KdataServiceImp implements KdataService{
 			kdata = this.getKdata(item.getItemID(), true);
 			dates = kdata.getDates();
 			
-			int j=1;
+			//int j=1;
 			for(LocalDate date : dates) {
 				//Progress.show(dates.size(),j++, date.toString());//进度条
 				entity = this.getMusterEntity(item.getItemID(), date, true);
@@ -326,7 +329,7 @@ public class KdataServiceImp implements KdataService{
 	}
 
 	@Override
-	public List<Muster> getLatestMusters() {
+	public Map<String,Muster> getLatestMusters() {
 		LocalDate date = kdataRealtimeSpider.getLatestMarketDate();
 		return this.getMusters(date);
 	}
@@ -363,14 +366,13 @@ public class KdataServiceImp implements KdataService{
 	}
 
 	@Override
-	public List<Muster> getMusters(LocalDate date) {
-		List<Muster> musters = new ArrayList<Muster>();
+	public Map<String,Muster> getMusters(LocalDate date) {
+		Map<String,Muster> musters = new HashMap<String,Muster>();
 		Muster muster;
 		
-		List<MusterEntity> entities = musterRepositoryImp.getMusters(date);
+		Map<String, MusterEntity> entities = musterRepositoryImp.getMusters(date);
 		
-		
-		for(MusterEntity entity : entities) {
+		for(MusterEntity entity : entities.values()) {
 			muster = new Muster();
 			muster.setItemID(entity.getItemID());
 			muster.setAmount(entity.getAmount());
@@ -381,7 +383,7 @@ public class KdataServiceImp implements KdataService{
 			muster.setDropPrice(entity.getDropPrice());
 			muster.setLatestPrice(entity.getLatestPrice());
 			
-			musters.add(muster);
+			musters.put(muster.getItemID(),muster);
 		}
 		
 		return musters;
@@ -394,10 +396,10 @@ public class KdataServiceImp implements KdataService{
 
 		Kbar kbar;
 		LocalDate date = this.getLatestMarketDate();
-		List<Muster> musters = this.getLatestMusters();
+		Map<String,Muster> musters = this.getLatestMusters();
 		List<MusterEntity> entities = new ArrayList<MusterEntity>();
 		int i=1;
-		for(Muster muster : musters) {
+		for(Muster muster : musters.values()) {
 			Progress.show(musters.size(),i++, muster.getItemID());
 
 			kbar = this.getLatestMarketData(muster.getItemID());

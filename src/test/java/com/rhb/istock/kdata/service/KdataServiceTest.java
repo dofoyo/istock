@@ -1,6 +1,7 @@
 package com.rhb.istock.kdata.service;
 
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -46,8 +47,8 @@ public class KdataServiceTest {
 	
 	//@Test
 	public void getLastMusters() {
-		List<Muster> musters = kdataService.getLatestMusters();
-		for(Muster muster : musters) {
+		Map<String,Muster> musters = kdataService.getLatestMusters();
+		for(Muster muster : musters.values()) {
 			System.out.println(muster);
 		}
 	}

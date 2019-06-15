@@ -1,5 +1,9 @@
 package com.rhb.istock.comm.util;
 
+import java.io.File;
+import java.time.format.DateTimeFormatter;
+
+import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 
 public class HttpClientTest {
@@ -13,10 +17,12 @@ public class HttpClientTest {
 		System.out.println(gn);
 	}
 	
-	@Test
+	//@Test
 	public void sleep() {
 		for(int i=0; i<10; i++) {
 			HttpClient.sleep(5);
 		}
 	}
+	
+
 }

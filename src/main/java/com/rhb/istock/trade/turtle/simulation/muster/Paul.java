@@ -36,7 +36,9 @@ public class Paul {
 			if(muster!=null) {
 				account.refreshHoldsPrice(itemID, muster.getLatestPrice());
 				
-				if(muster.isDrop() && !muster.isDownLimited()) {
+				if(muster.isDrop() && !muster.isDownLimited()) { 		//跌破21日均线就卖
+				//if(muster.isDown() && !muster.isDownLimited()) {  //下跌就卖
+				//if(!muster.isBreaker() && !muster.isDownLimited()) {  //没有突破就卖
 					account.drop(itemID, "", muster.getLatestPrice());
 				}				
 			}

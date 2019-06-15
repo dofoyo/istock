@@ -16,7 +16,6 @@ public class KellyServiceTest {
 	
 	@Test
 	public void test() {
-		kellyService.caculateFValuesByHL();
 	}
 	
 }
