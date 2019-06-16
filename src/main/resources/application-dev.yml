@@ -19,6 +19,7 @@ breakersSortByHLFile: D:/dev/istock-data/breakersSortByHL.txt
 breakersSortByDTFile: D:/dev/istock-data/breakersSortByDT.txt
 breakersSortByAVFile: D:/dev/istock-data/breakersSortByAV.txt
 fvaluesOfHLFile: D:/dev/istock-data/fvaluesOfHL.txt
+dailyMeansFile: D:/dev/istock-data/dailyMeans.txt
 
 
 

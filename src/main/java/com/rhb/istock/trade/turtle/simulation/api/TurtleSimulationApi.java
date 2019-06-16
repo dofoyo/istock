@@ -100,6 +100,7 @@ public class TurtleSimulationApi {
 		}
 		
 		turtleMusterSimulation.simulate(theBeginDate, theEndDate);
+		turtleMusterSimulation.generateDailyRatios(theBeginDate, theEndDate);
 
 		turtleSimulationRepository.evictAmountsCache();
 		turtleSimulationRepository.evictBreakersCache();
@@ -109,6 +110,38 @@ public class TurtleSimulationApi {
 		return new ResponseContent<String>(ResponseEnum.SUCCESS, "");
 		
 	}	
+	
+	@GetMapping("/turtle/simulation/means/{date}")
+	public ResponseContent<MeanView> getDailyMeans(
+			@PathVariable(value="date") String endDate){
+
+		MeanView view = new MeanView();
+
+		LocalDate theEndDate = null;
+		try{
+			theEndDate = LocalDate.parse(endDate, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+		}catch(Exception e){
+			return new ResponseContent<MeanView>(ResponseEnum.ERROR, view);
+		}
+		
+		LocalDate theDate;
+		Map<String,Map<String,String>> results = turtleSimulationRepository.getDailyMeans();
+		for(Map.Entry<String, Map<String,String>> entry : results.entrySet()) {
+			theDate = LocalDate.parse(entry.getKey());
+			if(theDate.isBefore(theEndDate) || theDate.equals(theEndDate)) {
+				view.add(entry.getKey(), 
+						entry.getValue().get("bhl"), 
+						entry.getValue().get("bav"), 
+						entry.getValue().get("bdt"), 
+						entry.getValue().get("hlb"), 
+						entry.getValue().get("avb"), 
+						entry.getValue().get("dtb"));
+			}
+		}
+	
+		return new ResponseContent<MeanView>(ResponseEnum.SUCCESS, view);
+	}
+
 	
 	@GetMapping("/turtle/simulation/allamounts/{date}")
 	public ResponseContent<AllAmountView> getAmounts(
@@ -134,22 +167,15 @@ public class TurtleSimulationApi {
 
 		for(LocalDate theDate : bhl.keySet()) {
 			if(theDate.isBefore(theEndDate) || theDate.equals(theEndDate)) {
-				view.add(theDate, bhl.get(theDate).getTotal(), bav.get(theDate).getTotal(), bdt.get(theDate).getTotal(),
-						hlb.get(theDate).getTotal(), avb.get(theDate).getTotal(), dtb.get(theDate).getTotal());
-				
-				if(min==null) {
-					min = bhl.get(theDate).getTotal();
-				}
-				
-				min = min.compareTo(bhl.get(theDate).getTotal())==1 ? bhl.get(theDate).getTotal() : min;
-				min = min.compareTo(bav.get(theDate).getTotal())==1 ? bav.get(theDate).getTotal() : min;
-				min = min.compareTo(bdt.get(theDate).getTotal())==1 ? bdt.get(theDate).getTotal() : min;
-				min = min.compareTo(hlb.get(theDate).getTotal())==1 ? hlb.get(theDate).getTotal() : min;
-				min = min.compareTo(avb.get(theDate).getTotal())==1 ? avb.get(theDate).getTotal() : min;
-				min = min.compareTo(dtb.get(theDate).getTotal())==1 ? dtb.get(theDate).getTotal() : min;
+				view.add(theDate, 
+						bhl.get(theDate).getTotal(),
+						bav.get(theDate).getTotal(),
+						bdt.get(theDate).getTotal(),
+						hlb.get(theDate).getTotal(), 
+						avb.get(theDate).getTotal(), 
+						dtb.get(theDate).getTotal());
 			}
 		}
-		view.setMin(min);
 	
 		return new ResponseContent<AllAmountView>(ResponseEnum.SUCCESS, view);
 	}

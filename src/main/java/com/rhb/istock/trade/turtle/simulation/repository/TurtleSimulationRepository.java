@@ -20,6 +20,52 @@ public class TurtleSimulationRepository {
 	@Value("${reportPath}")
 	private String reportPath;
 	
+	@Value("${dailyMeansFile}")
+	private String dailyMeansFile;
+	
+	public TreeMap<String,Map<String,String>> getDailyMeans(){
+		TreeMap<String,Map<String,String>> means = new TreeMap<String,Map<String,String>>();
+		
+		String[] lines = FileTools.readTextFile(dailyMeansFile).split("\n");
+		String[] columns;
+		String date;
+		Map<String,String> values;
+		for(int i=1; i<lines.length; i++) {
+			columns = lines[i].split(",");
+			
+			date = columns[0];
+			
+			values = new HashMap<String,String>();
+			values.put("bhl", columns[1]);
+			values.put("bav", columns[2]);
+			values.put("bdt", columns[3]);
+			values.put("hlb", columns[4]);
+			values.put("avb", columns[5]);
+			values.put("dtb", columns[6]);
+			
+			means.put(date, values);
+		}		
+		
+		return means;
+
+	}
+	
+	public void saveDailyMeans(Map<LocalDate,Map<String,Integer>> dailyMeans) {
+		StringBuffer sb = new StringBuffer("date,bhl,bav,bdt,hlb,avb,dtb\n");
+		for(Map.Entry<LocalDate, Map<String,Integer>> entry : dailyMeans.entrySet()) {
+			sb.append(entry.getKey());
+			sb.append(",");
+			
+			sb.append(entry.getValue().get("bhl") + ",");
+			sb.append(entry.getValue().get("bav") + ",");
+			sb.append(entry.getValue().get("bdt") + ",");
+			sb.append(entry.getValue().get("hlb") + ",");
+			sb.append(entry.getValue().get("avb") + ",");
+			sb.append(entry.getValue().get("dtb") + "\n");
+		}
+		FileTools.writeTextFile(dailyMeansFile, sb.toString(), false);
+	}
+	
 	public void save(String type, String breakers, String details, String dailyAmounts) {
 		FileTools.writeTextFile(reportPath + "/" + type + "_simulation_breakers.csv", breakers, false);
 		FileTools.writeTextFile(reportPath + "/" + type + "_simulation_detail.csv", details, false);

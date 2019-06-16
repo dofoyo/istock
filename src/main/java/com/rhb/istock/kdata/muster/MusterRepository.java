@@ -16,6 +16,8 @@ public interface MusterRepository {
 	
 	public Map<String,MusterEntity> getMusters(LocalDate date);
 	
+	public List<LocalDate> getMusterDates(LocalDate beginDate, LocalDate endDate);
+	
 	public void cleanTmpMusters();
 	public void copyTmpMusters();
 
