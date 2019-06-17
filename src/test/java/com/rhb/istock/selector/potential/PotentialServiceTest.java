@@ -21,7 +21,7 @@ public class PotentialServiceTest {
 
 	@Test
 	public void getLatestPotentials() {
-		Map<String,Potential> ps = potentialService.getLastPotentials();
+		Map<String,Potential> ps = potentialService.getLatestPotentials();
 		for(Potential p : ps.values()) {
 			//System.out.println(p);
 		}

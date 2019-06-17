@@ -147,7 +147,7 @@ public class SelectorServiceImp implements SelectorService{
 
 
 	@Override
-	public Map<String,Potential> getLastPotentials() {
-		return potentialService.getLastPotentials();
+	public Map<String,Potential> getLatestPotentials() {
+		return potentialService.getLatestPotentials();
 	}
 }

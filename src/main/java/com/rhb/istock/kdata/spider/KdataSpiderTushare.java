@@ -94,12 +94,12 @@ public class KdataSpiderTushare implements KdataSpider {
 			for(int i=0; i<items.length(); i++) {
 				item = items.getJSONArray(i);
 
-				Progress.show(items.length(),i,item.getString(0));
+				Progress.show(items.length(),i, " KdataSpiderTushare.downloadKdata " + item.getString(0));
 
 				setKdata(item);
 			}
 		}
-		System.out.println("KdataSpiderTushare.downloadKdata of " + date + " done!");
+		System.out.println("\nKdataSpiderTushare.downloadKdata of " + date + " done!");
 		long used = (System.currentTimeMillis() - beginTime)/1000; 
 		System.out.println("用时：" + used + "秒");          
 		
@@ -136,7 +136,7 @@ public class KdataSpiderTushare implements KdataSpider {
 				for(int i=0; i<items.length(); i++) {
 					item = items.getJSONArray(i);
 					
-					Progress.show(items.length(),i,item.getString(0));
+					Progress.show(items.length(),i, " KdataSpiderTushare.downloadFactor " + item.getString(0));
 					
 					setFactor(item);
 				}

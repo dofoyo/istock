@@ -23,7 +23,7 @@ public class PotentialService {
 	@Qualifier("kdataServiceImp")
 	KdataService kdataService;
 	
-	public Map<String,Potential> getLastPotentials(){
+	public Map<String,Potential> getLatestPotentials(){
 		Map<String,Potential> potentials = new HashMap<String,Potential>();
 		Potential potential;
 		

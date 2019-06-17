@@ -26,7 +26,21 @@ public class TurtleOperationServiceTest {
 		List<TurtleView> views = turtleService.getPotentials();
 		for(TurtleView view : views) {
 			System.out.println(view);
-		}		
+		}	
+		
+		try {
+			Thread.sleep(10000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		System.out.println("---**************************--------------");
+		
+		views = turtleService.getPotentials();
+		for(TurtleView view : views) {
+			System.out.println(view);
+		}	
 	}
 	
 	//@Test

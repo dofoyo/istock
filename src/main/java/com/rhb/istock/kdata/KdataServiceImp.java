@@ -148,7 +148,7 @@ public class KdataServiceImp implements KdataService{
 		for(int i=1; i<dates.size(); i++) { //因为factor比收盘数据早得到（开盘前就得到factor，收盘后才得到kdata）,
 			date = dates.get(i);
 			System.out.println("download "+ date +" factors from tushare, please wait....... ");
-			//kdataSpider.downFactors(date);
+			kdataSpider.downFactors(date);
 			System.out.println("downloaded "+ date +" factors from tushare.");
 		}
 		
@@ -254,7 +254,7 @@ public class KdataServiceImp implements KdataService{
 		List<Item> items = itemService.getItems();
 		int i=1;
 		for(Item item : items) {
-			Progress.show(items.size(),i++, item.getItemID());//进度条
+			Progress.show(items.size(),i++, " generateMusters " + item.getItemID());//进度条
 			
 			kdata = this.getKdata(item.getItemID(), true);
 			dates = kdata.getDates();
@@ -273,7 +273,7 @@ public class KdataServiceImp implements KdataService{
 		
 		musterRepositoryImp.copyTmpMusters();
 		
-		System.out.println("generateMusters done!");
+		System.out.println("\ngenerateMusters done!");
 		long used = (System.currentTimeMillis() - beginTime)/1000; 
 		System.out.println("用时：" + used + "秒");          
 	}
@@ -351,7 +351,7 @@ public class KdataServiceImp implements KdataService{
 			List<Item> items = itemService.getItems();
 			int i=1;
 			for(Item item : items) {
-				Progress.show(items.size(),i++, item.getItemID());//进度条
+				Progress.show(items.size(),i++, " generateLastMusters " + item.getItemID());//进度条
 				
 				entity = this.getMusterEntity(item.getItemID(), date, false);
 				if(entity!=null) musterRepositoryImp.saveMuster(date, entity);
@@ -400,7 +400,7 @@ public class KdataServiceImp implements KdataService{
 		List<MusterEntity> entities = new ArrayList<MusterEntity>();
 		int i=1;
 		for(Muster muster : musters.values()) {
-			Progress.show(musters.size(),i++, muster.getItemID());
+			Progress.show(musters.size(),i++, " updateLatestMusters " + muster.getItemID());
 
 			kbar = this.getLatestMarketData(muster.getItemID());
 			if(kbar!=null) {
@@ -416,7 +416,7 @@ public class KdataServiceImp implements KdataService{
 		}
 		musterRepositoryImp.saveMusters(date,entities);
 
-		System.out.println("updateLatestMusters done!");
+		System.out.println("\nupdateLatestMusters done!");
 		long used = (System.currentTimeMillis() - beginTime)/1000; 
 		System.out.println("用时：" + used + "秒");     
 

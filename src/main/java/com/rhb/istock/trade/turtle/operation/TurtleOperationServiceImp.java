@@ -59,7 +59,7 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 		
 		turtle = new Turtle();
 		
-		System.out.println("TurtleOperationService init done!");
+		System.out.println("\nTurtleOperationService init done!");
 		long used = (System.currentTimeMillis() - beginTime)/1000; 
 		System.out.println("用时：" + used + "秒");          
 	}
@@ -190,8 +190,8 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 		}
 		
 		int i=1;
-		for(Potential potential : potentials) {
-			Progress.show(potentials.size(), i++, "assembling view... " + potential.getItemID());
+		for(Potential potential : this.potentials) {
+			Progress.show(this.potentials.size(), i++, "assembling view... " + potential.getItemID());
 
 			view = new TurtleView();
 			view.setItemID(potential.getItemID());
@@ -228,7 +228,7 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 			}
 		});	
 		
-		System.out.println("getting potential views done!");
+		System.out.println("\ngetting potential views done!");
 		long used = (System.currentTimeMillis() - beginTime)/1000; 
 		System.out.println("用时：" + used + "秒");     
 		
@@ -308,7 +308,7 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 			}
 		});	
 		
-		System.out.println("getting "+name+" views done!");
+		System.out.println("\ngetting "+name+" views done!");
 		long used = (System.currentTimeMillis() - beginTime)/1000; 
 		System.out.println("用时：" + used + "秒");     
 		
@@ -355,20 +355,28 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 		long beginTime=System.currentTimeMillis(); 
 		System.out.println("refreshPotentialsWithLatestMarketDate ......");
 
-		Map<String, Potential> ps= selectorService.getLastPotentials();
+		Map<String, Potential> ps= selectorService.getLatestPotentials();
 		
-		int i=1;
-		for(Potential potential : this.potentials) {
-			Progress.show(this.potentials.size(),i++, " update latest price and amount ... " + potential.getItemID());
-			potential.setLatestPrice(ps.get(potential.getItemID()).getLatestPrice());
-			potential.setAmount(ps.get(potential.getItemID()).getAmount());
+		//System.out.println("potentials.size() = " + ps.size());
+		
+		if(ps.size()>0) {
+			int i=1;
+			for(Potential potential : this.potentials) {
+				Progress.show(this.potentials.size(),i++, " refresh latest price and amount ... " + potential.getItemID());
+				if(ps.get(potential.getItemID())!=null) {
+					potential.setLatestPrice(ps.get(potential.getItemID()).getLatestPrice());
+					potential.setAmount(ps.get(potential.getItemID()).getAmount());
+				}else {
+					System.out.println(" kicked out of potentials!");
+				}
+			}
+			
+			this.setBHL();
+			this.setBDT();
+			this.setBAV();
 		}
-		
-		this.setBHL();
-		this.setBDT();
-		this.setBAV();
 
-		System.out.println("refreshPotentialsWithLatestMarketDate done!");
+		System.out.println("\nrefreshPotentialsWithLatestMarketDate done!");
 		long used = (System.currentTimeMillis() - beginTime)/1000; 
 		System.out.println("用时：" + used + "秒");     
 	}
@@ -377,7 +385,7 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 		long beginTime=System.currentTimeMillis(); 
 		System.out.println("createPotentialsWithLatestMarketData ......");
 
-		this.potentials = new ArrayList<Potential>(selectorService.getLastPotentials().values());
+		this.potentials = new ArrayList<Potential>(selectorService.getLatestPotentials().values());
 
 		int i=1;
 		for(Potential potential : potentials) {
@@ -392,7 +400,7 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 		this.setBDT();
 		this.setBAV();
 
-		System.out.println("createPotentialsWithLatestMarketData done!");
+		System.out.println("\ncreatePotentialsWithLatestMarketData done!");
 		long used = (System.currentTimeMillis() - beginTime)/1000; 
 		System.out.println("用时：" + used + "秒");     
 		
