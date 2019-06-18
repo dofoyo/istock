@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import com.rhb.istock.comm.util.Progress;
 import com.rhb.istock.item.repository.ItemEntity;
 import com.rhb.istock.item.repository.ItemRepository;
 
@@ -31,19 +32,19 @@ public class KdataSpiderTest {
 	//@Test
 	public void testDwnKdataByID() throws Exception {
 		String itemID = "sz000852";
-		kdataSpiderTushare.downKdata(itemID);
-		kdataSpiderTushare.downFactor(itemID);
+		kdataSpiderTushare.downKdatas(itemID);
+		kdataSpiderTushare.downFactors(itemID);
 	}
 	
-	@Test
+	//@Test
 	public void testDwnKdataByIDs() {
 		List<ItemEntity> items = itemRepository.getItemEntities();
 		int i=1;
 		for(ItemEntity item : items){
-			System.out.format(" %d/%d \n", i++, items.size());
+			Progress.show(items.size(),i++, " testDwnKdataByIDs  " + item.getItemId());
 			try {
-				kdataSpiderTushare.downKdata(item.getItemId());
-				kdataSpiderTushare.downFactor(item.getItemId());
+				kdataSpiderTushare.downKdatas(item.getItemId());
+				kdataSpiderTushare.downFactors(item.getItemId());
 				Thread.sleep(300); //一分钟200个
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
@@ -52,9 +53,9 @@ public class KdataSpiderTest {
 		}
 	}
 
-	//@Test
+	@Test
 	public void testDwnKdataByDate() {
-		LocalDate date = LocalDate.parse("2019-06-13");
+		LocalDate date = LocalDate.parse("2019-06-18");
 		try {
 			//kdataSpiderTushare.downKdatas(date);
 			kdataSpiderTushare.downFactors(date); //此处仅供测试，正式使用时，factor的日期要比kdata的日期提前一个交易日
@@ -70,7 +71,7 @@ public class KdataSpiderTest {
 	public void testDownKdataByIDFrom163() {
 		String id = "sh000001";
 		try {
-			kdataSpider163.downKdata(id);
+			kdataSpider163.downKdatas(id);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

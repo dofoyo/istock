@@ -153,9 +153,11 @@ public class KdataServiceImp implements KdataService{
 		}
 		
 		if(dates.size()>0) {
+			System.out.println("download latest date "+ latestDate +" factors from tushare, please wait....... ");
 			kdataSpider.downFactors(latestDate);  //执行了这一步后，不需要再对收盘数据额外的复权处理了
+			System.out.println("downloaded latest date "+ latestDate +" factors from tushare.");
 			
-			kdataSpider163.downKdata(szzs);
+			kdataSpider163.downKdatas(szzs);
 			evictKDataCache();
 			
 			this.generateLatestMusters(); //此方法每天开盘时执行一次
@@ -338,7 +340,7 @@ public class KdataServiceImp implements KdataService{
 	@Override
 	public void generateLatestMusters() {
 		long beginTime=System.currentTimeMillis(); 
-		System.out.println("generateLastMusters ......");
+		System.out.println("generateLatestMusters ......");
 		
 		LocalDate date = kdataRealtimeSpider.getLatestMarketDate();
 
@@ -351,7 +353,7 @@ public class KdataServiceImp implements KdataService{
 			List<Item> items = itemService.getItems();
 			int i=1;
 			for(Item item : items) {
-				Progress.show(items.size(),i++, " generateLastMusters " + item.getItemID());//进度条
+				Progress.show(items.size(),i++, " generateLatestMusters " + item.getItemID());//进度条
 				
 				entity = this.getMusterEntity(item.getItemID(), date, false);
 				if(entity!=null) musterRepositoryImp.saveMuster(date, entity);
@@ -359,7 +361,7 @@ public class KdataServiceImp implements KdataService{
 			}
 		}
 		
-		System.out.println("generateLastMusters done!");
+		System.out.println("generateLatestMusters done!");
 		long used = (System.currentTimeMillis() - beginTime)/1000; 
 		System.out.println("用时：" + used + "秒");          
 		

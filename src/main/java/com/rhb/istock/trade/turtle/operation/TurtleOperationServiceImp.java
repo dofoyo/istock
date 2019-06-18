@@ -57,7 +57,8 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 		long beginTime=System.currentTimeMillis(); 
 		System.out.println("TurtleOperationService init...");
 		
-		turtle = new Turtle();
+		this.turtle = new Turtle();
+		this.potentials = null;
 		
 		System.out.println("\nTurtleOperationService init done!");
 		long used = (System.currentTimeMillis() - beginTime)/1000; 

@@ -70,7 +70,7 @@ public class KdataSpiderSina implements KdataSpider {
 	}
 
 	@Override
-	public void downKdata(String id)  throws Exception {
+	public void downKdatas(String id)  throws Exception {
 		String[] yjs = getYearAndJidu(5);
 		String year;
 		String jidu;
@@ -122,14 +122,14 @@ public class KdataSpiderSina implements KdataSpider {
 	}
 
 	@Override
-	public void downKdata(List<String> ids) throws Exception {
+	public void downKdatas(List<String> ids) throws Exception {
 		long beginTime=System.currentTimeMillis(); 
 		System.out.println("KdataSpiderSina downKdata...");
 
 		int i=0;
 		for(String id : ids) {
 			Progress.show(ids.size(),i++,id);
-			this.downKdata(id);
+			this.downKdatas(id);
 		}
 		
 		System.out.println("KdataSpiderSina downKdata done!");
@@ -152,7 +152,7 @@ public class KdataSpiderSina implements KdataSpider {
 	}
 
 	@Override
-	public void downFactor(String id) throws Exception {
+	public void downFactors(String id) throws Exception {
 		// TODO Auto-generated method stub
 		
 	}

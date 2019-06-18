@@ -9,6 +9,7 @@ import com.rhb.istock.fdata.FinancialStatementService;
 import com.rhb.istock.item.ItemService;
 import com.rhb.istock.kdata.KdataService;
 import com.rhb.istock.selector.SelectorService;
+import com.rhb.istock.trade.turtle.operation.TurtleOperationService;
 
 @Component
 public class IstockScheduledTask {
@@ -28,6 +29,9 @@ public class IstockScheduledTask {
 	@Qualifier("selectorServiceImp")
 	SelectorService selectorService;
 	
+	@Autowired
+	@Qualifier("turtleOperationServiceImp")
+	TurtleOperationService turtleOperationService;
 	
 	/*
 	 * 每周1至5，9:30,开盘后，
@@ -39,6 +43,7 @@ public class IstockScheduledTask {
 	public void dailyInit() throws Exception {
 		itemService.download();		//下载最新股票代码
 		kdataService.downKdatasAndFactors(); //上一交易日的收盘数据要等开盘前才能下载到, 大约需要15分钟
+		turtleOperationService.init();
 	}
 
 	@Scheduled(cron="0 */5 10-11 ? * 1-5")  //周一至周五，每日10点-11点，每5分钟刷新一次 

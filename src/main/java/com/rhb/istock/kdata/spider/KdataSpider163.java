@@ -15,13 +15,13 @@ public class KdataSpider163 implements KdataSpider {
 	private String kdataPath;
 	
 	@Override
-	public void downKdata(List<String> ids) throws Exception {
+	public void downKdatas(List<String> ids) throws Exception {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public void downKdata(String itemID) throws Exception {
+	public void downKdatas(String itemID) throws Exception {
 		String code = itemID.substring(2);
 		String marketCode = (itemID.indexOf("sh")==0 ? "0" : "1") + code;
 		DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyyMMdd");
@@ -59,7 +59,7 @@ public class KdataSpider163 implements KdataSpider {
 	}
 
 	@Override
-	public void downFactor(String id) throws Exception {
+	public void downFactors(String id) throws Exception {
 		// TODO Auto-generated method stub
 		
 	}

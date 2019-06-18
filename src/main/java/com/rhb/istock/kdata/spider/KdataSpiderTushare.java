@@ -27,7 +27,7 @@ public class KdataSpiderTushare implements KdataSpider {
 	private DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyyMMdd");
 
 	@Override
-	public void downKdata(String itemID) {
+	public void downKdatas(String itemID) {
 		String tushareID = itemID.indexOf("sh")==0 ? itemID.substring(2)+".SH" : itemID.substring(2)+".SZ";
 		
 		String url = "http://api.tushare.pro";
@@ -43,12 +43,12 @@ public class KdataSpiderTushare implements KdataSpider {
 		String str = HttpClient.doPostJson(url, args.toString());
 		JSONObject data = (new JSONObject(str)).getJSONObject("data");
 		
-		String kdataFile = kdataPath + "/" + tushareID + ".json";
+		String kdataFile = kdataPath + "/" + tushareID + "_kdatas.json";
 		FileTools.writeTextFile(kdataFile, data.toString(), false);
 	}
 	
 	@Override
-	public void downFactor(String itemID) {
+	public void downFactors(String itemID) {
 		String tushareID = itemID.indexOf("sh")==0 ? itemID.substring(2)+".SH" : itemID.substring(2)+".SZ";
 		String url = "http://api.tushare.pro";
 		JSONObject args = new JSONObject();
@@ -63,7 +63,7 @@ public class KdataSpiderTushare implements KdataSpider {
 		String str = HttpClient.doPostJson(url, args.toString());
 		JSONObject data = (new JSONObject(str)).getJSONObject("data");
 		
-		String kdataFile = kdataPath + "/kdatas" + tushareID + ".json";
+		String kdataFile = kdataPath + "/" + tushareID + "_factors.json";
 		FileTools.writeTextFile(kdataFile, data.toString(), false);
 	}
 
@@ -84,7 +84,7 @@ public class KdataSpiderTushare implements KdataSpider {
 		
 		String str = HttpClient.doPostJson(url, args.toString());
 
-		String kdataFile = kdataPath + "/" + date + ".json";
+		String kdataFile = kdataPath + "/kdatas_" + date + ".json";
 		FileTools.writeTextFile(kdataFile, str, false);
 
 		JSONArray items = (new JSONObject(str)).getJSONObject("data").getJSONArray("items");	
@@ -113,7 +113,7 @@ public class KdataSpiderTushare implements KdataSpider {
 		
 		String result = null;
 		
-		String kdataFile = kdataPath + "/factor_s" + date + ".json";
+		String kdataFile = kdataPath + "/factors_" + date + ".json";
 		
 		String url = "http://api.tushare.pro";
 		JSONObject args = new JSONObject();
@@ -136,14 +136,14 @@ public class KdataSpiderTushare implements KdataSpider {
 				for(int i=0; i<items.length(); i++) {
 					item = items.getJSONArray(i);
 					
-					Progress.show(items.length(),i, " KdataSpiderTushare.downloadFactor " + item.getString(0));
+					Progress.show(items.length(),i, " KdataSpiderTushare.downloadFactor.setFactor " + item.getString(0));
 					
 					setFactor(item);
 				}
 			}			
 		}
 		
-		System.out.println("KdataSpiderTushare.downloadFactor of " + date + " done!");
+		System.out.println("\nKdataSpiderTushare.downloadFactor of " + date + " done!");
 		long used = (System.currentTimeMillis() - beginTime)/1000; 
 		System.out.println("用时：" + used + "秒");          
 	}
@@ -153,7 +153,7 @@ public class KdataSpiderTushare implements KdataSpider {
 			JSONObject data;
 			JSONArray dataItems;
 			String id = item.getString(0);
-			String kdataFile = kdataPath + "/" + id+ ".json";
+			String kdataFile = kdataPath + "/" + id+ "_kdatas.json";
 			File file = new File(kdataFile);
 			if(file.exists()) {
 				data = new JSONObject(FileTools.readTextFile(kdataFile));
@@ -191,7 +191,7 @@ public class KdataSpiderTushare implements KdataSpider {
 			JSONObject data;
 			JSONArray dataItems;
 			String id = item.getString(0);
-			String factorFile = kdataPath + "/" + id+ "_factor.json";
+			String factorFile = kdataPath + "/" + id+ "_factors.json";
 			File file = new File(factorFile);
 			if(file.exists()) {
 				data = new JSONObject(FileTools.readTextFile(factorFile));
@@ -216,18 +216,18 @@ public class KdataSpiderTushare implements KdataSpider {
 	}
 
 	@Override
-	public void downKdata(List<String> ids) throws Exception {
+	public void downKdatas(List<String> ids) throws Exception {
 		long beginTime=System.currentTimeMillis(); 
 		System.out.println("KdataSpiderTushare downKdata...");
 
 		int i=0;
 		for(String id : ids) {
 			Progress.show(ids.size(),i++,id);
-			this.downKdata(id);
+			this.downKdatas(id);
 			Thread.sleep(300); //一分钟200次
 		}
 		
-		System.out.println("KdataSpiderTushare downKdata done!");
+		System.out.println("\nKdataSpiderTushare downKdata done!");
 		
 		long used = (System.currentTimeMillis() - beginTime)/1000; 
 		System.out.println("用时：" + used + "秒");          
@@ -242,11 +242,11 @@ public class KdataSpiderTushare implements KdataSpider {
 		int i=0;
 		for(String id : ids) {
 			Progress.show(ids.size(),i++,id);
-			this.downFactor(id);
+			this.downFactors(id);
 			Thread.sleep(300); //一分钟200次
 		}
 		
-		System.out.println("KdataSpiderTushare downFactors done!");
+		System.out.println("\nKdataSpiderTushare downFactors done!");
 		
 		long used = (System.currentTimeMillis() - beginTime)/1000; 
 		System.out.println("用时：" + used + "秒");          

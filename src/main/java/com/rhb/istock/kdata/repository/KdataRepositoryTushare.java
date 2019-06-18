@@ -34,8 +34,8 @@ public class KdataRepositoryTushare implements KdataRepository{
 		KdataEntity kdata = new KdataEntity(itemID);
 
 		String tushareID = itemID.indexOf("sh")==0 ? itemID.substring(2)+".SH" : itemID.substring(2)+".SZ";
-		String kdataFile = kdataPath + "/" + tushareID + ".json";
-		String factorFile = kdataPath + "/" + tushareID + "_factor.json";
+		String kdataFile = kdataPath + "/" + tushareID + "_kdatas.json";
+		String factorFile = kdataPath + "/" + tushareID + "_factors.json";
 
 		//System.out.println(kdataFile);//----------------
 		BigDecimal roof = null;
