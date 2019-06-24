@@ -1,6 +1,8 @@
 package com.rhb.istock;
 
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.CommandLineRunner;
@@ -28,11 +30,13 @@ public class AppInitRunner implements CommandLineRunner {
 	@Autowired
 	@Qualifier("selectorServiceImp")
 	SelectorService selectorService;
+
+	protected static final Logger logger = LoggerFactory.getLogger(AppInitRunner.class);
 	
     @Override
     public void run(String... args) throws Exception {
-		long beginTime=System.currentTimeMillis(); 
-		System.out.println("AppInitRunner ......");
+    	long beginTime=System.currentTimeMillis(); 
+    	logger.info("AppInitRunner ......");
 		
 		itemService.init();
     	
@@ -41,9 +45,9 @@ public class AppInitRunner implements CommandLineRunner {
 
     	turtleOperationService.init();
 
-    	System.out.println("AppInitRunner done!");
+    	logger.info("AppInitRunner done!");
 		long used = (System.currentTimeMillis() - beginTime)/1000; 
-		System.out.println("用时：" + used + "秒");          
+		logger.info("用时：" + used + "秒");          
     }
 
 }

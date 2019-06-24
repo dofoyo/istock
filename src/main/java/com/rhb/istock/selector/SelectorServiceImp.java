@@ -2,6 +2,7 @@ package com.rhb.istock.selector;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -56,12 +57,12 @@ public class SelectorServiceImp implements SelectorService{
 	}
 
 	@Override
-	public List<String> getLatestHighLowTops(Integer top) {
+	public Map<String,Integer> getLatestHighLowTops(Integer top) {
 		return hlt.getLatestHighLowTops(top);
 	}
 
 	@Override
-	public List<String> getLatestAverageAmountTops(Integer top) {
+	public Map<String,Integer>  getLatestAverageAmountTops(Integer top) {
 		return aat.getLatestAverageAmountTops(top);
 	}
 
@@ -76,8 +77,14 @@ public class SelectorServiceImp implements SelectorService{
 	}
 
 	@Override
-	public List<String> getLatestDailyAmountTops(Integer top) {
-		return dat.getLatestDailyAmountTops(top);
+	public Map<String,Integer> getLatestDailyAmountTops(Integer top) {
+		Map<String,Integer> tops = new HashMap<String,Integer>();
+		List<String> ids = dat.getLatestDailyAmountTops(top);
+		int i=0;
+		for(String id: ids) {
+			tops.put(id, i++);
+		}
+		return tops;
 	}
 
 	@Override

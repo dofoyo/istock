@@ -74,7 +74,7 @@ public class KdataRealtimeSpiderImp implements KdataRealtimeSpider{
 			sb.append(",");
 			ids.add(ss + code);
 		}
-		sb.deleteCharAt(sb.length()-1);
+		if(strs.size()>0) sb.deleteCharAt(sb.length()-1);
 		
 		return ids;
 	}

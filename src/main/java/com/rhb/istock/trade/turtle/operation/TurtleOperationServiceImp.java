@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -51,18 +53,26 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 	Turtle turtle = null;
 	
 	List<Potential> potentials = null;
+	Map<String,Integer> hltops = null;
+	Map<String,Integer> avtops = null;
+	
+	Integer bxxtops = 8;
+	
+	protected static final Logger logger = LoggerFactory.getLogger(TurtleOperationServiceImp.class);
 	
 	@Override
 	public void init() {
 		long beginTime=System.currentTimeMillis(); 
-		System.out.println("TurtleOperationService init...");
+		logger.info("TurtleOperationService init...");
 		
 		this.turtle = new Turtle();
 		this.potentials = null;
+		this.hltops = selectorService.getLatestHighLowTops(21);
+		this.avtops = selectorService.getLatestAverageAmountTops(21);
 		
-		System.out.println("\nTurtleOperationService init done!");
+		logger.info("\nTurtleOperationService init done!");
 		long used = (System.currentTimeMillis() - beginTime)/1000; 
-		System.out.println("用时：" + used + "秒");          
+		logger.info("用时：" + used + "秒");          
 	}
 	
 	@Override
@@ -174,7 +184,7 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 	@Override
 	public List<TurtleView> getPotentials() {
 		long beginTime=System.currentTimeMillis(); 
-		System.out.println("getting potential views ......");
+		logger.info("getting potential views ......");
 		
 		List<TurtleView> views = new ArrayList<TurtleView>();
 		TurtleView view;
@@ -189,7 +199,9 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 		}else {
 			this.refreshPotentialsWithLatestMarketDate();
 		}
-		
+
+		//this.createPotentialsWithLatestMarketData();			
+
 		int i=1;
 		for(Potential potential : this.potentials) {
 			Progress.show(this.potentials.size(), i++, "assembling view... " + potential.getItemID());
@@ -229,16 +241,16 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 			}
 		});	
 		
-		System.out.println("\ngetting potential views done!");
+		logger.info("\ngetting potential views done!");
 		long used = (System.currentTimeMillis() - beginTime)/1000; 
-		System.out.println("用时：" + used + "秒");     
+		logger.info("用时：" + used + "秒");     
 		
 		return views;
 	}
 	
 	private List<TurtleView> getTurtleViews(List<String> itemIDs, String name) {
 		long beginTime=System.currentTimeMillis(); 
-		System.out.println("getting " + name + " views ......");
+		logger.info("getting " + name + " views ......");
 		
 		List<TurtleView> views = new ArrayList<TurtleView>();
 		
@@ -309,9 +321,9 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 			}
 		});	
 		
-		System.out.println("\ngetting "+name+" views done!");
+		logger.info("\ngetting "+name+" views done!");
 		long used = (System.currentTimeMillis() - beginTime)/1000; 
-		System.out.println("用时：" + used + "秒");     
+		logger.info("用时：" + used + "秒");     
 		
 		return views;
 	}
@@ -354,7 +366,7 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 	
 	private void refreshPotentialsWithLatestMarketDate() {
 		long beginTime=System.currentTimeMillis(); 
-		System.out.println("refreshPotentialsWithLatestMarketDate ......");
+		logger.info("refreshPotentialsWithLatestMarketDate ......");
 
 		Map<String, Potential> ps= selectorService.getLatestPotentials();
 		
@@ -377,64 +389,36 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 			this.setBAV();
 		}
 
-		System.out.println("\nrefreshPotentialsWithLatestMarketDate done!");
+		logger.info("\nrefreshPotentialsWithLatestMarketDate done!");
 		long used = (System.currentTimeMillis() - beginTime)/1000; 
-		System.out.println("用时：" + used + "秒");     
+		logger.info("用时：" + used + "秒");     
 	}
 	
 	private void createPotentialsWithLatestMarketData(){
 		long beginTime=System.currentTimeMillis(); 
-		System.out.println("createPotentialsWithLatestMarketData ......");
+		logger.info("createPotentialsWithLatestMarketData ......");
 
+		Map<String,Integer> datops = selectorService.getLatestDailyAmountTops(21);
+		
 		this.potentials = new ArrayList<Potential>(selectorService.getLatestPotentials().values());
 
 		int i=1;
 		for(Potential potential : potentials) {
-			Progress.show(potentials.size(),i++, " sorting by hl/av/dt... " + potential.getItemID());
+			Progress.show(potentials.size(),i++, " sorting by hlb/avb/dtb... " + potential.getItemID());
 			
-			potential.setHlb(this.getHLB(potential.getItemID()));
-			potential.setAvb(this.getAVB(potential.getItemID()));
-			potential.setDtb(this.getDTB(potential.getItemID()));
+			potential.setHlb(this.hltops.get(potential.getItemID()));
+			potential.setAvb(this.avtops.get(potential.getItemID()));
+			potential.setDtb(datops.get(potential.getItemID()));
 		}
 		
 		this.setBHL();
 		this.setBDT();
 		this.setBAV();
 
-		System.out.println("\ncreatePotentialsWithLatestMarketData done!");
+		logger.info("\ncreatePotentialsWithLatestMarketData done!");
 		long used = (System.currentTimeMillis() - beginTime)/1000; 
-		System.out.println("用时：" + used + "秒");     
+		logger.info("用时：" + used + "秒");     
 		
-	}
-	
-	private Integer getHLB(String itemID) {
-		List<String> ids = selectorService.getLatestHighLowTops(21);
-		for(int i=0; i<ids.size(); i++) {
-			if(ids.get(i).equals(itemID)) {
-				return i+1;
-			}
-		}
-		return null;
-	}
-	
-	private Integer getAVB(String itemID) {
-		List<String> ids = selectorService.getLatestAverageAmountTops(21);
-		for(int i=0; i<ids.size(); i++) {
-			if(ids.get(i).equals(itemID)) {
-				return i+1;
-			}
-		}
-		return null;
-	}
-	
-	private Integer getDTB(String itemID) {
-		List<String> ids = selectorService.getLatestDailyAmountTops(21);
-		for(int i=0; i<ids.size(); i++) {
-			if(ids.get(i).equals(itemID)) {
-				return i+1;
-			}
-		}
-		return null;
 	}
 	
 	private void setBHL(){
@@ -449,7 +433,7 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 			if(potential.getStatus()=="2") {
 				potential.setBhl(i++);
 			}
-			if(i>5) {
+			if(i>=bxxtops) {
 				potential.setBhl(null);
 			};
 		}
@@ -467,7 +451,7 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 			if(potential.getStatus()=="2") {
 				potential.setBdt(i++);
 			}
-			if(i>5) {
+			if(i>=bxxtops) {
 				potential.setBdt(null);
 			}
 		}
@@ -485,7 +469,7 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 			if(potential.getStatus()=="2") {
 				potential.setBav(i++);
 			}
-			if(i>5) {
+			if(i>=bxxtops) {
 				potential.setBav(null);
 			};
 		}
@@ -494,6 +478,12 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 	@Override
 	public String[] getTopics() {
 		return itemService.getTopicTops(5);
+	}
+
+	@Override
+	public void redoPotentials() {
+		logger.info("redoPotentials ......");
+		this.createPotentialsWithLatestMarketData();
 	}
 	
 }

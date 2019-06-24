@@ -43,8 +43,8 @@ public class HighLowTopServiceImp implements HighLowTopService {
 	HighLowTopRepository highLowTopRepository;
 	
 	@Override
-	public List<String> getLatestHighLowTops(Integer top) {
-		List<String> tops = new ArrayList<String>();
+	public Map<String,Integer> getLatestHighLowTops(Integer top) {
+		Map<String,Integer> tops = new HashMap<String,Integer>();
 
 		List<Muster> musters = new ArrayList<Muster>(kdataService.getLatestMusters().values());
 		Collections.sort(musters, new Comparator<Muster>() {
@@ -56,7 +56,7 @@ public class HighLowTopServiceImp implements HighLowTopService {
 		
 		for(int i=0; i<top; i++) {
 			//System.out.println(musters.get(i).getItemID() + ": " + musters.get(i).getHLGap());
-			tops.add(musters.get(i).getItemID());
+			tops.put(musters.get(i).getItemID(),i);
 		}
 		
 		return tops;

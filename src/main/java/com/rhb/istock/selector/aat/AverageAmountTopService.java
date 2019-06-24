@@ -2,13 +2,14 @@ package com.rhb.istock.selector.aat;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
 
 public interface AverageAmountTopService {
 	/*
 	 * 用于实操 operation
 	 */
-	public List<String> getLatestAverageAmountTops(Integer top);
+	public Map<String,Integer> getLatestAverageAmountTops(Integer top);
 	
 	/*
 	 * 用于模拟测试 simulation

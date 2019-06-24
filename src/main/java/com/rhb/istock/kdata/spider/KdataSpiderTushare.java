@@ -7,6 +7,8 @@ import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +28,8 @@ public class KdataSpiderTushare implements KdataSpider {
 	
 	private DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyyMMdd");
 
+	protected static final Logger logger = LoggerFactory.getLogger(KdataSpiderTushare.class);
+	
 	@Override
 	public void downKdatas(String itemID) {
 		String tushareID = itemID.indexOf("sh")==0 ? itemID.substring(2)+".SH" : itemID.substring(2)+".SZ";
@@ -70,7 +74,7 @@ public class KdataSpiderTushare implements KdataSpider {
 	@Override
 	public void downKdatas(LocalDate date) {
 		long beginTime=System.currentTimeMillis(); 
-		System.out.println("KdataSpiderTushare.downloadKdata of " + date + "....");
+		logger.info("KdataSpiderTushare.downloadKdata of " + date + "....");
 
 		String url = "http://api.tushare.pro";
 		JSONObject args = new JSONObject();
@@ -94,14 +98,14 @@ public class KdataSpiderTushare implements KdataSpider {
 			for(int i=0; i<items.length(); i++) {
 				item = items.getJSONArray(i);
 
-				Progress.show(items.length(),i, " KdataSpiderTushare.downloadKdata " + item.getString(0));
+				Progress.show(items.length(),i, " KdataSpiderTushare.downloadKdata.setKdata " + item.getString(0));
 
 				setKdata(item);
 			}
 		}
-		System.out.println("\nKdataSpiderTushare.downloadKdata of " + date + " done!");
+		logger.info("\nKdataSpiderTushare.downloadKdata of " + date + " done!");
 		long used = (System.currentTimeMillis() - beginTime)/1000; 
-		System.out.println("用时：" + used + "秒");          
+		logger.info("用时：" + used + "秒");          
 		
 		//FileTools.writeTextFile(kdataFile, str, false);
 	}
@@ -109,7 +113,7 @@ public class KdataSpiderTushare implements KdataSpider {
 	@Override
 	public void downFactors(LocalDate date) {
 		long beginTime=System.currentTimeMillis(); 
-		System.out.println("KdataSpiderTushare.downloadFactor of " + date + "....");
+		logger.info("KdataSpiderTushare.downloadFactor of " + date + "....");
 		
 		String result = null;
 		
@@ -143,9 +147,9 @@ public class KdataSpiderTushare implements KdataSpider {
 			}			
 		}
 		
-		System.out.println("\nKdataSpiderTushare.downloadFactor of " + date + " done!");
+		logger.info("\nKdataSpiderTushare.downloadFactor of " + date + " done!");
 		long used = (System.currentTimeMillis() - beginTime)/1000; 
-		System.out.println("用时：" + used + "秒");          
+		logger.info("用时：" + used + "秒");          
 	}
 	
 	private void setKdata(JSONArray item) {
@@ -218,7 +222,7 @@ public class KdataSpiderTushare implements KdataSpider {
 	@Override
 	public void downKdatas(List<String> ids) throws Exception {
 		long beginTime=System.currentTimeMillis(); 
-		System.out.println("KdataSpiderTushare downKdata...");
+		logger.info("KdataSpiderTushare downKdata...");
 
 		int i=0;
 		for(String id : ids) {
@@ -227,17 +231,17 @@ public class KdataSpiderTushare implements KdataSpider {
 			Thread.sleep(300); //一分钟200次
 		}
 		
-		System.out.println("\nKdataSpiderTushare downKdata done!");
+		logger.info("\nKdataSpiderTushare downKdata done!");
 		
 		long used = (System.currentTimeMillis() - beginTime)/1000; 
-		System.out.println("用时：" + used + "秒");          
+		logger.info("用时：" + used + "秒");          
 		
 	}
 
 	@Override
 	public void downFactors(List<String> ids) throws Exception {
 		long beginTime=System.currentTimeMillis(); 
-		System.out.println("KdataSpiderTushare downFactors...");
+		logger.info("KdataSpiderTushare downFactors...");
 
 		int i=0;
 		for(String id : ids) {
@@ -246,10 +250,10 @@ public class KdataSpiderTushare implements KdataSpider {
 			Thread.sleep(300); //一分钟200次
 		}
 		
-		System.out.println("\nKdataSpiderTushare downFactors done!");
+		logger.info("\nKdataSpiderTushare downFactors done!");
 		
 		long used = (System.currentTimeMillis() - beginTime)/1000; 
-		System.out.println("用时：" + used + "秒");          
+		logger.info("用时：" + used + "秒");          
 		
 	}
 

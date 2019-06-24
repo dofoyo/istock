@@ -2,13 +2,14 @@ package com.rhb.istock.selector.hlt;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
 
 public interface HighLowTopService {
 	/*
 	 * 用于operation
 	 */
-	public List<String> getLatestHighLowTops(Integer top);
+	public Map<String,Integer> getLatestHighLowTops(Integer top);
 
 	public List<String> getHighLowTops(Integer top, LocalDate date);
 	public TreeMap<LocalDate,List<String>> getHighLowTops(Integer top, LocalDate beginDate, LocalDate endDate);

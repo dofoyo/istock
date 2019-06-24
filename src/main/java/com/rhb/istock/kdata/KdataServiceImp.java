@@ -7,6 +7,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -56,7 +58,8 @@ public class KdataServiceImp implements KdataService{
 	private Integer openPeriod = 55;
 	private Integer dropPeriod = 21;
 
-	
+	protected static final Logger logger = LoggerFactory.getLogger(KdataServiceImp.class);
+			
 	private KdataEntity getEntity(String itemID, boolean byCache) {
 		KdataEntity entity = null;
 		if(byCache) {
@@ -126,36 +129,36 @@ public class KdataServiceImp implements KdataService{
 
 	@Override
 	public void downKdatasAndFactors() throws Exception {
-		System.out.println("KdataService.downKdatas..........");
+		logger.info("KdataService.downKdatas..........");
 		
 		LocalDate latestDate = kdataRealtimeSpider.getLatestMarketDate();
-		System.out.println("latest trade date " + latestDate);
+		logger.info("latest trade date " + latestDate);
 
 		LocalDate lastDownDate = kdataRepository.getLastDate();
-		System.out.println("last down date " + lastDownDate);
+		logger.info("last down date " + lastDownDate);
 
 		List<LocalDate> dates = kdataRealtimeSpider.getCalendar(lastDownDate,latestDate);
-		System.out.println("dates bewteen latest trade date and down date " + dates);
+		logger.info("dates bewteen latest trade date and down date " + dates);
 		
 		LocalDate date;
 		for(int i=0; i<dates.size(); i++) {
 			date = dates.get(i);
-			System.out.println("download "+ date +" kdatas from tushare, please wait....... ");
+			logger.info("download "+ date +" kdatas from tushare, please wait....... ");
 			kdataSpider.downKdatas(date);
-			System.out.println("downloaded "+ date +" kdatas from tushare.");
+			logger.info("downloaded "+ date +" kdatas from tushare.");
 		}
 		
 		for(int i=1; i<dates.size(); i++) { //因为factor比收盘数据早得到（开盘前就得到factor，收盘后才得到kdata）,
 			date = dates.get(i);
-			System.out.println("download "+ date +" factors from tushare, please wait....... ");
+			logger.info("download "+ date +" factors from tushare, please wait....... ");
 			kdataSpider.downFactors(date);
-			System.out.println("downloaded "+ date +" factors from tushare.");
+			logger.info("downloaded "+ date +" factors from tushare.");
 		}
 		
 		if(dates.size()>0) {
-			System.out.println("download latest date "+ latestDate +" factors from tushare, please wait....... ");
+			logger.info("download latest date "+ latestDate +" factors from tushare, please wait....... ");
 			kdataSpider.downFactors(latestDate);  //执行了这一步后，不需要再对收盘数据额外的复权处理了
-			System.out.println("downloaded latest date "+ latestDate +" factors from tushare.");
+			logger.info("downloaded latest date "+ latestDate +" factors from tushare.");
 			
 			kdataSpider163.downKdatas(szzs);
 			evictKDataCache();
@@ -245,7 +248,7 @@ public class KdataServiceImp implements KdataService{
 	@Override
 	public void generateMusters() {
 		long beginTime=System.currentTimeMillis(); 
-		System.out.println("generateMusters ......");
+		logger.info("generateMusters ......");
 		
 		musterRepositoryImp.cleanTmpMusters();
 		
@@ -275,9 +278,9 @@ public class KdataServiceImp implements KdataService{
 		
 		musterRepositoryImp.copyTmpMusters();
 		
-		System.out.println("\ngenerateMusters done!");
+		logger.info("\ngenerateMusters done!");
 		long used = (System.currentTimeMillis() - beginTime)/1000; 
-		System.out.println("用时：" + used + "秒");          
+		logger.info("用时：" + used + "秒");          
 	}
 
 	
@@ -340,7 +343,7 @@ public class KdataServiceImp implements KdataService{
 	@Override
 	public void generateLatestMusters() {
 		long beginTime=System.currentTimeMillis(); 
-		System.out.println("generateLatestMusters ......");
+		logger.info("generateLatestMusters ......");
 		
 		LocalDate date = kdataRealtimeSpider.getLatestMarketDate();
 
@@ -361,9 +364,9 @@ public class KdataServiceImp implements KdataService{
 			}
 		}
 		
-		System.out.println("generateLatestMusters done!");
+		logger.info("generateLatestMusters done!");
 		long used = (System.currentTimeMillis() - beginTime)/1000; 
-		System.out.println("用时：" + used + "秒");          
+		logger.info("用时：" + used + "秒");          
 		
 	}
 
@@ -394,7 +397,7 @@ public class KdataServiceImp implements KdataService{
 	@Override
 	public void updateLatestMusters() {
 		long beginTime=System.currentTimeMillis(); 
-		System.out.println("updateLatestMusters ......");
+		logger.info("updateLatestMusters ......");
 
 		Kbar kbar;
 		LocalDate date = this.getLatestMarketDate();
@@ -418,9 +421,9 @@ public class KdataServiceImp implements KdataService{
 		}
 		musterRepositoryImp.saveMusters(date,entities);
 
-		System.out.println("\nupdateLatestMusters done!");
+		logger.info("\nupdateLatestMusters done!");
 		long used = (System.currentTimeMillis() - beginTime)/1000; 
-		System.out.println("用时：" + used + "秒");     
+		logger.info("用时：" + used + "秒");     
 
 	}
 

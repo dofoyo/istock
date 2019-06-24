@@ -6,6 +6,8 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -18,9 +20,11 @@ public class ItemSpiderTushare implements ItemSpider {
 	@Value("${tushareItemsFile}")
 	private String itemsFile;
 	
+	protected static final Logger logger = LoggerFactory.getLogger(ItemSpiderTushare.class);
+	
 	@Override
 	public void download() throws Exception {
-		System.out.println("download items...");
+		logger.info("download items...");
 		
 		String url = "http://api.tushare.pro";
 		JSONObject params = new JSONObject();
@@ -32,7 +36,7 @@ public class ItemSpiderTushare implements ItemSpider {
 		JSONObject data = (new JSONObject(str)).getJSONObject("data");
 		FileTools.writeTextFile(itemsFile, data.toString(), false);
 
-		System.out.println("download items done!");
+		logger.info("download items done!");
 	}
 
 	@Override

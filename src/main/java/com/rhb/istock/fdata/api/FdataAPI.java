@@ -30,20 +30,26 @@ public class FdataAPI {
 	
 	@GetMapping("/fdatas/{itemID}")
 	public ResponseContent<FdatasView> getFdatas(@PathVariable(value="itemID") String itemID) {
-		//System.out.println(itemID);
-		Item item = itemService.getItem(itemID);
-		FdatasView view = new FdatasView(item.getCode(),item.getName(),item.getIndustry());
+		FdatasView view = null;
 		
-		FinancialStatement fs = financialStatementService.getFinancialStatement(item.getCode());
-		List<String> periods = new ArrayList<String>(fs.getBalancesheets().keySet());
-		Collections.sort(periods);
-		Double revenue, profit, cash;
-		DecimalFormat df = new DecimalFormat("#.00");
-		for(String period : periods) {
-			revenue = fs.getProfitstatements().get(period).getOperatingRevenue()/100000000;
-			profit = fs.getProfitstatements().get(period).getProfit()/100000000;
-			cash = fs.getCashflows().get(period).getNetCashFlow()/100000000;
-			view.add(period.substring(0,4), df.format(revenue), df.format(profit), df.format(cash));
+		Item item = itemService.getItem(itemID);
+		
+		if(item!=null) {
+			view = new FdatasView(item.getCode(),item.getName(),item.getIndustry());
+			
+			FinancialStatement fs = financialStatementService.getFinancialStatement(item.getCode());
+			List<String> periods = new ArrayList<String>(fs.getBalancesheets().keySet());
+			Collections.sort(periods);
+			Double revenue, profit, cash;
+			DecimalFormat df = new DecimalFormat("#.00");
+			for(String period : periods) {
+				revenue = fs.getProfitstatements().get(period).getOperatingRevenue()/100000000;
+				profit = fs.getProfitstatements().get(period).getProfit()/100000000;
+				cash = fs.getCashflows().get(period).getNetCashFlow()/100000000;
+				view.add(period.substring(0,4), df.format(revenue), df.format(profit), df.format(cash));
+			}
+		}else {
+			System.out.println("Can NOT find " + itemID + "!!!");
 		}
 		
 		return new ResponseContent<FdatasView>(ResponseEnum.SUCCESS, view);

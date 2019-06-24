@@ -30,7 +30,7 @@ public class KdataServiceTest {
 		}
 	}
 
-	@Test
+	//@Test
 	public void generateMusters() {
 		kdataService.generateMusters();
 	}

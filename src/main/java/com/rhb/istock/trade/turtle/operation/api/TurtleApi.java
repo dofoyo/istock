@@ -31,6 +31,12 @@ public class TurtleApi{
 		return new ResponseContent<List<TurtleView>>(ResponseEnum.SUCCESS, views);
 	}
 	
+	@GetMapping("/turtle/potentials/redo")
+	public ResponseContent<String> redoPotentials() {
+		ts.redoPotentials();
+		return new ResponseContent<String>(ResponseEnum.SUCCESS, "");
+	}
+	
 	@GetMapping("/turtle/favors")
 	public ResponseContent<List<TurtleView>> getFavors() {
 		List<TurtleView> favors = ts.getFavors();

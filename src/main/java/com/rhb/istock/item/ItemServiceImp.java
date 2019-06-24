@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -25,7 +27,8 @@ public class ItemServiceImp implements ItemService {
 	ItemSpider itemSpider;
 	
 	private Map<String,String> topics = new HashMap<String,String>();
-	
+	protected static final Logger logger = LoggerFactory.getLogger("");
+
 	@Override
 	public List<Item> getItems() {
 		List<Item> items = new ArrayList<Item>();
@@ -108,9 +111,9 @@ public class ItemServiceImp implements ItemService {
 
 	@Override
 	public void init() {
-		System.out.println("itemService init...");
+		logger.info("itemService init...");
 		topics.putAll(itemRepository.getTopics());
-		System.out.println("there are " + topics.size() + " topics ready!");
+		logger.info("there are " + topics.size() + " topics ready!");
 	}
 
 }

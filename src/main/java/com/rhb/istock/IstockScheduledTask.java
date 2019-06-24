@@ -1,5 +1,7 @@
 package com.rhb.istock;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -33,6 +35,8 @@ public class IstockScheduledTask {
 	@Qualifier("turtleOperationServiceImp")
 	TurtleOperationService turtleOperationService;
 	
+	protected static final Logger logger = LoggerFactory.getLogger(IstockScheduledTask.class);
+	
 	/*
 	 * 每周1至5，9:30,开盘后，
 	 * 1、下载最新股票代码
@@ -41,6 +45,7 @@ public class IstockScheduledTask {
 	 */
 	@Scheduled(cron="0 30 9 ? * 1-5") 
 	public void dailyInit() throws Exception {
+		logger.info("run scheduled of '0 30 9 ? * 1-5'");
 		itemService.download();		//下载最新股票代码
 		kdataService.downKdatasAndFactors(); //上一交易日的收盘数据要等开盘前才能下载到, 大约需要15分钟
 		turtleOperationService.init();
@@ -48,23 +53,27 @@ public class IstockScheduledTask {
 
 	@Scheduled(cron="0 */5 10-11 ? * 1-5")  //周一至周五，每日10点-11点，每5分钟刷新一次 
 	public void updateLatestMusters1() throws Exception {
+		logger.info("run scheduled of '0 */5 10-11 ? * 1-5'");
 		kdataService.updateLatestMusters();
 	}
 
 	@Scheduled(cron="0 5-30/5 11 ? * 1-5")  //周一至周五，每日11点-11点30，每5分钟刷新一次 
 	public void updateLatestMusters2() throws Exception {
+		logger.info("run scheduled of '0 5-30/5 11 ? * 1-5'");
 		kdataService.updateLatestMusters();
 	}
 	
 	@Scheduled(cron="0 */5 13-15 ? * 1-5")  //周一至周五，每日13点-15点，每5分钟刷新一次 
 	public void updateLatestMusters3() throws Exception {
+		logger.info("run scheduled of '0 */5 13-15 ? * 1-5'");
 		kdataService.updateLatestMusters();
 	}
 	
-	@Scheduled(cron="0 20 10 ? * 1-5") //周一至周五，每日10:00点
+	@Scheduled(cron="0 0 12 ? * 1-5") //周一至周五，每日10:00点
 	public void downloadReports() {
-		//financialStatementService.downloadReports();  //下载最新年报
-		//selectorService.generateBluechip();  //并生成bluechip
+		logger.info("run scheduled of '0 0 10 ? * 1-5'");
+		financialStatementService.downloadReports();  //下载最新年报(包括新股)
+		selectorService.generateBluechip();  //并生成bluechip
 		kdataService.generateMusters();   //生成muster，需要192分，即3个多小时
 	}
 

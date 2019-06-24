@@ -36,7 +36,7 @@ public class KdataSpiderTest {
 		kdataSpiderTushare.downFactors(itemID);
 	}
 	
-	//@Test
+	@Test
 	public void testDwnKdataByIDs() {
 		List<ItemEntity> items = itemRepository.getItemEntities();
 		int i=1;
@@ -53,9 +53,9 @@ public class KdataSpiderTest {
 		}
 	}
 
-	@Test
+	//@Test
 	public void testDwnKdataByDate() {
-		LocalDate date = LocalDate.parse("2019-06-18");
+		LocalDate date = LocalDate.parse("2019-06-19");
 		try {
 			//kdataSpiderTushare.downKdatas(date);
 			kdataSpiderTushare.downFactors(date); //此处仅供测试，正式使用时，factor的日期要比kdata的日期提前一个交易日

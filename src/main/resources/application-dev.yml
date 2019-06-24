@@ -14,10 +14,6 @@ topicsFile: D:/dev/istock-data/topics.txt
 dailyAmountTopsFile: D:/dev/istock-data/dailyAmountTops.txt
 averageAmountTopsFile: D:/dev/istock-data/averageAmountTops.txt
 highLowTopsFile: D:/dev/istock-data/highLowTops.txt
-breakersFile: D:/dev/istock-data/breakers.txt
-breakersSortByHLFile: D:/dev/istock-data/breakersSortByHL.txt
-breakersSortByDTFile: D:/dev/istock-data/breakersSortByDT.txt
-breakersSortByAVFile: D:/dev/istock-data/breakersSortByAV.txt
 fvaluesOfHLFile: D:/dev/istock-data/fvaluesOfHL.txt
 dailyMeansFile: D:/dev/istock-data/dailyMeans.txt
 

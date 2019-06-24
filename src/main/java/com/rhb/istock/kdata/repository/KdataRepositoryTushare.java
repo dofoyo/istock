@@ -7,6 +7,8 @@ import java.util.TreeMap;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -21,6 +23,8 @@ public class KdataRepositoryTushare implements KdataRepository{
 	
 	//private Map<String,KdataEntity> kdatas = new HashMap<String,KdataEntity>();;
 	
+	protected static final Logger logger = LoggerFactory.getLogger(KdataRepositoryTushare.class);
+
 	@Override
 	@CacheEvict(value="tushareDailyKdatas",allEntries=true)
 	public void evictKDataCache() {}
@@ -69,8 +73,7 @@ public class KdataRepositoryTushare implements KdataRepository{
 					//System.out.println("date=" + date + ", nowFactor=" + nowFactor);
 					//if(preFactor==null) preFactor = nowFactor;
 					
-
-					try {
+					if(nowFactor!=null && roof!=null) {
 						open = getPrice(item.getBigDecimal(2),nowFactor,roof);
 						high = getPrice(item.getBigDecimal(3),nowFactor,roof);
 						low = getPrice(item.getBigDecimal(4),nowFactor,roof);
@@ -78,14 +81,14 @@ public class KdataRepositoryTushare implements KdataRepository{
 						amount = item.getBigDecimal(10);
 						quantity = item.getBigDecimal(9);						
 						kdata.addBar(date,open,high,low,close,amount,quantity);
-						
-						//System.out.printf("%tF: item.getBigDecimal(5) * nowFactor / preFactor = %f * %f / %f = %f\n" , date, item.getBigDecimal(5),nowFactor,roof,close);
+					}
+					
+					if(nowFactor==null){
+						logger.error("The nowFactor of " + itemID + " on " + date.toString() + " is NULL.");
+					}
 
-						
-					}catch(Exception e) {
-						System.err.println(item);
-						System.err.println(nowFactor);
-						System.err.println(roof);					
+					if(roof==null){
+						logger.error("The roof of " + itemID + " is NULL.");
 					}
 				}
 			}

@@ -8,7 +8,7 @@ server:
 logging:
   #配置日志文件路径
   level:
-    com.rhb: error #不同目录下的日志可配置不同级别
+    com.rhb: info #不同目录下的日志可配置不同级别
     org.springfromework: error
   #采用相对路径方式将日志文件输出到【log\istock.log】
   file: log\istock.log
