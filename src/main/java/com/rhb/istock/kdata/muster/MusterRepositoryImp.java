@@ -29,11 +29,17 @@ public class MusterRepositoryImp implements MusterRepository{
 	@Value("${tmpMusterPath}")
 	private String tmpMusterPath;
 	
+	@Value("${openDuration}")
+	private String openDuration;
+	
+	@Value("${dropDuration}")
+	private String dropDuration;
+	
 	@Override
 	public Map<String, MusterEntity> getMusters(LocalDate date) {
 		Map<String, MusterEntity> entities = new HashMap<String, MusterEntity>();
 		
-		String pathAndFile = musterPath + "/" + date.format(DateTimeFormatter.ofPattern("yyyyMMdd")) +  "_55_21_musters.txt";
+		String pathAndFile = musterPath + "/" + date.format(DateTimeFormatter.ofPattern("yyyyMMdd")) + "_" + openDuration+"_" + dropDuration + "_musters.txt";
 		//System.out.println(pathAndFile);
 		
 		File f = new File(pathAndFile);
@@ -53,14 +59,14 @@ public class MusterRepositoryImp implements MusterRepository{
 	
 	@Override
 	public void saveMuster(LocalDate date, MusterEntity entity) {
-		String pathAndFile = musterPath + "/" + date.format(DateTimeFormatter.ofPattern("yyyyMMdd")) +  "_55_21_musters.txt";
+		String pathAndFile = musterPath + "/" + date.format(DateTimeFormatter.ofPattern("yyyyMMdd")) +  "_" + openDuration+"_" + dropDuration + "_musters.txt";
 		FileTools.writeTextFile(pathAndFile, entity.toText(), true);
 	}
 
 
 	@Override
 	public boolean isMustersExist(LocalDate date) {
-		String pathAndFile = musterPath + "/" + date.format(DateTimeFormatter.ofPattern("yyyyMMdd")) +  "_55_21_musters.txt";
+		String pathAndFile = musterPath + "/" + date.format(DateTimeFormatter.ofPattern("yyyyMMdd")) +  "_" + openDuration+"_" + dropDuration + "_musters.txt";
 		File file = new File(pathAndFile);
 		return file.exists();
 	}
@@ -76,7 +82,7 @@ public class MusterRepositoryImp implements MusterRepository{
 
 	@Override
 	public void saveTmpMuster(LocalDate date, MusterEntity entity) {
-		String pathAndFile = tmpMusterPath + "/" + date.format(DateTimeFormatter.ofPattern("yyyyMMdd")) +  "_55_21_musters.txt";
+		String pathAndFile = tmpMusterPath + "/" + date.format(DateTimeFormatter.ofPattern("yyyyMMdd")) +  "_" + openDuration+"_" + dropDuration + "_musters.txt";
 		FileTools.writeTextFile(pathAndFile, entity.toText(), true);
 	}
 
@@ -91,7 +97,7 @@ public class MusterRepositoryImp implements MusterRepository{
 
 	@Override
 	public void saveMusters(LocalDate date,List<MusterEntity> musterEntities) {
-		String pathAndFile = musterPath + "/" + date.format(DateTimeFormatter.ofPattern("yyyyMMdd")) +  "_55_21_musters.txt";
+		String pathAndFile = musterPath + "/" + date.format(DateTimeFormatter.ofPattern("yyyyMMdd")) +  "_" + openDuration+"_" + dropDuration + "_musters.txt";
 		
 		FileUtils.deleteQuietly(new File(pathAndFile));
 		

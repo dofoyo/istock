@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.rhb.istock.comm.util.Progress;
@@ -54,9 +55,15 @@ public class KdataServiceImp implements KdataService{
 	@Qualifier("musterRepositoryImp")
 	MusterRepository musterRepositoryImp;
 	
+	@Value("${openDuration}")
+	private Integer openDuration;
+	
+	@Value("${dropDuration}")
+	private Integer dropDuration;
+	
 	private String szzs = "sh000001"; //上证指数
-	private Integer openPeriod = 55;
-	private Integer dropPeriod = 21;
+	//private Integer openDuration = 89;
+	//private Integer dropDuration = 21;
 
 	protected static final Logger logger = LoggerFactory.getLogger(KdataServiceImp.class);
 			
@@ -285,8 +292,8 @@ public class KdataServiceImp implements KdataService{
 
 	
 	private MusterEntity getMusterEntity(String itemID,LocalDate endDate, boolean cache) {
-		Kdata kdata = this.getKdata(itemID,endDate,openPeriod,cache);
-		if(kdata==null || kdata.getSize()<openPeriod) return null;  //此行很重要，涉及averageAmount和dropPrice的准确性
+		Kdata kdata = this.getKdata(itemID,endDate,openDuration,cache);
+		if(kdata==null || kdata.getSize()<openDuration) return null;  //此行很重要，涉及averageAmount和dropPrice的准确性
 		
 		BigDecimal close = null;
 		BigDecimal highest = null;
@@ -298,7 +305,7 @@ public class KdataServiceImp implements KdataService{
 		
 		List<LocalDate> dates = kdata.getDates();
 
-		int dropStart = openPeriod-dropPeriod+1;
+		int dropStart = openDuration-dropDuration+1;
 		int i=1;
 		for(LocalDate date : dates) {
 			if(highest==null) {
@@ -322,8 +329,8 @@ public class KdataServiceImp implements KdataService{
 			i++;
 		}
 		
-		BigDecimal averageAmount = totalAmount.divide(new BigDecimal(openPeriod),BigDecimal.ROUND_HALF_UP);
-		BigDecimal dropPrice = totalPrice.divide(new BigDecimal(dropPeriod),BigDecimal.ROUND_HALF_UP);
+		BigDecimal averageAmount = totalAmount.divide(new BigDecimal(openDuration),BigDecimal.ROUND_HALF_UP);
+		BigDecimal dropPrice = totalPrice.divide(new BigDecimal(dropDuration),BigDecimal.ROUND_HALF_UP);
 		
 		latestPrice = close;
 		Kbar bar =this.getKbar(itemID, endDate, cache);

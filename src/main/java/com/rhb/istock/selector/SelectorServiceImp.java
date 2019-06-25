@@ -93,21 +93,6 @@ public class SelectorServiceImp implements SelectorService{
 	}
 
 	@Override
-	public List<String> getDailyAmountTops(Integer top, LocalDate date) {
-		return dat.getDailyAmountTops(top, date);
-	}
-
-	@Override
-	public List<String> getAverageAmountTops(Integer top, LocalDate date) {
-		return aat.getAverageAmountTops(top, date);
-	}
-
-	@Override
-	public void generateAverageAmountTops() {
-		aat.generateAverageAmountTops();
-	}
-
-	@Override
 	public List<String> getLatestBluechipIDs() {
 		return bluechipService.getLatestBluechipIDs();
 	}
@@ -115,31 +100,6 @@ public class SelectorServiceImp implements SelectorService{
 	@Override
 	public TreeMap<LocalDate,List<String>> getBluechipIDs(LocalDate beginDate, LocalDate endDate) {
 		return bluechipService.getBluechipIDs(beginDate, endDate) ;
-	}
-
-	@Override
-	public TreeMap<LocalDate, List<String>> getDailyAmountTops(Integer top, LocalDate beginDate, LocalDate endDate) {
-		return dat.getDailyAmountTops(top, beginDate, endDate);
-	}
-
-	@Override
-	public TreeMap<LocalDate, List<String>> getAverageAmountTops(Integer top, LocalDate beginDate, LocalDate endDate) {
-		return aat.getAverageAmountTops(top, beginDate, endDate);
-	}
-
-	@Override
-	public List<String> getHighLowTops(Integer top, LocalDate date) {
-		return hlt.getHighLowTops(top, date);
-	}
-
-	@Override
-	public TreeMap<LocalDate, List<String>> getHighLowTops(Integer top, LocalDate beginDate, LocalDate endDate) {
-		return hlt.getHighLowTops(top, beginDate, endDate);
-	}
-
-	@Override
-	public void generateHighLowTops() {
-		hlt.generateHighLowTops();
 	}
 
 	@Override

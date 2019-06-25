@@ -19,11 +19,15 @@ public class AverageAmountTopServiceTest {
 	
 	@Test
 	public void getLatestAverageAmountTops() {
-		List<String> ids = averageAmountTopService.getLatestAverageAmountTops(10);
-		System.out.println(ids);			
+		List<String> ids = averageAmountTopService.getLatestTops(100);
+		for(String id : ids) {
+			if(id.startsWith("sh")){
+				System.out.println(id);			
+			}
+		}
 	}
 	
-	//@Test
+/*	//@Test
 	public void generateAverageAmountTops() {
 		averageAmountTopService.generateAverageAmountTops();
 	}
@@ -36,5 +40,5 @@ public class AverageAmountTopServiceTest {
 			List<String> ids = averageAmountTopService.getAverageAmountTops(10, date);
 			System.out.println(ids);			
 		}
-	}
+	}*/
 }

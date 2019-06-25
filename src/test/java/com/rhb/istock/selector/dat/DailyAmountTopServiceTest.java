@@ -17,12 +17,12 @@ public class DailyAmountTopServiceTest {
 	@Qualifier("dailyAmountTopServiceImp")
 	DailyAmountTopService dailyAmountTopService;
 	
-	@Test
+/*	@Test
 	public void generateDailyAmountTops() {
 		dailyAmountTopService.generateDailyAmountTops();
-	}
+	}*/
 	
-	//@Test
+/*	//@Test
 	public void getBluechipIDs() {
 		LocalDate beginDate = LocalDate.parse("2019-03-01");
 		LocalDate endDate = LocalDate.parse("2019-03-21");
@@ -30,5 +30,5 @@ public class DailyAmountTopServiceTest {
 			List<String> ids = dailyAmountTopService.getDailyAmountTops(10, date);
 			System.out.println(ids);			
 		}
-	}
+	}*/
 }

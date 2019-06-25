@@ -19,11 +19,15 @@ public class HighLowTopServiceTest {
 	
 	@Test
 	public void getLatestHighLowTops() {
-		List<String> ids = highLowTopService.getLatestHighLowTops(5);
-		System.out.println(ids);
+		List<String> ids = highLowTopService.getLatestTops(100);
+		for(String id: ids) {
+			if(id.startsWith("sh")){
+				System.out.println(id);
+			}
+		}
 	}
 	
-	//@Test
+/*	//@Test
 	public void generateHighLowTops() {
 		highLowTopService.generateHighLowTops();
 	}
@@ -36,5 +40,5 @@ public class HighLowTopServiceTest {
 			List<String> ids = highLowTopService.getHighLowTops(10, date);
 			System.out.println(ids);			
 		}
-	}
+	}*/
 }

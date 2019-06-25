@@ -11,11 +11,10 @@ holdsFile: D:/dev/istock-data/holds.txt
 favorsFile: D:/dev/istock-data/favors.txt
 bluechipsFile: D:/dev/istock-data/bluechips.json
 topicsFile: D:/dev/istock-data/topics.txt
-dailyAmountTopsFile: D:/dev/istock-data/dailyAmountTops.txt
-averageAmountTopsFile: D:/dev/istock-data/averageAmountTops.txt
-highLowTopsFile: D:/dev/istock-data/highLowTops.txt
 fvaluesOfHLFile: D:/dev/istock-data/fvaluesOfHL.txt
 dailyMeansFile: D:/dev/istock-data/dailyMeans.txt
+openDuration: 89
+dropDuration: 21
 
 
 

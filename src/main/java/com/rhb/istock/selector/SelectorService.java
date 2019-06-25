@@ -22,26 +22,11 @@ public interface SelectorService{
 
 	
 	public Map<String,Integer> getLatestHighLowTops(Integer top);
-	public List<String> getHighLowTops(Integer top, LocalDate date);
-	public TreeMap<LocalDate,List<String>> getHighLowTops(Integer top, LocalDate beginDate, LocalDate endDate);
-	public void generateHighLowTops();
 	
 	/*
 	 * 用于operation
 	 */	
 	public Map<String,Integer> getLatestAverageAmountTops(Integer top);
-	
-	/*
-	 * 用于simulation
-	 */
-	public List<String> getAverageAmountTops(Integer top, LocalDate date);
-	public TreeMap<LocalDate,List<String>> getAverageAmountTops(Integer top, LocalDate beginDate, LocalDate endDate);
-	
-	/*
-	 * 用于simulation，测试前执行一次
-	 */
-	public void generateAverageAmountTops();
-
 	
 	public void generateBluechip();
 	public List<String> getBluechipIDs(LocalDate date);
@@ -49,8 +34,6 @@ public interface SelectorService{
 	public List<String> getLatestBluechipIDs();
 
 	public Map<String,Integer> getLatestDailyAmountTops(Integer top);
-	public List<String> getDailyAmountTops(Integer top, LocalDate date);
-	public TreeMap<LocalDate,List<String>> getDailyAmountTops(Integer top, LocalDate beginDate, LocalDate endDate);
 	
 	public Map<String,Potential> getLatestPotentials();
 

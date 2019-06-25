@@ -194,13 +194,13 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 		List<String> holds = selectorService.getHoldIDs();
 		List<String> labels;
 		
-		if(this.potentials == null) {
+/*		if(this.potentials == null) {
 			this.createPotentialsWithLatestMarketData();			
 		}else {
 			this.refreshPotentialsWithLatestMarketDate();
-		}
+		}*/
 
-		//this.createPotentialsWithLatestMarketData();			
+		this.createPotentialsWithLatestMarketData();			
 
 		int i=1;
 		for(Potential potential : this.potentials) {
@@ -381,6 +381,7 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 					potential.setAmount(ps.get(potential.getItemID()).getAmount());
 				}else {
 					System.out.println(" kicked out of potentials!");
+					// TODO  落选potential后，应该从collection中remove
 				}
 			}
 			

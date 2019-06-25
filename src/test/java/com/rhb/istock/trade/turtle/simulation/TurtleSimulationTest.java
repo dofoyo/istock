@@ -43,13 +43,13 @@ public class TurtleSimulationTest {
 			endDate = LocalDate.of(year+1, 1, 1);
 
 			//TreeMap<LocalDate,List<String>> dailyItems = selectorService.getBreakers(beginDate, endDate);
-			TreeMap<LocalDate,List<String>> dailyItems = selectorService.getAverageAmountTops(13, beginDate, endDate);
+			//TreeMap<LocalDate,List<String>> dailyItems = selectorService.getAverageAmountTops(13, beginDate, endDate);
 			//TreeMap<LocalDate,List<String>> dailyItems = this.getSpecifyItem("sh600309", beginDate, endDate);
 			//TreeMap<LocalDate,List<String>> dailyItems = selectorService.getBluechipIDs(beginDate, endDate);
 			//TreeMap<LocalDate,List<String>> dailyItems = selectorService.getDailyAmountTops(13, beginDate, endDate);
 			//TreeMap<LocalDate,List<String>> dailyItems = selectorService.getHighLowTops(13, beginDate, endDate);
 			
-			results.put(beginDate, turtleSimulation.simulate(dailyItems, null, cache));
+			//results.put(beginDate, turtleSimulation.simulate(dailyItems, null, cache));
 			
 			//kdataService.evictDailyKDataCache();
 		}
@@ -100,7 +100,7 @@ public class TurtleSimulationTest {
 		 */
 		//TreeMap<LocalDate,List<String>> dailyItems = selectorService.getAverageAmountTops(21, beginDate, endDate);
 		//TreeMap<LocalDate,List<String>> dailyItems = selectorService.getHighLowTops(21, beginDate, endDate);
-		TreeMap<LocalDate,List<String>> dailyItems = selectorService.getDailyAmountTops(21, beginDate, endDate);
+		//TreeMap<LocalDate,List<String>> dailyItems = selectorService.getDailyAmountTops(21, beginDate, endDate);
 		
 		
 		//TreeMap<LocalDate,List<String>> dailyItems = selectorService.getBluechipIDs(beginDate, endDate);
@@ -113,7 +113,7 @@ public class TurtleSimulationTest {
 		/*
 		 * dailyItems必须每个交易日都要有
 		 */
-		turtleSimulation.simulate(dailyItems, null, cache);
+		//turtleSimulation.simulate(dailyItems, null, cache);
 	}
 	
 /*	//@Test
