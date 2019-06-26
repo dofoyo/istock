@@ -145,7 +145,10 @@ public class KdataSpiderTushare implements KdataSpider {
 					setFactor(item);
 				}
 			}			
+		}else {
+			logger.error("\n factor file is NULL!!!!!!");
 		}
+		
 		
 		logger.info("\nKdataSpiderTushare.downloadFactor of " + date + " done!");
 		long used = (System.currentTimeMillis() - beginTime)/1000; 

@@ -1,6 +1,5 @@
 package com.rhb.istock.selector.aat;
 
-import java.time.LocalDate;
 import java.util.List;
 
 import org.junit.Test;
@@ -26,19 +25,4 @@ public class AverageAmountTopServiceTest {
 			}
 		}
 	}
-	
-/*	//@Test
-	public void generateAverageAmountTops() {
-		averageAmountTopService.generateAverageAmountTops();
-	}
-	
-	//@Test
-	public void getBluechipIDs() {
-		LocalDate beginDate = LocalDate.parse("2019-03-01");
-		LocalDate endDate = LocalDate.parse("2019-03-21");
-		for(LocalDate date = beginDate; date.isBefore(endDate); date=date.plusDays(1)) {
-			List<String> ids = averageAmountTopService.getAverageAmountTops(10, date);
-			System.out.println(ids);			
-		}
-	}*/
 }

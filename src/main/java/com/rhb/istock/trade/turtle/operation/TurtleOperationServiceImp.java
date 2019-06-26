@@ -485,6 +485,7 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 	public void redoPotentials() {
 		logger.info("redoPotentials ......");
 		this.createPotentialsWithLatestMarketData();
+		kdataService.updateLatestMusters();
 	}
 	
 }

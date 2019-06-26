@@ -1,6 +1,5 @@
 package com.rhb.istock.selector.hlt;
 
-import java.time.LocalDate;
 import java.util.List;
 
 import org.junit.Test;
@@ -26,19 +25,5 @@ public class HighLowTopServiceTest {
 			}
 		}
 	}
-	
-/*	//@Test
-	public void generateHighLowTops() {
-		highLowTopService.generateHighLowTops();
-	}
-	
-	//@Test
-	public void getHighLowTops() {
-		LocalDate beginDate = LocalDate.parse("2019-03-01");
-		LocalDate endDate = LocalDate.parse("2019-03-21");
-		for(LocalDate date = beginDate; date.isBefore(endDate); date=date.plusDays(1)) {
-			List<String> ids = highLowTopService.getHighLowTops(10, date);
-			System.out.println(ids);			
-		}
-	}*/
+
 }

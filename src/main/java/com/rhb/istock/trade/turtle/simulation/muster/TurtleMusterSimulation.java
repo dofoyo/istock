@@ -33,6 +33,8 @@ public class TurtleMusterSimulation {
 	@Qualifier("turtleSimulationRepository")
 	TurtleSimulationRepository turtleSimulationRepository;
 	
+	
+	
 	Integer pool = 21;
 	Integer top = 5;
 	BigDecimal initCash = new BigDecimal(2000000);
