@@ -1,5 +1,8 @@
 package com.rhb.istock.kdata.service;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -30,7 +33,7 @@ public class KdataServiceTest {
 		}
 	}
 
-	@Test
+	//@Test
 	public void generateMusters() {
 		kdataService.generateMusters();
 	}
@@ -48,7 +51,13 @@ public class KdataServiceTest {
 	//@Test
 	public void getLastMusters() {
 		Map<String,Muster> musters = kdataService.getLatestMusters();
-		for(Muster muster : musters.values()) {
+		List<Muster> mm = new ArrayList<Muster>(musters.values());
+		Collections.sort(mm, new Comparator<Muster>() {
+			@Override
+			public int compare(Muster o1, Muster o2) {
+				return o1.getHLGap().compareTo(o2.getHLGap());
+			}});
+		for(Muster muster : mm) {
 			System.out.println(muster);
 		}
 	}

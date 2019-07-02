@@ -25,9 +25,9 @@ public class TurtleOperationServiceTest {
 	public void getPotentials() {
 		List<TurtleView> views = turtleService.getPotentials();
 		for(TurtleView view : views) {
-			System.out.println(view);
+			System.out.print(view.getItemID() + ",");
 		}	
-		
+/*		
 		try {
 			Thread.sleep(10000);
 		} catch (InterruptedException e) {
@@ -40,7 +40,7 @@ public class TurtleOperationServiceTest {
 		views = turtleService.getPotentials();
 		for(TurtleView view : views) {
 			System.out.println(view);
-		}	
+		}	*/
 	}
 	
 	//@Test

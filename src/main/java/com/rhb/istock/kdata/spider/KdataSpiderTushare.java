@@ -115,6 +115,37 @@ public class KdataSpiderTushare implements KdataSpider {
 		long beginTime=System.currentTimeMillis(); 
 		logger.info("KdataSpiderTushare.downloadFactor of " + date + "....");
 		
+		String result = this.downloadFactors(date);
+		JSONArray items = (new JSONObject(result)).getJSONObject("data").getJSONArray("items");	
+		while(items.length()==0) {
+			logger.error("\n factors file is NULL!!!!!!");
+			
+			try {
+				Thread.sleep(3000);  //等待3秒钟
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			
+			result = this.downloadFactors(date);
+			items = (new JSONObject(result)).getJSONObject("data").getJSONArray("items");	
+		}
+		
+		JSONArray item;
+		for(int i=0; i<items.length(); i++) {
+			item = items.getJSONArray(i);
+			
+			Progress.show(items.length(),i, " KdataSpiderTushare.downloadFactor.setFactor " + item.getString(0));
+			
+			setFactor(item);
+		}
+		
+		
+		logger.info("\nKdataSpiderTushare.downloadFactor of " + date + " done!");
+		long used = (System.currentTimeMillis() - beginTime)/1000; 
+		logger.info("用时：" + used + "秒");          
+	}
+	
+	private String downloadFactors(LocalDate date) {
 		String result = null;
 		
 		String kdataFile = kdataPath + "/factors_" + date + ".json";
@@ -132,27 +163,8 @@ public class KdataSpiderTushare implements KdataSpider {
 		result = HttpClient.doPostJson(url, args.toString());
 		
 		FileTools.writeTextFile(kdataFile, result, false);
+		return result;
 		
-		if(result!=null) {
-			JSONArray items = (new JSONObject(result)).getJSONObject("data").getJSONArray("items");	
-			if(items.length()>0) {
-				JSONArray item;
-				for(int i=0; i<items.length(); i++) {
-					item = items.getJSONArray(i);
-					
-					Progress.show(items.length(),i, " KdataSpiderTushare.downloadFactor.setFactor " + item.getString(0));
-					
-					setFactor(item);
-				}
-			}			
-		}else {
-			logger.error("\n factor file is NULL!!!!!!");
-		}
-		
-		
-		logger.info("\nKdataSpiderTushare.downloadFactor of " + date + " done!");
-		long used = (System.currentTimeMillis() - beginTime)/1000; 
-		logger.info("用时：" + used + "秒");          
 	}
 	
 	private void setKdata(JSONArray item) {
