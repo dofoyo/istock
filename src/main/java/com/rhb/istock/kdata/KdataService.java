@@ -30,6 +30,7 @@ public interface KdataService {
 	public Map<String,Muster> getLatestMusters();//用于operation，提供给前端显示。和updateLatestMusters配合，可以提升操作体验
 	public void updateLatestMusters();//用于operation, 在交易时间无限循环对其中的potential刷新latestPrice，
 	public List<LocalDate> getMusterDates(LocalDate beginDate, LocalDate endDate);
+	public List<LocalDate> getLastMusterDates();
 	
 
 }

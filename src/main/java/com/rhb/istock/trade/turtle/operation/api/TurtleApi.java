@@ -24,6 +24,12 @@ public class TurtleApi{
 		String[] topis = ts.getTopics();
 		return new ResponseContent<String[]>(ResponseEnum.SUCCESS, topis);
 	}
+
+	@GetMapping("/turtle/powers")
+	public ResponseContent<List<TurtleView>> getPowers() {
+		List<TurtleView> views = ts.getPowers();
+		return new ResponseContent<List<TurtleView>>(ResponseEnum.SUCCESS, views);
+	}
 	
 	@GetMapping("/turtle/potentials")
 	public ResponseContent<List<TurtleView>> getPotentials() {

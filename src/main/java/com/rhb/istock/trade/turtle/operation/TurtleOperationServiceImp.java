@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.assertj.core.util.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -486,6 +487,15 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 		logger.info("redoPotentials ......");
 		this.createPotentialsWithLatestMarketData();
 		kdataService.updateLatestMusters();
+	}
+
+	@Override
+	public List<TurtleView> getPowers() {
+		List<String> ps = selectorService.getPowerIDs();
+
+		List<TurtleView> views = getTurtleViews(ps,"powers");
+
+		return views;
 	}
 	
 }

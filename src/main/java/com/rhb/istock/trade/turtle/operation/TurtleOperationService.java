@@ -1,5 +1,6 @@
 package com.rhb.istock.trade.turtle.operation;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import com.rhb.istock.kdata.api.KdatasView;
@@ -23,6 +24,7 @@ public interface TurtleOperationService {
 	public List<TurtleView> getPotentials();
 	public void redoPotentials();
 	public String[] getTopics();
+	public List<TurtleView> getPowers();
 	
 	/*
 	 * 一般每周1-5，每天上午9:00初始化一次。主要是导入之前的历史记录

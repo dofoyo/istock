@@ -136,4 +136,23 @@ public class MusterRepositoryImp implements MusterRepository{
 		return dates;
 	}
 
+	@Override
+	public List<LocalDate> getMusterDates(Integer count) {
+		List<LocalDate> dates = new ArrayList<LocalDate>();
+		LocalDate date;
+		List<File> files = FileTools.getFiles(musterPath, null, true);
+		for(File file : files) {
+			date = LocalDate.parse(file.getName().substring(0, 8), DateTimeFormatter.ofPattern("yyyyMMdd"));
+			dates.add(date);
+		}
+		
+		Collections.sort(dates, new Comparator<LocalDate>() {
+			@Override
+			public int compare(LocalDate o1, LocalDate o2) {
+				return o1.compareTo(o2);
+			}
+		});
+		return dates.subList(dates.size()-count, dates.size());
+	}
+
 }

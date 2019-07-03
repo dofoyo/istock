@@ -1,11 +1,18 @@
 package com.rhb.istock.selector.potential;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import org.assertj.core.util.Lists;
+import org.assertj.core.util.Maps;
+import org.assertj.core.util.Sets;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +20,10 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import com.rhb.istock.comm.util.Progress;
+import com.rhb.istock.kdata.Kbar;
+import com.rhb.istock.kdata.KdataService;
+import com.rhb.istock.kdata.Muster;
 import com.rhb.istock.selector.potential.PotentialService;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -22,7 +33,11 @@ public class PotentialServiceTest {
 	@Qualifier("potentialService")
 	PotentialService potentialService;
 
-	@Test
+	@Autowired
+	@Qualifier("kdataServiceImp")
+	KdataService kdataService;
+	
+	//@Test
 	public void getLatestPotentials() {
 		Map<String,Potential> ps = potentialService.getLatestPotentials();
 		System.out.println("There are " + ps.size() + " potentials.");
@@ -42,7 +57,14 @@ public class PotentialServiceTest {
 				System.out.println(p.getItemID());
 			}
 		}
-		
+	}
+	
+	@Test
+	public void getPowers() {
+		List<String> pp = potentialService.getPowerIDs();
+		for(String p : pp) {
+			System.out.println(p);
+		}
 	}
 	
 }

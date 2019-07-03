@@ -117,4 +117,14 @@ public class SelectorServiceImp implements SelectorService{
 	public Map<String,Potential> getLatestPotentials() {
 		return potentialService.getLatestPotentials();
 	}
+
+	@Override
+	public Map<String, Potential> getPotentials(LocalDate date) {
+		return potentialService.getPotentials(date);
+	}
+
+	@Override
+	public List<String> getPowerIDs() {
+		return potentialService.getPowerIDs();
+	}
 }

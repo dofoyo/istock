@@ -36,5 +36,7 @@ public interface SelectorService{
 	public Map<String,Integer> getLatestDailyAmountTops(Integer top);
 	
 	public Map<String,Potential> getLatestPotentials();
+	public Map<String,Potential> getPotentials(LocalDate date);
+	public List<String> getPowerIDs();
 
 }

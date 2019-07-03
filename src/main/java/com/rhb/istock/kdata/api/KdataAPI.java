@@ -44,18 +44,20 @@ public class KdataAPI {
 		
 		Item item = itemService.getItem(itemID);
 		kdatas.setItemID(itemID);
-		kdatas.setCode(item.getCode());
-		kdatas.setName(item.getName());
-		
-		List<LocalDate> dates = kdataService.getKdata(itemID, theEndDate, true).getDates();
-		Kbar bar;
-		for(LocalDate date : dates) {
-			bar = kdataService.getKbar(itemID, date, true);
-			kdatas.addKdata(date, bar.getOpen(), bar.getHigh(), bar.getLow(), bar.getClose());
-		}
-		if(theEndDate==null) {
-			bar = kdataService.getLatestMarketData(itemID);
-			kdatas.addKdata(bar.getDate(), bar.getOpen(), bar.getHigh(), bar.getLow(), bar.getClose());
+		if(item!=null) {
+			kdatas.setCode(item.getCode());
+			kdatas.setName(item.getName());
+			
+			List<LocalDate> dates = kdataService.getKdata(itemID, theEndDate, true).getDates();
+			Kbar bar;
+			for(LocalDate date : dates) {
+				bar = kdataService.getKbar(itemID, date, true);
+				kdatas.addKdata(date, bar.getOpen(), bar.getHigh(), bar.getLow(), bar.getClose());
+			}
+			if(theEndDate==null) {
+				bar = kdataService.getLatestMarketData(itemID);
+				kdatas.addKdata(bar.getDate(), bar.getOpen(), bar.getHigh(), bar.getLow(), bar.getClose());
+			}
 		}
 		
 		return new ResponseContent<KdatasView>(ResponseEnum.SUCCESS, kdatas);

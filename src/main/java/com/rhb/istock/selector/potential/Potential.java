@@ -1,6 +1,7 @@
 package com.rhb.istock.selector.potential;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,6 +19,7 @@ public class Potential {
 	private Integer hlb;
 	private Integer dtb;
 	private Integer avb;
+	private LocalDate date;
 	
 	public Potential(String itemID, BigDecimal averageAmount, BigDecimal amount, BigDecimal highest, BigDecimal lowest, BigDecimal close,BigDecimal latestPrice) {
 		this.itemID = itemID;
@@ -46,6 +48,10 @@ public class Potential {
 
 	public void setLatestPrice(BigDecimal latestPrice) {
 		this.latestPrice = latestPrice;
+	}
+	
+	public boolean isBreaker() {
+		return latestPrice.compareTo(highest)==1; 
 	}
 
 	public String getStatus() {
@@ -91,6 +97,12 @@ public class Potential {
 	public void setHighest(BigDecimal highest) {
 		this.highest = highest;
 	}
+	
+	public void updateHighest(BigDecimal price) {
+		if(this.highest.compareTo(price)==-1) {
+			this.highest = price;
+		}
+	}
 
 	public BigDecimal getLowest() {
 		return lowest;
@@ -111,9 +123,10 @@ public class Potential {
 	@Override
 	public String toString() {
 		return "Potential [itemID=" + itemID + ", amount=" + amount + ", averageAmount=" + averageAmount + ", highest="
-				+ highest + ", lowest=" + lowest + ", close=" + close + ", latestPrice=" + latestPrice + ", bhl="
-				+ bhl + ", bdt=" + bdt + ", bav=" + bav + ", hlb=" + hlb + ", dtb=" + dtb + ", avb=" + avb
-				+ ", getHLGap()=" + getHLGap() + ", getHNGap()=" + getHNGap() + "]";
+				+ highest + ", lowest=" + lowest + ", close=" + close + ", latestPrice=" + latestPrice + ", bhl=" + bhl
+				+ ", bdt=" + bdt + ", bav=" + bav + ", hlb=" + hlb + ", dtb=" + dtb + ", avb=" + avb + ", date=" + date
+				+ ", isBreaker()=" + isBreaker() + ", getStatus()=" + getStatus() + ", getHLGap()=" + getHLGap()
+				+ ", getHNGap()=" + getHNGap() + ", isUpLimited()=" + isUpLimited() + "]";
 	}
 
 	public Integer getBhl() {
@@ -164,6 +177,20 @@ public class Potential {
 		this.avb = avb;
 	}
 
+	public boolean isUpLimited() {
+		//System.out.println(this.latestPrice.subtract(this.close).divide(this.latestPrice,BigDecimal.ROUND_HALF_UP));
+		//System.out.println(this.latestPrice.subtract(this.close).divide(this.latestPrice,BigDecimal.ROUND_HALF_UP).compareTo(new BigDecimal(0.09))==1);
+		return this.latestPrice.subtract(this.close).divide(this.close,BigDecimal.ROUND_HALF_UP).compareTo(new BigDecimal(0.09))==1;
+	}
+
+	public LocalDate getDate() {
+		return date;
+	}
+
+	public void setDate(LocalDate date) {
+		this.date = date;
+	}
+	
 	
 
 }
