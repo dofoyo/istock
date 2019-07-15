@@ -17,12 +17,12 @@ public class BluechipServiceTest {
 	@Qualifier("bluechipServiceImp")
 	BluechipService bluechipService;
 	
-	//@Test
+	@Test
 	public void generateBluechip() {
 		bluechipService.generateBluechip();
 	}
 	
-	@Test
+	//@Test
 	public void getBluechipIDs() {
 		LocalDate beginDate = LocalDate.parse("2019-01-01");
 		LocalDate endDate = LocalDate.parse("2019-05-30");

@@ -36,8 +36,8 @@ public class FinancialReport {
 			&& this.getRateOfProfit(year)>=0.2  //利润持续增长，且年均增长率大于20%
 			//&& this.getRateOfCashflow(year)>=0.0  //经营活动现金流为正，且持续增长
 			//&& this.getRateOfOperatngRevenue(year)>this.getRateOfAccountsReceivable(year) //应收账款的增长率小于销售收入的增长率
-			//&& this.getCPR(year)>=1  //现金流与利润的比率大于1
-			&& this.aboveZeroOfCashflow(year)    //现金流大于与利润
+			&& this.getCPR(year)>=1  //现金流与利润的比率大于1
+			//&& this.aboveZeroOfCashflow(year)    //现金流大于零
 			
 			&& this.getReceivableRatio(year)<=0.2  //应收占比销售额的比例小于20%
 			){
@@ -46,6 +46,19 @@ public class FinancialReport {
 		}
 		
 		return flag;
+	}
+	
+	//利润现金含量  cashflow to profit ratio
+	public Double getCPR(Integer year){
+		String[] periods= new String[3];
+		periods[0] = Integer.toString(year) + "1231";
+		if(this.cashflows.get(periods[0])!=null && this.profitstatements.get(periods[0])!=null) {
+			Double cash = ((CashFlow)this.cashflows.get(periods[0])).getNetCashFlow();
+			Double profit = ((ProfitStatement)this.profitstatements.get(periods[0])).getProfit();
+			return profit.intValue()==0 ? 0.0 : cash/profit;
+		}else {
+			return 0.0;
+		}
 	}
 	
 	public void setBalancesheets(Map<String, BalanceSheet> balancesheets) {
