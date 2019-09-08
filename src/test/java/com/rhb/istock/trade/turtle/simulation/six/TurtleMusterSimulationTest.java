@@ -1,4 +1,4 @@
-package com.rhb.istock.trade.turtle.simulation.muster;
+package com.rhb.istock.trade.turtle.simulation.six;
 
 import java.time.LocalDate;
 import java.util.Map;
@@ -11,8 +11,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import com.rhb.istock.trade.turtle.simulation.muster.TurtleMusterSimulation.Ratios;
-import com.rhb.istock.trade.turtle.simulation.repository.TurtleSimulationRepository;
+import com.rhb.istock.trade.turtle.simulation.six.TurtleMusterSimulation;
+import com.rhb.istock.trade.turtle.simulation.six.repository.TurtleSimulationRepository;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest

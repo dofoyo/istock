@@ -74,6 +74,7 @@ public class Account {
 	}
 	
 	public void open(String itemID, Integer quantity, String note, BigDecimal price) {
+		//System.out.println("buy " + itemID + " " + quantity + " units on " + price + " yuan.");
 		Order order = new Order(this.getOrderID(),itemID,LocalDate.parse(endDate.toString()),price,quantity);
 		order.setNote("open，" + note);
 
@@ -83,7 +84,26 @@ public class Account {
 		value = value.add(order.getAmount()); // 市值增加
 		holds.put(order.getOrderID(), order);
 		opens.put(order.getOrderID(), order);
-	}	
+	}
+	
+	/**
+	 * 满仓买入
+	 * @param items
+	 */
+	public void openAll(Map<String,BigDecimal> items) {
+		if(items.isEmpty()) return;
+		
+		BigDecimal quota = this.cash.divide(new BigDecimal(items.size()),BigDecimal.ROUND_DOWN);
+		for(Map.Entry<String, BigDecimal> entry : items.entrySet()) {
+			this.refreshHoldsPrice(entry.getKey(), entry.getValue());
+			this.open(entry.getKey(), this.getQuantity(quota, entry.getValue()), "" , entry.getValue());
+		}
+	}
+	
+	private Integer getQuantity(BigDecimal quota,BigDecimal price) {
+		return quota.divide(price,BigDecimal.ROUND_DOWN).divide(new BigDecimal(100),BigDecimal.ROUND_DOWN).intValue()*100;
+	}
+	
 	public void open(String itemID, Integer quantity, String note) {
 		this.open(itemID, quantity, note, prices.get(itemID));
 	}

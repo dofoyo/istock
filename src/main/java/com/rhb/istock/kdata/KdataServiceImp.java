@@ -441,7 +441,12 @@ public class KdataServiceImp implements KdataService{
 
 	@Override
 	public List<LocalDate> getLastMusterDates() {
-		return musterRepositoryImp.getMusterDates(dropDuration);
+		return musterRepositoryImp.getLastMusterDates(dropDuration);
+	}
+
+	@Override
+	public List<LocalDate> getMusterDates() {
+		return musterRepositoryImp.getMusterDates();
 	}
 
 }

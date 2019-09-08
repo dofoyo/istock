@@ -1,4 +1,4 @@
-package com.rhb.istock.trade.turtle.simulation;
+package com.rhb.istock.trade.turtle.simulation.old;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -15,6 +15,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.rhb.istock.kdata.KdataService;
 import com.rhb.istock.selector.SelectorService;
+import com.rhb.istock.trade.turtle.simulation.old.TurtleSimulation;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest

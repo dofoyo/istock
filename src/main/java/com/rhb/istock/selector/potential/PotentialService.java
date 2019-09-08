@@ -2,13 +2,10 @@ package com.rhb.istock.selector.potential;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.assertj.core.util.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -35,17 +32,17 @@ public class PotentialService {
 		Map<String,Muster> musters = kdataService.getLatestMusters();
 		
 		for(Muster item : musters.values()) {
-			potential =  new Potential(item.getItemID(),
-					item.getAmount(),
-					item.getAverageAmount(),
-					item.getHighest(),
-					item.getLowest(),
-					item.getClose(),
-					item.getLatestPrice());
-			if(potential.getHNGap()<10) {
-				//System.out.println(potential);
+			if(item.getHLGap()<50 && item.getHNGap()<10) {
+				potential =  new Potential(item.getItemID(),
+						item.getAmount(),
+						item.getAverageAmount(),
+						item.getHighest(),
+						item.getLowest(),
+						item.getClose(),
+						item.getLatestPrice());
+				
 				potentials.put(potential.getItemID(),potential);	
-			}					
+			}
 		}
 
 		return potentials;
@@ -58,17 +55,17 @@ public class PotentialService {
 		Map<String,Muster> musters = kdataService.getMusters(date);
 		
 		for(Muster item : musters.values()) {
-			potential =  new Potential(item.getItemID(),
-					item.getAmount(),
-					item.getAverageAmount(),
-					item.getHighest(),
-					item.getLowest(),
-					item.getClose(),
-					item.getLatestPrice());
-			if(potential.getHNGap()<10) {
-				//System.out.println(potential);
+			if(item.getHLGap()<50 && item.getHNGap()<10) {
+				potential =  new Potential(item.getItemID(),
+						item.getAmount(),
+						item.getAverageAmount(),
+						item.getHighest(),
+						item.getLowest(),
+						item.getClose(),
+						item.getLatestPrice());
+				
 				potentials.put(potential.getItemID(),potential);	
-			}					
+			}
 		}
 
 		return potentials;
@@ -116,4 +113,5 @@ public class PotentialService {
 		return ids;
 	}
 	
+
 }

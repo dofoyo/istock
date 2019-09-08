@@ -1,11 +1,16 @@
-package com.rhb.istock.trade.turtle.simulation.api;
+package com.rhb.istock.trade.turtle.simulation.six.api;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -21,9 +26,9 @@ import com.rhb.istock.item.ItemService;
 import com.rhb.istock.kdata.Kbar;
 import com.rhb.istock.kdata.KdataService;
 import com.rhb.istock.kdata.api.KdatasView;
-import com.rhb.istock.trade.turtle.simulation.muster.TurtleMusterSimulation;
-import com.rhb.istock.trade.turtle.simulation.repository.AmountEntity;
-import com.rhb.istock.trade.turtle.simulation.repository.TurtleSimulationRepository;
+import com.rhb.istock.trade.turtle.simulation.six.TurtleMusterSimulation;
+import com.rhb.istock.trade.turtle.simulation.six.repository.AmountEntity;
+import com.rhb.istock.trade.turtle.simulation.six.repository.TurtleSimulationRepository;
 
 @RestController
 public class TurtleSimulationApi {
@@ -100,7 +105,7 @@ public class TurtleSimulationApi {
 		}
 		
 		turtleMusterSimulation.simulate(theBeginDate, theEndDate);
-		turtleMusterSimulation.generateDailyRatios(theBeginDate, theEndDate);
+		//turtleMusterSimulation.generateDailyRatios(theBeginDate, theEndDate);
 
 		turtleSimulationRepository.evictAmountsCache();
 		turtleSimulationRepository.evictBreakersCache();
@@ -222,10 +227,10 @@ public class TurtleSimulationApi {
 		}
 
 		
-		Map<LocalDate,List<String>> buys = turtleSimulationRepository.getBuys(type);
-		Map<LocalDate,List<String>> sells = turtleSimulationRepository.getSells(type);
+		//Map<LocalDate,List<String>> buys = turtleSimulationRepository.getBuys(type);
+		//Map<LocalDate,List<String>> sells = turtleSimulationRepository.getSells(type);
 		
-		List<String> ids = this.generateHolds(type,theDate);
+		Set<String> ids = this.generateHolds(type,theDate);
 		//System.out.println("holds: " + ids);
 		if(ids!=null && !ids.isEmpty()) {
 			for(String id : ids) {
@@ -233,6 +238,7 @@ public class TurtleSimulationApi {
 			}
 		}
 		
+		/*
 		ids = buys.get(theDate);
 		//System.out.println("buys: " + ids);
 		if(ids!=null && !ids.isEmpty()) {
@@ -250,7 +256,7 @@ public class TurtleSimulationApi {
 					}
 				}
 			}
-		}	
+		}	*/
 		
 		return new ResponseContent<List<HoldView>>(ResponseEnum.SUCCESS, views);
 	}
@@ -291,28 +297,70 @@ public class TurtleSimulationApi {
 		for(LocalDate date : amounts.keySet()) {
 			dates.add(date.toString());
 		}
+		Collections.sort(dates, new Comparator<String>() {
+
+			@Override
+			public int compare(String o1, String o2) {
+				return o2.compareTo(o1);
+			}
+			
+		});
+		
+		
 		return new ResponseContent<List<String>>(ResponseEnum.SUCCESS, dates);
 	}
 	
-	private List<String> generateHolds(String type, LocalDate date){
-		List<String> ids = new ArrayList<String>();
+	private Set<String> generateHolds(String type, LocalDate date){
+		Holds holds = new Holds();
 		
 		Map<LocalDate,List<String>> buys = turtleSimulationRepository.getBuys(type);
+		
 		Map<LocalDate,List<String>> sells = turtleSimulationRepository.getSells(type);
 		
 		for(Map.Entry<LocalDate,List<String>> entry : buys.entrySet()) {
 			if(entry.getKey().isBefore(date)) {
-				ids.addAll(entry.getValue());
+				for(String id : entry.getValue()) {
+					holds.buy(id);
+				}
 			}
 		}
 		
 		for(Map.Entry<LocalDate,List<String>> entry : sells.entrySet()) {
 			if(entry.getKey().isBefore(date)) {
-				ids.removeAll(entry.getValue());
+				for(String id : entry.getValue()) {
+					holds.sell(id);
+				}
 			}
 		}
 		
-		return ids;
+		return holds.getResult();
+	}
+	
+	class Holds{
+		private Map<String, Integer> ss = new HashMap<String,Integer>();
+		public void buy(String id) {
+			if(ss.containsKey(id)) {
+				ss.put(id, ss.get(id)+1);
+			}else {
+				ss.put(id, 1);
+			}
+		}
+		
+		public void sell(String id) {
+			if(ss.containsKey(id)) {
+				ss.put(id, ss.get(id)-1);
+			}
+		}
+		
+		public Set<String> getResult(){
+			Set<String> ids = new HashSet<String>();
+			for(Map.Entry<String, Integer> entry : ss.entrySet()) {
+				if(entry.getValue() != 0) {
+					ids.add(entry.getKey());
+				}
+			}
+			return ids;
+		}
 	}
 	
 }

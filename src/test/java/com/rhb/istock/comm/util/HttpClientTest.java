@@ -1,9 +1,7 @@
 package com.rhb.istock.comm.util;
 
-import java.io.File;
-import java.time.format.DateTimeFormatter;
+import java.util.List;
 
-import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 
 public class HttpClientTest {
@@ -24,5 +22,17 @@ public class HttpClientTest {
 		}
 	}
 	
-
+	@Test
+	public void test1() {
+		String strUrl = "http://bond.jrj.com.cn/data";
+		String result = HttpClient.doGet(strUrl);
+		List<String> ss = ParseString.subStrings(result, "<table cellspacing=\"0\" cellpadding=\"0\" border=\"0\" class=\"dt1 sortable scrollable table_bonddata_qz\" rowclass=\",ln\">|</div>");
+		//String gn = ParseString.subString(result, "<dd title=\"|\">");
+		System.out.println(result);
+		System.out.println("----------");
+		for(String s : ss) {
+			System.out.println(s);
+		}
+	}
+	
 }

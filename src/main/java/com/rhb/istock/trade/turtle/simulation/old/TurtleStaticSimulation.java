@@ -1,4 +1,4 @@
-package com.rhb.istock.trade.turtle.simulation;
+package com.rhb.istock.trade.turtle.simulation.old;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -22,11 +22,11 @@ import com.rhb.istock.kdata.Kbar;
 import com.rhb.istock.kdata.Kdata;
 import com.rhb.istock.kdata.KdataService;
 import com.rhb.istock.trade.turtle.domain.Turtle;
-import com.rhb.istock.trade.turtle.simulation.api.AmountView;
-import com.rhb.istock.trade.turtle.simulation.api.BreakerView;
-import com.rhb.istock.trade.turtle.simulation.api.HoldView;
-import com.rhb.istock.trade.turtle.simulation.repository.AmountEntity;
-import com.rhb.istock.trade.turtle.simulation.repository.TurtleSimulationRepository;
+import com.rhb.istock.trade.turtle.simulation.six.api.AmountView;
+import com.rhb.istock.trade.turtle.simulation.six.api.BreakerView;
+import com.rhb.istock.trade.turtle.simulation.six.api.HoldView;
+import com.rhb.istock.trade.turtle.simulation.six.repository.AmountEntity;
+import com.rhb.istock.trade.turtle.simulation.six.repository.TurtleSimulationRepository;
 
 /*
  * 所谓static，即每天要交易的item是确定的，如上证50、每日交易量top50、日均交易量top50、等

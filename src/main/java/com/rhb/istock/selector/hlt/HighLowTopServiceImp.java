@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.assertj.core.util.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -23,7 +22,7 @@ public class HighLowTopServiceImp implements HighLowTopService {
 
 	@Override
 	public List<String> getLatestTops(Integer top) {
-		List<String> tops = Lists.newArrayList();
+		List<String> tops = new ArrayList<String>();
 
 		List<Muster> musters = new ArrayList<Muster>(kdataService.getLatestMusters().values());
 		Collections.sort(musters, new Comparator<Muster>() {

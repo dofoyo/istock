@@ -1,4 +1,4 @@
-package com.rhb.istock.trade.turtle.simulation.muster;
+package com.rhb.istock.trade.turtle.simulation.six;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -48,7 +48,7 @@ public class Paul {
 		breakers_sb.append(date.toString() + ",");
 
 		for(Muster breaker : breakers) {
-			if(!holdIDs.contains(breaker.getItemID()) && !breaker.isUpLimited()) {
+			if(!holdIDs.contains(breaker.getItemID()) && !breaker.isUpLimited() && breaker.getHLGap()<50) {
 				account.refreshHoldsPrice(breaker.getItemID(), breaker.getLatestPrice());
 				account.open(breaker.getItemID(), this.getQuantity(breaker.getLatestPrice()), "", breaker.getLatestPrice());
 			}
@@ -62,6 +62,67 @@ public class Paul {
 
 		//account.doDailyReport(date);
 	}
+	
+	/*
+	 * 满仓操作
+	 * 每只股票市值相同
+	 */
+	public void doIt_plus(Map<String,Muster> musters, List<Muster> breakers, LocalDate date) {
+		Muster muster;
+		account.setLatestDate(date);
+
+		//卖出跌破dropline的股票
+		Set<String> holdIDs = account.getItemIDsOfHolds();
+		for(String itemID: holdIDs) {
+			muster = musters.get(itemID);
+			if(muster!=null) {
+				account.refreshHoldsPrice(itemID, muster.getLatestPrice());
+				
+				if(muster.isDrop() && !muster.isDownLimited()) {
+					account.drop(itemID, "", muster.getLatestPrice()); 
+				}
+			}
+		}		
+		
+		Map<String, BigDecimal> dds = new HashMap<String,BigDecimal>();
+		//确定突破走势的股票
+		breakers_sb.append(date.toString() + ",");
+
+		for(Muster breaker : breakers) {
+			//if(!breaker.isUpLimited() && breaker.getHLGap()<50) {
+			if(!breaker.isUpLimited()) {
+				dds.put(breaker.getItemID(), breaker.getLatestPrice());
+				//account.refreshHoldsPrice(breaker.getItemID(), breaker.getLatestPrice());
+				//account.open(breaker.getItemID(), this.getQuantity(breaker.getLatestPrice()), "", breaker.getLatestPrice());
+			}
+			breakers_sb.append(breaker.getItemID());
+			breakers_sb.append(",");
+		}
+		breakers_sb.deleteCharAt(breakers_sb.length()-1);
+		breakers_sb.append("\n");
+		
+		
+		//卖出全部在手的股票（先卖后买）
+		if(!dds.isEmpty()) {
+			holdIDs = account.getItemIDsOfHolds();
+			for(String itemID: holdIDs) {
+				muster = musters.get(itemID);
+				if(muster!=null) {
+					account.refreshHoldsPrice(itemID, muster.getLatestPrice());
+					account.drop(itemID, "", muster.getLatestPrice());   //先卖
+					dds.put(itemID, muster.getLatestPrice());
+				}
+			}
+			
+			account.openAll(dds);			//后买
+		}
+
+		dailyAmount_sb.append(account.getDailyAmount() + "\n");
+
+		//account.doDailyReport(date);
+	}
+	
+	
 	
 	public Map<String,String> result() {
 		if(account == null) return null;

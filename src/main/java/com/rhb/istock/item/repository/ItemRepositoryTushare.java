@@ -41,6 +41,8 @@ public class ItemRepositoryTushare implements ItemRepository{
 					entity.setIndustry(item.get(3).toString());
 					entity.setIpo(item.get(4).toString());
 					entities.add(entity);
+					
+					//System.out.println(entity);  //***************
 				}
 			}
 		} catch (Exception e) {

@@ -1,12 +1,13 @@
-package com.rhb.istock.trade.turtle.simulation.api;
+package com.rhb.istock.trade.turtle.simulation.six.api;
 
+import java.math.BigDecimal;
 import java.text.DecimalFormat;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MeanView {
-	private Integer min;
-
+public class AllAmountView {
+	private BigDecimal min;
 	private List<String> dates;
 	private List<String> bhls;
 	private List<String> bavs;
@@ -16,7 +17,7 @@ public class MeanView {
 	private List<String> dtbs;
 	DecimalFormat df = new DecimalFormat("#.00");
 
-	public MeanView() {
+	public AllAmountView() {
 		min = null;
 		dates = new ArrayList<String>();
 		bhls = new ArrayList<String>();
@@ -27,14 +28,14 @@ public class MeanView {
 		dtbs = new ArrayList<String>();
 	}
 	
-	public void add(String date, String bhl, String bav, String bdt, String hlb, String avb, String dtb) {
-		dates.add(date);
-		bhls.add(bhl);
-		bavs.add(bav);
-		bdts.add(bdt);
-		hlbs.add(hlb);
-		avbs.add(avb);
-		dtbs.add(dtb);
+	public void add(LocalDate date, BigDecimal bhl, BigDecimal bav, BigDecimal bdt, BigDecimal hlb, BigDecimal avb, BigDecimal dtb) {
+		dates.add(date.toString());
+		bhls.add(df.format(bhl));
+		bavs.add(df.format(bav));
+		bdts.add(df.format(bdt));
+		hlbs.add(df.format(hlb));
+		avbs.add(df.format(avb));
+		dtbs.add(df.format(dtb));
 		
 		this.setMin(bhl);
 		this.setMin(bav);
@@ -44,10 +45,17 @@ public class MeanView {
 		this.setMin(dtb);
 		
 	}
-	
 
 	public String getMin() {
-		return min.toString();
+		return df.format(min);
+	}
+
+	public void setMin(BigDecimal a) {
+		if(this.min==null) {
+			this.min = a;
+		}else if(a.compareTo(this.min)==-1) {
+			this.min = a;			
+		}
 	}
 
 	public List<String> getDates() {
@@ -105,15 +113,5 @@ public class MeanView {
 	public void setDtbs(List<String> dtbs) {
 		this.dtbs = dtbs;
 	}
-
-
-	public void setMin(String min) {
-		Integer a = Integer.parseInt(min);
-		if(this.min==null) {
-			this.min = a;
-		}else if(a < this.min) {
-			this.min = a;
-		}
-	}
-
+	
 }

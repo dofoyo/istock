@@ -22,7 +22,7 @@ public class ItemEntity {
 	}
 
 	public void setCode(String code) {
-		this.itemID = code.indexOf("60")==0 ? "sh"+code : "sz"+code;
+		this.itemID = code.indexOf("6")==0 ? "sh"+code : "sz"+code;
 		this.code = code;
 	}
 

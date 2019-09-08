@@ -1,13 +1,13 @@
-package com.rhb.istock.trade.turtle.simulation;
+package com.rhb.istock.trade.turtle.simulation.old;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import com.rhb.istock.trade.turtle.simulation.api.AmountView;
-import com.rhb.istock.trade.turtle.simulation.api.BreakerView;
-import com.rhb.istock.trade.turtle.simulation.api.HoldView;
+import com.rhb.istock.trade.turtle.simulation.six.api.AmountView;
+import com.rhb.istock.trade.turtle.simulation.six.api.BreakerView;
+import com.rhb.istock.trade.turtle.simulation.six.api.HoldView;
 
 public interface TurtleSimulation {
 	public Map<String, String> simulate(TreeMap<LocalDate,List<String>> dailyItems, Toption option, boolean byCache);

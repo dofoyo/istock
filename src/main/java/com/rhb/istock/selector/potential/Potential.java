@@ -33,12 +33,12 @@ public class Potential {
 	
 	public List<String> getLabels() {
 		List<String> labels = new ArrayList<String>();
-		if(bhl!=null) labels.add("bhl(" + bhl + ")");
-		if(bdt!=null) labels.add("bdt(" + bdt + ")");
-		if(bav!=null) labels.add("bav(" + bav + ")");
-		if(hlb!=null) labels.add("hlb(" + hlb + ")");
-		if(dtb!=null) labels.add("dtb(" + dtb + ")");
-		if(avb!=null) labels.add("avb(" + avb + ")");
+		//if(bhl!=null) labels.add("bhl(" + String.format("%02d", bhl) + ")");
+		//if(bdt!=null) labels.add("bdt(" + String.format("%02d", bdt) + ")");
+		//if(bav!=null) labels.add("bav(" + String.format("%02d", bav) + ")");
+		if(hlb!=null) labels.add("hlb(" + String.format("%02d", hlb) + ")");
+		//if(dtb!=null) labels.add("dtb(" + String.format("%02d", dtb) + ")");
+		if(avb!=null) labels.add("avb(" + String.format("%02d", avb) + ")");
 		return labels;
 	}
 	

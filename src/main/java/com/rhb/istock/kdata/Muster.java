@@ -12,6 +12,10 @@ public class Muster {
 	private BigDecimal dropPrice;
 	private BigDecimal latestPrice;
 
+	public Integer getHNGap() {
+		return highest.subtract(latestPrice).divide(latestPrice,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)).intValue();
+	}
+	
 	public boolean isUpLimited() {
 		return latestPrice.subtract(close).divide(close,BigDecimal.ROUND_HALF_UP).compareTo(new BigDecimal(0.095))>=0;
 	}

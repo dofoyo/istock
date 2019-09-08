@@ -58,13 +58,4 @@ public class PotentialServiceTest {
 			}
 		}
 	}
-	
-	@Test
-	public void getPowers() {
-		List<String> pp = potentialService.getPowerIDs();
-		for(String p : pp) {
-			System.out.println(p);
-		}
-	}
-	
 }

@@ -202,34 +202,35 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 		}*/
 
 		this.createPotentialsWithLatestMarketData();			
-
+		
 		int i=1;
 		for(Potential potential : this.potentials) {
 			Progress.show(this.potentials.size(), i++, "assembling view... " + potential.getItemID());
-
-			view = new TurtleView();
-			view.setItemID(potential.getItemID());
-			view.setHigh(df.format(potential.getHighest()));
-			view.setLow(df.format(potential.getLowest()));
-			view.setPclose(df.format(potential.getClose()));
-			view.setNow(df.format(potential.getLatestPrice()));
-			view.setHlgap(df.format(potential.getHLGap()));
-			view.setNhgap(df.format(potential.getHNGap()));
-			view.setStatus(potential.getStatus());
-			
-			view.setTopic(this.getTopic(potential.getItemID()));
-			
-			labels = potential.getLabels();
-			labels.addAll(this.getLabels(potential.getItemID()));
-			view.setLabels(labels);
-			
-			item = itemService.getItem(potential.getItemID());
-			view.setCode(holds!=null && holds.contains(potential.getItemID()) ? "*" + item.getCode() : item.getCode());
-			view.setName(item.getName());
-			view.setArea(item.getArea());
-			view.setIndustry(item.getIndustry());
-			
-			views.add(view);
+			if(potential.getHlb()!=null || potential.getAvb()!=null) {
+				view = new TurtleView();
+				view.setItemID(potential.getItemID());
+				view.setHigh(df.format(potential.getHighest()));
+				view.setLow(df.format(potential.getLowest()));
+				view.setPclose(df.format(potential.getClose()));
+				view.setNow(df.format(potential.getLatestPrice()));
+				view.setHlgap(df.format(potential.getHLGap()));
+				view.setNhgap(df.format(potential.getHNGap()));
+				view.setStatus(potential.getStatus());
+				
+				view.setTopic(this.getTopic(potential.getItemID()));
+				
+				labels = potential.getLabels();
+				labels.addAll(this.getLabels(potential.getItemID()));
+				view.setLabels(labels);
+				
+				item = itemService.getItem(potential.getItemID());
+				view.setCode(holds!=null && holds.contains(potential.getItemID()) ? "*" + item.getCode() : item.getCode());
+				view.setName(item.getName());
+				view.setArea(item.getArea());
+				view.setIndustry(item.getIndustry());
+				
+				views.add(view);
+			}
 		}		
 
 		Collections.sort(views, new Comparator<TurtleView>() {

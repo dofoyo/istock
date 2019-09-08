@@ -1,4 +1,4 @@
-package com.rhb.istock.item;
+package com.rhb.istock.trade.turtle.simulation.power;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -9,24 +9,14 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest
-public class ItemServiceTest {
+public class PowerSimulationTest {
 	@Autowired
-	@Qualifier("itemServiceImp")
-	ItemService itemService;
-	
-	
-	//@Test
-	public void getTopic() {
-		String itemID = "sz300022";
-		String topic = itemService.getTopic(itemID);
-		System.out.println(topic);
-	}
+	@Qualifier("powerSimulation")
+	PowerSimulation powerSimulation;
 	
 	@Test
-	public void getItem() {
-		String itemID = "sh688001";
-		Item item = itemService.getItem(itemID);
-		System.out.println(item);
+	public void simulation() {
+		powerSimulation.simulate();
 	}
 	
 }

@@ -1,4 +1,4 @@
-package com.rhb.istock.trade.turtle.simulation.muster;
+package com.rhb.istock.trade.turtle.simulation.six;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -18,7 +18,7 @@ import org.springframework.stereotype.Service;
 import com.rhb.istock.comm.util.Progress;
 import com.rhb.istock.kdata.KdataService;
 import com.rhb.istock.kdata.Muster;
-import com.rhb.istock.trade.turtle.simulation.repository.TurtleSimulationRepository;
+import com.rhb.istock.trade.turtle.simulation.six.repository.TurtleSimulationRepository;
 
 @Service("turtleMusterSimulation")
 public class TurtleMusterSimulation {
@@ -64,13 +64,13 @@ public class TurtleMusterSimulation {
 			
 			musters = kdataService.getMusters(date);
 			if(musters!=null && musters.size()>0) {
-				bavPaul.doIt(musters, this.getTops(new ArrayList<Muster>(musters.values()), "bav"), date);
-				bhlPaul.doIt(musters, this.getTops(new ArrayList<Muster>(musters.values()), "bhl"), date);
-				bdtPaul.doIt(musters, this.getTops(new ArrayList<Muster>(musters.values()), "bdt"), date);
+				bavPaul.doIt_plus(musters, this.getTops(new ArrayList<Muster>(musters.values()), "bav"), date);
+				bhlPaul.doIt_plus(musters, this.getTops(new ArrayList<Muster>(musters.values()), "bhl"), date);
+				bdtPaul.doIt_plus(musters, this.getTops(new ArrayList<Muster>(musters.values()), "bdt"), date);
 				
-				avbPaul.doIt(musters, this.getTops(new ArrayList<Muster>(musters.values()), "avb"), date);
-				hlbPaul.doIt(musters, this.getTops(new ArrayList<Muster>(musters.values()), "hlb"), date);
-				dtbPaul.doIt(musters, this.getTops(new ArrayList<Muster>(musters.values()), "dtb"), date);
+				avbPaul.doIt_plus(musters, this.getTops(new ArrayList<Muster>(musters.values()), "avb"), date);
+				hlbPaul.doIt_plus(musters, this.getTops(new ArrayList<Muster>(musters.values()), "hlb"), date);
+				dtbPaul.doIt_plus(musters, this.getTops(new ArrayList<Muster>(musters.values()), "dtb"), date);
 			}
 		}
 		
@@ -159,6 +159,11 @@ public class TurtleMusterSimulation {
 		}
 	}
 	
+	/*
+	 * 计算每天的盈率
+	 * 以买入当天的收盘价和卖出当天的收盘价进行计算。
+	 */
+	
 	public void generateDailyRatios(LocalDate beginDate, LocalDate endDate) {
 		long beginTime=System.currentTimeMillis(); 
 		System.out.println("calculateDailyRatio from " + beginDate + " to " + endDate + " ......");
@@ -231,6 +236,12 @@ public class TurtleMusterSimulation {
 		}
 	}
 	
+	/*
+	 * 计算买入后第二天的盈率。
+	 * 如果连续盈，说明上升势头，可以买入股票
+	 * 否则，属于平衡式或下跌市。
+	 * 
+	 */
 	public Ratios calculateRatios(LocalDate buyDate, LocalDate sellDate, String type) {
 		Ratios ratios = new Ratios();
 		Integer ratio;
@@ -246,7 +257,9 @@ public class TurtleMusterSimulation {
 			if(buy!=null && buy.isBreaker() && !buy.isUpLimited()) {
 				sell = sellDateMusters.get(buy.getItemID());
 				if(sell!=null) {
+					//以买入当天的收盘价和卖出当天的收盘价进行计算
 					ratio = sell.getLatestPrice().subtract(buy.getLatestPrice()).divide(buy.getLatestPrice(),BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)).intValue();
+					
 					//System.out.format("%s %s %s buy price %f, %s day close price %f, ratio is %d.\n", 
 							//type,buyDate.toString(), buy.getItemID(), buy.getLatestPrice(), sellDate.toString(), sell.getLatestPrice(), ratio);
 					ratios.put(ratio);
