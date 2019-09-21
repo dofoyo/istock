@@ -21,7 +21,7 @@ public interface TurtleOperationService {
 	 */
 	public List<HoldView> getHolds();
 	public List<TurtleView> getFavors();
-	public List<TurtleView> getPotentials();
+	public List<TurtleView> getPotentials(String type);
 	public void redoPotentials();
 	public String[] getTopics();
 	public List<TurtleView> getPowers();

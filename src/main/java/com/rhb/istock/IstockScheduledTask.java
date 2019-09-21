@@ -1,5 +1,7 @@
 package com.rhb.istock;
 
+import java.time.LocalDate;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +12,7 @@ import org.springframework.stereotype.Component;
 import com.rhb.istock.fdata.FinancialStatementService;
 import com.rhb.istock.item.ItemService;
 import com.rhb.istock.kdata.KdataService;
+import com.rhb.istock.kdata.spider.KdataRealtimeSpider;
 import com.rhb.istock.selector.SelectorService;
 import com.rhb.istock.trade.turtle.operation.TurtleOperationService;
 
@@ -34,8 +37,31 @@ public class IstockScheduledTask {
 	@Autowired
 	@Qualifier("turtleOperationServiceImp")
 	TurtleOperationService turtleOperationService;
+
+	@Autowired
+	@Qualifier("kdataRealtimeSpiderImp")
+	KdataRealtimeSpider kdataRealtimeSpider;
 	
 	protected static final Logger logger = LoggerFactory.getLogger(IstockScheduledTask.class);
+	
+	private boolean isTradeDate = false;  
+	private LocalDate theDate = null;
+	
+	private boolean isTradeDate() {
+		LocalDate now = LocalDate.now();
+		if(this.theDate==null || !now.equals(theDate)) {
+			this.isTradeDate = kdataRealtimeSpider.isTradeDate(now);
+			theDate = now;
+		}
+		
+		if(this.isTradeDate) {
+	    	System.out.println("today is a trade date. Good Luck!");
+		}else {
+			System.out.println("today is NOT a trade date. Have Fun!");
+		}
+		
+		return this.isTradeDate;
+	}
 	
 	/*
 	 * 每周1至5，9:30,开盘后，
@@ -45,42 +71,54 @@ public class IstockScheduledTask {
 	 */
 	@Scheduled(cron="0 30 9 ? * 1-5") 
 	public void dailyInit() throws Exception {
-		logger.info("run scheduled of '0 30 9 ? * 1-5'");
-		itemService.download();		//下载最新股票代码
-		kdataService.downKdatasAndFactors(); //上一交易日的收盘数据要等开盘前才能下载到, 大约需要15分钟
-		turtleOperationService.init();
+		System.out.println("run scheduled of '0 30 9 ? * 1-5'");
+		if(this.isTradeDate()) {
+			itemService.download();		//下载最新股票代码
+			kdataService.downKdatasAndFactors(); //上一交易日的收盘数据要等开盘前才能下载到, 大约需要15分钟
+			turtleOperationService.init();
+		}
 	}
 
 	@Scheduled(cron="0 45/5 9 ? * 1-5")  //周一至周五，每日9点45分，每5分钟刷新一次 
 	public void updateLatestMusters0() throws Exception {
-		logger.info("run scheduled of '0 45/5 9 ? * 1-5'");
-		kdataService.updateLatestMusters();
+		System.out.println("run scheduled of '0 45/5 9 ? * 1-5'");
+		if(this.isTradeDate()) {
+			kdataService.updateLatestMusters();
+		}
 	}
 	
 	@Scheduled(cron="0 5/5 10-11 ? * 1-5")  //周一至周五，每日10点-11点，每5分钟刷新一次 
 	public void updateLatestMusters1() throws Exception {
-		logger.info("run scheduled of '0 */5 10-11 ? * 1-5'");
-		kdataService.updateLatestMusters();
+		System.out.println("run scheduled of '0 */5 10-11 ? * 1-5'");
+		if(this.isTradeDate()) {
+			kdataService.updateLatestMusters();
+		}
 	}
 
 	@Scheduled(cron="0 5-30/5 11 ? * 1-5")  //周一至周五，每日11点-11点30，每5分钟刷新一次 
 	public void updateLatestMusters2() throws Exception {
-		logger.info("run scheduled of '0 5-30/5 11 ? * 1-5'");
-		kdataService.updateLatestMusters();
+		System.out.println("run scheduled of '0 5-30/5 11 ? * 1-5'");
+		if(this.isTradeDate()) {
+			kdataService.updateLatestMusters();
+		}
 	}
 	
 	@Scheduled(cron="0 5/5 13-15 ? * 1-5")  //周一至周五，每日13点-15点，每5分钟刷新一次 
 	public void updateLatestMusters3() throws Exception {
-		logger.info("run scheduled of '0 */5 13-15 ? * 1-5'");
-		kdataService.updateLatestMusters();
+		System.out.println("run scheduled of '0 */5 13-15 ? * 1-5'");
+		if(this.isTradeDate()) {
+			kdataService.updateLatestMusters();
+		}
 	}
 	
 	@Scheduled(cron="0 50 9 ? * 1-5") //周一至周五，每日9:50点
 	public void downloadReports() {
-		logger.info("run scheduled of '0 0 10 ? * 1-5'");
-		financialStatementService.downloadReports();  //下载最新年报(包括新股)
-		selectorService.generateBluechip();  //并生成bluechip
-		kdataService.generateMusters();   //生成muster，需要192分，即3个多小时
+		System.out.println("run scheduled of '0 0 10 ? * 1-5'");
+		if(this.isTradeDate()) {
+			financialStatementService.downloadReports();  //下载最新年报(包括新股)
+			selectorService.generateBluechip();  //并生成bluechip
+			kdataService.generateMusters();   //生成muster，需要192分，即3个多小时
+		}
 	}
 
 }

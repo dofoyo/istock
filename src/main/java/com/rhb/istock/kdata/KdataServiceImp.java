@@ -384,18 +384,59 @@ public class KdataServiceImp implements KdataService{
 		
 		Map<String, MusterEntity> entities = musterRepositoryImp.getMusters(date);
 		
+		String exclude = "";
+
+		//String exclude = "黄金,食品,水泥,农用机械,白酒,出版业,其他建材,化工机械,普钢,港口,互联网,软件服务,电气设备,新型电力,空运,水运,装修装饰,铜,机床制造,园区开发,机械基件,化纤,水务,建筑工程,电信运营,工程机械,影视音像,旅游景点,铅锌,农业综合,银行,石油加工,煤炭开采,汽车整车,公共交通,酒店餐饮,火力发电,综合类,纺织";
+
+		//String include = "医疗保健,通信设备,化学制药,专用机械,汽车配件,塑料,水力发电,保险,机场,家居用品,文教休闲,农药化肥,服饰,石油开采,航空,染料涂料,元器件,半导体,铝,焦炭加工,商贸代理,造纸,电器仪表,乳制品,陶瓷,软饮料,小金属,船舶,林业,纺织机械,铁路,特种钢,红黄酒,多元金融,电器连锁";
+		/*
+		 * 元器件
+专用机械
+纺织
+服饰
+铁路
+商贸代理
+
+		 */
+		
+		//String include = "医疗保健,通信设备,化学制药,汽车配件,塑料,水力发电,保险,机场,家居用品,文教休闲,农药化肥,石油开采,航空,染料涂料,半导体,铝,焦炭加工,造纸,电器仪表,乳制品,陶瓷,软饮料,小金属,船舶,林业,纺织机械,特种钢,红黄酒,多元金融,电器连锁,";
+
+		/*
+		 * 铝
+电器连锁
+陶瓷
+半导体
+纺织机械
+机场
+特种钢
+林业
+小金属
+乳制品
+焦炭加工
+染料涂料
+
+		 */
+
+		String include = "红黄酒,船舶,软饮料,水力发电,石油开采,文教休闲,家居用品,保险,多元金融,塑料,电器仪表,造纸,汽车配件,医疗保健,通信设备,化学制药,";
+
+		
 		for(MusterEntity entity : entities.values()) {
-			muster = new Muster();
-			muster.setItemID(entity.getItemID());
-			muster.setAmount(entity.getAmount());
-			muster.setAverageAmount(entity.getAverageAmount());
-			muster.setHighest(entity.getHighest());
-			muster.setLowest(entity.getLowest());
-			muster.setClose(entity.getClose());
-			muster.setDropPrice(entity.getDropPrice());
-			muster.setLatestPrice(entity.getLatestPrice());
-			
-			musters.put(muster.getItemID(),muster);
+			if(exclude.indexOf(itemService.getItem(entity.getItemID()).getIndustry()+",")==-1){
+			//if(include.indexOf(itemService.getItem(entity.getItemID()).getIndustry()+",")!=-1){
+				
+				muster = new Muster();
+				muster.setItemID(entity.getItemID());
+				//muster.setItemName(itemService.getItem(entity.getItemID()).getName());
+				muster.setAmount(entity.getAmount());
+				muster.setAverageAmount(entity.getAverageAmount());
+				muster.setHighest(entity.getHighest());
+				muster.setLowest(entity.getLowest());
+				muster.setClose(entity.getClose());
+				muster.setDropPrice(entity.getDropPrice());
+				muster.setLatestPrice(entity.getLatestPrice());
+				
+				musters.put(muster.getItemID(),muster);
+			}
 		}
 		
 		return musters;

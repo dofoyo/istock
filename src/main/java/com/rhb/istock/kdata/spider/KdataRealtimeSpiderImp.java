@@ -115,6 +115,37 @@ public class KdataRealtimeSpiderImp implements KdataRealtimeSpider{
 		
 		return dates;
 	}
+
+
+	@Override
+	public boolean isTradeDate(LocalDate date) {
+		String url = "http://api.tushare.pro";
+		JSONObject args = new JSONObject();
+		args.put("api_name", "trade_cal");
+		args.put("token", "175936caa4637bc9ac8e5e75ac92eff6887739ca6be771b81653f278");
+		
+		JSONObject params = new JSONObject();
+		params.put("start_date", date.format(DateTimeFormatter.ofPattern("yyyyMMdd")));
+		
+		args.put("params", params);
+		
+		String str = HttpClient.doPostJson(url, args.toString());
+		//System.out.println(str);
+		JSONArray items = (new JSONObject(str)).getJSONObject("data").getJSONArray("items");
+		Integer isOpen;
+		LocalDate theDate;
+		if(items.length()>0) {
+			JSONArray item = items.getJSONArray(0);
+			System.out.println(item);
+			isOpen = item.getInt(2);
+			theDate = LocalDate.parse(item.getString(1),DateTimeFormatter.ofPattern("yyyyMMdd"));
+			if(isOpen==1 && theDate.equals(date)) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
 	
 }
 

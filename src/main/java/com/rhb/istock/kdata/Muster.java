@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 
 public class Muster {
 	private String itemID;
+	private String itemName;
 	private BigDecimal amount;
 	private BigDecimal averageAmount;
 	private BigDecimal highest;
@@ -11,6 +12,14 @@ public class Muster {
 	private BigDecimal close;
 	private BigDecimal dropPrice;
 	private BigDecimal latestPrice;
+
+	public String getItemName() {
+		return itemName;
+	}
+
+	public void setItemName(String itemName) {
+		this.itemName = itemName;
+	}
 
 	public Integer getHNGap() {
 		return highest.subtract(latestPrice).divide(latestPrice,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)).intValue();
@@ -94,9 +103,9 @@ public class Muster {
 	}
 	@Override
 	public String toString() {
-		return "Muster [itemID=" + itemID + ", amount=" + amount + ", averageAmount=" + averageAmount + ", highest="
-				+ highest + ", lowest=" + lowest + ", close=" + close + ", dropPrice=" + dropPrice + ", latestPrice="
-				+ latestPrice + "]";
+		return "Muster [itemID=" + itemID + ", itemName=" + itemName + ", amount=" + amount + ", averageAmount="
+				+ averageAmount + ", highest=" + highest + ", lowest=" + lowest + ", close=" + close + ", dropPrice="
+				+ dropPrice + ", latestPrice=" + latestPrice + "]";
 	}
 	
 	

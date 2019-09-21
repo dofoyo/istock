@@ -33,11 +33,9 @@ public class TurtleMusterSimulation {
 	@Qualifier("turtleSimulationRepository")
 	TurtleSimulationRepository turtleSimulationRepository;
 	
-	
-	
 	Integer pool = 21;
 	Integer top = 5;
-	BigDecimal initCash = new BigDecimal(2000000);
+	BigDecimal initCash = new BigDecimal(1000000);
 	BigDecimal quota = new BigDecimal(20000); //买入每只股票的定额
 	
 	

@@ -43,7 +43,7 @@ public class KdataServiceTest {
 		kdataService.generateLatestMusters();
 	}
 
-	@Test
+	//@Test
 	public void updateLatestMusters() {
 		kdataService.updateLatestMusters();
 	}

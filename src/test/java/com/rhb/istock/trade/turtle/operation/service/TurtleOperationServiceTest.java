@@ -23,7 +23,7 @@ public class TurtleOperationServiceTest {
 
 	@Test
 	public void getPotentials() {
-		List<TurtleView> views = turtleService.getPotentials();
+		List<TurtleView> views = turtleService.getPotentials("hlb");
 		for(TurtleView view : views) {
 			System.out.print(view.getItemID() + ",");
 		}	
@@ -45,7 +45,7 @@ public class TurtleOperationServiceTest {
 	
 	//@Test
 	public void getBreakers() {
-		List<TurtleView> views = turtleService.getPotentials();
+		List<TurtleView> views = turtleService.getPotentials("hlb");
 		for(TurtleView view : views) {
 			System.out.println(view);
 		}		

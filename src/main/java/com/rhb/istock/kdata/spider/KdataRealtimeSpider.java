@@ -13,5 +13,7 @@ public interface KdataRealtimeSpider {
 	 * 返回值中，包括startDate，不包括endDate
 	 */
 	public List<LocalDate> getCalendar(LocalDate startDate,LocalDate endDate) throws Exception;
+	
+	public boolean isTradeDate(LocalDate date);
 
 }

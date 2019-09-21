@@ -183,7 +183,7 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 	}
 
 	@Override
-	public List<TurtleView> getPotentials() {
+	public List<TurtleView> getPotentials(String type) {
 		long beginTime=System.currentTimeMillis(); 
 		logger.info("getting potential views ......");
 		
@@ -206,8 +206,8 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 		int i=1;
 		for(Potential potential : this.potentials) {
 			Progress.show(this.potentials.size(), i++, "assembling view... " + potential.getItemID());
+			view = new TurtleView();
 			if(potential.getHlb()!=null || potential.getAvb()!=null) {
-				view = new TurtleView();
 				view.setItemID(potential.getItemID());
 				view.setHigh(df.format(potential.getHighest()));
 				view.setLow(df.format(potential.getLowest()));
@@ -229,7 +229,11 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 				view.setArea(item.getArea());
 				view.setIndustry(item.getIndustry());
 				
-				views.add(view);
+				if(type.equals("hlb") && potential.getHlb()!=null) {
+					views.add(view);
+				}else if(type.equals("avb") && potential.getAvb()!=null) {
+					views.add(view);
+				}
 			}
 		}		
 

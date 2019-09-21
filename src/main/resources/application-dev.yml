@@ -14,7 +14,7 @@ topicsFile: D:/dev/istock-data/topics.txt
 fvaluesOfHLFile: D:/dev/istock-data/fvaluesOfHL.txt
 dailyMeansFile: D:/dev/istock-data/dailyMeans.txt
 openDuration: 89
-dropDuration: 34
+dropDuration: 21
 
 
 

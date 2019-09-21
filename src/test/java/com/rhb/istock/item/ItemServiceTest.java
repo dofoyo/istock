@@ -1,5 +1,7 @@
 package com.rhb.istock.item;
 
+import java.util.List;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,11 +24,20 @@ public class ItemServiceTest {
 		System.out.println(topic);
 	}
 	
-	@Test
+	//@Test
 	public void getItem() {
 		String itemID = "sh688001";
 		Item item = itemService.getItem(itemID);
 		System.out.println(item);
+	}
+	
+	@Test
+	public void getItems() {
+		List<Item> items = itemService.getItems();
+		for(Item item : items) {
+			System.out.println(item.getItemID() + "," + item.getName() + "," + item.getIndustry());
+			
+		}
 	}
 	
 }
