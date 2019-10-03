@@ -24,13 +24,14 @@ public class KdataSpider163 implements KdataSpider {
 	public void downKdatas(String itemID) throws Exception {
 		String code = itemID.substring(2);
 		String marketCode = (itemID.indexOf("sh")==0 ? "0" : "1") + code;
+		
 		DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyyMMdd");
 		LocalDate today = LocalDate.now();
 		
 		
 		//String start = Integer.toString(year-2) + "0101";
 		//String start = today.minusDays(250).format(df);
-		String start = "20060101";
+		String start = "19990101";
 		String end = today.format(df);
 		
 		//http://quotes.money.163.com/service/chddata.html?code=1300384&start=20181001&end=20190211&fields=TCLOSE

@@ -1,6 +1,7 @@
 package com.rhb.istock.kdata.spider;
 
 import java.time.LocalDate;
+import java.util.Map;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -16,10 +17,19 @@ public class KdataRealtimeSpiderTest {
 	@Qualifier("kdataRealtimeSpiderImp")
 	KdataRealtimeSpider kdataRealtimeSpider;
 	
-	@Test
+	//@Test
 	public void testIsTradeDate() {
 		LocalDate date = LocalDate.now();
 		System.out.println(kdataRealtimeSpider.isTradeDate(date));
+	}
+	
+	
+	@Test
+	public void getLatestMarketData() {
+		String id = "sh000001";
+		Map<String,String> data = kdataRealtimeSpider.getLatestMarketData(id);
+		System.out.println(data);
+		
 	}
 
 }

@@ -193,7 +193,7 @@ public class BluechipServiceImp implements BluechipService {
 		List<Bluechip> bluechips = this.getBluechips(date);
 		
 		for(Bluechip bluechip : bluechips) {
-			ids.add(bluechip.getCode().indexOf("60")==0 ? "sh"+bluechip.getCode() : "sz"+bluechip.getCode());
+			ids.add(bluechip.getCode().indexOf("6")==0 ? "sh"+bluechip.getCode() : "sz"+bluechip.getCode());
 		}
 		
 		return ids;

@@ -61,7 +61,7 @@ public class KdataServiceImp implements KdataService{
 	@Value("${dropDuration}")
 	private Integer dropDuration;
 	
-	private String szzs = "sh000001"; //上证指数
+	private String sseiID = "sh000001"; //上证指数
 	//private Integer openDuration = 89;
 	//private Integer dropDuration = 21;
 
@@ -70,9 +70,9 @@ public class KdataServiceImp implements KdataService{
 	private KdataEntity getEntity(String itemID, boolean byCache) {
 		KdataEntity entity = null;
 		if(byCache) {
-			entity = szzs.equals(itemID)? kdataRepository163.getKdataByCache(szzs): kdataRepository.getKdataByCache(itemID);
+			entity = sseiID.equals(itemID)? kdataRepository163.getKdataByCache(sseiID): kdataRepository.getKdataByCache(itemID);
 		}else {
-			entity = szzs.equals(itemID)? kdataRepository163.getKdata(szzs): kdataRepository.getKdata(itemID);
+			entity = sseiID.equals(itemID)? kdataRepository163.getKdata(sseiID): kdataRepository.getKdata(itemID);
 		}
 		return entity;
 	}
@@ -167,7 +167,7 @@ public class KdataServiceImp implements KdataService{
 			kdataSpider.downFactors(latestDate);  //执行了这一步后，不需要再对收盘数据额外的复权处理了
 			logger.info("downloaded latest date "+ latestDate +" factors from tushare.");
 			
-			kdataSpider163.downKdatas(szzs);
+			kdataSpider163.downKdatas(sseiID);
 			evictKDataCache();
 			
 			this.generateLatestMusters(); //此方法每天开盘时执行一次
@@ -302,6 +302,7 @@ public class KdataServiceImp implements KdataService{
 		BigDecimal totalAmount = new BigDecimal(0);
 		BigDecimal amount = null;
 		BigDecimal latestPrice = null;
+		Integer limited = 0;
 		
 		List<LocalDate> dates = kdata.getDates();
 
@@ -334,9 +335,12 @@ public class KdataServiceImp implements KdataService{
 		
 		latestPrice = close;
 		Kbar bar =this.getKbar(itemID, endDate, cache);
-		if(bar!=null) latestPrice = bar.getClose();
+		if(bar!=null) {
+			latestPrice = bar.getClose();
+			limited = bar.isLimited() ? 1 : 0;
+		}
 		
-		return new MusterEntity(itemID,amount,averageAmount,highest,lowest,close,dropPrice,latestPrice);
+		return new MusterEntity(itemID,amount,averageAmount,highest,lowest,close,dropPrice,latestPrice,limited);
 		
 	}
 
@@ -384,49 +388,12 @@ public class KdataServiceImp implements KdataService{
 		
 		Map<String, MusterEntity> entities = musterRepositoryImp.getMusters(date);
 		
-		String exclude = "";
-
-		//String exclude = "黄金,食品,水泥,农用机械,白酒,出版业,其他建材,化工机械,普钢,港口,互联网,软件服务,电气设备,新型电力,空运,水运,装修装饰,铜,机床制造,园区开发,机械基件,化纤,水务,建筑工程,电信运营,工程机械,影视音像,旅游景点,铅锌,农业综合,银行,石油加工,煤炭开采,汽车整车,公共交通,酒店餐饮,火力发电,综合类,纺织";
-
-		//String include = "医疗保健,通信设备,化学制药,专用机械,汽车配件,塑料,水力发电,保险,机场,家居用品,文教休闲,农药化肥,服饰,石油开采,航空,染料涂料,元器件,半导体,铝,焦炭加工,商贸代理,造纸,电器仪表,乳制品,陶瓷,软饮料,小金属,船舶,林业,纺织机械,铁路,特种钢,红黄酒,多元金融,电器连锁";
-		/*
-		 * 元器件
-专用机械
-纺织
-服饰
-铁路
-商贸代理
-
-		 */
-		
-		//String include = "医疗保健,通信设备,化学制药,汽车配件,塑料,水力发电,保险,机场,家居用品,文教休闲,农药化肥,石油开采,航空,染料涂料,半导体,铝,焦炭加工,造纸,电器仪表,乳制品,陶瓷,软饮料,小金属,船舶,林业,纺织机械,特种钢,红黄酒,多元金融,电器连锁,";
-
-		/*
-		 * 铝
-电器连锁
-陶瓷
-半导体
-纺织机械
-机场
-特种钢
-林业
-小金属
-乳制品
-焦炭加工
-染料涂料
-
-		 */
-
-		String include = "红黄酒,船舶,软饮料,水力发电,石油开采,文教休闲,家居用品,保险,多元金融,塑料,电器仪表,造纸,汽车配件,医疗保健,通信设备,化学制药,";
-
-		
 		for(MusterEntity entity : entities.values()) {
-			if(exclude.indexOf(itemService.getItem(entity.getItemID()).getIndustry()+",")==-1){
-			//if(include.indexOf(itemService.getItem(entity.getItemID()).getIndustry()+",")!=-1){
-				
+				//System.out.println(entity.getItemID());
 				muster = new Muster();
 				muster.setItemID(entity.getItemID());
-				//muster.setItemName(itemService.getItem(entity.getItemID()).getName());
+				muster.setItemName(itemService.getItem(entity.getItemID()).getName());
+				muster.setIndustry(itemService.getItem(entity.getItemID()).getIndustry());
 				muster.setAmount(entity.getAmount());
 				muster.setAverageAmount(entity.getAverageAmount());
 				muster.setHighest(entity.getHighest());
@@ -434,9 +401,9 @@ public class KdataServiceImp implements KdataService{
 				muster.setClose(entity.getClose());
 				muster.setDropPrice(entity.getDropPrice());
 				muster.setLatestPrice(entity.getLatestPrice());
+				muster.setLimited(entity.getLimited());
 				
 				musters.put(muster.getItemID(),muster);
-			}
 		}
 		
 		return musters;
@@ -464,7 +431,8 @@ public class KdataServiceImp implements KdataService{
 						muster.getLowest(), 
 						muster.getClose(), 
 						muster.getDropPrice(), 
-						kbar.getClose()));
+						kbar.getClose(),
+						kbar.isLimited()? 1 : 0));
 			}
 		}
 		musterRepositoryImp.saveMusters(date,entities);
@@ -488,6 +456,79 @@ public class KdataServiceImp implements KdataService{
 	@Override
 	public List<LocalDate> getMusterDates() {
 		return musterRepositoryImp.getMusterDates();
+	}
+
+	@Override
+	public Map<String, Muster> getMusters(LocalDate date, String industry) {
+		Map<String,Muster> musters = new HashMap<String,Muster>();
+		Muster muster;
+		
+		Map<String, MusterEntity> entities = musterRepositoryImp.getMusters(date);
+		
+		for(MusterEntity entity : entities.values()) {
+			if(itemService.getItem(entity.getItemID()).getIndustry().equals(industry)) {
+				//System.out.println(entity.getItemID());
+				muster = new Muster();
+				muster.setItemID(entity.getItemID());
+				muster.setItemName(itemService.getItem(entity.getItemID()).getName());
+				muster.setIndustry(itemService.getItem(entity.getItemID()).getIndustry());
+				muster.setAmount(entity.getAmount());
+				muster.setAverageAmount(entity.getAverageAmount());
+				muster.setHighest(entity.getHighest());
+				muster.setLowest(entity.getLowest());
+				muster.setClose(entity.getClose());
+				muster.setDropPrice(entity.getDropPrice());
+				muster.setLatestPrice(entity.getLatestPrice());
+				muster.setLimited(entity.getLimited());
+				
+				musters.put(muster.getItemID(),muster);				
+			}
+		}
+		
+		return musters;
+	}
+
+	@Override
+	public void downSSEI() {
+		try {
+			kdataSpider163.downKdatas(sseiID);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Override
+	public Integer getSseiFlag(LocalDate date) {
+		Integer flag = 1;
+		
+		Integer days1 = 13;
+		Integer days2 = 21;
+		Integer days3 = 34;
+		
+		//Kdata ssei1 = getKdata(sseiID, date.plusDays(1), days1, true);
+		Kdata ssei2 = getKdata(sseiID, date.plusDays(1), days2, true);
+		//Kdata ssei3 = getKdata(sseiID, date.plusDays(1), days3, true);
+		
+		flag = ssei2.isAboveAveragePrice()==1 ? 1 : 0;
+		
+		/*if(//ssei3.isAboveAveragePrice()==1 &&
+				ssei2.isAboveAveragePrice()==1 &&
+				ssei1.isAboveAveragePrice()==1) {
+			flag = 1;
+		}
+
+		if(//ssei3.isAboveAveragePrice()==1 &&
+				ssei2.isAboveAveragePrice()==1 &&
+				ssei1.isAboveAveragePrice()<=0) {
+			flag = 0;
+		}
+		
+		if(ssei2.isAboveAveragePrice()==-1) {
+			//flag = -1;
+			flag = 0;
+		}*/
+		
+		return flag;
 	}
 
 }

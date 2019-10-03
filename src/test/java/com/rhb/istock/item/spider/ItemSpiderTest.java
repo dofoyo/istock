@@ -32,7 +32,7 @@ public class ItemSpiderTest {
 		System.out.println(topic);
 	}
 	
-	@Test
+	//@Test
 	public void getTopciTops() {
 		System.out.println(itemSpider.getTopicTops(5));
 	}

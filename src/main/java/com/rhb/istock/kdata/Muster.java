@@ -5,13 +5,31 @@ import java.math.BigDecimal;
 public class Muster {
 	private String itemID;
 	private String itemName;
+	private String industry;
 	private BigDecimal amount;
 	private BigDecimal averageAmount;
 	private BigDecimal highest;
 	private BigDecimal lowest;
-	private BigDecimal close;
+	private BigDecimal close; 		//上一交易日收盘价
 	private BigDecimal dropPrice;
-	private BigDecimal latestPrice;
+	private BigDecimal latestPrice;  //当日收盘价
+	private Integer limited;        //当日是否一字板
+	
+	public Integer getLimited() {
+		return limited;
+	}
+
+	public void setLimited(Integer limited) {
+		this.limited = limited;
+	}
+
+	public String getIndustry() {
+		return industry;
+	}
+
+	public void setIndustry(String industry) {
+		this.industry = industry;
+	}
 
 	public String getItemName() {
 		return itemName;
@@ -26,11 +44,13 @@ public class Muster {
 	}
 	
 	public boolean isUpLimited() {
-		return latestPrice.subtract(close).divide(close,BigDecimal.ROUND_HALF_UP).compareTo(new BigDecimal(0.095))>=0;
+		return limited==1 || latestPrice.subtract(close).divide(close,BigDecimal.ROUND_HALF_UP).compareTo(new BigDecimal(0.095))>=0;
+		//return latestPrice.subtract(close).divide(close,BigDecimal.ROUND_HALF_UP).compareTo(new BigDecimal(0.095))>=0;
 	}
 
 	public boolean isDownLimited() {
-		return latestPrice.subtract(close).divide(close,BigDecimal.ROUND_HALF_UP).compareTo(new BigDecimal(-0.095))<=0;
+		return limited==1 || latestPrice.subtract(close).divide(close,BigDecimal.ROUND_HALF_UP).compareTo(new BigDecimal(-0.095))<=0;
+		//return latestPrice.subtract(close).divide(close,BigDecimal.ROUND_HALF_UP).compareTo(new BigDecimal(-0.095))<=0;
 	}
 	
 	public boolean isDrop() {
@@ -103,9 +123,9 @@ public class Muster {
 	}
 	@Override
 	public String toString() {
-		return "Muster [itemID=" + itemID + ", itemName=" + itemName + ", amount=" + amount + ", averageAmount="
-				+ averageAmount + ", highest=" + highest + ", lowest=" + lowest + ", close=" + close + ", dropPrice="
-				+ dropPrice + ", latestPrice=" + latestPrice + "]";
+		return "Muster [itemID=" + itemID + ", itemName=" + itemName + ", industry=" + industry + ", amount=" + amount
+				+ ", averageAmount=" + averageAmount + ", highest=" + highest + ", lowest=" + lowest + ", close="
+				+ close + ", dropPrice=" + dropPrice + ", latestPrice=" + latestPrice + "]";
 	}
 	
 	

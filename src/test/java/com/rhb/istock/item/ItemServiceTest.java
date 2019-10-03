@@ -24,14 +24,14 @@ public class ItemServiceTest {
 		System.out.println(topic);
 	}
 	
-	//@Test
+	@Test
 	public void getItem() {
-		String itemID = "sh688001";
+		String itemID = "sz002174";
 		Item item = itemService.getItem(itemID);
 		System.out.println(item);
 	}
 	
-	@Test
+	//@Test
 	public void getItems() {
 		List<Item> items = itemService.getItems();
 		for(Item item : items) {

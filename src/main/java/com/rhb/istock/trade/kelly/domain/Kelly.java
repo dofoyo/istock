@@ -306,7 +306,7 @@ public class Kelly {
 				//Integer quantity = getLot(itemID).multiply(new BigDecimal(unit)).intValue();
 				Integer quantity = getQuantity(feature.getAtr(),getQuantityPerHand(itemID),deficitFactor,feature.getNow());
 				if(quantity>0) {
-					account.reopen(itemID, quantity, reopenPrice.toString());
+					account.reopen(itemID,"","", quantity, reopenPrice.toString());
 				}
 				System.out.println("cash=" + account.getCash());
 			}else {
@@ -326,7 +326,7 @@ public class Kelly {
 			Integer quantity = getQuantity(feature.getAtr(),getQuantityPerHand(itemID),deficitFactor,feature.getNow());
 			
 			if(quantity>0) {
-				account.open(itemID, quantity,lots.toString());
+				account.open(itemID,"","", quantity,lots.toString());
 			}
 			
 			//account.open(itemID, 0, ""); //第一次突破，买入为0，如果后面再突破，才真正买入

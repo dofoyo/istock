@@ -39,6 +39,10 @@ public class Kbar {
 		}
 	}
 	
+	public boolean isLimited() {
+		return open.equals(high) && open.equals(low) && open.equals(close);
+	}
+	
 	public LocalDate getDate() {
 		return date;
 	}

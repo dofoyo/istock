@@ -3,7 +3,9 @@ package com.rhb.istock.item.spider;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -27,12 +29,29 @@ public class ItemSpiderTushare implements ItemSpider {
 		logger.info("download items...");
 		
 		String url = "http://api.tushare.pro";
+
+		JSONObject args = new JSONObject();
+		args.put("api_name", "stock_basic");
+		args.put("token", "175936caa4637bc9ac8e5e75ac92eff6887739ca6be771b81653f278");
+
+		
 		JSONObject params = new JSONObject();
+		//params.put("list_status", "L");
+		//params.put("fields", "symbol,name,area,industry,list_date");
+		
+		args.put("params", params);
+		
+		String str = HttpClient.doPostJson(url, args.toString());
+
+/*		Map<String,String> params = new HashMap<String,String>();
 		params.put("api_name", "stock_basic");
 		params.put("token", "175936caa4637bc9ac8e5e75ac92eff6887739ca6be771b81653f278");
+		params.put("list_status", "L");
 		params.put("fields", "symbol,name,area,industry,list_date");
 		
-		String str = HttpClient.doPostJson(url, params.toString());
+		String str = HttpClient.doPost(url, params);*/
+		
+		//logger.info(str);
 		JSONObject data = (new JSONObject(str)).getJSONObject("data");
 		FileTools.writeTextFile(itemsFile, data.toString(), false);
 

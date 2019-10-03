@@ -2,8 +2,10 @@ package com.rhb.istock.item;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -114,6 +116,17 @@ public class ItemServiceImp implements ItemService {
 		logger.info("itemService init...");
 		topics.putAll(itemRepository.getTopics());
 		logger.info("there are " + topics.size() + " topics ready!");
+	}
+
+	@Override
+	public Set<String> getIndustrys() {
+		Set<String> industrys = new HashSet<String>();
+		List<Item> items = this.getItems();
+		for(Item item : items) {
+			industrys.add(item.getIndustry());
+		}
+		
+		return industrys;
 	}
 
 }

@@ -8,7 +8,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -18,10 +17,11 @@ import org.springframework.stereotype.Service;
 import com.rhb.istock.comm.util.Progress;
 import com.rhb.istock.kdata.KdataService;
 import com.rhb.istock.kdata.Muster;
+import com.rhb.istock.selector.bluechip.BluechipService;
 import com.rhb.istock.trade.turtle.simulation.six.repository.TurtleSimulationRepository;
 
-@Service("turtleMusterSimulation")
-public class TurtleMusterSimulation {
+@Service("turtleMusterSimulationByBlueChips")
+public class TurtleMusterSimulationByBlueChips {
 	@Value("${musterPath}")
 	private String musterPath;
 	
@@ -32,6 +32,10 @@ public class TurtleMusterSimulation {
 	@Autowired
 	@Qualifier("turtleSimulationRepository")
 	TurtleSimulationRepository turtleSimulationRepository;
+	
+	@Autowired
+	@Qualifier("bluechipServiceImp")
+	BluechipService bluechipService;
 	
 	Integer pool = 21;
 	Integer top = 5;
@@ -44,8 +48,8 @@ public class TurtleMusterSimulation {
 	 */
 	public void simulate(LocalDate beginDate, LocalDate endDate) {
 		long beginTime=System.currentTimeMillis(); 
-		System.out.println("simulate from " + beginDate + " to " + endDate +" ......");
-
+		System.out.println("simulate by compass from " + beginDate + " to " + endDate +" ......");
+		
 		Paul bavPaul = new Paul(initCash, quota);
 		Paul bhlPaul = new Paul(initCash, quota);
 		Paul bdtPaul = new Paul(initCash, quota);
@@ -53,7 +57,9 @@ public class TurtleMusterSimulation {
 		Paul dtbPaul = new Paul(initCash, quota);
 		Paul hlbPaul = new Paul(initCash, quota);
 		
-		Map<String,Muster> musters;
+		Map<String,Muster> musters = null;
+		Map<String,Muster> ms = null;
+		List<String> bluechips = new ArrayList<String>();
 		
 		long days = endDate.toEpochDay()- beginDate.toEpochDay();
 		int i=1;
@@ -61,17 +67,24 @@ public class TurtleMusterSimulation {
 		for(LocalDate date = beginDate; (date.isBefore(endDate) || date.equals(endDate)); date = date.plusDays(1)) {
 			Progress.show((int)days, i++, date.toString());
 			
-			//flag = kdataService.getSseiFlag(date);
-			
 			musters = kdataService.getMusters(date);
+
 			if(musters!=null && musters.size()>0) {
-				bavPaul.doIt_plus(musters, this.getTops(new ArrayList<Muster>(musters.values()), "bav"), date, flag);
-				bhlPaul.doIt_plus(musters, this.getTops(new ArrayList<Muster>(musters.values()), "bhl"), date, flag);
-				bdtPaul.doIt_plus(musters, this.getTops(new ArrayList<Muster>(musters.values()), "bdt"), date, flag);
+				bluechips = bluechipService.getBluechipIDs(date);
+
+				ms = new HashMap<String,Muster>();
+				for(Map.Entry<String, Muster> entry : musters.entrySet()) {
+					if(bluechips.contains(entry.getKey())) {
+						ms.put(entry.getKey(), entry.getValue());
+					}
+				}			
+				bavPaul.doIt_plus(musters, this.getTops(new ArrayList<Muster>(ms.values()), "bav"), date, flag);
+				bhlPaul.doIt_plus(musters, this.getTops(new ArrayList<Muster>(ms.values()), "bhl"), date, flag);
+				bdtPaul.doIt_plus(musters, this.getTops(new ArrayList<Muster>(ms.values()), "bdt"), date, flag);
 				
-				avbPaul.doIt_plus(musters, this.getTops(new ArrayList<Muster>(musters.values()), "avb"), date, flag);
-				hlbPaul.doIt_plus(musters, this.getTops(new ArrayList<Muster>(musters.values()), "hlb"), date, flag);
-				dtbPaul.doIt_plus(musters, this.getTops(new ArrayList<Muster>(musters.values()), "dtb"), date, flag);
+				avbPaul.doIt_plus(musters, this.getTops(new ArrayList<Muster>(ms.values()), "avb"), date, flag);
+				hlbPaul.doIt_plus(musters, this.getTops(new ArrayList<Muster>(ms.values()), "hlb"), date, flag);
+				dtbPaul.doIt_plus(musters, this.getTops(new ArrayList<Muster>(ms.values()), "dtb"), date, flag);					
 			}
 		}
 		
@@ -92,13 +105,13 @@ public class TurtleMusterSimulation {
 		turtleSimulationRepository.save("hlb", hlbResult.get("breakers"), hlbResult.get("CSV"), hlbResult.get("dailyAmount"));
 		turtleSimulationRepository.save("dtb", dtbResult.get("breakers"), dtbResult.get("CSV"), dtbResult.get("dailyAmount"));
 
-		//System.out.println("simulate done!");
+		//System.out.println("simulate by compass done!");
 		long used = (System.currentTimeMillis() - beginTime)/1000; 
 		System.out.println("用时：" + used + "秒");          
 		
 	}
 	
-	private List<Muster> getTops(List<Muster> musters,String type){
+	private List<Muster> getTops(List<Muster> musters, String type){
 		return type.indexOf("b")==0 ? this.getBxxTops(musters, type)
 				: this.getxxBTops(musters, type);
 	}
@@ -160,115 +173,19 @@ public class TurtleMusterSimulation {
 		}
 	}
 	
-	/*
-	 * 计算每天的盈率
-	 * 以买入当天的收盘价和卖出当天的收盘价进行计算。
-	 */
-	
-	public void generateDailyRatios(LocalDate beginDate, LocalDate endDate) {
-		long beginTime=System.currentTimeMillis(); 
-		System.out.println("calculateDailyRatio from " + beginDate + " to " + endDate + " ......");
-		
-		Map<LocalDate,Map<String,Integer>> dailyMeans = new TreeMap<LocalDate,Map<String,Integer>>();
-		Integer bhl=0,bav=0,bdt=0,hlb=0,avb=0,dtb=0;
-		
-		List<LocalDate> dates = kdataService.getMusterDates(beginDate, endDate);
-		
-		if(dates.size()>2) {
-			Map<String,Integer> ratios = new HashMap<String,Integer>();
-			ratios.put("bhl", bhl);
-			ratios.put("bav", bav);
-			ratios.put("bdt", bdt);
-			ratios.put("hlb", hlb);
-			ratios.put("avb", avb);
-			ratios.put("dtb", dtb);
-			dailyMeans.put(dates.get(0), ratios);  //第一天的值都为0
-			
-			int j=1;
-			for(int i=1; i<dates.size(); i++) {
-				Progress.show(dates.size(), j++, dates.get(i).toString());
-				ratios = this.calculateDailyRatio(dates.get(i-1), dates.get(i));
-				bhl = bhl + ratios.get("bhl"); ratios.put("bhl", bhl);
-				bav = bav + ratios.get("bav"); ratios.put("bav", bav);
-				bdt = bdt + ratios.get("bdt"); ratios.put("bdt", bdt);
-				hlb = hlb + ratios.get("hlb"); ratios.put("hlb", hlb);
-				avb = avb + ratios.get("avb"); ratios.put("avb", avb);
-				dtb = dtb + ratios.get("dtb"); ratios.put("dtb", dtb);
-				
-				dailyMeans.put(dates.get(i), ratios);
-			}
-		}
-		
-		turtleSimulationRepository.saveDailyMeans(dailyMeans);
-		
-		System.out.println("calculateDailyRatio done!");
-		long used = (System.currentTimeMillis() - beginTime)/1000; 
-		System.out.println("用时：" + used + "秒");          
+	private List<String> getWinIndustrys(){
+		String str = "保险,船舶,电器仪表,多元金融,航空,红黄酒,化学制药,家居用品,汽车配件,软饮料,石油开采,水力发电,塑料,通信设备,文教休闲,医疗保健,造纸";
+		String[] ss = str.split(",");
+		List<String> industrys = new ArrayList<String>(ss.length);
+		Collections.addAll(industrys, ss);
+		return industrys;
 	}
 	
-	public Map<String,Integer> calculateDailyRatio(LocalDate buyDate, LocalDate sellDate){
-		Map<String,Integer> dr = new HashMap<String,Integer>();
-		String[] types = {"bhl","bav","bdt","hlb","avb","dtb"};
-		
-		for(String type : types) {
-			dr.put(type, this.calculateRatios(buyDate, sellDate, type).getResult());
-		}
-		
-		return dr;
+	private List<String> getLostIndustrys(){
+		String str = "纺织,综合类,火力发电,酒店餐饮,公共交通,汽车整车,煤炭开采,旅游景点,银行,石油加工,农业综合,铅锌,影视音像,电信运营,建筑工程,水务,化纤,机械基件,园区开发,机床制造,铜,装修装饰,空运,水运,新型电力,软件服务,互联网,港口,普钢,化工机械,其他建材,白酒,出版业,农用机械,水泥,食品,啤酒,黄金,石油开采,铁路,路桥,区域地产";
+		String[] ss = str.split(",");
+		List<String> industrys = new ArrayList<String>(ss.length);
+		Collections.addAll(industrys, ss);
+		return industrys;
 	}
-	
-	class Ratios{
-		private TreeMap<Integer, Integer> rc = new TreeMap<Integer,Integer>();  // ratio,count
-		
-		public void put(Integer ratio) {
-			if(rc.containsKey(ratio)) {
-				rc.put(ratio, rc.get(ratio)+1);
-			}else {
-				rc.put(ratio, 1);
-			}			
-		}
-		
-		public Integer getResult() {
-			Integer total = 0;
-			for(Map.Entry<Integer, Integer> entry : rc.entrySet()) {
-				total = total + entry.getKey()*entry.getValue();
-			}
-			return total;
-		}
-	}
-	
-	/*
-	 * 计算买入后第二天的盈率。
-	 * 如果连续盈，说明上升势头，可以买入股票
-	 * 否则，属于平衡式或下跌市。
-	 * 
-	 */
-	public Ratios calculateRatios(LocalDate buyDate, LocalDate sellDate, String type) {
-		Ratios ratios = new Ratios();
-		Integer ratio;
-		
-		Map<String,Muster> buyDateMusters = kdataService.getMusters(buyDate);
-		
-		List<Muster> buyDateTops = this.getTops(new ArrayList<Muster>(buyDateMusters.values()), type);
-
-		Map<String,Muster> sellDateMusters = kdataService.getMusters(sellDate);
-		Muster sell;
-		
-		for(Muster buy : buyDateTops) {
-			if(buy!=null && buy.isBreaker() && !buy.isUpLimited()) {
-				sell = sellDateMusters.get(buy.getItemID());
-				if(sell!=null) {
-					//以买入当天的收盘价和卖出当天的收盘价进行计算
-					ratio = sell.getLatestPrice().subtract(buy.getLatestPrice()).divide(buy.getLatestPrice(),BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)).intValue();
-					
-					//System.out.format("%s %s %s buy price %f, %s day close price %f, ratio is %d.\n", 
-							//type,buyDate.toString(), buy.getItemID(), buy.getLatestPrice(), sellDate.toString(), sell.getLatestPrice(), ratio);
-					ratios.put(ratio);
-				}
-			}
-		}		
-		
-		return ratios;
-	}
-	
 }

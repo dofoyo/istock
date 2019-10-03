@@ -75,6 +75,7 @@ public class IstockScheduledTask {
 		if(this.isTradeDate()) {
 			itemService.download();		//下载最新股票代码
 			kdataService.downKdatasAndFactors(); //上一交易日的收盘数据要等开盘前才能下载到, 大约需要15分钟
+			kdataService.downSSEI();
 			turtleOperationService.init();
 		}
 	}

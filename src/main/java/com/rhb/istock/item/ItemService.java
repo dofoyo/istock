@@ -1,6 +1,7 @@
 package com.rhb.istock.item;
 
 import java.util.List;
+import java.util.Set;
 
 public interface ItemService {
 	public void init();
@@ -10,4 +11,5 @@ public interface ItemService {
 	public void download();
 	public String getTopic(String itemID);
 	public String[] getTopicTops(Integer count);
+	public Set<String> getIndustrys();
 }

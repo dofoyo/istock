@@ -8,20 +8,24 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import com.rhb.istock.comm.util.FileTools;
 import com.rhb.istock.comm.util.Progress;
+import com.rhb.istock.item.ItemService;
 import com.rhb.istock.kdata.KdataService;
 import com.rhb.istock.kdata.Muster;
 import com.rhb.istock.trade.turtle.simulation.six.repository.TurtleSimulationRepository;
 
-@Service("turtleMusterSimulation")
-public class TurtleMusterSimulation {
+@Service("turtleMusterSimulationByIndustry")
+public class TurtleMusterSimulationByIndustry {
 	@Value("${musterPath}")
 	private String musterPath;
 	
@@ -32,6 +36,10 @@ public class TurtleMusterSimulation {
 	@Autowired
 	@Qualifier("turtleSimulationRepository")
 	TurtleSimulationRepository turtleSimulationRepository;
+
+	@Autowired
+	@Qualifier("itemServiceImp")
+	ItemService itemService;
 	
 	Integer pool = 21;
 	Integer top = 5;
@@ -45,53 +53,53 @@ public class TurtleMusterSimulation {
 	public void simulate(LocalDate beginDate, LocalDate endDate) {
 		long beginTime=System.currentTimeMillis(); 
 		System.out.println("simulate from " + beginDate + " to " + endDate +" ......");
-
-		Paul bavPaul = new Paul(initCash, quota);
-		Paul bhlPaul = new Paul(initCash, quota);
-		Paul bdtPaul = new Paul(initCash, quota);
-		Paul avbPaul = new Paul(initCash, quota);
-		Paul dtbPaul = new Paul(initCash, quota);
-		Paul hlbPaul = new Paul(initCash, quota);
-		
-		Map<String,Muster> musters;
 		
 		long days = endDate.toEpochDay()- beginDate.toEpochDay();
+		
+		Paul hlbPaul;
+		Map<String,Muster> musters;
+		Map<String,Muster> ms;
+		Map<String,Map<Integer,BigDecimal>> yearAmounts = new HashMap<String,Map<Integer,BigDecimal>>();
+		Set<Integer> years = new TreeSet<Integer>();
+		
+		Set<String> industrys = itemService.getIndustrys();
+		int total = (int)days * industrys.size();
 		int i=1;
 		int flag = 1;
-		for(LocalDate date = beginDate; (date.isBefore(endDate) || date.equals(endDate)); date = date.plusDays(1)) {
-			Progress.show((int)days, i++, date.toString());
+		for(String industry : industrys) {
+			hlbPaul = new Paul(initCash, quota);
 			
-			//flag = kdataService.getSseiFlag(date);
-			
-			musters = kdataService.getMusters(date);
-			if(musters!=null && musters.size()>0) {
-				bavPaul.doIt_plus(musters, this.getTops(new ArrayList<Muster>(musters.values()), "bav"), date, flag);
-				bhlPaul.doIt_plus(musters, this.getTops(new ArrayList<Muster>(musters.values()), "bhl"), date, flag);
-				bdtPaul.doIt_plus(musters, this.getTops(new ArrayList<Muster>(musters.values()), "bdt"), date, flag);
-				
-				avbPaul.doIt_plus(musters, this.getTops(new ArrayList<Muster>(musters.values()), "avb"), date, flag);
-				hlbPaul.doIt_plus(musters, this.getTops(new ArrayList<Muster>(musters.values()), "hlb"), date, flag);
-				dtbPaul.doIt_plus(musters, this.getTops(new ArrayList<Muster>(musters.values()), "dtb"), date, flag);
+			for(LocalDate date = beginDate; (date.isBefore(endDate) || date.equals(endDate)); date = date.plusDays(1)) {
+				Progress.show(total, i++, date.toString());
+
+				musters = kdataService.getMusters(date,industry);
+				if(musters!=null && musters.size()>0) {
+					hlbPaul.doIt_plus(musters, this.getTops(new ArrayList<Muster>(musters.values()), "hlb"), date, flag);
+				}
+				years.add(date.getYear());
 			}
+			yearAmounts.put(industry, hlbPaul.getYearAmount());
 		}
 		
-		Map<String, String> bavResult = bavPaul.result();
-		Map<String, String> bhlResult = bhlPaul.result();
-		Map<String, String> bdtResult = bdtPaul.result();
-
-		Map<String, String> avbResult = avbPaul.result();
-		Map<String, String> hlbResult = hlbPaul.result();
-		Map<String, String> dtbResult = dtbPaul.result();
-
+		StringBuffer sb = new StringBuffer("year,");
+		for(Integer year : years) {
+			sb.append(year);
+			sb.append(",");
+		}
+		sb.append("\n");
 		
-		turtleSimulationRepository.save("bav", bavResult.get("breakers"), bavResult.get("CSV"), bavResult.get("dailyAmount"));
-		turtleSimulationRepository.save("bhl", bhlResult.get("breakers"), bhlResult.get("CSV"), bhlResult.get("dailyAmount"));
-		turtleSimulationRepository.save("bdt", bdtResult.get("breakers"), bdtResult.get("CSV"), bdtResult.get("dailyAmount"));
-
-		turtleSimulationRepository.save("avb", avbResult.get("breakers"), avbResult.get("CSV"), avbResult.get("dailyAmount"));
-		turtleSimulationRepository.save("hlb", hlbResult.get("breakers"), hlbResult.get("CSV"), hlbResult.get("dailyAmount"));
-		turtleSimulationRepository.save("dtb", dtbResult.get("breakers"), dtbResult.get("CSV"), dtbResult.get("dailyAmount"));
-
+		for(Map.Entry<String, Map<Integer,BigDecimal>> entry : yearAmounts.entrySet()) {
+			sb.append(entry.getKey());
+			sb.append(",");
+			for(Integer year : years) {
+				sb.append(entry.getValue().get(year)==null ? 0 : entry.getValue().get(year));
+				sb.append(",");
+			}
+			sb.append("\n");
+		}
+		System.out.println(sb.toString());
+		FileTools.writeTextFile("D:\\dev\\istock-data\\year_amount.csv", sb.toString(), false);
+		
 		//System.out.println("simulate done!");
 		long used = (System.currentTimeMillis() - beginTime)/1000; 
 		System.out.println("用时：" + used + "秒");          

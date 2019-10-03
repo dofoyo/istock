@@ -36,10 +36,10 @@ public class FinancialReport {
 			&& this.getRateOfProfit(year)>=0.2  //利润持续增长，且年均增长率大于20%
 			//&& this.getRateOfCashflow(year)>=0.0  //经营活动现金流为正，且持续增长
 			//&& this.getRateOfOperatngRevenue(year)>this.getRateOfAccountsReceivable(year) //应收账款的增长率小于销售收入的增长率
-			&& this.getCPR(year)>=1  //现金流与利润的比率大于1
+			//&& this.getCPR(year)>=1  //现金流与利润的比率大于1
 			//&& this.aboveZeroOfCashflow(year)    //现金流大于零
 			
-			&& this.getReceivableRatio(year)<=0.2  //应收占比销售额的比例小于20%
+			&& this.getReceivableRatio(year)<=0.1  //应收占比销售额的比例小于10%
 			){
 			flag = true;
 			//System.out.println();

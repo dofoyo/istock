@@ -19,6 +19,10 @@ public class KbarEntity {
 		this.quantity = quantity;
 	}
 	
+	public boolean isLimited() {
+		return open.equals(high) && open.equals(low) && open.equals(close);
+	}
+	
 	public BigDecimal getOpen() {
 		return open;
 	}

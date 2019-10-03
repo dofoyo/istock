@@ -27,6 +27,9 @@ import com.rhb.istock.kdata.Kbar;
 import com.rhb.istock.kdata.KdataService;
 import com.rhb.istock.kdata.api.KdatasView;
 import com.rhb.istock.trade.turtle.simulation.six.TurtleMusterSimulation;
+import com.rhb.istock.trade.turtle.simulation.six.TurtleMusterSimulationByBlueChips;
+import com.rhb.istock.trade.turtle.simulation.six.TurtleMusterSimulationByCompass;
+import com.rhb.istock.trade.turtle.simulation.six.TurtleMusterSimulationByIndustry;
 import com.rhb.istock.trade.turtle.simulation.six.repository.AmountEntity;
 import com.rhb.istock.trade.turtle.simulation.six.repository.TurtleSimulationRepository;
 
@@ -39,6 +42,18 @@ public class TurtleSimulationApi {
 	@Autowired
 	@Qualifier("turtleMusterSimulation")
 	TurtleMusterSimulation turtleMusterSimulation;
+
+	@Autowired
+	@Qualifier("turtleMusterSimulationByCompass")
+	TurtleMusterSimulationByCompass turtleMusterSimulationByCompass;
+
+	@Autowired
+	@Qualifier("turtleMusterSimulationByBlueChips")
+	TurtleMusterSimulationByBlueChips turtleMusterSimulationByBlueChips;
+	
+	@Autowired
+	@Qualifier("turtleMusterSimulationByIndustry")
+	TurtleMusterSimulationByIndustry turtleMusterSimulationByIndustry;
 	
 	@Autowired
 	@Qualifier("itemServiceImp")
@@ -105,6 +120,9 @@ public class TurtleSimulationApi {
 		}
 		
 		turtleMusterSimulation.simulate(theBeginDate, theEndDate);
+		//turtleMusterSimulationByIndustry.simulate(theBeginDate, theEndDate);
+		//turtleMusterSimulationByCompass.simulate(theBeginDate, theEndDate);
+		//turtleMusterSimulationByBlueChips.simulate(theBeginDate, theEndDate);
 		//turtleMusterSimulation.generateDailyRatios(theBeginDate, theEndDate);
 
 		turtleSimulationRepository.evictAmountsCache();

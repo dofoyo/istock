@@ -35,11 +35,11 @@ public class ItemRepositoryTushare implements ItemRepository{
 				for(int i=0; i<theItems.length(); i++) {
 					item = theItems.getJSONArray(i);
 					entity = new ItemEntity();
-					entity.setCode(item.get(0).toString());
-					entity.setName(item.get(1).toString());
-					entity.setArea(item.get(2).toString());
-					entity.setIndustry(item.get(3).toString());
-					entity.setIpo(item.get(4).toString());
+					entity.setCode(item.get(1).toString());
+					entity.setName(item.get(2).toString());
+					entity.setArea(item.get(3).toString());
+					entity.setIndustry(item.get(4).toString());
+					entity.setIpo(item.get(6).toString());
 					entities.add(entity);
 					
 					//System.out.println(entity);  //***************

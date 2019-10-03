@@ -4,15 +4,21 @@ import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.Period;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.rhb.istock.kdata.Muster;
 
 public class Account {
 	protected static final Logger logger = LoggerFactory.getLogger(Account.class);
@@ -22,6 +28,7 @@ public class Account {
 	private BigDecimal cash = null;
 	private BigDecimal value = null;
 
+	private Map<String,HoldState> states = null;
 	private TreeMap<Integer,Order> holds = null;
 	private TreeMap<Integer,Order> opens = null;
 	private TreeMap<Integer,Order> drops = null;
@@ -31,18 +38,181 @@ public class Account {
 	private LocalDate endDate = null;
 	private Integer orderID=0;
 	DecimalFormat orderIDFormat = new DecimalFormat("0000"); 
-
+	
 	public Account(BigDecimal cash) {
 		this.initCash = cash;
 		
 		this.cash = cash;
 		this.value = new BigDecimal(0);
 		
+		states = new HashMap<String, HoldState>();
 		holds = new TreeMap<Integer,Order>();
 		opens = new TreeMap<Integer,Order>();
 		drops = new TreeMap<Integer,Order>();
 		stops = new TreeMap<Integer,Order>();
 		prices = new TreeMap<String,BigDecimal>();
+	}
+	
+	/*
+	 * 各industry中，按盈利的股票数量和盈利的幅度排序
+	 * 
+	 */
+	public String getWinIndustrys(){
+		Map<String, Industry> ins = new HashMap<String,Industry>();
+		Industry industry;
+		
+		Order openOrder, dsOrder;
+		for(Map.Entry<Integer,Order> entry : opens.entrySet()) {
+			openOrder = entry.getValue();
+			dsOrder = getDropOrStopOrder(entry.getKey());
+			if(dsOrder==null) {
+				dsOrder = new Order(openOrder.getOrderID(),openOrder.getItemID(),openOrder.getItemName(), openOrder.getIndustry(),endDate,prices.get(openOrder.getItemID()),openOrder.getQuantity());
+			}
+			if(ins.containsKey(openOrder.getIndustry())) {
+				industry = ins.get(openOrder.getIndustry());
+				industry.addRatio(openOrder.getPrice(), dsOrder.getPrice());
+				industry.SetProfit(dsOrder.getAmount().subtract(openOrder.getAmount()));
+			}else {
+				industry = new Industry(openOrder.getIndustry(),openOrder.getPrice(), dsOrder.getPrice());
+				industry.SetProfit(dsOrder.getAmount().subtract(openOrder.getAmount()));
+				ins.put(openOrder.getIndustry(), industry);
+			}				
+		}
+		
+		StringBuffer winIndustrys = new StringBuffer();
+		
+		List<Industry> ii = new ArrayList<Industry>(ins.values());
+		
+		Collections.sort(ii, new Comparator<Industry>() {
+			@Override
+			public int compare(Industry o1, Industry o2) {
+				return o2.getProfit().compareTo(o1.getProfit()); //倒叙
+			}
+		});
+		
+		for(Industry i : ii) {
+			if(i.getProfit().intValue()>=0) {
+				winIndustrys.append(i.getName());
+				winIndustrys.append(",");
+			}
+		}
+		
+		if(winIndustrys.length()>0) {
+			winIndustrys.deleteCharAt(winIndustrys.length()-1);
+		}
+		
+		return winIndustrys.toString();
+	}
+	
+	public String getLostIndustrys(){
+		Map<String, Industry> ins = new HashMap<String,Industry>();
+		Industry industry;
+		
+		Order openOrder, dsOrder;
+		for(Map.Entry<Integer,Order> entry : opens.entrySet()) {
+			openOrder = entry.getValue();
+			dsOrder = getDropOrStopOrder(entry.getKey());
+			if(dsOrder==null) {
+				dsOrder = new Order(openOrder.getOrderID(),openOrder.getItemID(),openOrder.getItemName(), openOrder.getIndustry(),endDate,prices.get(openOrder.getItemID()),openOrder.getQuantity());
+			}
+			
+			if(ins.containsKey(openOrder.getIndustry())) {
+				industry = ins.get(openOrder.getIndustry());
+				industry.addRatio(openOrder.getPrice(), dsOrder.getPrice());
+				industry.SetProfit(dsOrder.getAmount().subtract(openOrder.getAmount()));
+			}else {
+				industry = new Industry(openOrder.getIndustry(),openOrder.getPrice(), dsOrder.getPrice());
+				industry.SetProfit(dsOrder.getAmount().subtract(openOrder.getAmount()));
+				ins.put(openOrder.getIndustry(), industry);
+			}				
+		}
+		
+		StringBuffer lostIndustrys = new StringBuffer();
+		
+		List<Industry> ii = new ArrayList<Industry>(ins.values());
+
+		for(Industry i : ii) {
+			if(i.getProfit().intValue()<0) {
+				lostIndustrys.append(i.getName());
+				lostIndustrys.append(",");
+			}
+		}
+		
+		if(lostIndustrys.length()>0) {
+			lostIndustrys.deleteCharAt(lostIndustrys.length()-1);
+		}
+		
+		return lostIndustrys.toString();
+	}
+	
+	class Industry{
+		private String name;
+		private BigDecimal profit;
+		private List<Integer> ratios;
+		
+		public Industry(String name, BigDecimal profit) {
+			this.name = name;
+			this.profit = profit;
+			this.ratios = new ArrayList<Integer>();
+		}
+		
+		public void SetProfit(BigDecimal profit) {
+			this.profit = this.profit.add(profit);
+		}
+		
+		public BigDecimal getProfit() {
+			return this.profit;
+		}
+		
+		public Industry(String name, Integer ratio) {
+			this.name = name;
+			this.ratios = new ArrayList<Integer>();
+			this.ratios.add(ratio);
+		}
+		
+		public Industry(String name, BigDecimal buyPrice, BigDecimal sellPrice) {
+			this.name = name;
+			this.ratios = new ArrayList<Integer>();
+			this.addRatio(buyPrice, sellPrice);
+			this.profit = new BigDecimal(0);
+		}
+		
+		public void addRatio(BigDecimal buyPrice, BigDecimal sellPrice) {
+			this.addRatio(sellPrice.subtract(buyPrice).divide(buyPrice,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)).intValue());
+		}
+		
+		public void addRatio(Integer ratio) {
+			this.ratios.add(ratio);
+		}
+		
+		public String getName() {
+			return name;
+		}
+		public void setName(String name) {
+			this.name = name;
+		}
+		
+		public Integer getWinCount() {
+			Integer count = 0;
+			for(Integer ratio : ratios) {
+				if(ratio>0) {
+					count++;
+				}else {
+					count--;
+				}
+			}
+			return count;
+		}
+		
+		public Integer getWinRatio() {
+			Integer count = 0;
+			Integer ratio = 0;
+			for(Integer r : ratios) {
+				ratio = ratio + r;
+				count ++;
+			}
+			return ratio/count;
+		}
 	}
 	
 	public String getDailyAmount() {
@@ -61,8 +231,8 @@ public class Account {
 		return orderID++;
 	}
 	
-	public void reopen(String itemID, Integer quantity, String note) {
-		Order order = new Order(this.getOrderID(),itemID,LocalDate.parse(endDate.toString()),prices.get(itemID),quantity);
+	public void reopen(String itemID,String itemName,String industry, Integer quantity, String note) {
+		Order order = new Order(this.getOrderID(),itemID,itemName, industry,LocalDate.parse(endDate.toString()),prices.get(itemID),quantity);
 		order.setNote("reopen，" + note);
 		
 		//System.out.println(order); //----------------------------------------------
@@ -72,10 +242,10 @@ public class Account {
 		holds.put(order.getOrderID(), order);
 		opens.put(order.getOrderID(), order);
 	}
-	
-	public void open(String itemID, Integer quantity, String note, BigDecimal price) {
-		//System.out.println("buy " + itemID + " " + quantity + " units on " + price + " yuan.");
-		Order order = new Order(this.getOrderID(),itemID,LocalDate.parse(endDate.toString()),price,quantity);
+
+	public void open(String itemID,String itemName,String industry, Integer quantity, String note, BigDecimal price) {
+		//logger.info("buy " + itemID + " " + quantity + " units on " + price + " yuan.");
+		Order order = new Order(this.getOrderID(),itemID,itemName, industry,LocalDate.parse(endDate.toString()),price,quantity);
 		order.setNote("open，" + note);
 
 		//System.out.println(order); //----------------------------------------------
@@ -84,19 +254,45 @@ public class Account {
 		value = value.add(order.getAmount()); // 市值增加
 		holds.put(order.getOrderID(), order);
 		opens.put(order.getOrderID(), order);
+		
+		if(!states.containsKey(itemID)) {
+			states.put(itemID, new HoldState(itemID,price));
+		}
+		
+	}
+
+	/**
+	 * 满仓买入, 可重复买入，即可以加仓
+	 * @param items
+	 */
+	public void openAll(List<Muster> items) {
+		if(items.isEmpty()) return;
+		
+		//int position = items.size()<2 ? 2 : items.size();
+		
+		int position = items.size();
+		
+		BigDecimal quota = this.cash.divide(new BigDecimal(position),BigDecimal.ROUND_DOWN);
+		for(Muster item : items) {
+			this.prices.put(item.getItemID(), item.getLatestPrice());
+			this.open(item.getItemID(), item.getItemName(), item.getIndustry(), this.getQuantity(quota, item.getLatestPrice()), "" , item.getLatestPrice());
+		}
 	}
 	
 	/**
-	 * 满仓买入
+	 * 满仓买入， 不可重复买入，即不可加仓
 	 * @param items
 	 */
-	public void openAll(Map<String,BigDecimal> items) {
+	public void openAll(Set<Muster> items) {
 		if(items.isEmpty()) return;
 		
+		//int position = items.size()<2 ? 2 : items.size();
+		int position = items.size();
+		
 		BigDecimal quota = this.cash.divide(new BigDecimal(items.size()),BigDecimal.ROUND_DOWN);
-		for(Map.Entry<String, BigDecimal> entry : items.entrySet()) {
-			this.refreshHoldsPrice(entry.getKey(), entry.getValue());
-			this.open(entry.getKey(), this.getQuantity(quota, entry.getValue()), "" , entry.getValue());
+		for(Muster item : items) {
+			this.prices.put(item.getItemID(), item.getLatestPrice());
+			this.open(item.getItemID(), item.getItemName(), item.getIndustry(), this.getQuantity(quota, item.getLatestPrice()), "" , item.getLatestPrice());
 		}
 	}
 	
@@ -104,16 +300,34 @@ public class Account {
 		return quota.divide(price,BigDecimal.ROUND_DOWN).divide(new BigDecimal(100),BigDecimal.ROUND_DOWN).intValue()*100;
 	}
 	
-	public void open(String itemID, Integer quantity, String note) {
-		this.open(itemID, quantity, note, prices.get(itemID));
+	public void open(String itemID, String itemName, String industry, Integer quantity, String note) {
+		this.open(itemID, itemName, industry, quantity, note, prices.get(itemID));
+	}
+	
+	public void dropHoldState(String itemID) {
+		states.remove(itemID);
+	}
+	
+	public void dropByOrderID(String orderID, String note, BigDecimal price) {
+		Order openOrder = holds.get(Integer.parseInt(orderID));
+		Order dropOrder = new Order(openOrder.getOrderID(),openOrder.getItemID(),openOrder.getItemName(),openOrder.getIndustry(), LocalDate.parse(endDate.toString()), price, openOrder.getQuantity());
+		dropOrder.setNote("drop，" + note);
+
+		//System.out.println(dropOrder); //----------------------------------------------
+	
+		cash = cash.add(dropOrder.getAmount()); 			//卖出时，现金增加
+		value = value.subtract(dropOrder.getAmount());		//市值减少
+		
+		holds.remove(Integer.parseInt(orderID));
+		drops.put(dropOrder.getOrderID(), dropOrder);				
 	}
 
 	public void drop(String itemID, String note, BigDecimal price) {
-		Order openOrder;
+/*		Order openOrder;
 		for(Iterator<Map.Entry<Integer, Order>> hands_it = holds.entrySet().iterator(); hands_it.hasNext();) {
 			openOrder = hands_it.next().getValue();
 			if(openOrder.getItemID().equals(itemID)) {
-				Order dropOrder = new Order(openOrder.getOrderID(),itemID, LocalDate.parse(endDate.toString()), price, openOrder.getQuantity());
+				Order dropOrder = new Order(openOrder.getOrderID(),itemID,openOrder.getItemName(),openOrder.getIndustry(), LocalDate.parse(endDate.toString()), price, openOrder.getQuantity());
 				dropOrder.setNote("drop，" + note);
 
 				//System.out.println(dropOrder); //----------------------------------------------
@@ -122,9 +336,15 @@ public class Account {
 				value = value.subtract(dropOrder.getAmount());		//市值减少
 				
 				hands_it.remove();
-				drops.put(dropOrder.getOrderID(), dropOrder);
+				drops.put(dropOrder.getOrderID(), dropOrder);				
 			}
+		}*/
+		
+		Set<String> orderIDs = this.getHoldOrderIDs(itemID);
+		for(String orderID : orderIDs) {
+			this.dropByOrderID(orderID, note, price);
 		}
+		
 	}
 	
 	public void drop(String itemID, String note) {
@@ -136,7 +356,7 @@ public class Account {
 		for(Iterator<Map.Entry<Integer, Order>> hands_it = holds.entrySet().iterator(); hands_it.hasNext();) {
 			openOrder = hands_it.next().getValue();
 			if(openOrder.getItemID().equals(itemID)) {
-				Order stopOrder = new Order(openOrder.getOrderID(),itemID, LocalDate.parse(endDate.toString()), prices.get(itemID), openOrder.getQuantity());
+				Order stopOrder = new Order(openOrder.getOrderID(),itemID,openOrder.getItemName(),openOrder.getIndustry(), LocalDate.parse(endDate.toString()), prices.get(itemID), openOrder.getQuantity());
 				stopOrder.setNote("stop，" + note);
 
 				//System.out.println(stopOrder); //----------------------------------------------
@@ -153,7 +373,7 @@ public class Account {
 	public void stopByOrderID(String orderID) {
 		Order openOrder = holds.get(orderID);
 		if(openOrder!=null) {
-			Order stopOrder = new Order(openOrder.getOrderID(), openOrder.getItemID(), LocalDate.parse(endDate.toString()), prices.get(openOrder.getItemID()), openOrder.getQuantity());
+			Order stopOrder = new Order(openOrder.getOrderID(), openOrder.getItemID(),openOrder.getItemName(),openOrder.getIndustry(), LocalDate.parse(endDate.toString()), prices.get(openOrder.getItemID()), openOrder.getQuantity());
 			stopOrder.setNote("stop");
 
 			//System.out.println(stopOrder); //----------------------------------------------
@@ -169,7 +389,7 @@ public class Account {
 	public void cancelByOrderID(String orderID) {
 		Order openOrder = holds.get(orderID);
 		if(openOrder!=null) {
-			Order stopOrder = new Order(openOrder.getOrderID(), openOrder.getItemID(), LocalDate.parse(endDate.toString()), prices.get(openOrder.getItemID()), openOrder.getQuantity());
+			Order stopOrder = new Order(openOrder.getOrderID(), openOrder.getItemID(),openOrder.getItemName(),openOrder.getIndustry(), LocalDate.parse(endDate.toString()), prices.get(openOrder.getItemID()), openOrder.getQuantity());
 			stopOrder.setNote("cancel");
 
 			//System.out.println(stopOrder); //----------------------------------------------
@@ -192,12 +412,26 @@ public class Account {
 	}
 
 	public void refreshHoldsPrice(String itemID, BigDecimal price) {
+		if(states.containsKey(itemID)) states.get(itemID).setLatestPrice(price);
+		
 		prices.put(itemID, price);
+		
 		for(Order order : holds.values()) {
 			if(order.getItemID().equals(itemID)) {
 				order.setLatest(price);
 			}
 		}
+	}
+	
+	public Set<String> getItemIDsOfLost(Integer days) {
+		Set<String> ids = new HashSet<String>();
+		for(HoldState state : states.values()) {
+			//logger.info(state.toString(days));
+			if(state.isLost(days)) {
+				ids.add(state.getItemID());
+			}
+		}
+		return ids;
 	}
 	
 	public Set<String> getItemIDsOfHolds() {
@@ -206,6 +440,23 @@ public class Account {
 			ids.add(order.getItemID());
 		}
 		return ids;
+	}
+	
+	public Integer getProfitRatio(String itemID) {
+		BigDecimal cost = new BigDecimal(0);  //买入成本
+		BigDecimal value = new BigDecimal(0); //现在市值
+		for(Order order : holds.values()) {
+			if(order.getItemID().equals(itemID)) {
+				cost = cost.add(order.getAmount());
+				value = value.add(order.getValue());
+			}
+		}
+		
+		if(cost.intValue()==0) {
+			return null;
+		}else {
+			return value.subtract(cost).divide(cost,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)).intValue();
+		}
 	}
 	
 	public boolean isStupid(String itemID, String orderID, Integer days) {
@@ -355,7 +606,7 @@ public class Account {
 		sb.append(",");
 		sb.append("itemID");
 		sb.append(",");
-		sb.append("name");
+		sb.append("itemName");
 		sb.append(",");
 		sb.append("openDate");
 		sb.append(",");
@@ -380,6 +631,8 @@ public class Account {
 		sb.append("year");
 		sb.append(",");
 		sb.append("month");
+		sb.append(",");
+		sb.append("industry");
 		sb.append("\n");
 		return sb.toString();
 	}
@@ -391,14 +644,14 @@ public class Account {
 			openOrder = entry.getValue();
 			dsOrder = getDropOrStopOrder(entry.getKey());
 			if(dsOrder==null) {
-				dsOrder = new Order(openOrder.getOrderID(),openOrder.getItemID(),endDate,prices.get(openOrder.getItemID()),openOrder.getQuantity());
+				dsOrder = new Order(openOrder.getOrderID(),openOrder.getItemID(),openOrder.getItemName(), openOrder.getIndustry(),endDate,prices.get(openOrder.getItemID()),openOrder.getQuantity());
 				dsOrder.setNote("hold");
 			}
 			sb.append(openOrder.getOrderID());
 			sb.append(",");
 			sb.append(openOrder.getItemID());
 			sb.append(",");
-			sb.append("");
+			sb.append(openOrder.getItemName());
 			sb.append(",");
 			sb.append(openOrder.getDate());
 			sb.append(",");
@@ -423,6 +676,8 @@ public class Account {
 			sb.append(dsOrder.getDate().getYear());
 			sb.append(",");
 			sb.append(dsOrder.getDate().getMonth().getValue());
+			sb.append(",");
+			sb.append(openOrder.getIndustry());
 			sb.append("\n");
 
 		}
@@ -438,9 +693,62 @@ public class Account {
 		}
 	}
 	
+	class HoldState{
+		private String itemID;
+		private BigDecimal buyPrice;
+		private BigDecimal latestPrice;
+		private Integer holdsDays;
+		
+		public HoldState(String itemID, BigDecimal buyPrice) {
+			this.itemID = itemID;
+			this.buyPrice = buyPrice;
+			this.latestPrice = buyPrice;
+			this.holdsDays = 1;
+		}
+		
+		public boolean isLost(Integer days) {
+			return holdsDays>=days && latestPrice.compareTo(buyPrice)==-1;
+		}
+		
+		public String getItemID() {
+			return itemID;
+		}
+		public void setItemID(String itemID) {
+			this.itemID = itemID;
+		}
+		public BigDecimal getBuyPrice() {
+			return buyPrice;
+		}
+		public void setBuyPrice(BigDecimal buyPrice) {
+			this.buyPrice = buyPrice;
+		}
+		public BigDecimal getLatestPrice() {
+			return latestPrice;
+		}
+		public void setLatestPrice(BigDecimal latestPrice) {
+			this.latestPrice = latestPrice;
+			this.holdsDays = this.holdsDays + 1;
+			//logger.info("itemID=" + this.itemID + ",holdsDays=" + this.holdsDays);
+		}
+		public Integer getHoldsDays() {
+			return holdsDays;
+		}
+		public void setHoldsDays(Integer holdsDays) {
+			this.holdsDays = holdsDays;
+		}
+
+		public String toString(Integer days) {
+			return "HoldState [itemID=" + itemID + ", isLost=" + isLost(days) + ", buyPrice=" + buyPrice + ", latestPrice=" + latestPrice
+					+ ", holdsDays=" + holdsDays + "]";
+		}
+		
+	}
+	
 	class Order {
 		private Integer orderID;
 		private String itemID;
+		private String itemName;
+		private String industry;
 		private LocalDate date;  
 		private BigDecimal price;
 		private Integer quantity;	
@@ -448,7 +756,7 @@ public class Account {
 		private BigDecimal latest;
 		private BigDecimal highest;
 		
-		public Order(Integer orderID,String itemID, LocalDate date, BigDecimal price, Integer quantity) {
+		public Order(Integer orderID,String itemID, String itemName, String industry, LocalDate date, BigDecimal price, Integer quantity) {
 			this.orderID = orderID;
 			this.itemID = itemID;
 			this.date = date;
@@ -456,8 +764,31 @@ public class Account {
 			this.quantity = quantity;
 			this.latest = price;
 			this.highest = price;
+			this.industry = industry;
+			this.itemName = itemName;
 		}
 		
+		public Integer getRatio() {
+			return latest.subtract(price).divide(price,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)).intValue();
+		}
+		
+		
+		public String getItemName() {
+			return itemName;
+		}
+
+		public void setItemName(String itemName) {
+			this.itemName = itemName;
+		}
+
+		public String getIndustry() {
+			return industry;
+		}
+
+		public void setIndustry(String industry) {
+			this.industry = industry;
+		}
+
 		public BigDecimal getLatest() {
 			return latest;
 		}
@@ -477,6 +808,10 @@ public class Account {
 			return price.multiply(new BigDecimal(quantity));
 		}
 
+		public BigDecimal getValue() {
+			return latest.multiply(new BigDecimal(quantity));
+		}
+		
 		public Integer getOrderID() {
 			return orderID;
 		}
@@ -527,8 +862,9 @@ public class Account {
 
 		@Override
 		public String toString() {
-			return "Order [orderID=" + orderID + ", itemID=" + itemID + ", date=" + date + ", price=" + price
-					+ ", quantity=" + quantity + ", note=" + note + "]";
+			return "Order [orderID=" + orderID + ", itemID=" + itemID + ", itemName=" + itemName + ", industry="
+					+ industry + ", date=" + date + ", price=" + price + ", quantity=" + quantity + ", note=" + note
+					+ ", latest=" + latest + ", highest=" + highest + "]";
 		}
 		
 	}

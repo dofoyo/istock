@@ -20,19 +20,23 @@ public class TurtleMusterSimulationTest {
 	@Autowired
 	@Qualifier("turtleMusterSimulation")
 	TurtleMusterSimulation turtleMusterSimulation;
+
+	@Autowired
+	@Qualifier("turtleMusterSimulationByIndustry")
+	TurtleMusterSimulationByIndustry turtleMusterSimulationByIndustry;
 	
 	@Autowired
 	@Qualifier("turtleSimulationRepository")
 	TurtleSimulationRepository turtleSimulationRepository;
 	
-	//@Test
+	@Test
 	public void simulate() {
-		LocalDate beginDate = LocalDate.parse("2019-01-01");
-		LocalDate endDate = LocalDate.parse("2019-06-01");
-		turtleMusterSimulation.simulate(beginDate, endDate);
+		LocalDate beginDate = LocalDate.parse("2019-09-01");
+		LocalDate endDate = LocalDate.parse("2019-09-27");
+		turtleMusterSimulationByIndustry.simulate(beginDate, endDate);
 	}
 	
-	@Test
+	//@Test
 	public void test() {
 		LocalDate beginDate = LocalDate.parse("2019-06-01");
 		LocalDate endDate = LocalDate.parse("2019-06-14");

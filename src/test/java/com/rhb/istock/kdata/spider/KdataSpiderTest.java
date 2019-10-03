@@ -53,9 +53,9 @@ public class KdataSpiderTest {
 		}
 	}
 
-	@Test
+	//@Test
 	public void testDwnKdataByDate() {
-		LocalDate date = LocalDate.parse("2019-07-01");
+		LocalDate date = LocalDate.parse("2019-09-26");
 		try {
 			//kdataSpiderTushare.downKdatas(date);
 			kdataSpiderTushare.downFactors(date); //此处仅供测试，正式使用时，factor的日期要比kdata的日期提前一个交易日
@@ -67,7 +67,7 @@ public class KdataSpiderTest {
 		System.out.println("done!");
 	}
 	
-	//@Test
+	@Test
 	public void testDownKdataByIDFrom163() {
 		String id = "sh000001";
 		try {

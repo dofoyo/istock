@@ -10,9 +10,10 @@ public class MusterEntity {
 	private BigDecimal lowest;
 	private BigDecimal close;
 	private BigDecimal dropPrice;
-	private BigDecimal latestPrice;  
+	private BigDecimal latestPrice; 
+	private Integer limited;
 
-	public MusterEntity(String itemID, BigDecimal amount, BigDecimal averageAmount, BigDecimal highest, BigDecimal lowest, BigDecimal close, BigDecimal dropPrice, BigDecimal latestPrice) {
+	public MusterEntity(String itemID, BigDecimal amount, BigDecimal averageAmount, BigDecimal highest, BigDecimal lowest, BigDecimal close, BigDecimal dropPrice, BigDecimal latestPrice, Integer limited) {
 		this.itemID = itemID;
 		this.amount = amount;
 		this.averageAmount = averageAmount;
@@ -21,6 +22,7 @@ public class MusterEntity {
 		this.close = close;
 		this.dropPrice = dropPrice;
 		this.latestPrice = latestPrice;
+		this.limited = limited;
 	}
 	
 	public MusterEntity(String txt) {
@@ -33,10 +35,20 @@ public class MusterEntity {
 		this.close = new BigDecimal(ss[5]);
 		this.dropPrice = new BigDecimal(ss[6]);
 		this.latestPrice = new BigDecimal(ss[7]);
+		this.limited = Integer.parseInt(ss[8]);
 	}
 	
+	
+	public Integer getLimited() {
+		return limited;
+	}
+
+	public void setLimited(Integer limited) {
+		this.limited = limited;
+	}
+
 	public String toText() {
-		return this.itemID + "," + this.amount + "," + this.averageAmount + "," + this.highest + "," + this.lowest + "," + this.close + "," + this.dropPrice + "," + this.latestPrice + "\n";
+		return this.itemID + "," + this.amount + "," + this.averageAmount + "," + this.highest + "," + this.lowest + "," + this.close + "," + this.dropPrice + "," + this.latestPrice + "," + this.limited + "\n";
 	}
 
 	public BigDecimal getDropPrice() {

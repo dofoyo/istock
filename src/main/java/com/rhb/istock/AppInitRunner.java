@@ -50,6 +50,7 @@ public class AppInitRunner implements CommandLineRunner {
 		if(this.isTradeDate()) {
 	     	itemService.download();
 	    	kdataService.downKdatasAndFactors();  //上一交易日的收盘数据下载完成后，执行generateMuster，下载并整理上一交易日的收盘数据2分钟，生成muster需要3分钟，合计大概需要5分钟
+	    	kdataService.downSSEI();
 		}
 
     	turtleOperationService.init();

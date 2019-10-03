@@ -8,6 +8,10 @@ public interface KdataService {
 	/*
 	 * 获得的数据是不包含endDate的
 	 */
+	
+	public void downSSEI();  //下载上证指数
+	public Integer getSseiFlag(LocalDate date); 
+	
 	public Kdata getKdata(String itemID, LocalDate endDate, Integer count, boolean byCache);
 	public Kdata getLastKdata(String itemID, Integer count, boolean byCache);
 	public Kdata getKdata(String itemID, LocalDate endDate, boolean byCache);
@@ -25,6 +29,7 @@ public interface KdataService {
 	
 	public void generateMusters();  //用于simulation
 	public Map<String,Muster> getMusters(LocalDate date); //用于simulation
+	public Map<String,Muster> getMusters(LocalDate date, String industry); //用于simulation
 	
 	public void generateLatestMusters();  //用于operation，每天开盘前，根据上一交易日的收盘价和最新的除权因子计算
 	public Map<String,Muster> getLatestMusters();//用于operation，提供给前端显示。和updateLatestMusters配合，可以提升操作体验
