@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -404,6 +405,40 @@ public class KdataServiceImp implements KdataService{
 				muster.setLimited(entity.getLimited());
 				
 				musters.put(muster.getItemID(),muster);
+		}
+		
+		return musters;
+	}
+	
+	@Override
+	public Map<String,Muster> getMusters(LocalDate date, Set<String> excludeIndustrys) {
+		Map<String,Muster> musters = new HashMap<String,Muster>();
+		Muster muster;
+		String itemName;
+		String industry;
+		
+		Map<String, MusterEntity> entities = musterRepositoryImp.getMusters(date);
+		
+		for(MusterEntity entity : entities.values()) {
+			itemName = itemService.getItem(entity.getItemID()).getName();
+			industry = itemService.getItem(entity.getItemID()).getIndustry();
+			if(excludeIndustrys==null || !excludeIndustrys.contains(industry)) {
+				//System.out.println(entity.getItemID());
+				muster = new Muster();
+				muster.setItemID(entity.getItemID());
+				muster.setItemName(itemName);
+				muster.setIndustry(industry);
+				muster.setAmount(entity.getAmount());
+				muster.setAverageAmount(entity.getAverageAmount());
+				muster.setHighest(entity.getHighest());
+				muster.setLowest(entity.getLowest());
+				muster.setClose(entity.getClose());
+				muster.setDropPrice(entity.getDropPrice());
+				muster.setLatestPrice(entity.getLatestPrice());
+				muster.setLimited(entity.getLimited());
+				
+				musters.put(muster.getItemID(),muster);
+			}
 		}
 		
 		return musters;

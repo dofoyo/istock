@@ -21,7 +21,7 @@ public interface SelectorService{
 	public Map<String,String> getFavors();
 
 	
-	public Map<String,Integer> getLatestHighLowTops(Integer top);
+	public Map<String,Integer> getHighLowTops(Integer top);
 	
 	/*
 	 * 用于operation

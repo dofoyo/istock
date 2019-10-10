@@ -3,6 +3,7 @@ package com.rhb.istock.kdata;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public interface KdataService {
 	/*
@@ -29,6 +30,7 @@ public interface KdataService {
 	
 	public void generateMusters();  //用于simulation
 	public Map<String,Muster> getMusters(LocalDate date); //用于simulation
+	public Map<String,Muster> getMusters(LocalDate date, Set<String> excludeIndustrys); //用于simulation
 	public Map<String,Muster> getMusters(LocalDate date, String industry); //用于simulation
 	
 	public void generateLatestMusters();  //用于operation，每天开盘前，根据上一交易日的收盘价和最新的除权因子计算

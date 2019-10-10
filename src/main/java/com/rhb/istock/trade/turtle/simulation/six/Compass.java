@@ -102,7 +102,7 @@ public class Compass {
 						ms.put(entry.getKey(), entry.getValue());
 					}
 				}			
-				paul.doIt_plus(musters, this.getTops(new ArrayList<Muster>(ms.values()), type), date, flag);
+				paul.doIt_plus(musters, this.getTops(new ArrayList<Muster>(ms.values()), type), date);
 			}
 		}
 		

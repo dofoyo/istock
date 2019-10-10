@@ -1,5 +1,6 @@
 package com.rhb.istock.selector.hlt;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -21,7 +22,7 @@ public class HighLowTopServiceImp implements HighLowTopService {
 	KdataService kdataService;
 
 	@Override
-	public List<String> getLatestTops(Integer top) {
+	public List<String> getTops(Integer top) {
 		List<String> tops = new ArrayList<String>();
 
 		List<Muster> musters = new ArrayList<Muster>(kdataService.getLatestMusters().values());
@@ -41,14 +42,18 @@ public class HighLowTopServiceImp implements HighLowTopService {
 	}
 	
 	@Override
-	public Map<String,Integer> getLatestHighLowTops(Integer top) {
+	public Map<String,Integer> getHighLowTops(Integer top) {
 		Map<String,Integer> tops = new HashMap<String,Integer>();
-
+		
 		List<Muster> musters = new ArrayList<Muster>(kdataService.getLatestMusters().values());
 		Collections.sort(musters, new Comparator<Muster>() {
 			@Override
 			public int compare(Muster o1, Muster o2) {
-				return o1.getHLGap().compareTo(o2.getHLGap());
+				if(o1.getHLGap().compareTo(o2.getHLGap())==0) {
+					return o1.getClose().compareTo(o2.getClose());
+				}else {
+					return o1.getHLGap().compareTo(o2.getHLGap());
+				}
 			}
 		});
 		

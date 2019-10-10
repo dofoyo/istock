@@ -31,6 +31,10 @@ public class HoldView {
 	public void setStatus(Integer status) {
 		this.status = status;
 	}
+	
+	public String getColor() {
+		return this.status>0 ? "red" : "green";
+	}
 
 	@Override
 	public String toString() {

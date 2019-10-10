@@ -21,12 +21,14 @@ public class Paul {
 	private Account account = null;
 	private BigDecimal initCash = null;
 	private BigDecimal quota = null;
-	private Integer holdDays = 5;
-	private Integer theProfitRatio = 8;//盈利8%以上才能加仓
 	private Map<Integer,BigDecimal> yearAmount;
 	
 	private StringBuffer dailyAmount_sb = new StringBuffer("date,cash,value,total\n");
 	private StringBuffer breakers_sb = new StringBuffer();
+	
+	private BigDecimal highest = new BigDecimal(0);
+	private Integer max_down_ratio = -5; //当前总资产相比highest下跌超过此数值，清仓
+	private Integer breaker_ratio = 2; //清仓后，breakers与musters的比率超过此数值，再次开始买入操作
 	
 	public Paul(BigDecimal initCash, BigDecimal quote) {
 		account = new Account(initCash);
@@ -78,108 +80,168 @@ public class Paul {
 	 * 满仓操作
 	 * 每只股票市值相同
 	 * 
-	 * flag = 1, 可以买入
-	 * flag = 0, 不可买入
-	 * flag = -1, 清仓
-	 * 
+	 * 总市值回撤5%，清仓
 	 */
-	public void doIt_plus(Map<String,Muster> musters, List<Muster> breakers, LocalDate date,Integer flag) {
+	public void doIt_plus1(Map<String,Muster> musters, List<Muster> breakers, LocalDate date,Integer mCount, Integer bCount) {
 		//logger.info(date.toString());
 		Muster muster;
 		account.setLatestDate(date);
 
 		Set<String> holdItemIDs = account.getItemIDsOfHolds();
-		//如果flag=-1,清仓
-		if(flag == -1) {
+		for(String itemID : holdItemIDs) {
+			muster = musters.get(itemID);
+			if(muster != null) {
+				account.refreshHoldsPrice(itemID, muster.getLatestPrice());
+			}
+		}
+		
+		Integer ratio  = account.getTotal().subtract(highest).divide(account.getTotal(),BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)).intValue();
+		logger.info(String.format("%s: highest=%d, now=%d, up_ratio=%d", date.toString(),highest.intValue(), account.getTotal().intValue(),ratio));
+		if(ratio <= max_down_ratio) {
+			highest = account.getTotal();
+			int cleans  = holdItemIDs.size();
 			for(String itemID: holdItemIDs) {
 				muster = musters.get(itemID);
-				if(muster!=null) {
-					account.refreshHoldsPrice(itemID, muster.getLatestPrice());
+				if(muster!=null && !muster.isDownLimited()) {
 					account.drop(itemID, "清仓", muster.getLatestPrice()); 
 					account.dropHoldState(itemID);
 				}
-			}			
+			}
+			holdItemIDs = account.getItemIDsOfHolds();
+			logger.info(String.format("clean %d items, cleaned %d. %s can NOT be cleaned for limited",cleans,cleans-holdItemIDs.size(),holdItemIDs.toString()));
 		}else {
-			//卖出跌破dropline的股票
-			//logger.info("卖出跌破dropline的股票");
-			for(String itemID: holdItemIDs) {
-				muster = musters.get(itemID);
-				if(muster!=null) {
-					account.refreshHoldsPrice(itemID, muster.getLatestPrice());
-					
-					if(muster.isDrop() && !muster.isDownLimited()) {
-						account.drop(itemID, "跌破dropLine", muster.getLatestPrice()); 
-						account.dropHoldState(itemID);
-					}
-				}
-			}				
+			highest = highest.compareTo(account.getTotal())==-1 ? account.getTotal() : highest;
 		}
 		
-	
+		logger.info(String.format("musters=%d, breakers=%d, breaker_ratio=%d", mCount,bCount,bCount*100/mCount));
 
-/*		
- * 		//使用此功能，收益率大幅降低
- * 		//卖出几天都不涨的股票
-		//logger.info("卖出几天都不涨的股票");
-		holdIDs = account.getItemIDsOfLost(holdDays);
-		for(String itemID: holdIDs) {
+		
+		//卖出跌破dropline的股票
+		//logger.info("卖出跌破dropline的股票")
+		for(String itemID: holdItemIDs) {
 			muster = musters.get(itemID);
 			if(muster!=null) {
-				account.drop(itemID, "lost", muster.getLatestPrice()); 
-				account.dropHoldState(itemID);
+				if(muster.isDrop() && !muster.isDownLimited()) {
+					account.drop(itemID, "跌破dropLine", muster.getLatestPrice()); 
+					account.dropHoldState(itemID);
+				}
 			}
-		}	*/
+		}				
 		
-		//Map<String, BigDecimal> dds = new HashMap<String,BigDecimal>();
 		Set<Muster> dds = new HashSet<Muster>();  //用set，无重复，表示不可加仓
 		//List<Muster> dds = new ArrayList<Muster>();  //用list，有重复，表示可以加仓
 		
 		//确定突破走势的股票
-		if(flag == 1) {
-			breakers_sb.append(date.toString() + ",");
-
-			Integer profitRatio = null;
-			for(Muster breaker : breakers) {
-				//if(!breaker.isUpLimited() && breaker.getHLGap()<50) {
-				if(!breaker.isUpLimited()) {
-					profitRatio = account.getProfitRatio(breaker.getItemID());
-					if(profitRatio==null || profitRatio>=theProfitRatio) {
-						dds.add(breaker);
-					}
-					
-	/*				if(profitRatio!=null && profitRatio>=theProfitRatio) {
-						System.out.println("加仓" + breaker.getItemID() + breaker.getItemName());
-					}*/
-					
-					//account.refreshHoldsPrice(breaker.getItemID(), breaker.getLatestPrice());
-					//account.open(breaker.getItemID(), this.getQuantity(breaker.getLatestPrice()), "", breaker.getLatestPrice());
-				}
-				breakers_sb.append(breaker.getItemID());
-				breakers_sb.append(",");
+		breakers_sb.append(date.toString() + ",");
+		StringBuffer sb = new StringBuffer();
+		for(Muster breaker : breakers) {
+			if(!breaker.isUpLimited()) {
+				dds.add(breaker);
+				sb.append(breaker.getItemName());
+				sb.append(",");
 			}
-			breakers_sb.deleteCharAt(breakers_sb.length()-1);
-			breakers_sb.append("\n");
+			breakers_sb.append(breaker.getItemID());
+			breakers_sb.append(",");
+		}
+		breakers_sb.deleteCharAt(breakers_sb.length()-1);
+		breakers_sb.append("\n");
+		
+		logger.info(String.format("new open %d items: %s", dds.size(), sb.toString()));
+		
+		//先卖后买，完成调仓
+		//logger.info("先卖后买，完成调仓");
+		if(!dds.isEmpty()) {
+			holdItemIDs = account.getItemIDsOfHolds();
+			Set<String> holdOrderIDs;
+			for(String itemID: holdItemIDs) {
+				holdOrderIDs = 	account.getHoldOrderIDs(itemID);
+				muster = musters.get(itemID);
+				if(muster!=null) {
+					for(String holdOrderID : holdOrderIDs) {
+						account.dropByOrderID(holdOrderID, "调仓", muster.getLatestPrice());   //先卖
+						dds.add(muster);						
+					}
+				}
+			}
 			
-			//先卖后买，完成调仓
-			//logger.info("先卖后买，完成调仓");
-			if(!dds.isEmpty()) {
-				holdItemIDs = account.getItemIDsOfHolds();
-				Set<String> holdOrderIDs;
-				for(String itemID: holdItemIDs) {
-					holdOrderIDs = 	account.getHoldOrderIDs(itemID);
-					muster = musters.get(itemID);
-					if(muster!=null) {
-						for(String holdOrderID : holdOrderIDs) {
-							account.dropByOrderID(holdOrderID, "调仓", muster.getLatestPrice());   //先卖
-							dds.add(muster);						
-						}
+			//System.out.println(dds.size());
+			account.openAll(dds);			//后买
+		}
+		
+
+		dailyAmount_sb.append(account.getDailyAmount() + "," + mCount + "," + bCount + "\n");
+		yearAmount.put(date.getYear(), account.getTotal());
+
+		//account.doDailyReport(date);
+	}
+	
+	/*
+	 * 满仓操作
+	 * 每只股票市值相同
+	 *
+	 * 
+	 */
+	public void doIt_plus(Map<String,Muster> musters, List<Muster> breakers, LocalDate date) {
+		//logger.info(date.toString());
+		Muster muster;
+		account.setLatestDate(date);
+
+		Set<String> holdItemIDs = account.getItemIDsOfHolds();
+		for(String itemID : holdItemIDs) {
+			muster = musters.get(itemID);
+			if(muster != null) {
+				account.refreshHoldsPrice(itemID, muster.getLatestPrice());
+			}
+		}
+		
+		//卖出跌破dropline的股票
+		//logger.info("卖出跌破dropline的股票")
+		for(String itemID: holdItemIDs) {
+			muster = musters.get(itemID);
+			if(muster!=null) {
+				if(muster.isDrop() && !muster.isDownLimited()) {
+					account.drop(itemID, "跌破dropLine", muster.getLatestPrice()); 
+					account.dropHoldState(itemID);
+				}
+			}
+		}				
+		
+		Set<Muster> dds = new HashSet<Muster>();  //用set，无重复，表示不可加仓
+		//List<Muster> dds = new ArrayList<Muster>();  //用list，有重复，表示可以加仓
+		
+		//确定突破走势的股票
+		breakers_sb.append(date.toString() + ",");
+		StringBuffer sb = new StringBuffer();
+		for(Muster breaker : breakers) {
+			if(!breaker.isUpLimited()) {
+				dds.add(breaker);
+				sb.append(breaker.getItemName());
+				sb.append(",");
+			}
+			breakers_sb.append(breaker.getItemID());
+			breakers_sb.append(",");
+		}
+		breakers_sb.deleteCharAt(breakers_sb.length()-1);
+		breakers_sb.append("\n");
+		
+		//先卖后买，完成调仓和开仓
+		//logger.info("先卖后买，完成调仓");
+		if(!dds.isEmpty()) {
+			holdItemIDs = account.getItemIDsOfHolds();
+			Set<String> holdOrderIDs;
+			for(String itemID: holdItemIDs) {
+				holdOrderIDs = 	account.getHoldOrderIDs(itemID);
+				muster = musters.get(itemID);
+				if(muster!=null) {
+					for(String holdOrderID : holdOrderIDs) {
+						account.dropByOrderID(holdOrderID, "调仓", muster.getLatestPrice());   //先卖
+						dds.add(muster);						
 					}
 				}
-				
-				//System.out.println(dds.size());
-				account.openAll(dds);			//后买
 			}
-
+			
+			//System.out.println(dds.size());
+			account.openAll(dds);			//后买
 		}
 		
 

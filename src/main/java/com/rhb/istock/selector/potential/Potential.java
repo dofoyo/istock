@@ -7,6 +7,7 @@ import java.util.List;
 
 public class Potential {
 	private String itemID;
+	private String itemName;
 	private BigDecimal amount;
 	private BigDecimal averageAmount;
 	private BigDecimal highest;
@@ -21,8 +22,9 @@ public class Potential {
 	private Integer avb;
 	private LocalDate date;
 	
-	public Potential(String itemID, BigDecimal averageAmount, BigDecimal amount, BigDecimal highest, BigDecimal lowest, BigDecimal close,BigDecimal latestPrice) {
+	public Potential(String itemID, String itemName, BigDecimal averageAmount, BigDecimal amount, BigDecimal highest, BigDecimal lowest, BigDecimal close,BigDecimal latestPrice) {
 		this.itemID = itemID;
+		this.itemName = itemName;
 		this.amount = amount;
 		this.averageAmount = averageAmount;
 		this.highest = highest;
@@ -42,6 +44,14 @@ public class Potential {
 		return labels;
 	}
 	
+	public String getItemName() {
+		return itemName;
+	}
+
+	public void setItemName(String itemName) {
+		this.itemName = itemName;
+	}
+
 	public BigDecimal getLatestPrice() {
 		return latestPrice;
 	}

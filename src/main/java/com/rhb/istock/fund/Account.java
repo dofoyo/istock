@@ -242,15 +242,17 @@ public class Account {
 		holds.put(order.getOrderID(), order);
 		opens.put(order.getOrderID(), order);
 	}
-
+	
 	public void open(String itemID,String itemName,String industry, Integer quantity, String note, BigDecimal price) {
+		if(quantity<=0) return;
+		
 		//logger.info("buy " + itemID + " " + quantity + " units on " + price + " yuan.");
 		Order order = new Order(this.getOrderID(),itemID,itemName, industry,LocalDate.parse(endDate.toString()),price,quantity);
 		order.setNote("open，" + note);
 
 		//System.out.println(order); //----------------------------------------------
 
-		cash = cash.subtract(order.getAmount());  // 买入时，现金减少
+		cash = cash.subtract(order.getAmount().add(order.getFee()));  // 买入时，现金减少
 		value = value.add(order.getAmount()); // 市值增加
 		holds.put(order.getOrderID(), order);
 		opens.put(order.getOrderID(), order);
@@ -286,10 +288,10 @@ public class Account {
 	public void openAll(Set<Muster> items) {
 		if(items.isEmpty()) return;
 		
-		//int position = items.size()<2 ? 2 : items.size();
+		//int position = items.size()<3 ? 3 : items.size();
 		int position = items.size();
 		
-		BigDecimal quota = this.cash.divide(new BigDecimal(items.size()),BigDecimal.ROUND_DOWN);
+		BigDecimal quota = this.cash.divide(new BigDecimal(position),BigDecimal.ROUND_DOWN);
 		for(Muster item : items) {
 			this.prices.put(item.getItemID(), item.getLatestPrice());
 			this.open(item.getItemID(), item.getItemName(), item.getIndustry(), this.getQuantity(quota, item.getLatestPrice()), "" , item.getLatestPrice());
@@ -315,7 +317,7 @@ public class Account {
 
 		//System.out.println(dropOrder); //----------------------------------------------
 	
-		cash = cash.add(dropOrder.getAmount()); 			//卖出时，现金增加
+		cash = cash.add(dropOrder.getAmount().subtract(dropOrder.getFeeAndTax())); 			//卖出时，现金增加
 		value = value.subtract(dropOrder.getAmount());		//市值减少
 		
 		holds.remove(Integer.parseInt(orderID));
@@ -323,23 +325,6 @@ public class Account {
 	}
 
 	public void drop(String itemID, String note, BigDecimal price) {
-/*		Order openOrder;
-		for(Iterator<Map.Entry<Integer, Order>> hands_it = holds.entrySet().iterator(); hands_it.hasNext();) {
-			openOrder = hands_it.next().getValue();
-			if(openOrder.getItemID().equals(itemID)) {
-				Order dropOrder = new Order(openOrder.getOrderID(),itemID,openOrder.getItemName(),openOrder.getIndustry(), LocalDate.parse(endDate.toString()), price, openOrder.getQuantity());
-				dropOrder.setNote("drop，" + note);
-
-				//System.out.println(dropOrder); //----------------------------------------------
-			
-				cash = cash.add(dropOrder.getAmount()); 			//卖出时，现金增加
-				value = value.subtract(dropOrder.getAmount());		//市值减少
-				
-				hands_it.remove();
-				drops.put(dropOrder.getOrderID(), dropOrder);				
-			}
-		}*/
-		
 		Set<String> orderIDs = this.getHoldOrderIDs(itemID);
 		for(String orderID : orderIDs) {
 			this.dropByOrderID(orderID, note, price);
@@ -378,7 +363,7 @@ public class Account {
 
 			//System.out.println(stopOrder); //----------------------------------------------
 			
-			cash = cash.add(stopOrder.getAmount()); 			//卖出时，现金增加
+			cash = cash.add(stopOrder.getAmount().subtract(stopOrder.getAmount().multiply(new BigDecimal(0.002)))); 			//卖出时，现金增加
 			value = value.subtract(stopOrder.getAmount());		//市值减少	
 			
 			holds.remove(orderID);
@@ -394,7 +379,7 @@ public class Account {
 
 			//System.out.println(stopOrder); //----------------------------------------------
 			
-			cash = cash.add(stopOrder.getAmount()); 			//卖出时，现金增加
+			cash = cash.add(stopOrder.getAmount().subtract(stopOrder.getAmount().multiply(new BigDecimal(0.002)))); 			//卖出时，现金增加
 			value = value.subtract(stopOrder.getAmount());		//市值减少	
 			
 			holds.remove(orderID);
@@ -806,6 +791,16 @@ public class Account {
 
 		public BigDecimal getAmount() {
 			return price.multiply(new BigDecimal(quantity));
+		}
+		
+		private BigDecimal getFeeAndTax() {
+			return BigDecimal.ZERO;
+			//return this.getAmount().multiply(new BigDecimal(0.002));
+		}
+		
+		private BigDecimal getFee() {
+			return BigDecimal.ZERO;
+			//return this.getAmount().multiply(new BigDecimal(0.001));
 		}
 
 		public BigDecimal getValue() {

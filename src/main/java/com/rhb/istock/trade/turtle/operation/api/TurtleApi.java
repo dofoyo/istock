@@ -1,5 +1,7 @@
 package com.rhb.istock.trade.turtle.operation.api;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -7,6 +9,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.rhb.istock.comm.api.ResponseContent;
@@ -29,6 +32,26 @@ public class TurtleApi{
 	public ResponseContent<List<TurtleView>> getPowers() {
 		List<TurtleView> views = ts.getPowers();
 		return new ResponseContent<List<TurtleView>>(ResponseEnum.SUCCESS, views);
+	}
+	
+	@GetMapping("/turtle/potentials/{type}/{date}")
+	public ResponseContent<List<PotentialView>> getPotentials(
+			@PathVariable(value="type") String type,
+			@PathVariable(value="date") String date
+			) {
+
+		LocalDate theDate = null;
+		try{
+			theDate = LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+		}catch(Exception e){
+			System.out.println("the date '" + date + "' is ERROR!");
+		}
+		
+		//System.out.println("the date is " + theDate);
+		
+		List<PotentialView> views = ts.getPotentials(type, theDate);
+		
+		return new ResponseContent<List<PotentialView>>(ResponseEnum.SUCCESS, views);
 	}
 	
 	@GetMapping("/turtle/potentials/hlb")

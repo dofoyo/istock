@@ -47,8 +47,12 @@ public class PotentialServiceTest {
 		Collections.sort(potentials, new Comparator<Potential>() {
 			@Override
 			public int compare(Potential o1, Potential o2) {
-				return o1.getHLGap().compareTo(o2.getHLGap());
-			}
+					if(o1.getHLGap().compareTo(o2.getHLGap())==0) {
+						return o2.getAverageAmount().compareTo(o1.getAverageAmount());
+					}else {
+						return o1.getHLGap().compareTo(o2.getHLGap());//A-Z
+					}
+				}
 			
 		});
 		
@@ -57,5 +61,34 @@ public class PotentialServiceTest {
 				System.out.println(p.getItemID());
 			}
 		}
+	}
+	
+	@Test
+	public void getPotentials() {
+		LocalDate date = LocalDate.of(2019, 2, 19);
+		List<Potential> potentials = new ArrayList<Potential>(potentialService.getPotentials(date).values());
+		Collections.sort(potentials, new Comparator<Potential>() {
+
+			@Override
+			public int compare(Potential o1, Potential o2) {
+				return o1.getHLGap().compareTo(o2.getHLGap());
+			}
+			
+		});
+		
+		
+		int i=1;
+		for(Potential p : potentials) {
+			if(p.isBreaker()) {
+				System.out.println(i++);
+				System.out.println(p);
+				if(p.getItemID().equals("sh601519")) {
+					System.out.println("**************");
+					break;
+				}				
+			}
+
+		}
+		
 	}
 }

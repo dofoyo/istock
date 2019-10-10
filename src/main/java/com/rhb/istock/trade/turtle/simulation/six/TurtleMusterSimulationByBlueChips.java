@@ -39,7 +39,7 @@ public class TurtleMusterSimulationByBlueChips {
 	
 	Integer pool = 21;
 	Integer top = 5;
-	BigDecimal initCash = new BigDecimal(1000000);
+	BigDecimal initCash = new BigDecimal(100000);
 	BigDecimal quota = new BigDecimal(20000); //买入每只股票的定额
 	
 	
@@ -78,13 +78,13 @@ public class TurtleMusterSimulationByBlueChips {
 						ms.put(entry.getKey(), entry.getValue());
 					}
 				}			
-				bavPaul.doIt_plus(musters, this.getTops(new ArrayList<Muster>(ms.values()), "bav"), date, flag);
-				bhlPaul.doIt_plus(musters, this.getTops(new ArrayList<Muster>(ms.values()), "bhl"), date, flag);
-				bdtPaul.doIt_plus(musters, this.getTops(new ArrayList<Muster>(ms.values()), "bdt"), date, flag);
+				bavPaul.doIt_plus(musters, this.getTops(new ArrayList<Muster>(ms.values()), "bav"), date);
+				bhlPaul.doIt_plus(musters, this.getTops(new ArrayList<Muster>(ms.values()), "bhl"), date);
+				bdtPaul.doIt_plus(musters, this.getTops(new ArrayList<Muster>(ms.values()), "bdt"), date);
 				
-				avbPaul.doIt_plus(musters, this.getTops(new ArrayList<Muster>(ms.values()), "avb"), date, flag);
-				hlbPaul.doIt_plus(musters, this.getTops(new ArrayList<Muster>(ms.values()), "hlb"), date, flag);
-				dtbPaul.doIt_plus(musters, this.getTops(new ArrayList<Muster>(ms.values()), "dtb"), date, flag);					
+				avbPaul.doIt_plus(musters, this.getTops(new ArrayList<Muster>(ms.values()), "avb"), date);
+				hlbPaul.doIt_plus(musters, this.getTops(new ArrayList<Muster>(ms.values()), "hlb"), date);
+				dtbPaul.doIt_plus(musters, this.getTops(new ArrayList<Muster>(ms.values()), "dtb"), date);					
 			}
 		}
 		

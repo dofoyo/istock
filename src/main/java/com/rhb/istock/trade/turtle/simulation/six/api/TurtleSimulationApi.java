@@ -188,7 +188,7 @@ public class TurtleSimulationApi {
 		Map<LocalDate, AmountEntity> avb = turtleSimulationRepository.getAmounts("avb");
 		Map<LocalDate, AmountEntity> dtb = turtleSimulationRepository.getAmounts("dtb");
 
-		for(LocalDate theDate : bhl.keySet()) {
+		for(LocalDate theDate : hlb.keySet()) {
 			if(theDate.isBefore(theEndDate) || theDate.equals(theEndDate)) {
 				view.add(theDate, 
 						bhl.get(theDate).getTotal(),
@@ -202,7 +202,6 @@ public class TurtleSimulationApi {
 	
 		return new ResponseContent<AllAmountView>(ResponseEnum.SUCCESS, view);
 	}
-
 	
 	@GetMapping("/turtle/simulation/breakers/{type}/{date}")
 	public ResponseContent<List<BreakerView>> getBreakers(
@@ -211,16 +210,17 @@ public class TurtleSimulationApi {
 			) {
 
 		List<BreakerView> views = new ArrayList<BreakerView>();
-
+		
+		LocalDate theDate = null;
 		try{
-			LocalDate theDate = LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+			theDate = LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 		}catch(Exception e){
 			new ResponseContent<List<BreakerView>>(ResponseEnum.ERROR, views);
 		}
 		
 		
 		Map<LocalDate,List<String>> breakers = turtleSimulationRepository.getBreakers(type);
-		List<String> ids = breakers.get(LocalDate.parse(date));
+		List<String> ids = breakers.get(theDate);
 		if(ids!=null && !ids.isEmpty()) {
 			for(String id : ids) {
 				views.add(new BreakerView(id,itemService.getItem(id).getName()));
@@ -248,11 +248,11 @@ public class TurtleSimulationApi {
 		//Map<LocalDate,List<String>> buys = turtleSimulationRepository.getBuys(type);
 		//Map<LocalDate,List<String>> sells = turtleSimulationRepository.getSells(type);
 		
-		Set<String> ids = this.generateHolds(type,theDate);
+		Set<Hold> ids = this.generateHolds(type,theDate);
 		//System.out.println("holds: " + ids);
 		if(ids!=null && !ids.isEmpty()) {
-			for(String id : ids) {
-				views.add(new HoldView(id,itemService.getItem(id).getName(),0));
+			for(Hold id : ids) {
+				views.add(new HoldView(id.getItemID(),id.getItemName(),id.getProfit().intValue()));
 			}
 		}
 		
@@ -328,17 +328,17 @@ public class TurtleSimulationApi {
 		return new ResponseContent<List<String>>(ResponseEnum.SUCCESS, dates);
 	}
 	
-	private Set<String> generateHolds(String type, LocalDate date){
+	private Set<Hold> generateHolds(String type, LocalDate date){
 		Holds holds = new Holds();
 		
-		Map<LocalDate,List<String>> buys = turtleSimulationRepository.getBuys(type);
+		Map<LocalDate,List<String>> buys = turtleSimulationRepository.getBuys(type); // itemID, itemName, profit
 		
 		Map<LocalDate,List<String>> sells = turtleSimulationRepository.getSells(type);
 		
 		for(Map.Entry<LocalDate,List<String>> entry : buys.entrySet()) {
 			if(entry.getKey().isBefore(date)) {
-				for(String id : entry.getValue()) {
-					holds.buy(id);
+				for(String str : entry.getValue()) {
+					holds.buy(str);
 				}
 			}
 		}
@@ -355,30 +355,85 @@ public class TurtleSimulationApi {
 	}
 	
 	class Holds{
-		private Map<String, Integer> ss = new HashMap<String,Integer>();
-		public void buy(String id) {
-			if(ss.containsKey(id)) {
-				ss.put(id, ss.get(id)+1);
+		private Map<String, Hold> hs = new HashMap<String,Hold>();
+		Hold hold;
+		public void buy(String str) {
+			String[] ss = str.split(",");
+			hold = hs.get(ss[0]);
+			if(hold == null) {
+				hs.put(ss[0], new Hold(str));
 			}else {
-				ss.put(id, 1);
+				hold.update(str);
 			}
 		}
 		
 		public void sell(String id) {
-			if(ss.containsKey(id)) {
-				ss.put(id, ss.get(id)-1);
+			hold = hs.get(id);
+			if(hold != null) {
+				hold.deCount();
+			}else {
+				System.err.println("There is ERROR: no buy, but sell!");
 			}
 		}
 		
-		public Set<String> getResult(){
-			Set<String> ids = new HashSet<String>();
-			for(Map.Entry<String, Integer> entry : ss.entrySet()) {
-				if(entry.getValue() != 0) {
-					ids.add(entry.getKey());
+		public Set<Hold> getResult(){
+			Set<Hold> ids = new HashSet<Hold>();
+			for(Map.Entry<String, Hold> entry : hs.entrySet()) {
+				if(entry.getValue().isHold()) {
+					ids.add(entry.getValue());
 				}
 			}
 			return ids;
+		}		
+	}
+	class Hold{
+		private String itemID;
+		private String itemName;
+		private Integer count;
+		private BigDecimal profit;
+		
+		public Hold(String str) {
+			String[] ss = str.split(",");
+			this.itemID = ss[0];
+			this.itemName = ss[1];
+			this.profit = new BigDecimal(ss[2]);
+			this.count = 1;
+		}
+		
+		public void update(String str) {
+			String[] ss = str.split(",");
+			this.profit = this.profit.add(new BigDecimal(ss[2]));
+			this.count++;
+		}
+		
+		public boolean isHold() {
+			return count==0 ? false : true;
+		}
+		
+		public String getItemID() {
+			return itemID;
+		}
+		public void setItemID(String itemID) {
+			this.itemID = itemID;
+		}
+		public String getItemName() {
+			return itemName;
+		}
+		public void setItemName(String itemName) {
+			this.itemName = itemName;
+		}
+		public Integer getCount() {
+			return count;
+		}
+		public void deCount() {
+			this.count--;
+		}
+		public BigDecimal getProfit() {
+			return profit;
+		}
+		public void setProfit(BigDecimal profit) {
+			this.profit = profit;
 		}
 	}
-	
+
 }

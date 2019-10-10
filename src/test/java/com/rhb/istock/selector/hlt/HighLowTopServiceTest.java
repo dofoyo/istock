@@ -1,5 +1,6 @@
 package com.rhb.istock.selector.hlt;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.junit.Test;
@@ -18,7 +19,7 @@ public class HighLowTopServiceTest {
 	
 	@Test
 	public void getLatestHighLowTops() {
-		List<String> ids = highLowTopService.getLatestTops(100);
+		List<String> ids = highLowTopService.getTops(100);
 		for(String id: ids) {
 			if(id.startsWith("sh")){
 				System.out.println(id);

@@ -57,8 +57,8 @@ public class SelectorServiceImp implements SelectorService{
 	}
 
 	@Override
-	public Map<String,Integer> getLatestHighLowTops(Integer top) {
-		return hlt.getLatestHighLowTops(top);
+	public Map<String,Integer> getHighLowTops(Integer top) {
+		return hlt.getHighLowTops(top);
 	}
 
 	@Override

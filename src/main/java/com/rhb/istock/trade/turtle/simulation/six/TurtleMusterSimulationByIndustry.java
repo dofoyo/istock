@@ -43,7 +43,7 @@ public class TurtleMusterSimulationByIndustry {
 	
 	Integer pool = 21;
 	Integer top = 5;
-	BigDecimal initCash = new BigDecimal(1000000);
+	BigDecimal initCash = new BigDecimal(100000);
 	BigDecimal quota = new BigDecimal(20000); //买入每只股票的定额
 	
 	
@@ -74,7 +74,7 @@ public class TurtleMusterSimulationByIndustry {
 
 				musters = kdataService.getMusters(date,industry);
 				if(musters!=null && musters.size()>0) {
-					hlbPaul.doIt_plus(musters, this.getTops(new ArrayList<Muster>(musters.values()), "hlb"), date, flag);
+					hlbPaul.doIt_plus(musters, this.getTops(new ArrayList<Muster>(musters.values()), "hlb"), date);
 				}
 				years.add(date.getYear());
 			}

@@ -24,6 +24,7 @@ import com.rhb.istock.item.ItemService;
 import com.rhb.istock.kdata.Kbar;
 import com.rhb.istock.kdata.Kdata;
 import com.rhb.istock.kdata.KdataService;
+import com.rhb.istock.kdata.Muster;
 import com.rhb.istock.kdata.api.KdatasView;
 import com.rhb.istock.selector.SelectorService;
 import com.rhb.istock.selector.hold.HoldEntity;
@@ -32,6 +33,7 @@ import com.rhb.istock.trade.turtle.domain.Tfeature;
 import com.rhb.istock.trade.turtle.domain.Tbar;
 import com.rhb.istock.trade.turtle.domain.Turtle;
 import com.rhb.istock.trade.turtle.operation.api.HoldView;
+import com.rhb.istock.trade.turtle.operation.api.PotentialView;
 import com.rhb.istock.trade.turtle.operation.api.TurtleView;
 
 @Service("turtleOperationServiceImp")
@@ -57,6 +59,7 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 	Map<String,Integer> avtops = null;
 	
 	Integer bxxtops = 8;
+	Integer tops = 21;
 	
 	protected static final Logger logger = LoggerFactory.getLogger(TurtleOperationServiceImp.class);
 	
@@ -67,8 +70,8 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 		
 		this.turtle = new Turtle();
 		this.potentials = null;
-		this.hltops = selectorService.getLatestHighLowTops(21);
-		this.avtops = selectorService.getLatestAverageAmountTops(21);
+		this.hltops = selectorService.getHighLowTops(tops);
+		this.avtops = selectorService.getLatestAverageAmountTops(tops);
 		
 		logger.info("\nTurtleOperationService init done!");
 		long used = (System.currentTimeMillis() - beginTime)/1000; 
@@ -178,6 +181,55 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 			view.setName(favors.get(view.getItemID()));
 		}
 		
+		return views;
+	}
+	
+
+	@Override
+	public List<PotentialView> getPotentials(String type, LocalDate date) {
+		long beginTime=System.currentTimeMillis(); 
+		logger.info("getting potentials of "+type+" views of "+date.toString()+" ......");
+		List<PotentialView> views = new ArrayList<PotentialView>();
+		PotentialView view;
+		
+		List<Potential> potentials = new ArrayList<Potential>(selectorService.getPotentials(date).values());
+		
+		//System.out.println(potentials.size());
+		
+		Collections.sort(potentials, new Comparator<Potential>() {
+			@Override
+			public int compare(Potential o1, Potential o2) {
+				if(type.equals("hlb")) {
+					if(o1.getHLGap().compareTo(o2.getHLGap())==0) {
+						return o1.getClose().compareTo(o2.getClose());
+					}else {
+						return o1.getHLGap().compareTo(o2.getHLGap());
+					}
+				}else if(type.equals("avb")) {
+					return o2.getAverageAmount().compareTo(o1.getAverageAmount());
+				}else {
+					return 0;
+				}
+			}
+		});
+		
+		int i=0;
+		for(Potential potential : potentials) {
+			view = new PotentialView(potential.getItemID(),potential.getItemName());
+			views.add(view);
+			if(i++ > tops) {
+				break;
+			}
+		}
+		
+		//System.out.println(views.size());
+		
+		//List<Muster> musters = selectorService.getTops(21,date);
+		
+		logger.info("\ngetting potentials done!");
+		long used = (System.currentTimeMillis() - beginTime)/1000; 
+		logger.info("用时：" + used + "秒");     
+
 		return views;
 	}
 
@@ -501,5 +553,6 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 
 		return views;
 	}
+
 	
 }

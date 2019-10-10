@@ -32,8 +32,10 @@ public class PotentialService {
 		Map<String,Muster> musters = kdataService.getLatestMusters();
 		
 		for(Muster item : musters.values()) {
-			if(item.getHLGap()<50 && item.getHNGap()<10) {
+			//if(item.getHLGap()<50 && item.getHNGap()<10) {
+			if(item.getHNGap()<10) {
 				potential =  new Potential(item.getItemID(),
+						item.getItemName(),
 						item.getAmount(),
 						item.getAverageAmount(),
 						item.getHighest(),
@@ -55,8 +57,10 @@ public class PotentialService {
 		Map<String,Muster> musters = kdataService.getMusters(date);
 		
 		for(Muster item : musters.values()) {
-			if(item.getHLGap()<50 && item.getHNGap()<10) {
+			//if(item.getHLGap()<50 && item.getHNGap()<10) {
+			if(item.getHNGap()<10) {
 				potential =  new Potential(item.getItemID(),
+						item.getItemName(),
 						item.getAmount(),
 						item.getAverageAmount(),
 						item.getHighest(),

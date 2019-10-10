@@ -14,7 +14,16 @@ public class Muster {
 	private BigDecimal dropPrice;
 	private BigDecimal latestPrice;  //当日收盘价
 	private Integer limited;        //当日是否一字板
+	private Integer industry_hot=0;
 	
+	public Integer getIndustry_hot() {
+		return industry_hot;
+	}
+
+	public void setIndustry_hot(Integer industry_hot) {
+		this.industry_hot = industry_hot;
+	}
+
 	public Integer getLimited() {
 		return limited;
 	}

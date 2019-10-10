@@ -40,7 +40,7 @@ public class TurtleMusterSimulationTest {
 	public void test() {
 		LocalDate beginDate = LocalDate.parse("2019-06-01");
 		LocalDate endDate = LocalDate.parse("2019-06-14");
-		turtleMusterSimulation.generateDailyRatios(beginDate,endDate);
+		//turtleMusterSimulation.generateDailyRatios(beginDate,endDate);
 		
 		Map<String,Map<String,String>> results = turtleSimulationRepository.getDailyMeans();
 		System.out.println(results);
