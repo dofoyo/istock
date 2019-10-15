@@ -3,12 +3,50 @@ package com.rhb.istock.trade.turtle.operation.api;
 public class PotentialView {
 	private String itemID;
 	private String itemName;
+	private String industry;
+	private Integer industryHot;
+	private Integer hlGap;
+	private Integer hnGap;
 	
-	public PotentialView(String itemID, String name) {
+	public PotentialView(String itemID, String name, String industry, Integer hlGap, Integer hnGap) {
 		this.itemID = itemID;
 		this.itemName = name;
+		this.industry = industry;
+		this.hlGap = hlGap;
+		this.hnGap = hnGap;
 	}
 	
+	public Integer getHnGap() {
+		return hnGap;
+	}
+
+	public void setHnGap(Integer hnGap) {
+		this.hnGap = hnGap;
+	}
+
+	public Integer getHlGap() {
+		return hlGap;
+	}
+
+	public void setHlGap(Integer hlGap) {
+		this.hlGap = hlGap;
+	}
+
+	public String getIndustry() {
+		return industry;
+	}
+
+	public void setIndustry(String industry) {
+		this.industry = industry;
+	}
+
+	public Integer getIndustryHot() {
+		return industryHot;
+	}
+
+	public void setIndustryHot(Integer industryHot) {
+		this.industryHot = industryHot;
+	}
 
 	public String getItemID() {
 		return itemID;
@@ -25,11 +63,11 @@ public class PotentialView {
 	public void setItemName(String itemName) {
 		this.itemName = itemName;
 	}
-
 	
 	@Override
 	public String toString() {
-		return "PotentialView [itemID=" + itemID + ", itemName=" + itemName + "]";
+		return "PotentialView [itemID=" + itemID + ", itemName=" + itemName + ", industry=" + industry + ", industryHot="
+				+ industryHot + "]";
 	}
 
 }

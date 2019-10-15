@@ -294,7 +294,7 @@ public class Account {
 		BigDecimal quota = this.cash.divide(new BigDecimal(position),BigDecimal.ROUND_DOWN);
 		for(Muster item : items) {
 			this.prices.put(item.getItemID(), item.getLatestPrice());
-			this.open(item.getItemID(), item.getItemName(), item.getIndustry(), this.getQuantity(quota, item.getLatestPrice()), "" , item.getLatestPrice());
+			this.open(item.getItemID(), item.getItemName(), item.getIndustry(), this.getQuantity(quota, item.getLatestPrice()), item.getIndustry_hot().toString() , item.getLatestPrice());
 		}
 	}
 	

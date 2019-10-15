@@ -9,5 +9,6 @@ import com.rhb.istock.kdata.Muster;
 public interface HighLowTopService {
 	public Map<String,Integer> getHighLowTops(Integer top);
 	public List<String> getTops(Integer top);
+	public List<Muster> getTops(LocalDate date, Integer top);
 
 	}

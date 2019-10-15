@@ -16,6 +16,10 @@ public class Muster {
 	private Integer limited;        //当日是否一字板
 	private Integer industry_hot=0;
 	
+	public boolean isPotential() {
+		return this.getHNGap()<10 && !this.isDrop();
+	}
+	
 	public Integer getIndustry_hot() {
 		return industry_hot;
 	}
@@ -47,6 +51,10 @@ public class Muster {
 	public void setItemName(String itemName) {
 		this.itemName = itemName;
 	}
+	
+	public Integer getLNGap() {
+		return latestPrice.subtract(lowest).divide(lowest,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)).intValue();
+	}
 
 	public Integer getHNGap() {
 		return highest.subtract(latestPrice).divide(latestPrice,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)).intValue();
@@ -64,6 +72,14 @@ public class Muster {
 	
 	public boolean isDrop() {
 		return latestPrice.compareTo(dropPrice)==-1;
+	}
+	
+	public boolean isNewLowest() {
+		return latestPrice.compareTo(lowest)==-1;
+	}
+	
+	public boolean isUp() {
+		return latestPrice.compareTo(dropPrice)==1;
 	}
 	
 	public boolean isBreaker() {
@@ -134,7 +150,8 @@ public class Muster {
 	public String toString() {
 		return "Muster [itemID=" + itemID + ", itemName=" + itemName + ", industry=" + industry + ", amount=" + amount
 				+ ", averageAmount=" + averageAmount + ", highest=" + highest + ", lowest=" + lowest + ", close="
-				+ close + ", dropPrice=" + dropPrice + ", latestPrice=" + latestPrice + "]";
+				+ close + ", dropPrice=" + dropPrice + ", latestPrice=" + latestPrice + ", limited=" + limited
+				+ ", industry_hot=" + industry_hot + "]";
 	}
 	
 	

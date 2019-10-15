@@ -33,6 +33,7 @@ import com.rhb.istock.trade.turtle.domain.Tfeature;
 import com.rhb.istock.trade.turtle.domain.Tbar;
 import com.rhb.istock.trade.turtle.domain.Turtle;
 import com.rhb.istock.trade.turtle.operation.api.HoldView;
+import com.rhb.istock.trade.turtle.operation.api.IndustryView;
 import com.rhb.istock.trade.turtle.operation.api.PotentialView;
 import com.rhb.istock.trade.turtle.operation.api.TurtleView;
 
@@ -215,7 +216,7 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 		
 		int i=0;
 		for(Potential potential : potentials) {
-			view = new PotentialView(potential.getItemID(),potential.getItemName());
+			view = new PotentialView(potential.getItemID(),potential.getItemName(),potential.getIndustry(),potential.getHLGap(), potential.getHNGap());
 			views.add(view);
 			if(i++ > tops) {
 				break;
@@ -551,6 +552,48 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 
 		List<TurtleView> views = getTurtleViews(ps,"powers");
 
+		return views;
+	}
+
+	@Override
+	public Map<String,IndustryView> getPotentialIndustrys(LocalDate date) {
+		long beginTime=System.currentTimeMillis(); 
+		logger.info("getting potentials industrys of "+date.toString()+" ......");
+		Map<String,IndustryView> industryViews = new HashMap<String,IndustryView>();
+		IndustryView industryView;
+		PotentialView potentialView;
+		
+		List<Potential> potentials = new ArrayList<Potential>(selectorService.getPotentials(date).values());
+		
+		int i=0;
+		for(Potential potential : potentials) {
+			potentialView = new PotentialView(potential.getItemID(),potential.getItemName(),potential.getIndustry(),potential.getHLGap(),potential.getHNGap());
+			industryView = industryViews.get(potential.getIndustry());
+			if(industryView == null) {
+				industryView = new IndustryView(potential.getIndustry());
+				industryViews.put(potential.getIndustry(), industryView);
+			}
+			industryView.addPotential(potentialView);
+		}
+
+		logger.info(String.format("\ngetting potentials industrys done! there are %d industrys", industryViews.size()));
+		long used = (System.currentTimeMillis() - beginTime)/1000; 
+		logger.info("用时：" + used + "秒");     
+		
+		return industryViews;
+	}
+
+	@Override
+	public List<PotentialView> getPotentials_hlb(LocalDate date) {
+		List<PotentialView> views = new ArrayList<PotentialView>();
+		List<Potential> potentials = selectorService.getPotentials_hlb(date, tops);
+		PotentialView view;
+		for(Potential potential : potentials) {
+			view = new PotentialView(potential.getItemID(),potential.getItemName(),potential.getIndustry(),potential.getHLGap(), potential.getHNGap());
+			view.setIndustryHot(potential.getIndustryHot());
+			views.add(view);
+		}
+		
 		return views;
 	}
 

@@ -2,9 +2,11 @@ package com.rhb.istock.trade.turtle.operation;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 import com.rhb.istock.kdata.api.KdatasView;
 import com.rhb.istock.trade.turtle.operation.api.HoldView;
+import com.rhb.istock.trade.turtle.operation.api.IndustryView;
 import com.rhb.istock.trade.turtle.operation.api.PotentialView;
 import com.rhb.istock.trade.turtle.operation.api.TurtleView;
 
@@ -24,6 +26,8 @@ public interface TurtleOperationService {
 	public List<TurtleView> getFavors();
 	public List<TurtleView> getPotentials(String type);
 	public List<PotentialView> getPotentials(String type, LocalDate date);
+	public List<PotentialView> getPotentials_hlb(LocalDate date);
+	public Map<String,IndustryView> getPotentialIndustrys(LocalDate date);
 	public void redoPotentials();
 	public String[] getTopics();
 	public List<TurtleView> getPowers();

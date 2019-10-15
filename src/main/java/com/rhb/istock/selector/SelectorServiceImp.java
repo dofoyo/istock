@@ -127,4 +127,9 @@ public class SelectorServiceImp implements SelectorService{
 	public List<String> getPowerIDs() {
 		return potentialService.getPowerIDs();
 	}
+
+	@Override
+	public List<Potential> getPotentials_hlb(LocalDate date, Integer tops) {
+		return potentialService.getPotentials_hlb(date, tops);
+	}
 }

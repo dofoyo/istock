@@ -26,6 +26,7 @@ import com.rhb.istock.item.ItemService;
 import com.rhb.istock.kdata.Kbar;
 import com.rhb.istock.kdata.KdataService;
 import com.rhb.istock.kdata.api.KdatasView;
+import com.rhb.istock.trade.hunt.HuntSimulation;
 import com.rhb.istock.trade.turtle.simulation.six.TurtleMusterSimulation;
 import com.rhb.istock.trade.turtle.simulation.six.TurtleMusterSimulationByBlueChips;
 import com.rhb.istock.trade.turtle.simulation.six.TurtleMusterSimulationByCompass;
@@ -62,6 +63,10 @@ public class TurtleSimulationApi {
 	@Autowired
 	@Qualifier("kdataServiceImp")
 	KdataService kdataService;
+	
+	@Autowired
+	@Qualifier("huntSimulation")
+	HuntSimulation huntSimulation;
 	
 	@GetMapping("/turtle/simulation/kdatas/{itemID}")
 	public ResponseContent<KdatasView> getKdatas(@PathVariable(value="itemID") String itemID,
@@ -120,6 +125,7 @@ public class TurtleSimulationApi {
 		}
 		
 		turtleMusterSimulation.simulate(theBeginDate, theEndDate);
+		huntSimulation.simulate(theBeginDate, theEndDate);
 		//turtleMusterSimulationByIndustry.simulate(theBeginDate, theEndDate);
 		//turtleMusterSimulationByCompass.simulate(theBeginDate, theEndDate);
 		//turtleMusterSimulationByBlueChips.simulate(theBeginDate, theEndDate);

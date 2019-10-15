@@ -5,9 +5,10 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Potential {
+public class Potential implements Comparable<Potential>{
 	private String itemID;
 	private String itemName;
+	private String industry;
 	private BigDecimal amount;
 	private BigDecimal averageAmount;
 	private BigDecimal highest;
@@ -21,10 +22,12 @@ public class Potential {
 	private Integer dtb;
 	private Integer avb;
 	private LocalDate date;
+	private Integer industryHot;
 	
-	public Potential(String itemID, String itemName, BigDecimal averageAmount, BigDecimal amount, BigDecimal highest, BigDecimal lowest, BigDecimal close,BigDecimal latestPrice) {
+	public Potential(String itemID, String itemName, String industry, BigDecimal averageAmount, BigDecimal amount, BigDecimal highest, BigDecimal lowest, BigDecimal close,BigDecimal latestPrice) {
 		this.itemID = itemID;
 		this.itemName = itemName;
+		this.industry = industry;
 		this.amount = amount;
 		this.averageAmount = averageAmount;
 		this.highest = highest;
@@ -33,6 +36,14 @@ public class Potential {
 		this.latestPrice = latestPrice;
 	}
 	
+	public Integer getIndustryHot() {
+		return industryHot;
+	}
+
+	public void setIndustryHot(Integer industryHot) {
+		this.industryHot = industryHot;
+	}
+
 	public List<String> getLabels() {
 		List<String> labels = new ArrayList<String>();
 		//if(bhl!=null) labels.add("bhl(" + String.format("%02d", bhl) + ")");
@@ -44,6 +55,14 @@ public class Potential {
 		return labels;
 	}
 	
+	public String getIndustry() {
+		return industry;
+	}
+
+	public void setIndustry(String industry) {
+		this.industry = industry;
+	}
+
 	public String getItemName() {
 		return itemName;
 	}
@@ -66,6 +85,10 @@ public class Potential {
 
 	public String getStatus() {
 		return latestPrice.compareTo(highest)==1 ? "2" : "0";
+	}
+
+	public Integer getLNGap() {
+		return latestPrice.subtract(lowest).divide(lowest,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)).intValue();
 	}
 	
 	public Integer getHLGap() {
@@ -199,6 +222,15 @@ public class Potential {
 
 	public void setDate(LocalDate date) {
 		this.date = date;
+	}
+
+	@Override
+	public int compareTo(Potential o) {
+		if(this.getLNGap().compareTo(o.getLNGap())==0) {
+			return this.getLatestPrice().compareTo(o.getLatestPrice());
+		}else {
+			return this.getLNGap().compareTo(o.getLNGap());
+		}
 	}
 	
 	

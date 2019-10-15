@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -38,6 +39,8 @@ public class TurtleMusterSimulation {
 	@Qualifier("turtleSimulationRepository")
 	TurtleSimulationRepository turtleSimulationRepository;
 	
+	Integer industry_potential_count = 21;
+	Integer industry_hot = 8;
 	Integer pool = 21;
 	Integer top = 5;
 	BigDecimal initCash = new BigDecimal(100000);
@@ -55,44 +58,44 @@ public class TurtleMusterSimulation {
 		Paul bhlPaul = new Paul(initCash, quota);
 		Paul bdtPaul = new Paul(initCash, quota);
 		Paul avbPaul = new Paul(initCash, quota);
-		Paul dtbPaul = new Paul(initCash, quota);
+		//Paul dtbPaul = new Paul(initCash, quota);
 		Paul hlbPaul = new Paul(initCash, quota);
 		
 		Map<String,Muster> musters;
 		List<Muster> breakers;
-		Map<String,Integer> industrysOfPotential;
+		Map<String,Integer> industryHots;
 		Integer industry_hot;
+		//IndustryPotentials ips;
 		
 		long days = endDate.toEpochDay()- beginDate.toEpochDay();
 		int i=1;
 		for(LocalDate date = beginDate; (date.isBefore(endDate) || date.equals(endDate)); date = date.plusDays(1)) {
 			Progress.show((int)days, i++, date.toString());
 			
+			//ips = new IndustryPotentials();
+
 			musters = kdataService.getMusters(date);
-			industrysOfPotential = new HashMap<String,Integer>();
 			breakers = new ArrayList<Muster>();
+			industryHots = new HashMap<String,Integer>();
 			for(Muster m : musters.values()) {
-				if(m.getHNGap()<10) {
-					industry_hot = industrysOfPotential.get(m.getIndustry());
-					//System.out.println(m.getIndustry());
+				if(m.isPotential()) {
+					industry_hot = industryHots.get(m.getIndustry());
 					if(industry_hot == null) {
-						industrysOfPotential.put(m.getIndustry(), 1);
+						industryHots.put(m.getIndustry(), 1);
 					}else {
 						industry_hot = industry_hot + 1;
-						industrysOfPotential.put(m.getIndustry(), industry_hot);
+						industryHots.put(m.getIndustry(), industry_hot);
 					}						
 				}
-			
+				
+				//ips.put(m);
+				
 				if(m.isBreaker()) {
 					breakers.add(m);
 				}
 			}
 			
-			//logger.info(industrysOfPotential.toString());
-			
-			for(Muster m : breakers) {
-				m.setIndustry_hot(industrysOfPotential.get(m.getIndustry()));
-			}
+			//logger.info(date.toString());
 			
 			if(musters!=null && musters.size()>0) {
 				bavPaul.doIt_plus(musters, this.getBxxTops(breakers, "bav"), date);
@@ -100,10 +103,9 @@ public class TurtleMusterSimulation {
 				bdtPaul.doIt_plus(musters, this.getBxxTops(breakers, "bdt"), date);
 				
 				avbPaul.doIt_plus(musters, this.getxxBTops(new ArrayList<Muster>(musters.values()), "avb"), date);
-				dtbPaul.doIt_plus(musters, this.getxxBTops(new ArrayList<Muster>(musters.values()), "dtb"), date);
-				hlbPaul.doIt_plus(musters, this.getHLBTops(new ArrayList<Muster>(musters.values())), date);
+				//dtbPaul.doIt_plus(musters, this.getxxBTops(new ArrayList<Muster>(musters.values()), "dtb"), date);
+				hlbPaul.doIt_plus(musters, this.getHLBTops(new ArrayList<Muster>(musters.values()),industryHots), date);
 				
-				//hlbPaul.doIt_plus1(musters, this.getxxBTops(new ArrayList<Muster>(musters.values()), "hlb"), date, musters.size(), breakers.size());
 			}
 		}
 		
@@ -112,7 +114,7 @@ public class TurtleMusterSimulation {
 		Map<String, String> bdtResult = bdtPaul.result();
 
 		Map<String, String> avbResult = avbPaul.result();
-		Map<String, String> dtbResult = dtbPaul.result();
+		//Map<String, String> dtbResult = dtbPaul.result();
 		Map<String, String> hlbResult = hlbPaul.result();
 
 		
@@ -121,7 +123,7 @@ public class TurtleMusterSimulation {
 		turtleSimulationRepository.save("bdt", bdtResult.get("breakers"), bdtResult.get("CSV"), bdtResult.get("dailyAmount"));
 
 		turtleSimulationRepository.save("avb", avbResult.get("breakers"), avbResult.get("CSV"), avbResult.get("dailyAmount"));
-		turtleSimulationRepository.save("dtb", dtbResult.get("breakers"), dtbResult.get("CSV"), dtbResult.get("dailyAmount"));
+		//turtleSimulationRepository.save("dtb", dtbResult.get("breakers"), dtbResult.get("CSV"), dtbResult.get("dailyAmount"));
 		turtleSimulationRepository.save("hlb", hlbResult.get("breakers"), hlbResult.get("CSV"), hlbResult.get("dailyAmount"));
 
 		//System.out.println("simulate done!");
@@ -184,12 +186,17 @@ public class TurtleMusterSimulation {
 		}
 	}
 	
-	private List<Muster> getHLBTops(List<Muster> musters){
+	private List<Muster> getHLBTops(List<Muster> musters,Map<String,Integer> industryHots){
 		List<Muster> breakers = new ArrayList<Muster>();
 
 		Collections.sort(musters, new Comparator<Muster>() {
 			@Override
 			public int compare(Muster o1, Muster o2) {
+/*				if(o1.getHLGap().compareTo(o2.getHLGap())==0) {
+					return o2.getHNGap().compareTo(o1.getHNGap());
+				}else {
+					return o1.getHLGap().compareTo(o2.getHLGap());//A-Z
+				}	*/
 				return o1.getHLGap().compareTo(o2.getHLGap());//A-Z
 			}
 		});
@@ -197,31 +204,71 @@ public class TurtleMusterSimulation {
 		Muster m;
 		for(int i=0; i<musters.size() && i<pool; i++) {
 			m = musters.get(i);
-			if(m.isBreaker()) {
+			if(m.isBreaker()
+					//&& industryHots.get(m.getIndustry())>industry_hot
+					){
+				m.setIndustry_hot(industryHots.get(m.getIndustry()));
 				breakers.add(m);
+				//logger.info(m.toString());
 			}
 		}
 
-		Collections.sort(breakers, new Comparator<Muster>() {
+/*		Collections.sort(breakers, new Comparator<Muster>() {
 			@Override
 			public int compare(Muster o1, Muster o2) {
-				if(o2.getIndustry_hot().compareTo(o1.getIndustry_hot())==0) {
-					if(o1.getHLGap().compareTo(o2.getHLGap())==0) {
-						return o1.getLatestPrice().compareTo(o2.getLatestPrice());
-					}else {
-						return o1.getHLGap().compareTo(o2.getHLGap());//A-Z
-					}						
-				}else {
-					return o2.getIndustry_hot().compareTo(o1.getIndustry_hot());
-				}
+				return o2.getIndustry_hot().compareTo(o1.getIndustry_hot());
 			}
-		});
+		});*/
 		
 		
 		if(breakers.size()>top) {
 			return breakers.subList(0, top);
 		}else {
 			return breakers;
+		}
+	}
+	
+	class IndustryPotentials {
+		Map<String,List<Muster>> potentials = new HashMap<String,List<Muster>>();
+		List tmp;
+		public void put(Muster muster) {
+			if(muster.isPotential()) {
+				tmp = potentials.get(muster.getIndustry()); 
+				if(tmp == null) {
+					tmp = new ArrayList<Muster>();
+					potentials.put(muster.getIndustry(), tmp);
+				}
+				tmp.add(muster);
+			}
+		}
+		
+		public List<Muster> getBreakers(){
+			List<Muster> breakers = new ArrayList<Muster>();
+			for(Map.Entry<String, List<Muster>> entry : potentials.entrySet()) {
+				if(entry.getValue().size()>industry_potential_count) {
+					StringBuffer sb = new StringBuffer();
+					for(Muster m : entry.getValue()) {
+						if(m.isBreaker()) {
+							breakers.add(m);
+							sb.append(m.getItemName());
+							sb.append(",");
+						}
+					}
+					if(sb.length()>0) {
+						//logger.info(String.format("%s: %d potentials, breakers:%s",  entry.getKey(),entry.getValue().size(),sb.toString()));
+					}
+				}
+			}
+			
+			Collections.sort(breakers, new Comparator<Muster>() {
+				@Override
+				public int compare(Muster o1, Muster o2) {
+					return o1.getHLGap().compareTo(o2.getHLGap());
+				}
+				
+			});
+			
+			return breakers.subList(0, breakers.size()>top ? top : breakers.size());
 		}
 	}
 	
