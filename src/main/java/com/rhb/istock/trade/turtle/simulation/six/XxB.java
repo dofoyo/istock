@@ -15,12 +15,11 @@ import org.slf4j.LoggerFactory;
 import com.rhb.istock.fund.Account;
 import com.rhb.istock.kdata.Muster;
 
-public class Paul {
-	protected static final Logger logger = LoggerFactory.getLogger(Paul.class);
+public class XxB {
+	protected static final Logger logger = LoggerFactory.getLogger(XxB.class);
 
 	private Account account = null;
 	private BigDecimal initCash = null;
-	private BigDecimal quota = null;
 	private Map<Integer,BigDecimal> yearAmount;
 	
 	private StringBuffer dailyAmount_sb = new StringBuffer("date,cash,value,total\n");
@@ -30,9 +29,8 @@ public class Paul {
 	private Integer max_down_ratio = -5; //当前总资产相比highest下跌超过此数值，清仓
 	private Integer breaker_ratio = 2; //清仓后，breakers与musters的比率超过此数值，再次开始买入操作
 	
-	public Paul(BigDecimal initCash, BigDecimal quote) {
+	public XxB(BigDecimal initCash) {
 		account = new Account(initCash);
-		this.quota = quote;
 		this.initCash = initCash;
 		this.yearAmount = new HashMap<Integer,BigDecimal>();
 	}
@@ -63,7 +61,7 @@ public class Paul {
 		for(Muster breaker : breakers) {
 			if(!holdIDs.contains(breaker.getItemID()) && !breaker.isUpLimited() && breaker.getHLGap()<50) {
 				account.refreshHoldsPrice(breaker.getItemID(), breaker.getLatestPrice());
-				account.open(breaker.getItemID(),breaker.getItemName(), breaker.getIndustry(), this.getQuantity(breaker.getLatestPrice()), "", breaker.getLatestPrice());
+				account.open(breaker.getItemID(),breaker.getItemName(), breaker.getIndustry(), this.getQuantity(account.getCash(),breaker.getLatestPrice()), "", breaker.getLatestPrice());
 			}
 			breakers_sb.append(breaker.getItemID());
 			breakers_sb.append(",");
@@ -206,6 +204,8 @@ public class Paul {
 			}
 		}				
 		
+		holdItemIDs = account.getItemIDsOfHolds();
+		
 		Set<Muster> dds = new HashSet<Muster>();  //用set，无重复，表示不可加仓
 		//List<Muster> dds = new ArrayList<Muster>();  //用list，有重复，表示可以加仓
 		
@@ -213,7 +213,7 @@ public class Paul {
 		breakers_sb.append(date.toString() + ",");
 		StringBuffer sb = new StringBuffer();
 		for(Muster breaker : breakers) {
-			if(!breaker.isUpLimited()) {
+			if(!breaker.isUpLimited() && !breaker.isDownLimited() && !holdItemIDs.contains(breaker.getItemID())) {
 				dds.add(breaker);
 				sb.append(breaker.getItemName());
 				sb.append(",");
@@ -275,8 +275,8 @@ public class Paul {
 		return result;
 	}
 	
-	private Integer getQuantity(BigDecimal price) {
-		return this.quota.divide(price,BigDecimal.ROUND_DOWN).divide(new BigDecimal(100),BigDecimal.ROUND_DOWN).intValue()*100;
+	private Integer getQuantity(BigDecimal cash,BigDecimal price) {
+		return cash.divide(price,BigDecimal.ROUND_DOWN).divide(new BigDecimal(100),BigDecimal.ROUND_DOWN).intValue()*100;
 	}
 
 }

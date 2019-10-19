@@ -82,7 +82,7 @@ public class Compass {
 		long beginTime=System.currentTimeMillis(); 
 		System.out.println("\nrun with new lost industrys from " + beginDate + " to " + endDate +" ......");
 		
-		Paul paul = new Paul(new BigDecimal(1000000), new BigDecimal(20000));
+		XxB paul = new XxB(new BigDecimal(1000000));
 		
 		Map<String,Muster> musters = null;
 		Map<String,Muster> ms = null;

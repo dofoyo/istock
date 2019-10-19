@@ -40,7 +40,6 @@ public class TurtleMusterSimulationByBlueChips {
 	Integer pool = 21;
 	Integer top = 5;
 	BigDecimal initCash = new BigDecimal(100000);
-	BigDecimal quota = new BigDecimal(20000); //买入每只股票的定额
 	
 	
 	/*
@@ -50,12 +49,12 @@ public class TurtleMusterSimulationByBlueChips {
 		long beginTime=System.currentTimeMillis(); 
 		System.out.println("simulate by compass from " + beginDate + " to " + endDate +" ......");
 		
-		Paul bavPaul = new Paul(initCash, quota);
-		Paul bhlPaul = new Paul(initCash, quota);
-		Paul bdtPaul = new Paul(initCash, quota);
-		Paul avbPaul = new Paul(initCash, quota);
-		Paul dtbPaul = new Paul(initCash, quota);
-		Paul hlbPaul = new Paul(initCash, quota);
+		XxB bavPaul = new XxB(initCash);
+		XxB bhlPaul = new XxB(initCash);
+		XxB bdtPaul = new XxB(initCash);
+		XxB avbPaul = new XxB(initCash);
+		XxB dtbPaul = new XxB(initCash);
+		XxB hlbPaul = new XxB(initCash);
 		
 		Map<String,Muster> musters = null;
 		Map<String,Muster> ms = null;

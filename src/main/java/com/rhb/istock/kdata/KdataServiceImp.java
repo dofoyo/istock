@@ -63,8 +63,6 @@ public class KdataServiceImp implements KdataService{
 	private Integer dropDuration;
 	
 	private String sseiID = "sh000001"; //上证指数
-	//private Integer openDuration = 89;
-	//private Integer dropDuration = 21;
 
 	protected static final Logger logger = LoggerFactory.getLogger(KdataServiceImp.class);
 			
@@ -390,7 +388,6 @@ public class KdataServiceImp implements KdataService{
 		Map<String, MusterEntity> entities = musterRepositoryImp.getMusters(date);
 		
 		for(MusterEntity entity : entities.values()) {
-				//System.out.println(entity.getItemID());
 				muster = new Muster();
 				muster.setItemID(entity.getItemID());
 				muster.setItemName(itemService.getItem(entity.getItemID()).getName());
@@ -411,7 +408,7 @@ public class KdataServiceImp implements KdataService{
 	}
 	
 	@Override
-	public Map<String,Muster> getMusters(LocalDate date, Set<String> excludeIndustrys) {
+	public Map<String,Muster> getMusters(LocalDate date, Set<String> includeIndustrys) {
 		Map<String,Muster> musters = new HashMap<String,Muster>();
 		Muster muster;
 		String itemName;
@@ -422,7 +419,7 @@ public class KdataServiceImp implements KdataService{
 		for(MusterEntity entity : entities.values()) {
 			itemName = itemService.getItem(entity.getItemID()).getName();
 			industry = itemService.getItem(entity.getItemID()).getIndustry();
-			if(excludeIndustrys==null || !excludeIndustrys.contains(industry)) {
+			if(includeIndustrys==null || includeIndustrys.contains(entity.getItemID())) {
 				//System.out.println(entity.getItemID());
 				muster = new Muster();
 				muster.setItemID(entity.getItemID());

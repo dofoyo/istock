@@ -102,15 +102,25 @@ public class TurtleSimulationRepository {
 		return breakers;
 	}
 	
-	public Map<String, String>  getAllBuys(String itemID){
+	public Map<String, String>  getBuys(String itemID,String type){
 		Map<String, String> buys = new HashMap<String, String>();
 		
-		buys.putAll(this.getAllBuysOfType("bhl", itemID));
-		buys.putAll(this.getAllBuysOfType("bav", itemID));
-		buys.putAll(this.getAllBuysOfType("bdt", itemID));
-		buys.putAll(this.getAllBuysOfType("hlb", itemID));
-		buys.putAll(this.getAllBuysOfType("avb", itemID));
-		buys.putAll(this.getAllBuysOfType("dtb", itemID));
+		if("bhl".equals(type)) {
+			buys.putAll(this.getAllBuysOfType("bhl", itemID));
+		}else if("bav".equals(type)) {
+			buys.putAll(this.getAllBuysOfType("bav", itemID));
+		}else if("bdt".equals(type)) {
+			buys.putAll(this.getAllBuysOfType("bdt", itemID));
+		}else if("hlb".equals(type)) {
+			buys.putAll(this.getAllBuysOfType("hlb", itemID));
+		}else if("avb".equals(type)) {
+			buys.putAll(this.getAllBuysOfType("avb", itemID));
+		}else if("dtb".equals(type)) {
+			buys.putAll(this.getAllBuysOfType("dtb", itemID));
+		}
+		
+		//System.out.println(type);
+		//System.out.println(buys);
 		
 		return buys;
 	}
@@ -129,15 +139,25 @@ public class TurtleSimulationRepository {
 		return buys;
 	}
 	
-	public Map<String, String>  getAllSells(String itemID){
+	public Map<String, String>  getSells(String itemID, String type){
 		Map<String, String> sells = new HashMap<String, String>();
+
+		if("bhl".equals(type)) {
+			sells.putAll(this.getAllSellsOfType("bhl", itemID));
+		}else if("bav".equals(type)) {
+			sells.putAll(this.getAllSellsOfType("bav", itemID));
+		}else if("bdt".equals(type)) {
+			sells.putAll(this.getAllSellsOfType("bdt", itemID));
+		}else if("hlb".equals(type)) {
+			sells.putAll(this.getAllSellsOfType("hlb", itemID));
+		}else if("avb".equals(type)) {
+			sells.putAll(this.getAllSellsOfType("avb", itemID));
+		}else if("dtb".equals(type)) {
+			sells.putAll(this.getAllSellsOfType("dtb", itemID));
+		}
 		
-		sells.putAll(this.getAllSellsOfType("bhl", itemID));
-		sells.putAll(this.getAllSellsOfType("bav", itemID));
-		sells.putAll(this.getAllSellsOfType("bdt", itemID));
-		sells.putAll(this.getAllSellsOfType("hlb", itemID));
-		sells.putAll(this.getAllSellsOfType("avb", itemID));
-		sells.putAll(this.getAllSellsOfType("dtb", itemID));
+		//System.out.println(type);
+		//System.out.println(sells);
 		
 		return sells;
 	}

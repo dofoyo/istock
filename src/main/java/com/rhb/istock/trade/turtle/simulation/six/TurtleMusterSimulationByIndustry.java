@@ -44,8 +44,6 @@ public class TurtleMusterSimulationByIndustry {
 	Integer pool = 21;
 	Integer top = 5;
 	BigDecimal initCash = new BigDecimal(100000);
-	BigDecimal quota = new BigDecimal(20000); //买入每只股票的定额
-	
 	
 	/*
 	 * 根据输入起止日期，系统模拟买入和卖出
@@ -56,7 +54,7 @@ public class TurtleMusterSimulationByIndustry {
 		
 		long days = endDate.toEpochDay()- beginDate.toEpochDay();
 		
-		Paul hlbPaul;
+		XxB hlbPaul;
 		Map<String,Muster> musters;
 		Map<String,Muster> ms;
 		Map<String,Map<Integer,BigDecimal>> yearAmounts = new HashMap<String,Map<Integer,BigDecimal>>();
@@ -67,7 +65,7 @@ public class TurtleMusterSimulationByIndustry {
 		int i=1;
 		int flag = 1;
 		for(String industry : industrys) {
-			hlbPaul = new Paul(initCash, quota);
+			hlbPaul = new XxB(initCash);
 			
 			for(LocalDate date = beginDate; (date.isBefore(endDate) || date.equals(endDate)); date = date.plusDays(1)) {
 				Progress.show(total, i++, date.toString());

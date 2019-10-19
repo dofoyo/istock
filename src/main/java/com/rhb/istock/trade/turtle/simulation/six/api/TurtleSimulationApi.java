@@ -70,9 +70,13 @@ public class TurtleSimulationApi {
 	
 	@GetMapping("/turtle/simulation/kdatas/{itemID}")
 	public ResponseContent<KdatasView> getKdatas(@PathVariable(value="itemID") String itemID,
-			@RequestParam(value="endDate") String endDate
+			@RequestParam(value="endDate") String endDate,
+			@RequestParam(value="theType") String type
 			) {
 
+		//System.out.println(endDate);
+		//System.out.println(type);
+		
 		BSKdatasView kdatas = new BSKdatasView();
 
 		LocalDate theEndDate = null;
@@ -101,8 +105,8 @@ public class TurtleSimulationApi {
 				kdatas.addKdata(theEndDate, bar.getOpen(), bar.getHigh(), bar.getLow(), bar.getClose());
 			}			
 			
-			kdatas.addBuys(turtleSimulationRepository.getAllBuys(itemID));
-			kdatas.addSells(turtleSimulationRepository.getAllSells(itemID));
+			kdatas.addBuys(turtleSimulationRepository.getBuys(itemID,type));
+			kdatas.addSells(turtleSimulationRepository.getSells(itemID,type));
 		}
 		
 		return new ResponseContent<KdatasView>(ResponseEnum.SUCCESS, kdatas);
@@ -185,8 +189,6 @@ public class TurtleSimulationApi {
 			return new ResponseContent<AllAmountView>(ResponseEnum.ERROR, view);
 		}
 
-		BigDecimal min = null;
-		
 		Map<LocalDate, AmountEntity> bhl = turtleSimulationRepository.getAmounts("bhl");
 		Map<LocalDate, AmountEntity> bav = turtleSimulationRepository.getAmounts("bav");
 		Map<LocalDate, AmountEntity> bdt = turtleSimulationRepository.getAmounts("bdt");

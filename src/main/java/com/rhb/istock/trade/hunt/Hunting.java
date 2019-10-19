@@ -2,10 +2,8 @@ package com.rhb.istock.trade.hunt;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -20,17 +18,13 @@ public class Hunting {
 
 	private Account account = null;
 	private BigDecimal initCash = null;
-	private BigDecimal quota = null;
 	private Map<Integer,BigDecimal> yearAmount;
 	
 	private StringBuffer dailyAmount_sb = new StringBuffer("date,cash,value,total\n");
 	private StringBuffer potentials_sb = new StringBuffer();
 
-	private Map<String,Integer> holdStatus = new HashMap<String,Integer>();//0 表示还未突破21均线，1表示突破21均线
-	
-	public Hunting(BigDecimal initCash, BigDecimal quote) {
+	public Hunting(BigDecimal initCash) {
 		account = new Account(initCash);
-		this.quota = quote;
 		this.initCash = initCash;
 		this.yearAmount = new HashMap<Integer,BigDecimal>();
 	}
@@ -41,11 +35,12 @@ public class Hunting {
 	 * 每只股票市值相同
 	 * 
 	 * 买入：
-	 * 每天在低位买入一只横盘的潜力股
+	 * 每天只买一只
+	 * 低位横盘股
+	 * 21日均线上
 	 * 
 	 * 卖出：
-	 * 1、突破21均线前，跌破前期最低点，即卖出
-	 * 2、突破21均线后，跌破21均线，即卖出
+	 * 跌破21均线
 	 * 
 	 */
 	public void doIt_plus(Map<String,Muster> musters, Set<Muster> potentials, LocalDate date) {
@@ -56,19 +51,13 @@ public class Hunting {
 		Set<String> holdItemIDs = account.getItemIDsOfHolds();
 		
 		//卖出跌破dropline的股票
-		//logger.info("卖出跌破dropline的股票")
 		for(String itemID: holdItemIDs) {
 			muster = musters.get(itemID);
 			if(muster!=null) {
 				account.refreshHoldsPrice(itemID, muster.getLatestPrice());
-				if(muster.isNewLowest() && !muster.isDownLimited()) {
-					account.drop(itemID, "跌破lowest", muster.getLatestPrice()); 
-					account.dropHoldState(itemID);
-					holdStatus.remove(itemID);
-				}else if(muster.isDrop() && !muster.isDownLimited() && holdStatus.get(itemID)==1){
+				if(muster.isDrop() && !muster.isDownLimited()){
 					account.drop(itemID, "跌破dropLine", muster.getLatestPrice()); 
 					account.dropHoldState(itemID);
-					holdStatus.remove(itemID);
 				}
 			}
 		}				
@@ -104,25 +93,9 @@ public class Hunting {
 			account.openAll(dds);			//后买
 		}
 
-		for(Muster mu : dds) {
-			if(!holdStatus.containsKey(mu.getItemID())) {
-				holdStatus.put(mu.getItemID(), 0);
-			}
-			if(mu.isUp() && holdStatus.containsKey(mu.getItemID())){
-				holdStatus.put(mu.getItemID(), 1);
-			}
-		}
-
 		dailyAmount_sb.append(account.getDailyAmount() + "\n");
 		yearAmount.put(date.getYear(), account.getTotal());
-
-		//account.doDailyReport(date);
 	}
-	
-	public Map<Integer,BigDecimal> getYearAmount(){
-		return this.yearAmount;
-	}
-	
 	
 	
 	public Map<String,String> result() {
@@ -143,8 +116,4 @@ public class Hunting {
 		return result;
 	}
 	
-	private Integer getQuantity(BigDecimal price) {
-		return this.quota.divide(price,BigDecimal.ROUND_DOWN).divide(new BigDecimal(100),BigDecimal.ROUND_DOWN).intValue()*100;
-	}
-
 }
