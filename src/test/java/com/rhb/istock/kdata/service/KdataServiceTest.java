@@ -38,12 +38,12 @@ public class KdataServiceTest {
 		kdataService.generateMusters();
 	}
 	
-	@Test
+	//@Test
 	public void generateLatestMusters() {
 		kdataService.generateLatestMusters();
 	}
 
-	//@Test
+	@Test
 	public void updateLatestMusters() {
 		kdataService.updateLatestMusters();
 	}

@@ -1,5 +1,6 @@
 package com.rhb.istock.item;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 
@@ -12,4 +13,5 @@ public interface ItemService {
 	public String getTopic(String itemID);
 	public String[] getTopicTops(Integer count);
 	public Set<String> getIndustrys();
+	public List<String> getSz50(LocalDate date);
 }

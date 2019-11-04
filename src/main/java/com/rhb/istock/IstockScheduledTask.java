@@ -114,7 +114,7 @@ public class IstockScheduledTask {
 	
 	@Scheduled(cron="0 50 9 ? * 1-5") //周一至周五，每日9:50点
 	public void downloadReports() {
-		System.out.println("run scheduled of '0 0 10 ? * 1-5'");
+		System.out.println("run scheduled of '0 50 9 ? * 1-5'");
 		if(this.isTradeDate()) {
 			financialStatementService.downloadReports();  //下载最新年报(包括新股)
 			selectorService.generateBluechip();  //并生成bluechip

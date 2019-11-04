@@ -13,6 +13,7 @@ bluechipsFile: D:/dev/istock-data/bluechips.json
 topicsFile: D:/dev/istock-data/topics.txt
 fvaluesOfHLFile: D:/dev/istock-data/fvaluesOfHL.txt
 dailyMeansFile: D:/dev/istock-data/dailyMeans.txt
+sz50File: D:/dev/istock-data/sz50.csv
 openDuration: 89
 dropDuration: 21
 

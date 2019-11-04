@@ -6,13 +6,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.NavigableSet;
 import java.util.TreeMap;
 
 public class Kdata {
 	private String itemID;
 	private TreeMap<LocalDate,Kbar> bars;
 
+	Map<String,BigDecimal> features = null;
+	Map<String,BigDecimal> averagePrices = null;
+	
 	public Kdata(String itemID) {
 		this.itemID = itemID;
 		this.bars = new TreeMap<LocalDate,Kbar>();
@@ -22,145 +24,122 @@ public class Kdata {
 		return this.bars.size();
 	}
 	
-	public BigDecimal[] getTotalAmounts() {
-		Integer half = this.bars.size()/2;
-		BigDecimal[] total = {new BigDecimal(0),new BigDecimal(0)};
-		int i=0;
-		for(Kbar bar : bars.values()) {
-			if(i++ < half) {
-				total[0] = total[0].add(bar.getAmount());
-			}else {
-				total[1] = total[1].add(bar.getAmount());
+	public Map<String,BigDecimal> getFeatures(){
+		if(this.features == null) {
+			this.features = new HashMap<String,BigDecimal>();
+
+			BigDecimal highest = new BigDecimal(0);
+			BigDecimal lowest = new BigDecimal(10000);
+			BigDecimal lowest21 = new BigDecimal(10000);
+			BigDecimal lowest34 = new BigDecimal(10000);
+			BigDecimal totalAmount = new BigDecimal(0);
+			BigDecimal totalPrice = new BigDecimal(0);
+			
+			int j = bars.size()-21;
+			int k = bars.size()-34;
+			int i = 0;
+			for(Kbar kbar : bars.values()) {
+				highest = highest.compareTo(kbar.getHigh())==-1 ? kbar.getHigh() : highest;
+				lowest = lowest.compareTo(kbar.getLow())==1 ? kbar.getLow() : lowest;
+				totalAmount = totalAmount.add(kbar.getAmount());
+				totalPrice = totalPrice.add(kbar.getClose());
+				
+				if(i>=j && lowest21.compareTo(kbar.getLow())==1) {
+					lowest21 =  kbar.getLow();
+				}
+
+				if(i>=k && lowest34.compareTo(kbar.getLow())==1) {
+					lowest34 =  kbar.getLow();
+				}
+				
+				i++;
+				
 			}
-		}
-		return total;
-	}
-	
-	public BigDecimal getAverageAmount() {
-		if(bars.size() == 0) {
-			return new BigDecimal(0);
-		}
-		
-		BigDecimal total = new BigDecimal(0);
-		for(Kbar kbar : bars.values()) {
-			total = total.add(kbar.getAmount());
-		}
-		
+				
+			BigDecimal averageAmount = totalAmount.divide(new BigDecimal(this.bars.size()),BigDecimal.ROUND_HALF_UP);
+			BigDecimal averagePrice = totalPrice.divide(new BigDecimal(this.bars.size()),BigDecimal.ROUND_HALF_UP);
 
-		return total.divide(new BigDecimal(bars.size()),BigDecimal.ROUND_HALF_UP);
-	}
-	
-	public BigDecimal getAveragePrice() {
-		if(bars.size() == 0) {
-			return new BigDecimal(0);
+			features.put("highest", highest);
+			features.put("lowest", lowest);
+			features.put("lowest21", lowest21);
+			features.put("lowest34", lowest34);
+			features.put("averageAmount", averageAmount);
+			features.put("averagePrice", averagePrice);
 		}
 		
-		BigDecimal total = new BigDecimal(0);
-		for(Kbar kbar : bars.values()) {
-			total = total.add(kbar.getClose());
-		}
-
-		return total.divide(new BigDecimal(bars.size()),BigDecimal.ROUND_HALF_UP);
+		return this.features;
+	}	
+	
+	public boolean isUp() {
+		Map<String, BigDecimal> ap = this.getAveragePrices();
+		Map<String, BigDecimal> fe = this.getFeatures(); 
+		return  //latestPrice.compareTo(averagePrice8)==1 &&
+				ap.get("a8").compareTo(ap.get("a13"))==1 &&
+						ap.get("a13").compareTo(ap.get("a21"))==1 &&
+								ap.get("a21").compareTo(ap.get("a34"))==1 &&
+										ap.get("a34").compareTo(fe.get("averagePrice"))==1;
 	}
 	
-	public Integer isAboveAveragePrice() {
+	public Map<String,BigDecimal> getAveragePrices(){
+		if(this.averagePrices == null) {
+			this.averagePrices = new HashMap<String,BigDecimal>();
+			
+			BigDecimal totalPrice8 = new BigDecimal(0);
+			BigDecimal totalPrice13 = new BigDecimal(0);
+			BigDecimal totalPrice21 = new BigDecimal(0);
+			BigDecimal totalPrice34 = new BigDecimal(0);
+
+			Integer a8 = this.bars.size() - 8;
+			Integer a13 = this.bars.size() - 13;
+			Integer a21 = this.bars.size() - 21;
+			Integer a34 = this.bars.size() - 34;
+			Integer i=0;
+			for(Kbar kbar : bars.values()) {
+				totalPrice8  = i>= a8  ? totalPrice8.add(kbar.getClose()) : totalPrice8;
+				totalPrice13 = i>= a13 ? totalPrice13.add(kbar.getClose()) : totalPrice13;
+				totalPrice21 = i>= a21 ? totalPrice21.add(kbar.getClose()) : totalPrice21;
+				totalPrice34 = i>= a34 ? totalPrice34.add(kbar.getClose()) : totalPrice34;
+
+				i++;
+			}
+				
+			BigDecimal averagePrice8 = totalPrice8.divide(new BigDecimal(8),BigDecimal.ROUND_HALF_UP);
+			BigDecimal averagePrice13 = totalPrice13.divide(new BigDecimal(13),BigDecimal.ROUND_HALF_UP);
+			BigDecimal averagePrice21 = totalPrice21.divide(new BigDecimal(21),BigDecimal.ROUND_HALF_UP);
+			BigDecimal averagePrice34 = totalPrice34.divide(new BigDecimal(34),BigDecimal.ROUND_HALF_UP);
+
+			averagePrices.put("a8", averagePrice8);
+			averagePrices.put("a13", averagePrice13);
+			averagePrices.put("a21", averagePrice21);
+			averagePrices.put("a34", averagePrice34);
+		}
+		
+		return this.averagePrices;
+	}
+	
+	public boolean isAboveAveragePrice(Integer days) {
 		if(bars.size() == 0) {
-			return -1;
+			return false;
 		}		
 		BigDecimal price = this.bars.lastEntry().getValue().getClose();
-		return price.compareTo(this.getAveragePrice());
-	}
-
-	
-	public Integer getHighLowGap() {
-		BigDecimal high = new BigDecimal(0);
-		BigDecimal low = new BigDecimal(10000);
-		for(Kbar kbar : bars.values()) {
-			high = high.compareTo(kbar.getHigh())==-1 ? kbar.getHigh() : high;
-			low = low.compareTo(kbar.getLow())==1 ? kbar.getLow() : low;
-		}
-		BigDecimal rate = high.subtract(low).divide(low,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100));
-
-		return rate.intValue();
-	}
-	
-	public BigDecimal getAverageAmount(Integer count) {
-		BigDecimal total = new BigDecimal(0);
-		NavigableSet<LocalDate> dates = this.bars.descendingKeySet();
-		int i=0;
-		for(LocalDate date : dates) {
-			//System.out.println(date);
-			if(i++ < count) {
-				total = total.add(this.bars.get(date).getAmount());
-			}else {
-				break;
-			}
+		BigDecimal avaragePrice = null;
+		if(days == 8) {
+			avaragePrice = this.getAveragePrices().get("a8");
+		}else if(days == 21) {
+			avaragePrice = this.getAveragePrices().get("a21");
+		}else if(days == 34) {
+			avaragePrice = this.getAveragePrices().get("a34");
+		}else{
+			avaragePrice = this.getFeatures().get("averagePrice");
 		}
 		
-		return total.divide(new BigDecimal(count),BigDecimal.ROUND_HALF_UP);
+		return price.compareTo(avaragePrice)==1;
 	}
 	
-	public Map<String,Object> getPotentialFeatures(Integer count) {
-		if(this.bars.size()<count || this.bars.lastEntry().getValue()==null) return null;
-		
-		Map<String,Object> result = new HashMap<String,Object>();
-		
-		BigDecimal now = this.bars.lastEntry().getValue().getClose();
-
-		BigDecimal highest = now;
-		BigDecimal lowest = now;
-
-		BigDecimal totalAmount = new BigDecimal(0);
-		
-		NavigableSet<LocalDate> dates = this.bars.descendingKeySet();
-
-		int i=0;
-		for(LocalDate date : dates) {
-			if(i++ < count) {
-				//highest = highest.compareTo(this.bars.get(date).getHigh())==-1 ? this.bars.get(date).getHigh() : highest;
-				totalAmount = totalAmount.add(this.bars.get(date).getAmount());
-				highest = highest.compareTo(this.bars.get(date).getHigh())==-1 ? this.bars.get(date).getHigh() : highest;
-				lowest = lowest.compareTo(this.bars.get(date).getLow())==1 ? this.bars.get(date).getLow() : lowest;
-			}else {
-				break;
-			}
-		}
-		
-		BigDecimal averageAmount = totalAmount.divide(new BigDecimal(count),BigDecimal.ROUND_HALF_UP);
-		Integer hlGap = highest.subtract(lowest).divide(lowest,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)).intValue();
-		
-		Integer hnGap = highest.subtract(now).divide(now,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)).intValue();
-		//boolean isPotential = ratio.compareTo(new BigDecimal(0.1))<0;
-		
-		//System.out.println(", highest: " + highest + ", now: " + now + ", ratio: " + ratio + ", isBreaker=" + isBreaker);
-		
-		result.put("averageAmount", averageAmount);
-		result.put("amount", this.bars.lastEntry().getValue().getAmount());
-		result.put("hlGap", hlGap);
-		result.put("hnGap", hnGap);
-		
-		return result;
+	public Kbar getLastBar() {
+		return this.bars.lastEntry().getValue();
 	}
 
-	
-	public Integer getHighLowGap(Integer count) {
-		BigDecimal high = new BigDecimal(0);
-		BigDecimal low = new BigDecimal(10000);
-		NavigableSet<LocalDate> dates = this.bars.descendingKeySet();
-		int i=0;
-		for(LocalDate date : dates) {
-			if(i++ < count) {
-				high = high.compareTo(this.bars.get(date).getHigh())==-1 ? this.bars.get(date).getHigh() : high;
-				low = low.compareTo(this.bars.get(date).getLow())==1 ? this.bars.get(date).getLow() : low;
-			}else {
-				break;
-			}
-		}
-		BigDecimal rate = high.subtract(low).divide(low,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100));
-
-		return rate.intValue();
-	}
-	
 	public void addBar(LocalDate date,Kbar bar) {
 		if(bar!=null) {
 			this.bars.put(date, bar);
@@ -169,10 +148,6 @@ public class Kdata {
 	
 	public void addBar(LocalDate date,BigDecimal open,BigDecimal high,BigDecimal low,BigDecimal close,BigDecimal amount,BigDecimal quantity) {
 		this.bars.put(date, new Kbar(open, high, low, close, amount, quantity,date));
-	}
-	
-	public void addBar(String date,String open,String high,String low,String close,String amount, String quantity) {
-		this.bars.put(LocalDate.parse(date), new Kbar(new BigDecimal(open), new BigDecimal(high), new BigDecimal(low), new BigDecimal(close), new BigDecimal(amount), new BigDecimal(quantity),LocalDate.parse(date)));
 	}
 	
 	public Kbar getBar(LocalDate date){
@@ -195,31 +170,4 @@ public class Kdata {
 		this.itemID = itemID;
 	}
 	
-	public String getString() {
-		//System.out.println(bars.size());
-		StringBuffer sb = new StringBuffer();
-		sb.append("'"+itemID+"'	日线\n");
-		sb.append("日期	开盘	最高	最低	收盘	成交量	成交额\n");
-		for(Map.Entry<LocalDate, Kbar> entry : bars.entrySet()) {
-			sb.append(entry.getKey());
-			sb.append(" ");
-			sb.append(entry.getValue().getOpen());
-			sb.append(" ");
-			sb.append(entry.getValue().getHigh());
-			sb.append(" ");
-			sb.append(entry.getValue().getLow());
-			sb.append(" ");
-			sb.append(entry.getValue().getClose());
-			sb.append(" ");
-			sb.append(entry.getValue().getQuantity());
-			sb.append(" ");
-			sb.append(entry.getValue().getAmount());
-			sb.append("\n");
-		}
-		
-		return sb.toString();
-	}
-
-	
-
 }

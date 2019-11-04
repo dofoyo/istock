@@ -38,6 +38,7 @@ public interface SelectorService{
 	public Map<String,Potential> getLatestPotentials();
 	public Map<String,Potential> getPotentials(LocalDate date);
 	public List<Potential> getPotentials_hlb(LocalDate date, Integer tops);
+	public List<Potential> getPotentials_avb(LocalDate date, Integer tops);
 	public List<String> getPowerIDs();
 
 }

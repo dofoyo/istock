@@ -17,6 +17,17 @@ public class AmountView {
 		this.value = (new BigDecimal(value)).intValue();
 	}
 	
+	public Integer getRatio() {
+		Integer a = 1000000;
+		Integer b = (this.getTotal()-a)*100/a;
+		//System.out.println(b);
+		return b;
+	}
+	
+	public String getColor() {
+		return this.getRatio()>0 ? "red" : "green";
+	}
+	
 	public Integer getCash() {
 		return cash;
 	}

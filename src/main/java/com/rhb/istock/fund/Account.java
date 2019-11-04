@@ -294,7 +294,7 @@ public class Account {
 		BigDecimal quota = this.cash.divide(new BigDecimal(position),BigDecimal.ROUND_DOWN);
 		for(Muster item : items) {
 			this.prices.put(item.getItemID(), item.getLatestPrice());
-			this.open(item.getItemID(), item.getItemName(), item.getIndustry(), this.getQuantity(quota, item.getLatestPrice()), item.getIndustry_hot().toString() , item.getLatestPrice());
+			this.open(item.getItemID(), item.getItemName(), item.getIndustry(), this.getQuantity(quota, item.getLatestPrice()), "" , item.getLatestPrice());
 		}
 	}
 	
@@ -437,11 +437,15 @@ public class Account {
 			}
 		}
 		
-		if(cost.intValue()==0) {
-			return null;
-		}else {
-			return value.subtract(cost).divide(cost,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)).intValue();
+		Integer ratio = null;
+		
+		if(cost.intValue()!=0) {
+			ratio = value.subtract(cost).divide(cost,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)).intValue();
 		}
+
+		//logger.info(String.format("%s cost=%02f, value=%02f, ratio=%d", itemID,cost,value,ratio));
+		
+		return ratio;
 	}
 	
 	public boolean isStupid(String itemID, String orderID, Integer days) {

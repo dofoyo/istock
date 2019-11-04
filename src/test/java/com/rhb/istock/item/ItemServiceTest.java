@@ -1,6 +1,8 @@
 package com.rhb.istock.item;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,7 +26,7 @@ public class ItemServiceTest {
 		System.out.println(topic);
 	}
 	
-	@Test
+	//@Test
 	public void getItem() {
 		String itemID = "sz002174";
 		Item item = itemService.getItem(itemID);
@@ -37,6 +39,15 @@ public class ItemServiceTest {
 		for(Item item : items) {
 			System.out.println(item.getItemID() + "," + item.getName() + "," + item.getIndustry());
 			
+		}
+	}
+	
+	@Test
+	public void getSz50() {
+		LocalDate date = LocalDate.parse("2019-11-01");
+		List<String> items = itemService.getSz50(date);
+		for(String item : items) {
+			System.out.println(item);
 		}
 	}
 	

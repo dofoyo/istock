@@ -132,4 +132,9 @@ public class SelectorServiceImp implements SelectorService{
 	public List<Potential> getPotentials_hlb(LocalDate date, Integer tops) {
 		return potentialService.getPotentials_hlb(date, tops);
 	}
+
+	@Override
+	public List<Potential> getPotentials_avb(LocalDate date, Integer tops) {
+		return potentialService.getPotentials_avb(date, tops);
+	}
 }

@@ -52,6 +52,8 @@ public class TurtleApi{
 		List<PotentialView> potentialviews = new ArrayList<PotentialView>();
 		if("hlb".equals(type)) {
 			potentialviews =  ts.getPotentials_hlb(theDate);
+		}else if("avb".equals(type)) {
+			potentialviews =  ts.getPotentials_avb(theDate);
 		}
 /*		
 		//System.out.println("the date is " + theDate);

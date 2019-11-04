@@ -27,8 +27,8 @@ public class PotentialService {
 	@Autowired
 	@Qualifier("kdataServiceImp")
 	KdataService kdataService;
-	
-	public List<Potential> getPotentials_hlb(LocalDate date, Integer tops){
+
+	public List<Potential> getPotentials_avb(LocalDate date, Integer tops){
 		List<Potential> potentials = new ArrayList<Potential>();
 		
 		List<Muster> musters = new ArrayList<Muster>(kdataService.getMusters(date).values());
@@ -36,12 +36,7 @@ public class PotentialService {
 		Collections.sort(musters, new Comparator<Muster>() {
 			@Override
 			public int compare(Muster o1, Muster o2) {
-/*				if(o1.getHLGap().compareTo(o2.getHLGap())==0) {
-					return o2.getLatestPrice().compareTo(o1.getLatestPrice());
-				}else {
-					return o1.getHLGap().compareTo(o2.getHLGap());//A-Z
-				}	
-*/				return o1.getHLGap().compareTo(o2.getHLGap());//A-Z
+				return o2.getAverageAmount().compareTo(o1.getAverageAmount());//z-a
 			}
 		});
 
@@ -61,7 +56,44 @@ public class PotentialService {
 			}
 		}
 		
-		Map<String,Integer> industryHots = new HashMap<String,Integer>();
+		return potentials;
+	}
+
+	
+	public List<Potential> getPotentials_hlb(LocalDate date, Integer tops){
+		List<Potential> potentials = new ArrayList<Potential>();
+		
+		List<Muster> musters = new ArrayList<Muster>(kdataService.getMusters(date).values());
+
+		Collections.sort(musters, new Comparator<Muster>() {
+			@Override
+			public int compare(Muster o1, Muster o2) {
+				if(o1.getHLGap().compareTo(o2.getHLGap())==0) {
+					return o1.getLatestPrice().compareTo(o2.getLatestPrice());
+				}else {
+					return o1.getHLGap().compareTo(o2.getHLGap());//A-Z
+				}	
+				//return o1.getHLGap().compareTo(o2.getHLGap());//A-Z
+			}
+		});
+
+		Muster muster;
+		for(int i=0; i<musters.size() && i<tops; i++) {
+			muster = musters.get(i);
+			if(muster.isPotential()){
+				potentials.add(new Potential(muster.getItemID(),
+						muster.getItemName(),
+						muster.getIndustry(),
+						muster.getAmount(),
+						muster.getAverageAmount(),
+						muster.getHighest(),
+						muster.getLowest(),
+						muster.getClose(),
+						muster.getLatestPrice()));
+			}
+		}
+		
+/*		Map<String,Integer> industryHots = new HashMap<String,Integer>();
 		Integer hot;
 		for(Muster m : musters) {
 			if(m.isPotential()) {
@@ -79,7 +111,7 @@ public class PotentialService {
 			p.setIndustryHot(industryHots.get(p.getIndustry()));
 		}
 		
-/*		Collections.sort(potentials, new Comparator<Potential>() {
+		Collections.sort(potentials, new Comparator<Potential>() {
 			@Override
 			public int compare(Potential o1, Potential o2) {
 					return o2.getIndustryHot().compareTo(o1.getIndustryHot());

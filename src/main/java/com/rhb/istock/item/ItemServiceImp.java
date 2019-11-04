@@ -1,5 +1,6 @@
 package com.rhb.istock.item;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -14,6 +15,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import com.rhb.istock.comm.util.HttpClient;
+import com.rhb.istock.item.repository.Component;
+import com.rhb.istock.item.repository.ComponentRepository;
 import com.rhb.istock.item.repository.ItemEntity;
 import com.rhb.istock.item.repository.ItemRepository;
 import com.rhb.istock.item.spider.ItemSpider;
@@ -27,6 +30,10 @@ public class ItemServiceImp implements ItemService {
 	@Autowired
 	@Qualifier("itemSpiderTushare")
 	ItemSpider itemSpider;
+	
+	@Autowired
+	@Qualifier("componentRepositoryImp")
+	ComponentRepository componentRepository;
 	
 	private Map<String,String> topics = new HashMap<String,String>();
 	protected static final Logger logger = LoggerFactory.getLogger("");
@@ -127,6 +134,22 @@ public class ItemServiceImp implements ItemService {
 		}
 		
 		return industrys;
+	}
+
+	@Override
+	public List<String> getSz50(LocalDate date) {
+		List<String> items = new ArrayList<String>();
+		Item item;
+		List<Component> components = componentRepository.getSz50Components();
+		for(Component component : components) {
+			if(
+					(date.isAfter(component.getBeginDate()) || date.isEqual(component.getBeginDate()))
+					&& (date.isBefore(component.getEndDate()) || date.isEqual(component.getEndDate()))
+				) {
+				items.add(component.getItemID());
+			}
+		}
+		return items;
 	}
 
 }

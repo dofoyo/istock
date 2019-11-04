@@ -2,6 +2,9 @@ package com.rhb.istock.trade.turtle.simulation.six;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,8 +16,17 @@ import org.slf4j.LoggerFactory;
 import com.rhb.istock.fund.Account;
 import com.rhb.istock.kdata.Muster;
 
-public class Bxx {
-	protected static final Logger logger = LoggerFactory.getLogger(Bxx.class);
+/*
+ * 操作策略
+ * 买入：21日趋势形成
+ * 卖出：跌破21日低点
+ * 筛选范围：业绩高增长的股票中选3个
+ * 筛选依据：89天的高点和低点形成的通道越窄、价格越低
+ * 仓位控制：每只股票不能超过市值的1/3
+ *
+ */
+public class Blue {
+	protected static final Logger logger = LoggerFactory.getLogger(Blue.class);
 
 	private Account account = null;
 	private BigDecimal initCash = null;
@@ -23,13 +35,14 @@ public class Bxx {
 	private StringBuffer breakers_sb = new StringBuffer();
 	
 	private BigDecimal valueRatio = new BigDecimal(3);  //每只股票不能超过市值的1/3
-	
-	public Bxx(BigDecimal initCash) {
+	private Integer top = 3;
+
+	public Blue(BigDecimal initCash) {
 		account = new Account(initCash);
 		this.initCash = initCash;
 	}
 	
-	public void doIt(Map<String,Muster> musters, List<Muster> breakers, LocalDate date) {
+	public void doIt(Map<String,Muster> musters, List<String> ms, LocalDate date) {
 		Muster muster;
 		account.setLatestDate(date);
 		
@@ -49,6 +62,7 @@ public class Bxx {
 		}
 		
 		//买入突破走势的股票
+		List<Muster> breakers = this.getTops(musters, ms);
 		breakers_sb.append(date.toString() + ",");
 
 		for(Muster breaker : breakers) {
@@ -89,6 +103,63 @@ public class Bxx {
 		BigDecimal dd = total.divide(valueRatio,BigDecimal.ROUND_DOWN);
 		BigDecimal ee = dd.compareTo(cash)<=0 ? dd : cash;
 		return ee.divide(price,BigDecimal.ROUND_DOWN).divide(new BigDecimal(100),BigDecimal.ROUND_DOWN).intValue()*100;
+	}
+	
+	private List<Muster> getTops(Map<String,Muster> musters, List<String> bluechips){
+		List<Muster> ms = new ArrayList<Muster>();
+		for(String id : bluechips) {
+			if(musters.get(id)!=null) {
+				ms.add(musters.get(id));
+			}
+		}
+		
+		Collections.sort(ms, new Comparator<Muster>() {
+			@Override
+			public int compare(Muster o1, Muster o2) {
+				if(o1.getHLGap().compareTo(o2.getHLGap())==0){
+					return o1.getLatestPrice().compareTo(o2.getLatestPrice()); //a-z
+				}else {
+					return o1.getHLGap().compareTo(o2.getHLGap());//A-Z
+				}
+/*				if(o1.getHLGap().compareTo(o2.getHLGap())==0){
+					if(o1.getLNGap().compareTo(o2.getLNGap())==0){  
+						return o1.getLatestPrice().compareTo(o2.getLatestPrice()); //a-z
+					}else {
+						return o1.getLNGap().compareTo(o2.getLNGap()); //a-z
+					}
+				}else {
+					return o1.getHLGap().compareTo(o2.getHLGap());//A-Z
+				}*/
+/*				if(o1.getHLGap().compareTo(o2.getHLGap())==0) {
+					return o1.getLNGap().compareTo(o2.getLNGap());
+				}else {
+					return o1.getHLGap().compareTo(o2.getHLGap());//A-Z
+				}*/
+				
+/*						if(o1.getHLGap().compareTo(o2.getHLGap())==0){
+					if(o1.getN21Gap().compareTo(o2.getN21Gap())==0){  
+						return o1.getLatestPrice().compareTo(o2.getLatestPrice()); //a-z
+					}else {
+						return o1.getN21Gap().compareTo(o2.getN21Gap()); //a-z
+					}
+				}else {
+					return o1.getHLGap().compareTo(o2.getHLGap());//A-Z
+				}*/
+			}
+		});
+		
+		List<Muster>  tops = new ArrayList<Muster>();
+		for(Muster muster : ms) {
+			if(!muster.isNewLowest() && !muster.isUpLimited() && !muster.isDownLimited() && muster.isUp()) {
+				tops.add(muster);
+			}
+			
+			if(tops.size()>=top) {
+				break;
+			}
+		}
+		
+		return tops;
 	}
 
 }

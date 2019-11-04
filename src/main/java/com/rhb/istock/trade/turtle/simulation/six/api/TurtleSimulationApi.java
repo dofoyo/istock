@@ -26,11 +26,7 @@ import com.rhb.istock.item.ItemService;
 import com.rhb.istock.kdata.Kbar;
 import com.rhb.istock.kdata.KdataService;
 import com.rhb.istock.kdata.api.KdatasView;
-import com.rhb.istock.trade.hunt.HuntSimulation;
 import com.rhb.istock.trade.turtle.simulation.six.TurtleMusterSimulation;
-import com.rhb.istock.trade.turtle.simulation.six.TurtleMusterSimulationByBlueChips;
-import com.rhb.istock.trade.turtle.simulation.six.TurtleMusterSimulationByCompass;
-import com.rhb.istock.trade.turtle.simulation.six.TurtleMusterSimulationByIndustry;
 import com.rhb.istock.trade.turtle.simulation.six.repository.AmountEntity;
 import com.rhb.istock.trade.turtle.simulation.six.repository.TurtleSimulationRepository;
 
@@ -45,29 +41,13 @@ public class TurtleSimulationApi {
 	TurtleMusterSimulation turtleMusterSimulation;
 
 	@Autowired
-	@Qualifier("turtleMusterSimulationByCompass")
-	TurtleMusterSimulationByCompass turtleMusterSimulationByCompass;
-
-	@Autowired
-	@Qualifier("turtleMusterSimulationByBlueChips")
-	TurtleMusterSimulationByBlueChips turtleMusterSimulationByBlueChips;
-	
-	@Autowired
-	@Qualifier("turtleMusterSimulationByIndustry")
-	TurtleMusterSimulationByIndustry turtleMusterSimulationByIndustry;
-	
-	@Autowired
 	@Qualifier("itemServiceImp")
 	ItemService itemService;
 	
 	@Autowired
 	@Qualifier("kdataServiceImp")
 	KdataService kdataService;
-	
-	@Autowired
-	@Qualifier("huntSimulation")
-	HuntSimulation huntSimulation;
-	
+
 	@GetMapping("/turtle/simulation/kdatas/{itemID}")
 	public ResponseContent<KdatasView> getKdatas(@PathVariable(value="itemID") String itemID,
 			@RequestParam(value="endDate") String endDate,
@@ -128,13 +108,8 @@ public class TurtleSimulationApi {
 			return new ResponseContent<String>(ResponseEnum.ERROR, " NO date!");
 		}
 		
-		turtleMusterSimulation.simulate(theBeginDate, theEndDate);
-		huntSimulation.simulate(theBeginDate, theEndDate);
-		//turtleMusterSimulationByIndustry.simulate(theBeginDate, theEndDate);
-		//turtleMusterSimulationByCompass.simulate(theBeginDate, theEndDate);
-		//turtleMusterSimulationByBlueChips.simulate(theBeginDate, theEndDate);
-		//turtleMusterSimulation.generateDailyRatios(theBeginDate, theEndDate);
-
+		turtleMusterSimulation.simulate(theBeginDate, theEndDate); 
+		
 		turtleSimulationRepository.evictAmountsCache();
 		turtleSimulationRepository.evictBreakersCache();
 		turtleSimulationRepository.evictBuysCache();
@@ -253,36 +228,23 @@ public class TurtleSimulationApi {
 		}
 
 		
-		//Map<LocalDate,List<String>> buys = turtleSimulationRepository.getBuys(type);
-		//Map<LocalDate,List<String>> sells = turtleSimulationRepository.getSells(type);
-		
-		Set<Hold> ids = this.generateHolds(type,theDate);
-		//System.out.println("holds: " + ids);
-		if(ids!=null && !ids.isEmpty()) {
-			for(Hold id : ids) {
-				views.add(new HoldView(id.getItemID(),id.getItemName(),id.getProfit().intValue()));
+		Set<Hold> holds = this.generateHolds(type,theDate);
+		if(holds!=null && !holds.isEmpty()) {
+			for(Hold hold : holds) {
+				views.add(new HoldView(hold.getItemID(),hold.getItemName(),hold.getProfit().intValue(),hold.getDate()));
 			}
 		}
 		
-		/*
-		ids = buys.get(theDate);
-		//System.out.println("buys: " + ids);
-		if(ids!=null && !ids.isEmpty()) {
-			for(String id : ids) {
-				views.add(new HoldView(id,itemService.getItem(id).getName(),1));
-			}
-		}
-		
-		ids = sells.get(theDate);
-		if(ids!=null && !ids.isEmpty()) {
-			for(String id : ids) {
-				for(HoldView view : views) {
-					if(view.getItemID().equals(id)) {
-						view.setStatus(-1);
-					}
+		Collections.sort(views, new Comparator<HoldView>() {
+			@Override
+			public int compare(HoldView o1, HoldView o2) {
+				if(o1.getDate().compareTo(o2.getDate()) == 0) {
+					return o2.getStatus().compareTo(o1.getStatus());
+				}else {
+					return o1.getDate().compareTo(o2.getDate());
 				}
 			}
-		}	*/
+		});
 		
 		return new ResponseContent<List<HoldView>>(ResponseEnum.SUCCESS, views);
 	}
@@ -399,15 +361,25 @@ public class TurtleSimulationApi {
 		private String itemName;
 		private Integer count;
 		private BigDecimal profit;
+		private LocalDate date;
 		
 		public Hold(String str) {
 			String[] ss = str.split(",");
 			this.itemID = ss[0];
 			this.itemName = ss[1];
 			this.profit = new BigDecimal(ss[2]);
+			this.date = LocalDate.parse(ss[3],DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 			this.count = 1;
 		}
 		
+		public LocalDate getDate() {
+			return date;
+		}
+
+		public void setDate(LocalDate date) {
+			this.date = date;
+		}
+
 		public void update(String str) {
 			String[] ss = str.split(",");
 			this.profit = this.profit.add(new BigDecimal(ss[2]));

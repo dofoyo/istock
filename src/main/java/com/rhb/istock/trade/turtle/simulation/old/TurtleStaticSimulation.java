@@ -146,7 +146,7 @@ public class TurtleStaticSimulation implements TurtleSimulation{
 	 */
 	private boolean isGoodTime(LocalDate theDate, Integer duration) {
 		Kdata kdata = kdataService.getKdata("sh000001", theDate, duration, true);
-		return kdata.isAboveAveragePrice()==1 ? true : false; 
+		return kdata.isAboveAveragePrice(21) ? true : false; 
 	}
 	
 	
@@ -232,7 +232,7 @@ public class TurtleStaticSimulation implements TurtleSimulation{
 		//System.out.println("holds: " + ids);
 		if(ids!=null && !ids.isEmpty()) {
 			for(String id : ids) {
-				views.add(new HoldView(id,itemService.getItem(id).getName(),0));
+				views.add(new HoldView(id,itemService.getItem(id).getName(),0,date));
 			}
 		}
 		
@@ -240,7 +240,7 @@ public class TurtleStaticSimulation implements TurtleSimulation{
 		//System.out.println("buys: " + ids);
 		if(ids!=null && !ids.isEmpty()) {
 			for(String id : ids) {
-				views.add(new HoldView(id,itemService.getItem(id).getName(),1));
+				views.add(new HoldView(id,itemService.getItem(id).getName(),1,date));
 			}
 		}
 		

@@ -69,7 +69,7 @@ public class Turtle {
 		openDuration = 55; 
 		dropDuration = 21; 
 		maxOfLot = 1; 
-		initCash = new BigDecimal(5000000);
+		initCash = new BigDecimal(1000000);
 		stopStrategy  = 0;
 		gap = 60;
 		cancels = 2;

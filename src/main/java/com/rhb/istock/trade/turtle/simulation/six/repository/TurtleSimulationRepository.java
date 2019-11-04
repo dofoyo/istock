@@ -196,7 +196,7 @@ public class TurtleSimulationRepository {
 				ids = new ArrayList<String>(); 
 				buys.put(buyDate, ids);
 			}
-			ids.add(columns[1] + "," + columns[2] + "," + columns[12]);
+			ids.add(columns[1] + "," + columns[2] + "," + columns[12] + "," + columns[3]);
 		}		
 		
 		return buys;

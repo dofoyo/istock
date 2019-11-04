@@ -597,5 +597,19 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 		return views;
 	}
 
+	@Override
+	public List<PotentialView> getPotentials_avb(LocalDate date) {
+		List<PotentialView> views = new ArrayList<PotentialView>();
+		List<Potential> potentials = selectorService.getPotentials_avb(date, tops);
+		PotentialView view;
+		for(Potential potential : potentials) {
+			view = new PotentialView(potential.getItemID(),potential.getItemName(),potential.getIndustry(),potential.getHLGap(), potential.getHNGap());
+			view.setIndustryHot(potential.getIndustryHot());
+			views.add(view);
+		}
+		
+		return views;
+	}
+
 	
 }

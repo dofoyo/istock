@@ -27,6 +27,7 @@ public interface TurtleOperationService {
 	public List<TurtleView> getPotentials(String type);
 	public List<PotentialView> getPotentials(String type, LocalDate date);
 	public List<PotentialView> getPotentials_hlb(LocalDate date);
+	public List<PotentialView> getPotentials_avb(LocalDate date);
 	public Map<String,IndustryView> getPotentialIndustrys(LocalDate date);
 	public void redoPotentials();
 	public String[] getTopics();

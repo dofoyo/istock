@@ -103,8 +103,6 @@ public class KdataServiceImp implements KdataService{
 		
 		KdataEntity entity = this.getEntity(itemID, byCache);
 		
-		//System.out.println(entity.getBarSize());
-		
 		for(int i=0,j=0; i<count && j<entity.getBarSize(); j++) {
 			bar = entity.getBar(date);
 			if(bar!=null) {
@@ -270,13 +268,9 @@ public class KdataServiceImp implements KdataService{
 			kdata = this.getKdata(item.getItemID(), true);
 			dates = kdata.getDates();
 			
-			//int j=1;
 			for(LocalDate date : dates) {
-				//Progress.show(dates.size(),j++, date.toString());//进度条
 				entity = this.getMusterEntity(item.getItemID(), date, true);
 				if(entity!=null) musterRepositoryImp.saveTmpMuster(date, entity);
-
-				//if(j++>2) return;
 			}
 			
 			this.evictKDataCache();
@@ -291,58 +285,39 @@ public class KdataServiceImp implements KdataService{
 
 	
 	private MusterEntity getMusterEntity(String itemID,LocalDate endDate, boolean cache) {
-		Kdata kdata = this.getKdata(itemID,endDate,openDuration,cache);
+		Kdata kdata = this.getKdata(itemID,endDate,openDuration,cache); //不包含endDate
+		
 		if(kdata==null || kdata.getSize()<openDuration) return null;  //此行很重要，涉及averageAmount和dropPrice的准确性
 		
-		BigDecimal close = null;
-		BigDecimal highest = null;
-		BigDecimal lowest = null;
-		BigDecimal totalPrice = new BigDecimal(0);
-		BigDecimal totalAmount = new BigDecimal(0);
-		BigDecimal amount = null;
-		BigDecimal latestPrice = null;
+		Kbar lastBar = kdata.getLastBar(); //是endDate的前一个交易日
+		BigDecimal close = lastBar.getClose();
+		BigDecimal amount = lastBar.getAmount();
+		
+		BigDecimal latestPrice = close;
 		Integer limited = 0;
-		
-		List<LocalDate> dates = kdata.getDates();
+		Kbar kbar = this.getKbar(itemID, endDate, cache);
+		if(kbar!=null) {
+			latestPrice = kbar.getClose();
+			limited = kbar.isLimited();
+		}
 
-		int dropStart = openDuration-dropDuration+1;
-		int i=1;
-		for(LocalDate date : dates) {
-			if(highest==null) {
-				highest = kdata.getBar(date).getHigh();
-			}else {
-				highest = highest.compareTo(kdata.getBar(date).getHigh())==-1 ? kdata.getBar(date).getHigh() : highest;
-			}
-			if(lowest==null) {
-				lowest = kdata.getBar(date).getLow();
-			}else {
-				lowest = lowest.compareTo(kdata.getBar(date).getLow())==1 ? kdata.getBar(date).getLow() : lowest;
-			}
-			close = kdata.getBar(date).getClose();
-			amount = kdata.getBar(date).getAmount();
-			totalAmount = totalAmount.add(amount);
-			
-			if(i>=dropStart) {
-				totalPrice = totalPrice.add(kdata.getBar(date).getClose());
-			}
-			
-			i++;
-		}
+		Map<String,BigDecimal> features = kdata.getFeatures();
+		BigDecimal highest = features.get("highest");
+		BigDecimal lowest = features.get("lowest");
+		BigDecimal lowest21 = features.get("lowest21");
+		BigDecimal lowest34 = features.get("lowest34");
+		BigDecimal averageAmount = features.get("averageAmount");
+		BigDecimal averagePrice = features.get("averagePrice");
 		
-		BigDecimal averageAmount = totalAmount.divide(new BigDecimal(openDuration),BigDecimal.ROUND_HALF_UP);
-		BigDecimal dropPrice = totalPrice.divide(new BigDecimal(dropDuration),BigDecimal.ROUND_HALF_UP);
+		Map<String,BigDecimal> averagePrices = kdata.getAveragePrices();
+		BigDecimal a8 = averagePrices.get("a8");
+		BigDecimal a13 = averagePrices.get("a13");
+		BigDecimal a21 = averagePrices.get("a21");
+		BigDecimal a34 = averagePrices.get("a34");
 		
-		latestPrice = close;
-		Kbar bar =this.getKbar(itemID, endDate, cache);
-		if(bar!=null) {
-			latestPrice = bar.getClose();
-			limited = bar.isLimited() ? 1 : 0;
-		}
-		
-		return new MusterEntity(itemID,amount,averageAmount,highest,lowest,close,dropPrice,latestPrice,limited);
-		
+		return new MusterEntity(itemID,close,amount,latestPrice,limited,highest,lowest,averageAmount,averagePrice,a8,a13,a21,a34,lowest21,lowest34);
 	}
-
+	
 	@Override
 	public Map<String,Muster> getLatestMusters() {
 		LocalDate date = kdataRealtimeSpider.getLatestMarketDate();
@@ -392,14 +367,20 @@ public class KdataServiceImp implements KdataService{
 				muster.setItemID(entity.getItemID());
 				muster.setItemName(itemService.getItem(entity.getItemID()).getName());
 				muster.setIndustry(itemService.getItem(entity.getItemID()).getIndustry());
-				muster.setAmount(entity.getAmount());
-				muster.setAverageAmount(entity.getAverageAmount());
-				muster.setHighest(entity.getHighest());
-				muster.setLowest(entity.getLowest());
 				muster.setClose(entity.getClose());
-				muster.setDropPrice(entity.getDropPrice());
+				muster.setAmount(entity.getAmount());
 				muster.setLatestPrice(entity.getLatestPrice());
 				muster.setLimited(entity.getLimited());
+				muster.setHighest(entity.getHighest());
+				muster.setLowest(entity.getLowest());
+				muster.setLowest21(entity.getLowest21());
+				muster.setLowest34(entity.getLowest34());
+				muster.setAverageAmount(entity.getAverageAmount());
+				muster.setAveragePrice(entity.getAveragePrice());
+				muster.setAveragePrice8(entity.getAveragePrice8());
+				muster.setAveragePrice13(entity.getAveragePrice13());
+				muster.setAveragePrice21(entity.getAveragePrice21());
+				muster.setAveragePrice34(entity.getAveragePrice34());
 				
 				musters.put(muster.getItemID(),muster);
 		}
@@ -425,15 +406,21 @@ public class KdataServiceImp implements KdataService{
 				muster.setItemID(entity.getItemID());
 				muster.setItemName(itemName);
 				muster.setIndustry(industry);
-				muster.setAmount(entity.getAmount());
-				muster.setAverageAmount(entity.getAverageAmount());
-				muster.setHighest(entity.getHighest());
-				muster.setLowest(entity.getLowest());
 				muster.setClose(entity.getClose());
-				muster.setDropPrice(entity.getDropPrice());
+				muster.setAmount(entity.getAmount());
 				muster.setLatestPrice(entity.getLatestPrice());
 				muster.setLimited(entity.getLimited());
-				
+				muster.setHighest(entity.getHighest());
+				muster.setLowest(entity.getLowest());
+				muster.setLowest21(entity.getLowest21());
+				muster.setLowest34(entity.getLowest34());
+				muster.setAverageAmount(entity.getAverageAmount());
+				muster.setAveragePrice(entity.getAveragePrice());
+				muster.setAveragePrice8(entity.getAveragePrice8());
+				muster.setAveragePrice13(entity.getAveragePrice13());
+				muster.setAveragePrice21(entity.getAveragePrice21());
+				muster.setAveragePrice34(entity.getAveragePrice34());
+
 				musters.put(muster.getItemID(),muster);
 			}
 		}
@@ -456,15 +443,23 @@ public class KdataServiceImp implements KdataService{
 
 			kbar = this.getLatestMarketData(muster.getItemID());
 			if(kbar!=null) {
-				entities.add(new MusterEntity(muster.getItemID(), 
+				entities.add(new MusterEntity(
+						muster.getItemID(), 
+						muster.getClose(), 
 						kbar.getAmount(), 
-						muster.getAverageAmount(), 
+						kbar.getClose(),
+						kbar.isLimited(),
 						muster.getHighest(), 
 						muster.getLowest(), 
-						muster.getClose(), 
-						muster.getDropPrice(), 
-						kbar.getClose(),
-						kbar.isLimited()? 1 : 0));
+						muster.getAverageAmount(), 
+						muster.getAveragePrice(), 
+						muster.getAveragePrice8(), 
+						muster.getAveragePrice13(), 
+						muster.getAveragePrice21(), 
+						muster.getAveragePrice34(),
+						muster.getLowest21(),
+						muster.getLowest34()
+						));
 			}
 		}
 		musterRepositoryImp.saveMusters(date,entities);
@@ -504,14 +499,20 @@ public class KdataServiceImp implements KdataService{
 				muster.setItemID(entity.getItemID());
 				muster.setItemName(itemService.getItem(entity.getItemID()).getName());
 				muster.setIndustry(itemService.getItem(entity.getItemID()).getIndustry());
-				muster.setAmount(entity.getAmount());
-				muster.setAverageAmount(entity.getAverageAmount());
-				muster.setHighest(entity.getHighest());
-				muster.setLowest(entity.getLowest());
 				muster.setClose(entity.getClose());
-				muster.setDropPrice(entity.getDropPrice());
+				muster.setAmount(entity.getAmount());
 				muster.setLatestPrice(entity.getLatestPrice());
 				muster.setLimited(entity.getLimited());
+				muster.setHighest(entity.getHighest());
+				muster.setLowest(entity.getLowest());
+				muster.setLowest21(entity.getLowest21());
+				muster.setLowest34(entity.getLowest34());
+				muster.setAverageAmount(entity.getAverageAmount());
+				muster.setAveragePrice(entity.getAveragePrice());
+				muster.setAveragePrice8(entity.getAveragePrice8());
+				muster.setAveragePrice13(entity.getAveragePrice13());
+				muster.setAveragePrice21(entity.getAveragePrice21());
+				muster.setAveragePrice34(entity.getAveragePrice34());
 				
 				musters.put(muster.getItemID(),muster);				
 			}
@@ -541,7 +542,7 @@ public class KdataServiceImp implements KdataService{
 		Kdata ssei2 = getKdata(sseiID, date.plusDays(1), days2, true);
 		//Kdata ssei3 = getKdata(sseiID, date.plusDays(1), days3, true);
 		
-		flag = ssei2.isAboveAveragePrice()==1 ? 1 : 0;
+		flag = ssei2.isAboveAveragePrice(21) ? 1 : 0;
 		
 		/*if(//ssei3.isAboveAveragePrice()==1 &&
 				ssei2.isAboveAveragePrice()==1 &&

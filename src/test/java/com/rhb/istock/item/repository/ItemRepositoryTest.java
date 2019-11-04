@@ -13,13 +13,13 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @SpringBootTest
 public class ItemRepositoryTest {
 	@Autowired
-	@Qualifier("itemRepositoryTushare")
-	ItemRepository itemRepository;
+	@Qualifier("componentRepositoryImp")
+	ComponentRepository componentRepository;
 	
-	//@Test
-	public void testGetItemEntities() {
-		List<ItemEntity> items = itemRepository.getItemEntities();
-		for(ItemEntity item : items) {
+	@Test
+	public void getSz50Components() {
+		List<Component> items = componentRepository.getSz50Components();
+		for(Component item : items) {
 			System.out.println(item);
 		}
 	}

@@ -1,16 +1,28 @@
 package com.rhb.istock.trade.turtle.simulation.six.api;
 
+import java.time.LocalDate;
+
 public class HoldView {
 	private String itemID;
 	private String name;
 	private Integer status; // 1--buy, -1--sell, 0--hold
+	private LocalDate date;
 	
-	public HoldView(String itemID, String name, Integer status) {
+	public HoldView(String itemID, String name, Integer status, LocalDate date) {
 		this.itemID = itemID;
 		this.name = name;
 		this.status = status;
+		this.date = date;
 	}
 	
+	public LocalDate getDate() {
+		return date;
+	}
+
+	public void setDate(LocalDate date) {
+		this.date = date;
+	}
+
 	public String getItemID() {
 		return itemID;
 	}

@@ -1,6 +1,6 @@
-package com.rhb.istock.trade.hunt;
+package com.rhb.istock.item.repository;
 
-import java.time.LocalDate;
+import java.util.List;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -11,16 +11,17 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest
-public class HuntSimulationTest {
+public class ComponentRepositoryTest {
 	@Autowired
-	@Qualifier("huntSimulation")
-	HuntSimulation huntSimulation;
+	@Qualifier("itemRepositoryTushare")
+	ItemRepository itemRepository;
 	
-	@Test
-	public void simulate() {
-		LocalDate beginDate = LocalDate.parse("2010-01-01");
-		LocalDate endDate = LocalDate.parse("2019-09-16");
-		huntSimulation.simulate(beginDate, endDate);
+	//@Test
+	public void testGetItemEntities() {
+		List<ItemEntity> items = itemRepository.getItemEntities();
+		for(ItemEntity item : items) {
+			System.out.println(item);
+		}
 	}
-	
+
 }
