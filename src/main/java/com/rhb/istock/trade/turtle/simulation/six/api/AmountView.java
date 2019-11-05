@@ -18,8 +18,8 @@ public class AmountView {
 	}
 	
 	public Integer getRatio() {
-		Integer a = 1000000;
-		Integer b = (this.getTotal()-a)*100/a;
+		//Integer a = 10000;
+		Integer b = (this.getTotal()-1000000)/10000;
 		//System.out.println(b);
 		return b;
 	}
