@@ -263,7 +263,7 @@ public class KdataServiceImp implements KdataService{
 		List<Item> items = itemService.getItems();
 		int i=1;
 		for(Item item : items) {
-			Progress.show(items.size(),i++, " generateMusters " + item.getItemID());//进度条
+			Progress.show(items.size(),i++, " generateMusters: " + item.getItemID());//进度条
 			
 			kdata = this.getKdata(item.getItemID(), true);
 			dates = kdata.getDates();
@@ -341,7 +341,7 @@ public class KdataServiceImp implements KdataService{
 			List<Item> items = itemService.getItems();
 			int i=1;
 			for(Item item : items) {
-				Progress.show(items.size(),i++, " generateLatestMusters " + item.getItemID());//进度条
+				Progress.show(items.size(),i++, " generateLatestMusters: " + item.getItemID());//进度条
 				
 				entity = this.getMusterEntity(item.getItemID(), date, false);
 				if(entity!=null) musterRepositoryImp.saveMuster(date, entity);
@@ -359,14 +359,17 @@ public class KdataServiceImp implements KdataService{
 	public Map<String,Muster> getMusters(LocalDate date) {
 		Map<String,Muster> musters = new HashMap<String,Muster>();
 		Muster muster;
+		Item item;
 		
 		Map<String, MusterEntity> entities = musterRepositoryImp.getMusters(date);
 		
 		for(MusterEntity entity : entities.values()) {
+			item = itemService.getItem(entity.getItemID());
+			if(item!=null) {
 				muster = new Muster();
 				muster.setItemID(entity.getItemID());
-				muster.setItemName(itemService.getItem(entity.getItemID()).getName());
-				muster.setIndustry(itemService.getItem(entity.getItemID()).getIndustry());
+				muster.setItemName(item.getName());
+				muster.setIndustry(item.getIndustry());
 				muster.setClose(entity.getClose());
 				muster.setAmount(entity.getAmount());
 				muster.setLatestPrice(entity.getLatestPrice());
@@ -383,6 +386,9 @@ public class KdataServiceImp implements KdataService{
 				muster.setAveragePrice34(entity.getAveragePrice34());
 				
 				musters.put(muster.getItemID(),muster);
+			}else {
+				//logger.info(String.format("item of %s is null", entity.getItemID()));
+			}
 		}
 		
 		return musters;

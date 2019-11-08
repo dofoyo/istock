@@ -145,7 +145,7 @@ public class AVB {
 		Muster m;
 		for(int i=0; i<musters.size() && i<pool; i++) {
 			m = musters.get(i);
-			if(m.isUpBreaker()&& !m.isUpLimited() && !m.isDownLimited()) {
+			if(m.isUpBreaker()&& !m.isUpLimited() && !m.isDownLimited() && m.isUp()) {
 				breakers.add(m);
 			}
 			if(breakers.size()>=top) {

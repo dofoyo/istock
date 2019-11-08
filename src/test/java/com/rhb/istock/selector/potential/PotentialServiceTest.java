@@ -84,7 +84,7 @@ public class PotentialServiceTest {
 		}
 	}
 	
-	@Test
+	//@Test
 	public void getIndustryPotentials() {
 		LocalDate date = LocalDate.of(2019, 9, 27);
 

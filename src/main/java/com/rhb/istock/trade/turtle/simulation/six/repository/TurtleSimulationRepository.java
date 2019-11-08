@@ -203,8 +203,8 @@ public class TurtleSimulationRepository {
 	}
 
 	@Cacheable("sells")
-	public Map<LocalDate, List<String>>  getSells(String type){
-		Map<LocalDate, List<String>> sells = new TreeMap<LocalDate, List<String>>();
+	public TreeMap<LocalDate, List<String>>  getSells(String type){
+		TreeMap<LocalDate, List<String>> sells = new TreeMap<LocalDate, List<String>>();
 		
 		String theFile = reportPath + "/" + type + "_simulation_detail_"+openDuration+"_"+dropDuration+".csv"; 
 		//System.out.println(theFile);

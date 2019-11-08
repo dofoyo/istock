@@ -53,7 +53,7 @@ public class TurtleMusterSimulation {
 		BHL bhl = new BHL(initCash);
 		BAV bav = new BAV(initCash);
 		Blue bdt = new Blue(initCash);
-		Hunt dtb = new Hunt(initCash);
+		//Hunt dtb = new Hunt(initCash);
 
 		AVB avb = new AVB(initCash);
 		HLB hlb = new HLB(initCash);
@@ -63,14 +63,14 @@ public class TurtleMusterSimulation {
 		long days = endDate.toEpochDay()- beginDate.toEpochDay();
 		int i=1;
 		for(LocalDate date = beginDate; (date.isBefore(endDate) || date.equals(endDate)); date = date.plusDays(1)) {
-			Progress.show((int)days, i++, date.toString());
+			Progress.show((int)days, i++, "  simulate: " + date.toString());
 
 			musters = kdataService.getMusters(date);
 			if(musters!=null && musters.size()>0) {
 				bhl.doIt(musters, date);
 				bav.doIt(musters, itemService.getSz50(date), date);
 				bdt.doIt(musters, bluechipService.getBluechipIDs(date), date);
-				dtb.doIt(musters, date);
+				//dtb.doIt(musters, date);
 
 				hlb.doIt(musters, date);
 				avb.doIt(musters, date);
@@ -80,7 +80,7 @@ public class TurtleMusterSimulation {
 		Map<String, String> bhlResult = bhl.result();
 		Map<String, String> bavResult = bav.result();
 		Map<String, String> bdtResult = bdt.result();
-		Map<String, String> dtbResult = dtb.result();
+		//Map<String, String> dtbResult = dtb.result();
 
 		Map<String, String> avbResult = avb.result();
 		Map<String, String> hlbResult = hlb.result();
@@ -88,7 +88,7 @@ public class TurtleMusterSimulation {
 		turtleSimulationRepository.save("bhl", bhlResult.get("breakers"), bhlResult.get("CSV"), bhlResult.get("dailyAmount"));
 		turtleSimulationRepository.save("bav", bavResult.get("breakers"), bavResult.get("CSV"), bavResult.get("dailyAmount"));
 		turtleSimulationRepository.save("bdt", bdtResult.get("breakers"), bdtResult.get("CSV"), bdtResult.get("dailyAmount"));
-		turtleSimulationRepository.save("dtb", dtbResult.get("breakers"), dtbResult.get("CSV"), dtbResult.get("dailyAmount"));
+		//turtleSimulationRepository.save("dtb", dtbResult.get("breakers"), dtbResult.get("CSV"), dtbResult.get("dailyAmount"));
 
 		turtleSimulationRepository.save("hlb", hlbResult.get("breakers"), hlbResult.get("CSV"), hlbResult.get("dailyAmount"));
 		turtleSimulationRepository.save("avb", avbResult.get("breakers"), avbResult.get("CSV"), avbResult.get("dailyAmount"));

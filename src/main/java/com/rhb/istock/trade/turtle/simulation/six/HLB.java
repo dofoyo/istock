@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +36,8 @@ public class HLB {
 	private StringBuffer breakers_sb = new StringBuffer();
 	private Integer pool = 21;
 	private Integer top = 5;
-
+	
+	private Keeps keeps = new Keeps();
 	
 	public HLB(BigDecimal initCash) {
 		account = new Account(initCash);
@@ -45,7 +47,7 @@ public class HLB {
 	public void doIt(Map<String,Muster> musters, LocalDate date) {
 		Muster muster;
 		account.setLatestDate(date);
-
+		
 		Set<String> holdItemIDs = account.getItemIDsOfHolds();
 		for(String itemID : holdItemIDs) {
 			muster = musters.get(itemID);
@@ -61,10 +63,12 @@ public class HLB {
 				if(muster.isDrop(21) && !muster.isDownLimited()) {
 					account.drop(itemID, "跌破dropLine", muster.getLatestPrice()); 
 					account.dropHoldState(itemID);
+					keeps.add(date, itemID);
 				}
 				if(muster.isDropLowest(21) && !muster.isDownLimited()) {
 					account.drop(itemID, "跌破lowest", muster.getLatestPrice()); 
 					account.dropHoldState(itemID);
+					keeps.add(date, itemID);
 				}
 			}
 		}				
@@ -75,7 +79,9 @@ public class HLB {
 		//List<Muster> dds = new ArrayList<Muster>();  //用list，有重复，表示可以加仓
 		
 		//确定突破走势的股票
-		List<Muster> breakers = this.getTops(new ArrayList<Muster>(musters.values()));
+		List<Muster> breakers = this.getBreakers(new ArrayList<Muster>(musters.values()));
+		//breakers.addAll(keeps.getUps(musters));
+		
 		breakers_sb.append(date.toString() + ",");
 		StringBuffer sb = new StringBuffer();
 		for(Muster breaker : breakers) {
@@ -128,47 +134,25 @@ public class HLB {
 		return result;
 	}
 	
-	private List<Muster> getTops(List<Muster> musters){
+	private List<Muster> getBreakers(List<Muster> musters){
 		List<Muster> breakers = new ArrayList<Muster>();
 
 		Collections.sort(musters, new Comparator<Muster>() {
 			@Override
 			public int compare(Muster o1, Muster o2) {
-/*					
- 					//303万
-  					if(o1.getHLGap().compareTo(o2.getHLGap())==0){
-							return o1.getLNGap().compareTo(o2.getLNGap()); //a-z
-					}else {
-						return o1.getHLGap().compareTo(o2.getHLGap());//A-Z
-					}*/
-					
-/*					//391万
-					if(o1.getHLGap().compareTo(o2.getHLGap())==0){
-						if(o1.getN21Gap().compareTo(o2.getN21Gap())==0){  
-							return o1.getLatestPrice().compareTo(o2.getLatestPrice()); //a-z
-						}else {
-							return o1.getN21Gap().compareTo(o2.getN21Gap()); //a-z
-						}
-					}else {
-						return o1.getHLGap().compareTo(o2.getHLGap());//A-Z
-					}*/
-					
-					// 431万
 					if(o1.getHLGap().compareTo(o2.getHLGap())==0){
 						return o1.getLatestPrice().compareTo(o2.getLatestPrice()); //a-z
 					}else {
 						return o1.getHLGap().compareTo(o2.getHLGap());//A-Z
 					}
 				
-					//409万
-					//return o1.getHLGap().compareTo(o2.getHLGap());//A-Z
 			}
 		});
 
 		Muster m;
 		for(int i=0; i<musters.size() && i<pool; i++) {
 			m = musters.get(i);
-			if(!m.isUpLimited() && !m.isDownLimited() && m.isUpBreaker()) {
+			if(m!=null && !m.isUpLimited() && !m.isDownLimited() && m.isUpBreaker() && m.isUp()) {
 				breakers.add(m);
 			}
 			if(breakers.size()>=top) {
@@ -178,6 +162,39 @@ public class HLB {
 		
 		return breakers;
 	}
-
-
+	
+	class Keeps{
+		private TreeMap<LocalDate,Set<String>> drops = new TreeMap<LocalDate,Set<String>>();
+		private Integer max_drops_size = 89;
+		
+		public void add(LocalDate date, String id) {
+			Set<String> ds = drops.get(date);
+			if(ds == null) {
+				ds = new HashSet<String>();
+				drops.put(date, ds);
+				if(drops.size()>max_drops_size) {
+					drops.pollFirstEntry();
+				}
+			}
+			ds.add(id);
+		}
+		
+		public List<Muster> getUps(Map<String,Muster> musters){
+			Set<String> ids = new HashSet<String>();
+			for(Set<String> ds : drops.values()) {
+				ids.addAll(ds);
+			}
+			
+			List<Muster> ms = new ArrayList<Muster>();
+			Muster m;
+			for(String id : ids) {
+				m = musters.get(id);
+				if(m!=null && !m.isUpLimited() && !m.isDownLimited() && m.isAboveAveragePrice(21) && m.isUp()) {
+					ms.add(m);
+				}
+			}
+			
+			return ms;
+		}
+	}
 }

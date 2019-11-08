@@ -27,6 +27,7 @@ import com.rhb.istock.kdata.Kbar;
 import com.rhb.istock.kdata.KdataService;
 import com.rhb.istock.kdata.api.KdatasView;
 import com.rhb.istock.trade.turtle.simulation.six.TurtleMusterSimulation;
+import com.rhb.istock.trade.turtle.simulation.six.TurtleMusterSimulation_hunt;
 import com.rhb.istock.trade.turtle.simulation.six.repository.AmountEntity;
 import com.rhb.istock.trade.turtle.simulation.six.repository.TurtleSimulationRepository;
 
@@ -40,6 +41,10 @@ public class TurtleSimulationApi {
 	@Qualifier("turtleMusterSimulation")
 	TurtleMusterSimulation turtleMusterSimulation;
 
+	@Autowired
+	@Qualifier("turtleMusterSimulation_hunt")
+	TurtleMusterSimulation_hunt turtleMusterSimulation_hunt;
+	
 	@Autowired
 	@Qualifier("itemServiceImp")
 	ItemService itemService;
@@ -107,8 +112,15 @@ public class TurtleSimulationApi {
 		}catch(Exception e){
 			return new ResponseContent<String>(ResponseEnum.ERROR, " NO date!");
 		}
+
+		turtleSimulationRepository.evictAmountsCache();
+		turtleSimulationRepository.evictBreakersCache();
+		turtleSimulationRepository.evictBuysCache();
+		turtleSimulationRepository.evictSellsCache();
+
 		
 		turtleMusterSimulation.simulate(theBeginDate, theEndDate); 
+		turtleMusterSimulation_hunt.simulate(theBeginDate, theEndDate);
 		
 		turtleSimulationRepository.evictAmountsCache();
 		turtleSimulationRepository.evictBreakersCache();

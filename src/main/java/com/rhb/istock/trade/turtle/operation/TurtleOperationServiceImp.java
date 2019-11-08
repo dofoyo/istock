@@ -24,7 +24,6 @@ import com.rhb.istock.item.ItemService;
 import com.rhb.istock.kdata.Kbar;
 import com.rhb.istock.kdata.Kdata;
 import com.rhb.istock.kdata.KdataService;
-import com.rhb.istock.kdata.Muster;
 import com.rhb.istock.kdata.api.KdatasView;
 import com.rhb.istock.selector.SelectorService;
 import com.rhb.istock.selector.hold.HoldEntity;
@@ -457,7 +456,7 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 		long beginTime=System.currentTimeMillis(); 
 		logger.info("createPotentialsWithLatestMarketData ......");
 
-		Map<String,Integer> datops = selectorService.getLatestDailyAmountTops(21);
+		//Map<String,Integer> datops = selectorService.getLatestDailyAmountTops(21);
 		
 		this.potentials = new ArrayList<Potential>(selectorService.getLatestPotentials().values());
 
@@ -467,12 +466,12 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 			
 			potential.setHlb(this.hltops.get(potential.getItemID()));
 			potential.setAvb(this.avtops.get(potential.getItemID()));
-			potential.setDtb(datops.get(potential.getItemID()));
+			//potential.setDtb(datops.get(potential.getItemID()));
 		}
 		
-		this.setBHL();
-		this.setBDT();
-		this.setBAV();
+		//this.setBHL();
+		//this.setBDT();
+		//this.setBAV();
 
 		logger.info("\ncreatePotentialsWithLatestMarketData done!");
 		long used = (System.currentTimeMillis() - beginTime)/1000; 

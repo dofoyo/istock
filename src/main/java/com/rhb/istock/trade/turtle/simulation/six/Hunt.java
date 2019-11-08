@@ -35,14 +35,13 @@ public class Hunt {
 	private StringBuffer potentials_sb = new StringBuffer();
 
 	private BigDecimal valueRatio = new BigDecimal(3);  //每只股票不能超过市值的1/3
-	private Integer top = 3;
 
 	public Hunt(BigDecimal initCash) {
 		account = new Account(initCash);
 		this.initCash = initCash;
 	}
 	
-	public void doIt(Map<String,Muster> musters, LocalDate date) {
+	public void doIt(Map<String,Muster> musters, Set<String> ids, LocalDate date) {
 		//logger.info(date.toString());
 		Muster muster;
 		account.setLatestDate(date);
@@ -66,12 +65,12 @@ public class Hunt {
 			}
 		}				
 
-		//买入潜力股
-		List<Muster> potentials = this.getHLs(new ArrayList<Muster>(musters.values()));
-		potentials_sb.append(date.toString() + ",");
+		//买入
+		List<Muster> potentials = this.getHLs(musters, ids);
+/*		potentials_sb.append(date.toString() + ",");
 		holdItemIDs = account.getItemIDsOfHolds();
 		for(Muster potential : potentials) {
-			if(!holdItemIDs.contains(potential.getItemID()) && !potential.isUpLimited()) {
+			if(!holdItemIDs.contains(potential.getItemID())) {
 				account.refreshHoldsPrice(potential.getItemID(), potential.getLatestPrice());
 				account.open(potential.getItemID(),potential.getItemName(), potential.getIndustry(), this.getQuantity(account.getCash(),account.getTotal(),potential.getLatestPrice()), "", potential.getLatestPrice());
 			}
@@ -82,9 +81,9 @@ public class Hunt {
 		potentials_sb.append("\n");
 		
 		dailyAmount_sb.append(account.getDailyAmount() + "\n");
-
+*/
 		
-/*		potentials_sb.append(date.toString() + ",");
+		potentials_sb.append(date.toString() + ",");
 		Set<Muster> dds = new HashSet<Muster>();
 		holdItemIDs = account.getItemIDsOfHolds();
 		for(Muster must : potentials) {
@@ -116,7 +115,7 @@ public class Hunt {
 		}
 
 		dailyAmount_sb.append(account.getDailyAmount() + "\n");
-*/	}
+	}
 	
 	private Integer getQuantity(BigDecimal cash, BigDecimal total,BigDecimal price) {
 		BigDecimal dd = total.divide(valueRatio,BigDecimal.ROUND_DOWN);
@@ -142,44 +141,17 @@ public class Hunt {
 		return result;
 	}
 	
-	private List<Muster> getHLs(List<Muster> musters){
-		List<Muster> hls = new ArrayList<Muster>();
-
-		Collections.sort(musters, new Comparator<Muster>() {
-			@Override
-			public int compare(Muster o1, Muster o2) {
-				if(o1.getHLGap().compareTo(o2.getHLGap())==0) {
-					return o1.getLatestPrice().compareTo(o2.getLatestPrice()); //a-z
-				}else {
-					return o1.getHLGap().compareTo(o2.getHLGap());//A-Z
-				}
-				
-/*				if(o1.getHLGap().compareTo(o2.getHLGap())==0){
-					if(o1.getLNGap().compareTo(o2.getLNGap())==0){  
-						return o1.getLatestPrice().compareTo(o2.getLatestPrice()); //a-z
-					}else {
-						return o1.getLNGap().compareTo(o2.getLNGap()); //a-z
-					}
-				}else {
-					return o1.getHLGap().compareTo(o2.getHLGap());//A-Z
-				}
-*/				
-
-			}
-		});
-
+	private List<Muster> getHLs(Map<String,Muster> musters,Set<String> ids){
+		List<Muster>  ms = new ArrayList<Muster>();
 		Muster m;
-		for(int i=0; i<musters.size(); i++) {
-			m = musters.get(i);
-			if(!m.isUpLimited() && !m.isDownLimited() && m.isUp()){
-				hls.add(m);
-			}
-			if(hls.size()>=top) {
-				break;
+		for(String id : ids) {
+			m = musters.get(id);
+			if(m!=null && !m.isUpLimited() && !m.isDownLimited() && m.isAboveAveragePrice(21) && m.isUp()) {
+				ms.add(m);
 			}
 		}
-		
-		return hls;
+				
+		return ms;
 	}
 	
 }
