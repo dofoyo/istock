@@ -27,6 +27,7 @@ import com.rhb.istock.kdata.Kbar;
 import com.rhb.istock.kdata.KdataService;
 import com.rhb.istock.kdata.api.KdatasView;
 import com.rhb.istock.trade.turtle.simulation.six.TurtleMusterSimulation;
+import com.rhb.istock.trade.turtle.simulation.six.TurtleMusterSimulation_avb_plus;
 import com.rhb.istock.trade.turtle.simulation.six.TurtleMusterSimulation_hunt;
 import com.rhb.istock.trade.turtle.simulation.six.repository.AmountEntity;
 import com.rhb.istock.trade.turtle.simulation.six.repository.TurtleSimulationRepository;
@@ -44,6 +45,10 @@ public class TurtleSimulationApi {
 	@Autowired
 	@Qualifier("turtleMusterSimulation_hunt")
 	TurtleMusterSimulation_hunt turtleMusterSimulation_hunt;
+	
+	@Autowired
+	@Qualifier("turtleMusterSimulation_avb_plus")
+	TurtleMusterSimulation_avb_plus turtleMusterSimulation_avb_plus;
 	
 	@Autowired
 	@Qualifier("itemServiceImp")
@@ -121,6 +126,7 @@ public class TurtleSimulationApi {
 		
 		turtleMusterSimulation.simulate(theBeginDate, theEndDate); 
 		turtleMusterSimulation_hunt.simulate(theBeginDate, theEndDate);
+		turtleMusterSimulation_avb_plus.simulate(theBeginDate, theEndDate);
 		
 		turtleSimulationRepository.evictAmountsCache();
 		turtleSimulationRepository.evictBreakersCache();

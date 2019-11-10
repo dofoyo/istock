@@ -52,7 +52,7 @@ public class TurtleMusterSimulation {
 
 		BHL bhl = new BHL(initCash);
 		BAV bav = new BAV(initCash);
-		Blue bdt = new Blue(initCash);
+		//Blue bdt = new Blue(initCash);
 		//Hunt dtb = new Hunt(initCash);
 
 		AVB avb = new AVB(initCash);
@@ -69,7 +69,7 @@ public class TurtleMusterSimulation {
 			if(musters!=null && musters.size()>0) {
 				bhl.doIt(musters, date);
 				bav.doIt(musters, itemService.getSz50(date), date);
-				bdt.doIt(musters, bluechipService.getBluechipIDs(date), date);
+				//bdt.doIt(musters, bluechipService.getBluechipIDs(date), date);
 				//dtb.doIt(musters, date);
 
 				hlb.doIt(musters, date);
@@ -79,7 +79,7 @@ public class TurtleMusterSimulation {
 		
 		Map<String, String> bhlResult = bhl.result();
 		Map<String, String> bavResult = bav.result();
-		Map<String, String> bdtResult = bdt.result();
+		//Map<String, String> bdtResult = bdt.result();
 		//Map<String, String> dtbResult = dtb.result();
 
 		Map<String, String> avbResult = avb.result();
@@ -87,7 +87,7 @@ public class TurtleMusterSimulation {
 		
 		turtleSimulationRepository.save("bhl", bhlResult.get("breakers"), bhlResult.get("CSV"), bhlResult.get("dailyAmount"));
 		turtleSimulationRepository.save("bav", bavResult.get("breakers"), bavResult.get("CSV"), bavResult.get("dailyAmount"));
-		turtleSimulationRepository.save("bdt", bdtResult.get("breakers"), bdtResult.get("CSV"), bdtResult.get("dailyAmount"));
+		//turtleSimulationRepository.save("bdt", bdtResult.get("breakers"), bdtResult.get("CSV"), bdtResult.get("dailyAmount"));
 		//turtleSimulationRepository.save("dtb", dtbResult.get("breakers"), dtbResult.get("CSV"), dtbResult.get("dailyAmount"));
 
 		turtleSimulationRepository.save("hlb", hlbResult.get("breakers"), hlbResult.get("CSV"), hlbResult.get("dailyAmount"));
