@@ -67,7 +67,7 @@ public class KdataRepositoryDzh implements KdataRepository{
 	}
 
 	@Override
-	public LocalDate getLastDate() {
+	public LocalDate getLastDate(String itemID) {
 		// TODO Auto-generated method stub
 		return null;
 	}

@@ -38,8 +38,8 @@ public class KdataRepositoryTushare implements KdataRepository{
 		KdataEntity kdata = new KdataEntity(itemID);
 
 		String tushareID = itemID.indexOf("sh")==0 ? itemID.substring(2)+".SH" : itemID.substring(2)+".SZ";
-		String kdataFile = kdataPath + "/" + tushareID + "_kdatas.json";
-		String factorFile = kdataPath + "/" + tushareID + "_factors.json";
+		String kdataFile = kdataPath + "/daily/" + tushareID + "_kdatas.json";
+		String factorFile = kdataPath + "/factor/" + tushareID + "_factors.json";
 
 		//System.out.println(kdataFile);//----------------
 		BigDecimal roof = null;
@@ -111,12 +111,13 @@ public class KdataRepositoryTushare implements KdataRepository{
 	}
 
 	@Override
-	public LocalDate getLastDate() {
-		String itemID1="sh601398"; //工商银行
-		String itemID2="sh601288"; //农业银行
-		LocalDate date1 = this.getKdata(itemID1).getLastDate();
-		LocalDate date2 = this.getKdata(itemID2).getLastDate();
-		return date1.isAfter(date2) ? date1 : date2;
+	public LocalDate getLastDate(String itemID) {
+		KdataEntity kdata = this.getKdata(itemID);
+		if(kdata != null) {
+			return kdata.getLastDate();
+		}else {
+			return null;
+		}
 	}
 
 

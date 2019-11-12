@@ -35,10 +35,12 @@ public class Hunt {
 	private StringBuffer potentials_sb = new StringBuffer();
 
 	private BigDecimal valueRatio = new BigDecimal(3);  //每只股票不能超过市值的1/3
+	private boolean isUp = false;
 
-	public Hunt(BigDecimal initCash) {
+	public Hunt(BigDecimal initCash, boolean isUp) {
 		account = new Account(initCash);
 		this.initCash = initCash;
+		this.isUp = isUp;
 	}
 	
 	public void doIt(Map<String,Muster> musters, Set<String> ids, LocalDate date) {
@@ -66,7 +68,7 @@ public class Hunt {
 		}				
 
 		//买入
-		List<Muster> potentials = this.getHLs(musters, ids);
+		List<Muster> potentials = this.isUp ? this.getUps(musters, ids) : this.getAboves(musters, ids);
 /*		potentials_sb.append(date.toString() + ",");
 		holdItemIDs = account.getItemIDsOfHolds();
 		for(Muster potential : potentials) {
@@ -141,7 +143,20 @@ public class Hunt {
 		return result;
 	}
 	
-	private List<Muster> getHLs(Map<String,Muster> musters,Set<String> ids){
+	private List<Muster> getAboves(Map<String,Muster> musters,Set<String> ids){
+		List<Muster>  ms = new ArrayList<Muster>();
+		Muster m;
+		for(String id : ids) {
+			m = musters.get(id);
+			if(m!=null && !m.isUpLimited() && !m.isDownLimited() && m.isAboveAveragePrice(21)) {
+				ms.add(m);
+			}
+		}
+				
+		return ms;
+	}
+	
+	private List<Muster> getUps(Map<String,Muster> musters,Set<String> ids){
 		List<Muster>  ms = new ArrayList<Muster>();
 		Muster m;
 		for(String id : ids) {
@@ -152,6 +167,5 @@ public class Hunt {
 		}
 				
 		return ms;
-	}
-	
+	}	
 }

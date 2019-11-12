@@ -57,7 +57,7 @@ public class TurtleMusterSimulation_hunt {
 		long beginTime=System.currentTimeMillis(); 
 		System.out.println("simulate hunt from " + beginDate + " to " + endDate +" ......");
 
-		Hunt dtb = new Hunt(initCash);
+		Hunt dtb = new Hunt(initCash, false);
 
 		TreeMap<LocalDate,List<String>> sells = turtleSimulationRepository.getSells("hlb");
 		TreeMap<LocalDate,List<String>> buys = turtleSimulationRepository.getBuys("hlb"); // itemID, itemName, profit

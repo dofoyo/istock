@@ -49,7 +49,7 @@ public class TurtleMusterSimulation_avb_plus {
 	ItemService itemService;
 	
 	BigDecimal initCash = new BigDecimal(1000000);
-	
+
 	/*
 	 * 根据输入起止日期，系统模拟买入和卖出
 	 */
@@ -57,7 +57,7 @@ public class TurtleMusterSimulation_avb_plus {
 		long beginTime=System.currentTimeMillis(); 
 		System.out.println("simulate hunt from " + beginDate + " to " + endDate +" ......");
 
-		Hunt dtb = new Hunt(initCash);
+		Hunt bdt = new Hunt(initCash, true);
 
 		TreeMap<LocalDate,List<String>> sells = turtleSimulationRepository.getSells("avb");
 		TreeMap<LocalDate,List<String>> buys = turtleSimulationRepository.getBuys("avb"); // itemID, itemName, profit
@@ -82,11 +82,11 @@ public class TurtleMusterSimulation_avb_plus {
 			fromIndex = toIndex<max_period ? 0 : toIndex-max_period;
 			
 			if(musters!=null && musters.size()>0) {
-				dtb.doIt(musters, this.getIDs(buys,sells, dates.subList(fromIndex, toIndex)), date);
+				bdt.doIt(musters, this.getIDs(buys,sells, dates.subList(fromIndex, toIndex)), date);
 			}
 		}
 		
-		Map<String, String> dtbResult = dtb.result();
+		Map<String, String> dtbResult = bdt.result();
 		
 		turtleSimulationRepository.save("bdt", dtbResult.get("breakers"), dtbResult.get("CSV"), dtbResult.get("dailyAmount"));
 

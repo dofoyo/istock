@@ -20,7 +20,7 @@ public class KdataRealtimeSpiderTest {
 	//@Test
 	public void testIsTradeDate() {
 		LocalDate date = LocalDate.now();
-		System.out.println(kdataRealtimeSpider.isTradeDate(date));
+		System.out.println(kdataRealtimeSpider.isTradeDate1(date));
 	}
 	
 	

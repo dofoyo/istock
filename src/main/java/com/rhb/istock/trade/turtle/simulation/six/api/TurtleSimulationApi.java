@@ -82,7 +82,7 @@ public class TurtleSimulationApi {
 			kdatas.setCode(item.getCode());
 			kdatas.setName(item.getName());
 			
-			LocalDate latestDate = kdataService.getLatestMarketDate();
+			LocalDate latestDate = kdataService.getLatestMarketDate("sh000001");
 			List<LocalDate> dates = kdataService.getKdata(itemID, theEndDate, true).getDates();
 			Kbar bar;
 			for(LocalDate date : dates) {

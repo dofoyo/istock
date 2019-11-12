@@ -70,7 +70,7 @@ public class KdataRepository163 implements KdataRepository {
 	public void evictKDataCache() {}
 
 	@Override
-	public LocalDate getLastDate() {
+	public LocalDate getLastDate(String itemID) {
 		return this.getKdataByCache("sh000001").getLastDate();
 	}
 

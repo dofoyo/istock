@@ -21,8 +21,8 @@ public class KdataRealtimeSpiderImp implements KdataRealtimeSpider{
 	DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
 
 	@Override
-	public LocalDate getLatestMarketDate() {
-		String url = "http://qt.gtimg.cn/q=sh000001";
+	public LocalDate getLatestMarketDate(String itemID) {
+		String url = "http://qt.gtimg.cn/q=" + itemID;
 		String result = HttpClient.doGet(url);
 		
 		String[] ss = result.split("~");
@@ -118,7 +118,7 @@ public class KdataRealtimeSpiderImp implements KdataRealtimeSpider{
 
 
 	@Override
-	public boolean isTradeDate(LocalDate date) {
+	public boolean isTradeDate1(LocalDate date) {
 		String url = "http://api.tushare.pro";
 		JSONObject args = new JSONObject();
 		args.put("api_name", "trade_cal");
@@ -130,11 +130,20 @@ public class KdataRealtimeSpiderImp implements KdataRealtimeSpider{
 		args.put("params", params);
 		
 		String str = HttpClient.doPostJson(url, args.toString());
-		//System.out.println(str);
-		JSONArray items = (new JSONObject(str)).getJSONObject("data").getJSONArray("items");
+		JSONObject tmp = new JSONObject(str);
+		
+		JSONArray items = null;
+		try {
+			items = tmp.getJSONObject("data").getJSONArray("items");
+		}catch(Exception e) {
+			System.out.println(date.toString());
+			System.out.println(str);
+			e.printStackTrace();
+		}
+		
 		Integer isOpen;
 		LocalDate theDate;
-		if(items.length()>0) {
+		if(items!=null && items.length()>0) {
 			JSONArray item = items.getJSONArray(0);
 			System.out.println(item);
 			isOpen = item.getInt(2);

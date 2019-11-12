@@ -49,8 +49,8 @@ public class AppInitRunner implements CommandLineRunner {
     	
 		if(this.isTradeDate()) {
 	     	itemService.download();
-	    	kdataService.downKdatasAndFactors();  //上一交易日的收盘数据下载完成后，执行generateMuster，下载并整理上一交易日的收盘数据2分钟，生成muster需要3分钟，合计大概需要5分钟
 	    	kdataService.downSSEI();
+	    	kdataService.downKdatasAndFactors();  //上一交易日的收盘数据下载完成后，执行generateMuster，下载并整理上一交易日的收盘数据2分钟，生成muster需要3分钟，合计大概需要5分钟
 		}
 
     	turtleOperationService.init();
@@ -62,7 +62,10 @@ public class AppInitRunner implements CommandLineRunner {
 
 	private boolean isTradeDate() {
 		LocalDate now = LocalDate.now();
-		boolean flag = kdataRealtimeSpider.isTradeDate(now);
+		LocalDate theDay = kdataRealtimeSpider.getLatestMarketDate("sh000001");
+		
+		//boolean flag = kdataRealtimeSpider.isTradeDate(now);
+		boolean flag = now.equals(theDay) ? true : false;
 		
 		if(flag) {
 	    	logger.info("today is a trade date. Good Luck!");

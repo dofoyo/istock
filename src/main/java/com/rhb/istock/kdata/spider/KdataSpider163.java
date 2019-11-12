@@ -4,15 +4,20 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.rhb.istock.comm.util.HttpDownload;
+import com.rhb.istock.kdata.KdataServiceImp;
 
 @Service("kdataSpider163")
 public class KdataSpider163 implements KdataSpider {
 	@Value("${kdataPath163}")
 	private String kdataPath;
+	
+	protected static final Logger logger = LoggerFactory.getLogger(KdataSpider163.class);
 	
 	@Override
 	public void downKdatas(List<String> ids) throws Exception {
@@ -43,6 +48,8 @@ public class KdataSpider163 implements KdataSpider {
 
 		//System.out.println("save trade record: " + pathAndfileName);
 		HttpDownload.saveToFile(url, pathAndfileName);
+		
+		logger.info("KdataService.downSSEI  done!  ..........");
 
 
 	}

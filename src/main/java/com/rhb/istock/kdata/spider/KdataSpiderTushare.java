@@ -47,7 +47,7 @@ public class KdataSpiderTushare implements KdataSpider {
 		String str = HttpClient.doPostJson(url, args.toString());
 		JSONObject data = (new JSONObject(str)).getJSONObject("data");
 		
-		String kdataFile = kdataPath + "/" + tushareID + "_kdatas.json";
+		String kdataFile = kdataPath + "/daily/" + tushareID + "_kdatas.json";
 		FileTools.writeTextFile(kdataFile, data.toString(), false);
 	}
 	
@@ -67,7 +67,7 @@ public class KdataSpiderTushare implements KdataSpider {
 		String str = HttpClient.doPostJson(url, args.toString());
 		JSONObject data = (new JSONObject(str)).getJSONObject("data");
 		
-		String kdataFile = kdataPath + "/" + tushareID + "_factors.json";
+		String kdataFile = kdataPath + "/factor/" + tushareID + "_factors.json";
 		FileTools.writeTextFile(kdataFile, data.toString(), false);
 	}
 
@@ -88,7 +88,7 @@ public class KdataSpiderTushare implements KdataSpider {
 		
 		String str = HttpClient.doPostJson(url, args.toString());
 
-		String kdataFile = kdataPath + "/kdatas_" + date + ".json";
+		String kdataFile = kdataPath + "/daily/kdatas_" + date + ".json";
 		FileTools.writeTextFile(kdataFile, str, false);
 
 		JSONArray items = (new JSONObject(str)).getJSONObject("data").getJSONArray("items");	
@@ -148,7 +148,7 @@ public class KdataSpiderTushare implements KdataSpider {
 	private String downloadFactors(LocalDate date) {
 		String result = null;
 		
-		String kdataFile = kdataPath + "/factors_" + date + ".json";
+		String kdataFile = kdataPath + "/factor/factors_" + date + ".json";
 		
 		String url = "http://api.tushare.pro";
 		JSONObject args = new JSONObject();
@@ -172,7 +172,7 @@ public class KdataSpiderTushare implements KdataSpider {
 			JSONObject data;
 			JSONArray dataItems;
 			String id = item.getString(0);
-			String kdataFile = kdataPath + "/" + id+ "_kdatas.json";
+			String kdataFile = kdataPath + "/daily/" + id+ "_kdatas.json";
 			File file = new File(kdataFile);
 			if(file.exists()) {
 				data = new JSONObject(FileTools.readTextFile(kdataFile));
@@ -210,7 +210,7 @@ public class KdataSpiderTushare implements KdataSpider {
 			JSONObject data;
 			JSONArray dataItems;
 			String id = item.getString(0);
-			String factorFile = kdataPath + "/" + id+ "_factors.json";
+			String factorFile = kdataPath + "/factor/" + id+ "_factors.json";
 			File file = new File(factorFile);
 			if(file.exists()) {
 				data = new JSONObject(FileTools.readTextFile(factorFile));

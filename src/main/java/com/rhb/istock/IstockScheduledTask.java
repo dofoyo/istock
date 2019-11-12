@@ -50,7 +50,11 @@ public class IstockScheduledTask {
 	private boolean isTradeDate() {
 		LocalDate now = LocalDate.now();
 		if(this.theDate==null || !now.equals(theDate)) {
-			this.isTradeDate = kdataRealtimeSpider.isTradeDate(now);
+			LocalDate dd = kdataRealtimeSpider.getLatestMarketDate("sh000001");
+
+			//this.isTradeDate = kdataRealtimeSpider.isTradeDate(now);
+			this.isTradeDate = now.equals(dd) ? true : false;
+			
 			theDate = now;
 		}
 		
@@ -72,11 +76,11 @@ public class IstockScheduledTask {
 	@Scheduled(cron="0 30 9 ? * 1-5") 
 	public void dailyInit() throws Exception {
 		System.out.println("run scheduled of '0 30 9 ? * 1-5'");
-		if(this.isTradeDate()) {
-			itemService.download();		//下载最新股票代码
-			kdataService.downKdatasAndFactors(); //上一交易日的收盘数据要等开盘前才能下载到, 大约需要15分钟
-			kdataService.downSSEI();
-			turtleOperationService.init();
+		if(this.isTradeDate()) {   //次序很重要
+			itemService.download();		// 1. 下载最新股票代码
+			kdataService.downSSEI();  // 2. 
+			kdataService.downKdatasAndFactors(); // 3. 上一交易日的收盘数据要等开盘前才能下载到, 大约需要15分钟
+			turtleOperationService.init();  // 4. 
 		}
 	}
 

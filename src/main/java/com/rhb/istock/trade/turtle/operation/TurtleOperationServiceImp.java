@@ -116,7 +116,7 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 	}
 
 	private void setDailyKdata(String itemID, boolean byCache) {
-		LocalDate endDate = kdataService.getLatestMarketDate();
+		LocalDate endDate = kdataService.getLatestMarketDate("sh000001");
 		
 		Kbar kbar;
 		Kdata kdata = kdataService.getKdata(itemID, endDate, turtle.getOpenDuration(), byCache);
@@ -138,7 +138,7 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 		
 		boolean flag = false;
 		
-		LocalDate endDate = kdataService.getLatestMarketDate();
+		LocalDate endDate = kdataService.getLatestMarketDate("sh000001");
 		
 		Kbar kbar = kdataService.getLatestMarketData(itemID);
 		if(kbar!=null) {

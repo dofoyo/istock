@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 public interface KdataRealtimeSpider {
-	public LocalDate getLatestMarketDate(); 
+	public LocalDate getLatestMarketDate(String id); 
 	public Map<String,String> getLatestMarketData(String id);
 	public List<String> getLatestDailyTop(Integer top);
 	
@@ -14,6 +14,6 @@ public interface KdataRealtimeSpider {
 	 */
 	public List<LocalDate> getCalendar(LocalDate startDate,LocalDate endDate) throws Exception;
 	
-	public boolean isTradeDate(LocalDate date);
+	public boolean isTradeDate1(LocalDate date);
 
 }

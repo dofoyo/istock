@@ -14,14 +14,15 @@ public interface KdataService {
 	public Integer getSseiFlag(LocalDate date); 
 	
 	public Kdata getKdata(String itemID, LocalDate endDate, Integer count, boolean byCache);
-	public Kdata getLastKdata(String itemID, Integer count, boolean byCache);
+	public Kdata getKdata(String itemID, LocalDate beginDate, LocalDate endDate, boolean byCache);
 	public Kdata getKdata(String itemID, LocalDate endDate, boolean byCache);
 	public Kdata getKdata(String itemID, boolean byCache);
 	public Kbar getKbar(String itemID,LocalDate date, boolean byCache);
+	public Kdata getLastKdata(String itemID, Integer count, boolean byCache);
 	public void evictKDataCache();
 	
-	public LocalDate getLatestMarketDate(); 
-	public LocalDate getLastKdataDate();
+	public LocalDate getLatestMarketDate(String itemID); 
+	public LocalDate getLastKdataDate(String itemID);
 	
 	public Kbar getLatestMarketData(String itemID);
 	public List<String> getLatestDailyTop(Integer top); 

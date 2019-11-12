@@ -75,7 +75,7 @@ public class BalloonOperationServiceImp implements BalloonOperationService {
 
 	
 	private void setDailyKdata(String itemID) {
-		LocalDate endDate = kdataService.getLatestMarketDate();
+		LocalDate endDate = kdataService.getLatestMarketDate("sh000001");
 		boolean byCache = true;  
 		
 		Kbar kbar;
@@ -98,7 +98,7 @@ public class BalloonOperationServiceImp implements BalloonOperationService {
 		
 		boolean flag = false;
 		
-		LocalDate endDate = kdataService.getLatestMarketDate();
+		LocalDate endDate = kdataService.getLatestMarketDate("sh000001");
 		
 		Kbar kbar = kdataService.getLatestMarketData(itemID);
 		if(kbar!=null) {

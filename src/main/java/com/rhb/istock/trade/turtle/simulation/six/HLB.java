@@ -37,8 +37,6 @@ public class HLB {
 	private Integer pool = 21;
 	private Integer top = 5;
 	
-	private Keeps keeps = new Keeps();
-	
 	public HLB(BigDecimal initCash) {
 		account = new Account(initCash);
 		this.initCash = initCash;
@@ -63,12 +61,10 @@ public class HLB {
 				if(muster.isDrop(21) && !muster.isDownLimited()) {
 					account.drop(itemID, "跌破dropLine", muster.getLatestPrice()); 
 					account.dropHoldState(itemID);
-					keeps.add(date, itemID);
 				}
 				if(muster.isDropLowest(21) && !muster.isDownLimited()) {
 					account.drop(itemID, "跌破lowest", muster.getLatestPrice()); 
 					account.dropHoldState(itemID);
-					keeps.add(date, itemID);
 				}
 			}
 		}				
@@ -148,7 +144,15 @@ public class HLB {
 				
 			}
 		});
-
+		
+/*		Distribution distribution = new Distribution();
+		for(Muster m : musters) {
+			if(m!=null && !m.isUpLimited() && !m.isDownLimited() && m.isUpBreaker() && m.isUp()) {
+				distribution.add(m.getHLGap(), m.getItemID());
+			}
+		}
+		distribution.show();
+*/		
 		Muster m;
 		for(int i=0; i<musters.size() && i<pool; i++) {
 			m = musters.get(i);
@@ -163,38 +167,26 @@ public class HLB {
 		return breakers;
 	}
 	
-	class Keeps{
-		private TreeMap<LocalDate,Set<String>> drops = new TreeMap<LocalDate,Set<String>>();
-		private Integer max_drops_size = 89;
-		
-		public void add(LocalDate date, String id) {
-			Set<String> ds = drops.get(date);
-			if(ds == null) {
-				ds = new HashSet<String>();
-				drops.put(date, ds);
-				if(drops.size()>max_drops_size) {
-					drops.pollFirstEntry();
-				}
+	class Distribution {
+		TreeMap<Integer, Set<String>> ids = new TreeMap<Integer, Set<String>>();
+		public void add(Integer i, String id) {
+			Set<String> ss = ids.get(i);
+			if(ss == null) {
+				ss = new HashSet<String>();
+				ids.put(i, ss);
 			}
-			ds.add(id);
+			ss.add(id);
 		}
 		
-		public List<Muster> getUps(Map<String,Muster> musters){
-			Set<String> ids = new HashSet<String>();
-			for(Set<String> ds : drops.values()) {
-				ids.addAll(ds);
+		public void show() {
+			StringBuffer sb = new StringBuffer();
+			for(Map.Entry<Integer, Set<String>> entry : ids.entrySet()) {
+				sb.append(entry.getKey());
+				sb.append(":");
+				sb.append(entry.getValue().size());
+				sb.append("\n");
 			}
-			
-			List<Muster> ms = new ArrayList<Muster>();
-			Muster m;
-			for(String id : ids) {
-				m = musters.get(id);
-				if(m!=null && !m.isUpLimited() && !m.isDownLimited() && m.isAboveAveragePrice(21) && m.isUp()) {
-					ms.add(m);
-				}
-			}
-			
-			return ms;
+			logger.info(sb.toString());
 		}
 	}
 }

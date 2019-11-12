@@ -9,5 +9,5 @@ public interface KdataRepository {
 	public KdataEntity getKdataByCache(String itemID);
 	public KdataEntity getKdata(String itemID);
 	public void evictKDataCache();
-	public LocalDate getLastDate();
+	public LocalDate getLastDate(String itemID);
 }

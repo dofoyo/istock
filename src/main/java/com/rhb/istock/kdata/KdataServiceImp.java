@@ -30,7 +30,7 @@ import com.rhb.istock.kdata.spider.KdataSpider;
 public class KdataServiceImp implements KdataService{
 	@Autowired
 	@Qualifier("kdataRepositoryTushare")
-	KdataRepository kdataRepository;
+	KdataRepository kdataRepositoryTushare;
 	
 	@Autowired
 	@Qualifier("kdataRealtimeSpiderImp")
@@ -69,9 +69,9 @@ public class KdataServiceImp implements KdataService{
 	private KdataEntity getEntity(String itemID, boolean byCache) {
 		KdataEntity entity = null;
 		if(byCache) {
-			entity = sseiID.equals(itemID)? kdataRepository163.getKdataByCache(sseiID): kdataRepository.getKdataByCache(itemID);
+			entity = sseiID.equals(itemID)? kdataRepository163.getKdataByCache(sseiID): kdataRepositoryTushare.getKdataByCache(itemID);
 		}else {
-			entity = sseiID.equals(itemID)? kdataRepository163.getKdata(sseiID): kdataRepository.getKdata(itemID);
+			entity = sseiID.equals(itemID)? kdataRepository163.getKdata(sseiID): kdataRepositoryTushare.getKdata(itemID);
 		}
 		return entity;
 	}
@@ -127,21 +127,29 @@ public class KdataServiceImp implements KdataService{
 	}
 
 	@Override
-	public LocalDate getLatestMarketDate() {
-		return kdataRealtimeSpider.getLatestMarketDate();
+	public LocalDate getLatestMarketDate(String itemID) {
+		return kdataRealtimeSpider.getLatestMarketDate(itemID);
 	}
 
+	/*
+	 * 下载前，要先下载上证指数sh000001
+	 */
 	@Override
 	public void downKdatasAndFactors() throws Exception {
 		logger.info("KdataService.downKdatas..........");
 		
-		LocalDate latestDate = kdataRealtimeSpider.getLatestMarketDate();
+		LocalDate latestDate = kdataRealtimeSpider.getLatestMarketDate("sh000001");
 		logger.info("latest trade date " + latestDate);
 
-		LocalDate lastDownDate = kdataRepository.getLastDate();
+		LocalDate lastDownDate1 = kdataRepositoryTushare.getLastDate("sh601398");
+		LocalDate lastDownDate2 = kdataRepositoryTushare.getLastDate("sh601288");
+		LocalDate lastDownDate = lastDownDate1.isBefore(lastDownDate2) ? lastDownDate2 : lastDownDate1;
 		logger.info("last down date " + lastDownDate);
 
-		List<LocalDate> dates = kdataRealtimeSpider.getCalendar(lastDownDate,latestDate);
+		List<LocalDate> dates = this.getKdata("sh000001", lastDownDate.plusDays(1), latestDate, true).getDates();
+
+		//List<LocalDate> dates = kdataRealtimeSpider.getCalendar(lastDownDate,latestDate);
+		
 		logger.info("dates bewteen latest trade date and down date " + dates);
 		
 		LocalDate date;
@@ -189,7 +197,7 @@ public class KdataServiceImp implements KdataService{
 
 	@Override
 	public void evictKDataCache() {
-		kdataRepository.evictKDataCache();
+		kdataRepositoryTushare.evictKDataCache();
 		kdataRepository163.evictKDataCache();
 	}
 
@@ -222,8 +230,9 @@ public class KdataServiceImp implements KdataService{
 	}
 
 	@Override
-	public LocalDate getLastKdataDate() {
-		return kdataRepository.getLastDate();
+	public LocalDate getLastKdataDate(String itemID) {
+		KdataEntity entity = this.getEntity(itemID, true);
+		return entity.getLastDate();
 	}
 
 	@Override
@@ -320,7 +329,7 @@ public class KdataServiceImp implements KdataService{
 	
 	@Override
 	public Map<String,Muster> getLatestMusters() {
-		LocalDate date = kdataRealtimeSpider.getLatestMarketDate();
+		LocalDate date = kdataRealtimeSpider.getLatestMarketDate("sh000001");
 		return this.getMusters(date);
 	}
 
@@ -330,7 +339,7 @@ public class KdataServiceImp implements KdataService{
 		long beginTime=System.currentTimeMillis(); 
 		logger.info("generateLatestMusters ......");
 		
-		LocalDate date = kdataRealtimeSpider.getLatestMarketDate();
+		LocalDate date = kdataRealtimeSpider.getLatestMarketDate("sh000001");
 
 		//LocalDate date = kdataRepository.getLastDate();
 		if(musterRepositoryImp.isMustersExist(date)) {
@@ -440,7 +449,7 @@ public class KdataServiceImp implements KdataService{
 		logger.info("updateLatestMusters ......");
 
 		Kbar kbar;
-		LocalDate date = this.getLatestMarketDate();
+		LocalDate date = this.getLatestMarketDate("sh000001");
 		Map<String,Muster> musters = this.getLatestMusters();
 		List<MusterEntity> entities = new ArrayList<MusterEntity>();
 		int i=1;
@@ -529,8 +538,14 @@ public class KdataServiceImp implements KdataService{
 
 	@Override
 	public void downSSEI() {
+		logger.info("KdataService.downSSEI..........");
+
 		try {
-			kdataSpider163.downKdatas(sseiID);
+			LocalDate latestMarketDate = this.getLatestMarketDate("sh000001");
+			LocalDate latestKdataDate = this.getLastKdataDate("sh000001");
+			if(!latestMarketDate.equals(latestKdataDate)) {
+				kdataSpider163.downKdatas(sseiID);
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -568,6 +583,24 @@ public class KdataServiceImp implements KdataService{
 		}*/
 		
 		return flag;
+	}
+
+	@Override
+	public Kdata getKdata(String itemID, LocalDate beginDate, LocalDate endDate, boolean byCache) {
+		Kdata kdata = new Kdata(itemID);
+
+		KbarEntity bar;
+		
+		KdataEntity entity = this.getEntity(itemID, byCache);
+		
+		for(LocalDate date = beginDate; date.isBefore(endDate); date = date.plusDays(1)) {
+			bar = entity.getBar(date);
+			if(bar!=null) {
+				kdata.addBar(date, bar.getOpen(), bar.getHigh(), bar.getLow(), bar.getClose(), bar.getAmount(), bar.getQuantity());
+			}
+		}
+		
+		return kdata;
 	}
 
 }
