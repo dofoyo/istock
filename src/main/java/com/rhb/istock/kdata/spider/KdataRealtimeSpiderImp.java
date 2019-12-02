@@ -12,6 +12,7 @@ import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 
 import com.rhb.istock.comm.util.HttpClient;
+import com.rhb.istock.comm.util.HttpDownload;
 import com.rhb.istock.comm.util.ParseString;
 
 
@@ -22,10 +23,16 @@ public class KdataRealtimeSpiderImp implements KdataRealtimeSpider{
 
 	@Override
 	public LocalDate getLatestMarketDate(String itemID) {
-		String url = "http://qt.gtimg.cn/q=" + itemID;
-		String result = HttpClient.doGet(url);
+		String url = "https://qt.gtimg.cn/q=" + itemID;
+		
+		String result = HttpDownload.getResult(url);
+		//String result = HttpClient.doGet(url);
 		
 		String[] ss = result.split("~");
+		
+		if(ss==null || ss.length<30) {
+			return null;
+		}
 		
 		return LocalDate.parse(ss[30].substring(0, 8),formatter);
 	}
@@ -35,8 +42,11 @@ public class KdataRealtimeSpiderImp implements KdataRealtimeSpider{
 	public Map<String, String> getLatestMarketData(String id) {
 		Map<String,String> map = null;
 		
-		String url = "http://qt.gtimg.cn/q=" + id;
-		String result = HttpClient.doGet(url);
+		String url = "https://qt.gtimg.cn/q=" + id;
+		//System.out.println(url);
+		String result = HttpDownload.getResult(url);
+
+		//String result = HttpClient.doGet(url);
 		
 		String[] ss = result.split("~");
 		if(ss.length>4 && !ss[3].equals("0.00")) {

@@ -10,12 +10,26 @@ public class BalanceSheet{
 	private Double payables = 0.0;      		//资产负债表.预收帐款
 	private Double debt = 0.0; //资产负债表.负债合计
 	private Double assets = 0.0; // //资产负债表.资产总计
-	
+	private Double goodwill = 0.0; //商誉
 
 	public Double getDAR(){
 		return this.assets.intValue()==0 ? 0.0 : this.debt/this.assets;
 	}
 	
+	public Double getGoodwillRate(){
+		Double rate = this.goodwill.intValue()==0 ? 0.0 : this.goodwill/this.assets;
+		//System.out.println(String.format("%f/%f=%f", this.goodwill,this.assets,rate));
+		return rate;
+	}
+	
+	public Double getGoodwill() {
+		return goodwill;
+	}
+
+	public void setGoodwill(Double goodwill) {
+		this.goodwill = goodwill;
+	}
+
 	public Double getDebt() {
 		return debt;
 	}

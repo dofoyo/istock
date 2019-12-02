@@ -141,7 +141,7 @@ public class BHL {
 		Muster muster;
 		for(int i=0; i<musters.size(); i++) {
 			muster = musters.get(i);
-			if(muster.isUp() && !muster.isUpLimited() && !muster.isDownLimited()) {
+			if(muster.isUp(21) && !muster.isUpLimited() && !muster.isDownLimited()) {
 				bs.add(muster);
 			}
 			if(bs.size()>=top) {

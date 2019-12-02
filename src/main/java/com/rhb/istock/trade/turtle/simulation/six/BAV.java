@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -19,11 +20,12 @@ import com.rhb.istock.kdata.Muster;
 
 /*
  * 操作策略
- * 买入：21日趋势形成
- * 卖出：跌破21日低点
- * 筛选范围：上证50选3个
- * 筛选依据：成交量排名靠前，上升态势，没有涨停或跌停
- * 仓位控制：每只股票不能超过市值的1/3
+ *
+ * 买入：突破89日高点
+ * 卖出：跌破21日均线
+ * 筛选范围：上证50中筛选出3个突破的
+ * 筛选依据：89天日均成交量，越高越好
+ * 仓位控制：满仓，每只股票的均衡市值
  *
  */
 public class BAV {
@@ -43,7 +45,7 @@ public class BAV {
 		this.initCash = initCash;
 	}
 	
-	public void doIt(Map<String,Muster> musters, List<String> sz50, LocalDate date) {
+	public void doIt(Map<String,Muster> musters, List<String> sz50, LocalDate date, Integer sseiFlag) {
 		Muster muster;
 		account.setLatestDate(date);
 		
@@ -53,19 +55,56 @@ public class BAV {
 			muster = musters.get(itemID);
 			if(muster!=null) {
 				account.refreshHoldsPrice(itemID, muster.getLatestPrice());
-/*				if(muster.isDrop(21) && !muster.isDownLimited()) { 		//跌破21日均线就卖
+				if(sseiFlag==0 && muster.isDrop(21) && !muster.isDownLimited()) { 		//跌破21日均线就卖
 					account.drop(itemID, "跌破dropline", muster.getLatestPrice());
-				}	*/			
-				if(muster.isDropLowest(21) && !muster.isDownLimited()) { 		//跌破21日低点就卖
+				}				
+				if(sseiFlag==1 && muster.isDropLowest(21) && !muster.isDownLimited()) { 		//跌破21日低点就卖
 					account.drop(itemID, "跌破lowest", muster.getLatestPrice());
 				}	
 			}
 		}
 		
-		//买入
+		//确定突破走势的股票
+		Set<String> holdItemIDs = account.getItemIDsOfHolds();
+		Set<Muster> dds = new HashSet<Muster>();  //用set，无重复，表示不可加仓
 		List<Muster> breakers = this.getTops(musters, sz50);
-
 		breakers_sb.append(date.toString() + ",");
+		StringBuffer sb = new StringBuffer();
+		for(Muster breaker : breakers) {
+			if(!holdItemIDs.contains(breaker.getItemID())) {
+				dds.add(breaker);
+				sb.append(breaker.getItemName());
+				sb.append(",");
+			}
+			breakers_sb.append(breaker.getItemID());
+			breakers_sb.append(",");
+		}
+		breakers_sb.deleteCharAt(breakers_sb.length()-1);
+		breakers_sb.append("\n");
+		
+		//先卖后买，完成调仓和开仓
+		//logger.info("先卖后买，完成调仓");
+		if(!dds.isEmpty()) {
+			holdItemIDs = account.getItemIDsOfHolds();
+			Set<String> holdOrderIDs;
+			for(String itemID: holdItemIDs) {
+				holdOrderIDs = 	account.getHoldOrderIDs(itemID);
+				muster = musters.get(itemID);
+				if(muster!=null) {
+					for(String holdOrderID : holdOrderIDs) {
+						account.dropByOrderID(holdOrderID, "调仓", muster.getLatestPrice());   //先卖
+						dds.add(muster);						
+					}
+				}
+			}
+			
+			//System.out.println(dds.size());
+			account.openAll(dds);			//后买
+		}
+
+		
+		
+/*		breakers_sb.append(date.toString() + ",");
 		for(Muster breaker : breakers) {
 			if(!holdIDs.contains(breaker.getItemID())) {
 				account.refreshHoldsPrice(breaker.getItemID(), breaker.getLatestPrice());
@@ -76,7 +115,7 @@ public class BAV {
 		}
 		breakers_sb.deleteCharAt(breakers_sb.length()-1);
 		breakers_sb.append("\n");
-		
+*/		
 		dailyAmount_sb.append(account.getDailyAmount() + "\n");
 
 	}
@@ -147,7 +186,11 @@ public class BAV {
 		
 		List<Muster>  tops = new ArrayList<Muster>();
 		for(Muster muster : ms) {
-			if(!muster.isNewLowest() && !muster.isUpLimited() && !muster.isDownLimited() && muster.isUp()) {
+			if(muster!=null 
+					&& !muster.isUpLimited() 
+					&& muster.isUpBreaker() 
+					&& muster.isUp(21)
+					) {
 				tops.add(muster);
 			}
 			

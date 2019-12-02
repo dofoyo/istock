@@ -41,6 +41,7 @@ public class KdataRepository163 implements KdataRepository {
 		
 		LocalDate date;
 		BigDecimal open,high,low,close,amount,quantity;
+		BigDecimal zero = BigDecimal.ZERO;
 		String[] columns = null;
 		String[] lines = FileTools.readTextFile(kdataFile).split("\n");
 		for(int i=lines.length-1; i>0; i--){  //文档是倒序，要变成顺序,排除第一行
@@ -55,10 +56,8 @@ public class KdataRepository163 implements KdataRepository {
 			open = ParseString.toBigDecimal(columns[6]);
 			quantity = ParseString.toBigDecimal(columns[10]);
 			amount = ParseString.toBigDecimal(columns[11]);
-
 			
-			
-			kdata.addBar(date,open,high,low,close,amount,quantity);
+			kdata.addBar(date,open,high,low,close,amount,quantity,zero,zero,zero,zero,zero,zero,zero);
 
 		}
 

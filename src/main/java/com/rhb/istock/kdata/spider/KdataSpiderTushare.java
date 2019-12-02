@@ -272,4 +272,48 @@ public class KdataSpiderTushare implements KdataSpider {
 		
 	}
 
+	@Override
+	public void downBasics(String itemID) throws Exception {
+		String tushareID = itemID.indexOf("sh")==0 ? itemID.substring(2)+".SH" : itemID.substring(2)+".SZ";
+		String url = "http://api.tushare.pro";
+		JSONObject args = new JSONObject();
+		args.put("api_name", "daily_basic");
+		args.put("token", "175936caa4637bc9ac8e5e75ac92eff6887739ca6be771b81653f278");
+		
+		JSONObject params = new JSONObject();
+		params.put("ts_code", tushareID);
+		
+		args.put("params", params);
+		
+		String str = HttpClient.doPostJson(url, args.toString());
+		JSONObject data = (new JSONObject(str)).getJSONObject("data");
+		
+		String kdataFile = kdataPath + "/basic/" + tushareID + "_basics.json";
+		FileTools.writeTextFile(kdataFile, data.toString(), false);
+		
+	}
+
+	@Override
+	public void downBasics(List<String> ids) throws Exception {
+		long beginTime=System.currentTimeMillis(); 
+		logger.info("KdataSpiderTushare downBasics...");
+
+		int i=0;
+		for(String id : ids) {
+			Progress.show(ids.size(),i++,id);
+			this.downFactors(id);
+			Thread.sleep(300); //一分钟200次
+		}
+		
+		long used = (System.currentTimeMillis() - beginTime)/1000; 
+		logger.info("用时：" + used + "秒");          
+		
+	}
+
+	@Override
+	public void downBasics(LocalDate date) throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

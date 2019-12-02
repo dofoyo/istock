@@ -161,7 +161,7 @@ public class Hunt {
 		Muster m;
 		for(String id : ids) {
 			m = musters.get(id);
-			if(m!=null && !m.isUpLimited() && !m.isDownLimited() && m.isAboveAveragePrice(21) && m.isUp()) {
+			if(m!=null && !m.isUpLimited() && !m.isDownLimited() && m.isAboveAveragePrice(21) && m.isUp(21)) {
 				ms.add(m);
 			}
 		}

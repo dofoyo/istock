@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -42,7 +43,7 @@ public class Blue {
 		this.initCash = initCash;
 	}
 	
-	public void doIt(Map<String,Muster> musters, List<String> ms, LocalDate date) {
+	public void doIt(Map<String,Muster> musters, List<String> ms, LocalDate date, Integer sseiFlag) {
 		Muster muster;
 		account.setLatestDate(date);
 		
@@ -52,19 +53,18 @@ public class Blue {
 			muster = musters.get(itemID);
 			if(muster!=null) {
 				account.refreshHoldsPrice(itemID, muster.getLatestPrice());
-/*				if(muster.isDrop(21) && !muster.isDownLimited()) { 		//跌破21日均线就卖
+				if(sseiFlag==0 && muster.isDrop(21) && !muster.isDownLimited()) { 		//跌破21日均线就卖
 					account.drop(itemID, "跌破dropline", muster.getLatestPrice());
-				}	*/			
-				if(muster.isDropLowest(21) && !muster.isDownLimited()) { 		//跌破21日低点就卖
+				}				
+				if(sseiFlag==1 && muster.isDropLowest(21) && !muster.isDownLimited()) { 		//跌破21日低点就卖
 					account.drop(itemID, "跌破lowest", muster.getLatestPrice());
-				}	
+				}
 			}
 		}
 		
 		//买入突破走势的股票
 		List<Muster> breakers = this.getTops(musters, ms);
-		breakers_sb.append(date.toString() + ",");
-
+/*		breakers_sb.append(date.toString() + ",");
 		for(Muster breaker : breakers) {
 			if(!holdIDs.contains(breaker.getItemID()) && !breaker.isUpLimited()) {
 				account.refreshHoldsPrice(breaker.getItemID(), breaker.getLatestPrice());
@@ -75,7 +75,41 @@ public class Blue {
 		}
 		breakers_sb.deleteCharAt(breakers_sb.length()-1);
 		breakers_sb.append("\n");
+*/	
 		
+		Set<Muster> dds = new HashSet<Muster>();  //用set，无重复，表示不可加仓
+		Set<String> holdItemIDs = account.getItemIDsOfHolds();
+		breakers_sb.append(date.toString() + ",");
+		StringBuffer sb = new StringBuffer();
+		for(Muster breaker : breakers) {
+			if(!holdItemIDs.contains(breaker.getItemID())) {
+				dds.add(breaker);
+				sb.append(breaker.getItemName());
+				sb.append(",");
+			}
+			breakers_sb.append(breaker.getItemID());
+			breakers_sb.append(",");
+		}
+		breakers_sb.deleteCharAt(breakers_sb.length()-1);
+		breakers_sb.append("\n");
+		
+		//先卖后买，完成调仓和开仓
+		if(!dds.isEmpty()) {
+			Set<String> holdOrderIDs;
+			for(String itemID: holdItemIDs) {
+				holdOrderIDs = 	account.getHoldOrderIDs(itemID);
+				muster = musters.get(itemID);
+				if(muster!=null) {
+					for(String holdOrderID : holdOrderIDs) {
+						account.dropByOrderID(holdOrderID, "调仓", muster.getLatestPrice());   //先卖
+						dds.add(muster);						
+					}
+				}
+			}
+			
+			account.openAll(dds);			//后买
+		}
+
 		dailyAmount_sb.append(account.getDailyAmount() + "\n");
 
 	}
@@ -150,7 +184,13 @@ public class Blue {
 		
 		List<Muster>  tops = new ArrayList<Muster>();
 		for(Muster muster : ms) {
-			if(!muster.isNewLowest() && !muster.isUpLimited() && !muster.isDownLimited() && muster.isUp()) {
+			if(muster!=null 
+					&& !muster.isNewLowest() 
+					&& !muster.isUpLimited() 
+					&& !muster.isDownLimited() 
+					&& muster.isUpBreaker() 
+					&& muster.isUp(21)
+					) {
 				tops.add(muster);
 			}
 			

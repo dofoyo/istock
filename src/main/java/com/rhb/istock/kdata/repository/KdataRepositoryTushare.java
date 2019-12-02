@@ -3,6 +3,8 @@ package com.rhb.istock.kdata.repository;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.TreeMap;
 
 import org.json.JSONArray;
@@ -40,20 +42,52 @@ public class KdataRepositoryTushare implements KdataRepository{
 		String tushareID = itemID.indexOf("sh")==0 ? itemID.substring(2)+".SH" : itemID.substring(2)+".SZ";
 		String kdataFile = kdataPath + "/daily/" + tushareID + "_kdatas.json";
 		String factorFile = kdataPath + "/factor/" + tushareID + "_factors.json";
+		String basicFile = kdataPath + "/basic/" + tushareID + "_basics.json";
 
 		//System.out.println(kdataFile);//----------------
-		BigDecimal roof = null;
-		if(FileTools.isExists(kdataFile) && FileTools.isExists(factorFile)) {
-			BigDecimal f = null;
-			JSONObject factor = new JSONObject(FileTools.readTextFile(factorFile));
-			TreeMap<LocalDate,BigDecimal> factors = new TreeMap<LocalDate,BigDecimal>();
-			JSONArray items = factor.getJSONArray("items");
+		if(FileTools.isExists(kdataFile) && FileTools.isExists(factorFile) && FileTools.isExists(basicFile)) {
+			Map<LocalDate,BigDecimal[]> basics = new HashMap<LocalDate,BigDecimal[]>();
+			JSONObject basic = new JSONObject(FileTools.readTextFile(basicFile));
+			JSONArray items = basic.getJSONArray("items");
 			if(items.length()>0) {
 				JSONArray item;
 				for(int i=0; i<items.length(); i++) {
 					item = items.getJSONArray(i);
-					f = item.getBigDecimal(2);
-					factors.put(LocalDate.parse(item.getString(1), DateTimeFormatter.ofPattern("yyyyMMdd")),f);
+					try {
+						if(item.get(4).toString()!=null
+							&& item.get(5).toString()!=null
+							&& !item.get(4).toString().equals("null")
+							&& !item.get(5).toString().equals("null")
+								) {
+							basics.put(LocalDate.parse(item.getString(1), DateTimeFormatter.ofPattern("yyyyMMdd")),
+									new BigDecimal[]{item.getBigDecimal(4),
+													item.getBigDecimal(5),
+													item.getBigDecimal(14),
+													item.getBigDecimal(15),
+													item.getBigDecimal(11),
+													item.getBigDecimal(12),
+													item.getBigDecimal(13)});
+						}
+					}catch(Exception e) {
+						System.out.println("");
+						System.out.println(tushareID);
+						System.out.println(item.getString(1));
+						System.out.println(item.getString(4));
+						System.out.println(item.getString(5));
+						e.printStackTrace();
+					}
+				}
+			}
+			
+			BigDecimal roof = null;
+			JSONObject factor = new JSONObject(FileTools.readTextFile(factorFile));
+			TreeMap<LocalDate,BigDecimal> factors = new TreeMap<LocalDate,BigDecimal>();
+			items = factor.getJSONArray("items");
+			if(items.length()>0) {
+				JSONArray item;
+				for(int i=0; i<items.length(); i++) {
+					item = items.getJSONArray(i);
+					factors.put(LocalDate.parse(item.getString(1), DateTimeFormatter.ofPattern("yyyyMMdd")),item.getBigDecimal(2));
 				}
 				roof = factors.lastEntry().getValue();
 			}
@@ -65,11 +99,14 @@ public class KdataRepositoryTushare implements KdataRepository{
 			items = data.getJSONArray("items");
 			if(items.length()>0) {
 				JSONArray item;
+				BigDecimal[] dd;
+				BigDecimal turnover_rate_f,volume_ratio,total_mv,circ_mv,total_share,float_share,free_share;
 				for(int i=0; i<items.length(); i++) {
 					item = items.getJSONArray(i);
 					
 					date = LocalDate.parse(item.getString(1),DateTimeFormatter.ofPattern("yyyyMMdd"));
 					nowFactor = factors.get(date);
+					
 					//System.out.println("date=" + date + ", nowFactor=" + nowFactor);
 					//if(preFactor==null) preFactor = nowFactor;
 					
@@ -80,7 +117,17 @@ public class KdataRepositoryTushare implements KdataRepository{
 						close = getPrice(item.getBigDecimal(5),nowFactor,roof);
 						amount = item.getBigDecimal(10);
 						quantity = item.getBigDecimal(9);						
-						kdata.addBar(date,open,high,low,close,amount,quantity);
+						
+						dd = basics.get(date);
+						turnover_rate_f = dd==null ? new BigDecimal(0) : dd[0];
+						volume_ratio = dd==null ? new BigDecimal(0) : dd[1];
+						total_mv = dd==null ? new BigDecimal(0) : dd[2];
+						circ_mv = dd==null ? new BigDecimal(0) : dd[3];
+						total_share = dd==null ? new BigDecimal(0) : dd[4];
+						float_share = dd==null ? new BigDecimal(0) : dd[5];
+						free_share = dd==null ? new BigDecimal(0) : dd[6];
+						
+						kdata.addBar(date,open,high,low,close,amount,quantity,turnover_rate_f,volume_ratio,total_mv,circ_mv,total_share,float_share,free_share);
 					}
 					
 					if(nowFactor==null){

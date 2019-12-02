@@ -76,30 +76,41 @@ public class FinanceStatementsRepositoryFromSina implements FinanceStatementsRep
 			}
 		}
 		*/
-		
+		//System.out.println("--" + lines.length);
 		for(int m=1; m<j; m++){
 			String period = cells[m][0];
 			Integer year = Integer.parseInt(period.substring(0, 4));
 			if(period.contains("1231") && year>=theYear){ //2006年后才有现金流分析
 				BalanceSheet bs = new BalanceSheet();
 				bs.setPeriod(cells[m][0]);
-				if(lines.length>100){
+				if(lines.length==69){  //保险
 					bs.setCash(ParseString.toDouble(cells[m][3]));
-					bs.setInventories(ParseString.toDouble(cells[m][22]));
+					bs.setInventories(0.0);
 					bs.setAccountsReceivable(ParseString.toDouble(cells[m][9]));
 					bs.setNotesReceivable(ParseString.toDouble(cells[m][8]));
 					bs.setPayables(ParseString.toDouble(cells[m][10]));
-					bs.setAssets(ParseString.toDouble(cells[m][55]));
-					bs.setDebt(ParseString.toDouble(cells[m][98]));
-				}else if(lines.length > 85){   // 银行
+					bs.setAssets(ParseString.toDouble(cells[m][29]));
+					bs.setDebt(ParseString.toDouble(cells[m][56]));
+					bs.setGoodwill(ParseString.toDouble(cells[m][23]));
+				}else if(lines.length == 85){   
 					bs.setCash(ParseString.toDouble(cells[m][3]));
-					bs.setInventories(0.0);
-					bs.setAccountsReceivable(0.0);
-					bs.setNotesReceivable(0.0);
-					bs.setPayables(0.0);
+					bs.setInventories(ParseString.toDouble(cells[m][13]));
+					bs.setAccountsReceivable(ParseString.toDouble(cells[m][7]));
+					bs.setNotesReceivable(ParseString.toDouble(cells[m][6]));
+					bs.setPayables(ParseString.toDouble(cells[m][8]));
 					bs.setAssets(ParseString.toDouble(cells[m][41]));
 					bs.setDebt(ParseString.toDouble(cells[m][71]));
-				}else{ // 券商
+					bs.setGoodwill(ParseString.toDouble(cells[m][36]));
+				}else if(lines.length == 87){  //科创板   
+					bs.setCash(ParseString.toDouble(cells[m][3]));
+					bs.setInventories(ParseString.toDouble(cells[m][14]));
+					bs.setAccountsReceivable(ParseString.toDouble(cells[m][8]));
+					bs.setNotesReceivable(ParseString.toDouble(cells[m][7]));
+					bs.setPayables(ParseString.toDouble(cells[m][9]));
+					bs.setAssets(ParseString.toDouble(cells[m][42]));
+					bs.setDebt(ParseString.toDouble(cells[m][73]));
+					bs.setGoodwill(ParseString.toDouble(cells[m][37]));
+				}else if(lines.length == 60){ // 券商
 					bs.setCash(ParseString.toDouble(cells[m][3]));
 					bs.setInventories(0.0);
 					bs.setAccountsReceivable(0.0);
@@ -107,6 +118,18 @@ public class FinanceStatementsRepositoryFromSina implements FinanceStatementsRep
 					bs.setPayables(0.0);
 					bs.setAssets(ParseString.toDouble(cells[m][24]));
 					bs.setDebt(ParseString.toDouble(cells[m][44]));
+					bs.setGoodwill(ParseString.toDouble(cells[m][20]));
+				}else if(lines.length == 59){ // 银行
+					bs.setCash(ParseString.toDouble(cells[m][3]));
+					bs.setInventories(0.0);
+					bs.setAccountsReceivable(0.0);
+					bs.setNotesReceivable(0.0);
+					bs.setPayables(0.0);
+					bs.setAssets(ParseString.toDouble(cells[m][23]));
+					bs.setDebt(ParseString.toDouble(cells[m][42]));
+					bs.setGoodwill(ParseString.toDouble(cells[m][19]));
+				}else {
+					System.out.println("can NOT read " + stockid + " reports, lines is " + lines.length);
 				}
 				balancesheets.put(period,bs);
 			}

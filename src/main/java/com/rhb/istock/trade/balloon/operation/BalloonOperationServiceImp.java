@@ -46,24 +46,26 @@ public class BalloonOperationServiceImp implements BalloonOperationService {
 		Bfeature feature;
 		
 		List<String> itemIDs = selectorService.getBluechipIDs(LocalDate.now());
+		System.out.println(itemIDs.size());
 		for(String itemID : itemIDs) {
 			itemID = itemID.replaceAll("\r|\n", "");
 			
 			setLatestKdata(itemID);
 			item = itemService.getItem(itemID);
 			feature = balloon.getFeature(itemID);
-			
-			view = new BluechipView();
-			view.setItemID(itemID);
-			view.setCode(item.getCode());
-			view.setName(item.getName());
-			view.setUps(feature.getUps());
-			view.setBiasOfBaseLine(feature.getBiasBaseLine());
-			view.setBiasOfGolden(feature.getBiasOfGolden());
-			view.setSlips(feature.getSlips());
-			view.setStatus(feature.getStatus());
-			
-			views.add(view);
+			if(item != null) {
+				view = new BluechipView();
+				view.setItemID(itemID);
+				view.setCode(item.getCode());
+				view.setName(item.getName());
+				view.setUps(feature.getUps());
+				view.setBiasOfBaseLine(feature.getBiasBaseLine());
+				view.setBiasOfGolden(feature.getBiasOfGolden());
+				view.setSlips(feature.getSlips());
+				view.setStatus(feature.getStatus());
+				
+				views.add(view);				
+			}
 		}
 		
 		

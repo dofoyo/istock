@@ -68,14 +68,14 @@ public class IstockScheduledTask {
 	}
 	
 	/*
-	 * 每周1至5，9:30,开盘后，
+	 * 每周1至5，9:35,开盘后，
 	 * 1、下载最新股票代码
 	 * 2、下载上一交易日收盘后的K线数据
 	 * 3、初始化: 即把日K线读入内存
 	 */
-	@Scheduled(cron="0 30 9 ? * 1-5") 
+	@Scheduled(cron="0 35 9 ? * 1-5") 
 	public void dailyInit() throws Exception {
-		System.out.println("run scheduled of '0 30 9 ? * 1-5'");
+		System.out.println("run scheduled of '0 35 9 ? * 1-5'");
 		if(this.isTradeDate()) {   //次序很重要
 			itemService.download();		// 1. 下载最新股票代码
 			kdataService.downSSEI();  // 2. 

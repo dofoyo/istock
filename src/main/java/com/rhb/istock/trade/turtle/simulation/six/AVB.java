@@ -18,6 +18,8 @@ import com.rhb.istock.fund.Account;
 import com.rhb.istock.kdata.Muster;
 
 /*
+ * 成交量
+ * 
  * 操作策略
  * 买入：突破89日高点
  * 卖出：跌破21日均线
@@ -35,14 +37,14 @@ public class AVB {
 	private StringBuffer dailyAmount_sb = new StringBuffer("date,cash,value,total\n");
 	private StringBuffer breakers_sb = new StringBuffer();
 	private Integer pool = 21;
-	private Integer top = 5;
+	private Integer top = 3;
 	
 	public AVB(BigDecimal initCash) {
 		account = new Account(initCash);
 		this.initCash = initCash;
 	}
 	
-	public void doIt(Map<String,Muster> musters, LocalDate date) {
+	public void doIt(Map<String,Muster> musters, LocalDate date, Integer sseiFlag) {
 		//logger.info(date.toString());
 		Muster muster;
 		account.setLatestDate(date);
@@ -59,13 +61,11 @@ public class AVB {
 		for(String itemID: holdItemIDs) {
 			muster = musters.get(itemID);
 			if(muster!=null) {
-				if(muster.isDrop(21) && !muster.isDownLimited()) {
-					account.drop(itemID, "跌破dropLine", muster.getLatestPrice()); 
-					account.dropHoldState(itemID);
-				}
-				if(muster.isDropLowest(21) && !muster.isDownLimited()) {
-					account.drop(itemID, "跌破lowest", muster.getLatestPrice()); 
-					account.dropHoldState(itemID);
+				if(sseiFlag==0 && muster.isDrop(21) && !muster.isDownLimited()) { 		//跌破21日均线就卖
+					account.drop(itemID, "跌破dropline", muster.getLatestPrice());
+				}				
+				if(sseiFlag==1 && muster.isDropLowest(21) && !muster.isDownLimited()) { 		//跌破21日低点就卖
+					account.drop(itemID, "跌破lowest", muster.getLatestPrice());
 				}
 			}
 		}				
@@ -145,7 +145,12 @@ public class AVB {
 		Muster m;
 		for(int i=0; i<musters.size() && i<pool; i++) {
 			m = musters.get(i);
-			if(m.isUpBreaker()&& !m.isUpLimited() && !m.isDownLimited() && m.isUp()) {
+			if(m!=null 
+					&& !m.isUpLimited() 
+					&& !m.isDownLimited() 
+					&& m.isUpBreaker()
+					&& m.isUp(21)
+					) {
 				breakers.add(m);
 			}
 			if(breakers.size()>=top) {

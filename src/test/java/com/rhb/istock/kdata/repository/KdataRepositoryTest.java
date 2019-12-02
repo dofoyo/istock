@@ -28,10 +28,10 @@ public class KdataRepositoryTest {
 	@Qualifier("kdataRepository163")
 	KdataRepository kdataRepository163;
 	
-	//@Test
+	@Test
 	public void testGetDailyKdata() {
-		String id="sz000620";
-		LocalDate date = LocalDate.parse("2019-04-09");
+		String id="sh603920";
+		LocalDate date = LocalDate.parse("2019-11-11");
 
 /*		System.out.println("kdataRepositoryDzh");
 		KdataEntity kdata1 = kdataRepositoryDzh.getDailyKdata(id);
@@ -43,6 +43,7 @@ public class KdataRepositoryTest {
 
 		System.out.println("kdataRepositoryTushare");
 		KdataEntity kdata3 = kdataRepositoryTushare.getKdata(id);
+		System.out.println(kdata3.getBarSize());
 		System.out.println(kdata3.getBar(date));
 	
 	}

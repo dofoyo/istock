@@ -100,6 +100,10 @@ public class BluechipServiceImp implements BluechipService {
 						dto.setYear(year);
 						dto.setReportdate(reportDates==null ? null : reportDates.get(year));
 						dtos.add(dto);
+						
+/*						if(code.equals("300230")) {
+							System.out.println(fReport.getGoodwillRate(year));
+						}*/
 					}
 				}				
 			}
@@ -169,7 +173,7 @@ public class BluechipServiceImp implements BluechipService {
 		List<Bluechip> bs = new ArrayList<Bluechip>();
 		for(Bluechip bluechip : this.bluechips){
 			isgood = false;
-			if(bluechip.hasReported(date)){
+/*			if(bluechip.hasReported(date)){
 				if(bluechip.isOk(year) || (bluechip.isOk(year-1) && bluechip.isOk(year-2))){
 					isgood = true;
 				}
@@ -177,11 +181,22 @@ public class BluechipServiceImp implements BluechipService {
 				if(bluechip.isOk(year-1) || (bluechip.isOk(year-2) && bluechip.isOk(year-3))){
 					isgood = true;
 				}				
+			}*/
+			
+			if(bluechip.hasReported(date)){
+				if(bluechip.isOk(year) && bluechip.isOk(year-1) && bluechip.isOk(year-2)){
+					isgood = true;
+				}
+			}else{
+				if(bluechip.isOk(year-1) && bluechip.isOk(year-2) && bluechip.isOk(year-3)){
+					isgood = true;
+				}				
 			}
 			
 			if(isgood){
 				bs.add(bluechip);
 			}
+			//System.out.println(bluechip.getCode());
 		}
 		
 		return bs;
@@ -195,7 +210,7 @@ public class BluechipServiceImp implements BluechipService {
 		for(Bluechip bluechip : bluechips) {
 			ids.add(bluechip.getCode().indexOf("6")==0 ? "sh"+bluechip.getCode() : "sz"+bluechip.getCode());
 		}
-		
+		//System.out.println(ids.size());
 		return ids;
 	}
 	

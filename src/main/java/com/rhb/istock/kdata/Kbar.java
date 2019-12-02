@@ -12,8 +12,29 @@ public class Kbar {
 	private BigDecimal quantity;
 	private BigDecimal amount;
 	private LocalDate date;
+	private BigDecimal turnover_rate_f;
+	private BigDecimal volume_ratio;
+	private BigDecimal total_mv;
+	private BigDecimal circ_mv;
+	private BigDecimal total_share;
+	private BigDecimal float_share;
+	private BigDecimal free_share;	
 
-	public Kbar(BigDecimal open, BigDecimal high, BigDecimal low, BigDecimal close, BigDecimal amount, BigDecimal quantity,LocalDate date) {
+	public Kbar(BigDecimal open, 
+			BigDecimal high, 
+			BigDecimal low, 
+			BigDecimal close, 
+			BigDecimal amount, 
+			BigDecimal quantity,
+			LocalDate date,
+			BigDecimal turnover_rate_f,
+			BigDecimal volume_ratio,
+			BigDecimal total_mv,
+			BigDecimal circ_mv,
+			BigDecimal total_share,
+			BigDecimal float_share,
+			BigDecimal free_share
+			) {
 		this.open = open;
 		this.high = high;
 		this.low = low;
@@ -21,9 +42,30 @@ public class Kbar {
 		this.amount = amount;
 		this.quantity = quantity;
 		this.date = date;
+		this.turnover_rate_f = turnover_rate_f;
+		this.volume_ratio = volume_ratio;
+		this.total_mv = total_mv;
+		this.circ_mv = circ_mv;
+		this.total_share = total_share;
+		this.float_share = float_share;
+		this.free_share = free_share;
 	}
 
-	public Kbar(String open, String high, String low, String close, String amount, String quantity,String date) {
+	public Kbar(String open, 
+			String high, 
+			String low, 
+			String close, 
+			String amount, 
+			String quantity,
+			String date,
+			String turnover_rate_f,
+			String volume_ratio,
+			String total_mv,
+			String circ_mv,
+			String total_share,
+			String float_share,
+			String free_share
+			) {
 		this.open = new BigDecimal(open);
 		this.high = new BigDecimal(high);
 		this.low = new BigDecimal(low);
@@ -37,8 +79,71 @@ public class Kbar {
 				this.date = LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 			}
 		}
+		this.turnover_rate_f = new BigDecimal(turnover_rate_f);
+		this.volume_ratio = new BigDecimal(volume_ratio);
+		this.total_mv = new BigDecimal(total_mv);
+		this.circ_mv = new BigDecimal(circ_mv);
+		this.total_share = new BigDecimal(total_share);
+		this.float_share = new BigDecimal(float_share);
+		this.free_share = new BigDecimal(free_share);
+		
 	}
-	
+	public BigDecimal getTotal_share() {
+		return total_share;
+	}
+
+	public void setTotal_share(BigDecimal total_share) {
+		this.total_share = total_share;
+	}
+
+	public BigDecimal getFloat_share() {
+		return float_share;
+	}
+
+	public void setFloat_share(BigDecimal float_share) {
+		this.float_share = float_share;
+	}
+
+	public BigDecimal getFree_share() {
+		return free_share;
+	}
+
+	public void setFree_share(BigDecimal free_share) {
+		this.free_share = free_share;
+	}
+
+	public BigDecimal getTotal_mv() {
+		return total_mv;
+	}
+
+	public void setTotal_mv(BigDecimal total_mv) {
+		this.total_mv = total_mv;
+	}
+
+	public BigDecimal getCirc_mv() {
+		return circ_mv;
+	}
+
+	public void setCirc_mv(BigDecimal circ_mv) {
+		this.circ_mv = circ_mv;
+	}
+
+	public BigDecimal getTurnover_rate_f() {
+		return turnover_rate_f;
+	}
+
+	public void setTurnover_rate_f(BigDecimal turnover_rate_f) {
+		this.turnover_rate_f = turnover_rate_f;
+	}
+
+	public BigDecimal getVolume_ratio() {
+		return volume_ratio;
+	}
+
+	public void setVolume_ratio(BigDecimal volume_ratio) {
+		this.volume_ratio = volume_ratio;
+	}
+
 	public Integer isLimited() {
 		return open.equals(high) && open.equals(low) && open.equals(close) ? 1 : 0;
 	}
@@ -106,7 +211,8 @@ public class Kbar {
 	@Override
 	public String toString() {
 		return "Kbar [open=" + open + ", high=" + high + ", low=" + low + ", close=" + close + ", quantity=" + quantity
-				+ ", amount=" + amount + "]";
+				+ ", amount=" + amount + ", date=" + date + ", turnover_rate_f=" + turnover_rate_f + ", volume_ratio="
+				+ volume_ratio + "]";
 	}
 
 }

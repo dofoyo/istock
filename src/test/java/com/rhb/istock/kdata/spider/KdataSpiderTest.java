@@ -30,6 +30,12 @@ public class KdataSpiderTest {
 	ItemRepository itemRepository;
 	
 	//@Test
+	public void downBasicsByID() throws Exception {
+		String itemID = "sz000852";
+		kdataSpiderTushare.downBasics(itemID);
+	}
+	
+	//@Test
 	public void testDwnKdataByID() throws Exception {
 		String itemID = "sz000852";
 		kdataSpiderTushare.downKdatas(itemID);
@@ -37,7 +43,9 @@ public class KdataSpiderTest {
 	}
 	
 	//@Test
-	public void testDwnKdataByIDs() {
+	public void testDownKdataByIDs() {
+		long beginTime=System.currentTimeMillis(); 
+
 		List<ItemEntity> items = itemRepository.getItemEntities();
 		int i=1;
 		for(ItemEntity item : items){
@@ -45,17 +53,22 @@ public class KdataSpiderTest {
 			try {
 				kdataSpiderTushare.downKdatas(item.getItemId());
 				kdataSpiderTushare.downFactors(item.getItemId());
-				Thread.sleep(300); //一分钟200个
+				kdataSpiderTushare.downBasics(item.getItemId());
+				//Thread.sleep(300); //一分钟200个
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} 
 		}
+		
+		long used = (System.currentTimeMillis() - beginTime)/1000; 
+		System.out.println("用时：" + used + "秒");          
+
 	}
 
 	//@Test
-	public void testDwnKdataByDate() {
-		LocalDate date = LocalDate.parse("2019-09-26");
+	public void testDownKdataByDate() {
+		LocalDate date = LocalDate.parse("2019-12-02");
 		try {
 			//kdataSpiderTushare.downKdatas(date);
 			kdataSpiderTushare.downFactors(date); //此处仅供测试，正式使用时，factor的日期要比kdata的日期提前一个交易日
@@ -67,7 +80,7 @@ public class KdataSpiderTest {
 		System.out.println("done!");
 	}
 	
-	@Test
+	//@Test
 	public void testDownKdataByIDFrom163() {
 		String id = "sh000001";
 		try {

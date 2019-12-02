@@ -23,7 +23,7 @@ public class BalloonOperationServiceTest {
 	public void test() {
 		List<BluechipView> views = balloonOperationService.getBluechips();
 		for(BluechipView view : views) {
-			System.out.println(view);
+			System.out.println(view.getCode() + "," + view.getName());
 		}
 	}
 }

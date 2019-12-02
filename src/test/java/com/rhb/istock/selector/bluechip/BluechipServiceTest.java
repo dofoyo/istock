@@ -10,12 +10,26 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import com.rhb.istock.fdata.FinancialStatement;
+import com.rhb.istock.fdata.FinancialStatementService;
+import com.rhb.istock.item.Item;
+import com.rhb.istock.item.ItemService;
+
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest
 public class BluechipServiceTest {
 	@Autowired
 	@Qualifier("bluechipServiceImp")
 	BluechipService bluechipService;
+
+	@Autowired
+	@Qualifier("financialStatementServiceImp")
+	FinancialStatementService financialStatementService;
+	
+	@Autowired
+	@Qualifier("itemServiceImp")
+	ItemService itemService;
+
 	
 	//@Test
 	public void generateBluechip() {
@@ -23,13 +37,18 @@ public class BluechipServiceTest {
 	}
 	
 	@Test
-	public void getBluechipIDs() {
-		LocalDate beginDate = LocalDate.parse("2018-01-01");
-		LocalDate endDate = LocalDate.parse("2018-05-30");
-		for(LocalDate date = beginDate; date.isBefore(endDate); date=date.plusDays(1)) {
-			List<String> ids = bluechipService.getBluechipIDs(date);
-			System.out.print(date + "," + ids.size() + ",");			
-			System.out.println(ids);
+	public void showBluechips() {
+		Item item;
+
+		LocalDate date = LocalDate.now();
+		List<String> ids = bluechipService.getBluechipIDs(date);
+		System.out.println(ids.size());
+		for(String id : ids) {
+			item = itemService.getItem(id);
+			if(item!=null) {
+				System.out.println(item.getItemID() + "," + item.getName());			
+			}
 		}
+		System.out.println(ids.size());
 	}
 }

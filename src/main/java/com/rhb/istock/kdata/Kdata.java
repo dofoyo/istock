@@ -34,6 +34,8 @@ public class Kdata {
 			BigDecimal lowest34 = new BigDecimal(10000);
 			BigDecimal totalAmount = new BigDecimal(0);
 			BigDecimal totalPrice = new BigDecimal(0);
+			BigDecimal total_turnover_rate_f = new BigDecimal(0);
+			BigDecimal total_volume_ratio = new BigDecimal(0);
 			
 			int j = bars.size()-21;
 			int k = bars.size()-34;
@@ -43,7 +45,9 @@ public class Kdata {
 				lowest = lowest.compareTo(kbar.getLow())==1 ? kbar.getLow() : lowest;
 				totalAmount = totalAmount.add(kbar.getAmount());
 				totalPrice = totalPrice.add(kbar.getClose());
-				
+				total_turnover_rate_f = total_turnover_rate_f.add(kbar.getTurnover_rate_f());
+				total_volume_ratio = total_volume_ratio.add(kbar.getVolume_ratio());
+						
 				if(i>=j && lowest21.compareTo(kbar.getLow())==1) {
 					lowest21 =  kbar.getLow();
 				}
@@ -58,6 +62,8 @@ public class Kdata {
 				
 			BigDecimal averageAmount = totalAmount.divide(new BigDecimal(this.bars.size()),BigDecimal.ROUND_HALF_UP);
 			BigDecimal averagePrice = totalPrice.divide(new BigDecimal(this.bars.size()),BigDecimal.ROUND_HALF_UP);
+			BigDecimal average_turnover_rate_f = total_turnover_rate_f.divide(new BigDecimal(this.bars.size()),BigDecimal.ROUND_HALF_UP);
+			BigDecimal average_volume_ratio = total_volume_ratio.divide(new BigDecimal(this.bars.size()),BigDecimal.ROUND_HALF_UP);
 
 			features.put("highest", highest);
 			features.put("lowest", lowest);
@@ -65,6 +71,8 @@ public class Kdata {
 			features.put("lowest34", lowest34);
 			features.put("averageAmount", averageAmount);
 			features.put("averagePrice", averagePrice);
+			features.put("average_turnover_rate_f", average_turnover_rate_f);
+			features.put("average_volume_ratio", average_volume_ratio);
 		}
 		
 		return this.features;
@@ -146,8 +154,23 @@ public class Kdata {
 		}
 	}
 	
-	public void addBar(LocalDate date,BigDecimal open,BigDecimal high,BigDecimal low,BigDecimal close,BigDecimal amount,BigDecimal quantity) {
-		this.bars.put(date, new Kbar(open, high, low, close, amount, quantity,date));
+	public void addBar(LocalDate date,
+			BigDecimal open,
+			BigDecimal high,
+			BigDecimal low,
+			BigDecimal close,
+			BigDecimal amount,
+			BigDecimal quantity,
+			BigDecimal turnover_rate_f,
+			BigDecimal volume_ratio,
+			BigDecimal total_mv,
+			BigDecimal circ_mv,
+			BigDecimal total_share,
+			BigDecimal float_share,
+			BigDecimal free_share
+			) {
+		this.bars.put(date, new Kbar(open, high, low, close, amount, quantity,date, 
+				turnover_rate_f, volume_ratio,total_mv,circ_mv,total_share,float_share,free_share));
 	}
 	
 	public Kbar getBar(LocalDate date){

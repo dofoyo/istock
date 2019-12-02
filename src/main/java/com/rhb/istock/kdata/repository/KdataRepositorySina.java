@@ -40,7 +40,7 @@ public class KdataRepositorySina implements KdataRepository{
 		for (int i = 0; i < files.length; i++) {
 			bars = toBars(files[i]);
 			for(Map<String,String> bar : bars) {
-				kdata.addBar(bar.get("date"), bar.get("open"), bar.get("high"), bar.get("low"), bar.get("close"), bar.get("amount"),bar.get("quantity"));
+				kdata.addBar(bar.get("date"), bar.get("open"), bar.get("high"), bar.get("low"), bar.get("close"), bar.get("amount"),bar.get("quantity"),"0","0","0","0","0","0","0");
 			}
 		}
 		

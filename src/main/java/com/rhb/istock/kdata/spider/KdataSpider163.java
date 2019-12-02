@@ -78,5 +78,23 @@ public class KdataSpider163 implements KdataSpider {
 		
 	}
 
+	@Override
+	public void downBasics(String id) throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void downBasics(List<String> ids) throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void downBasics(LocalDate date) throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
+
 
 }

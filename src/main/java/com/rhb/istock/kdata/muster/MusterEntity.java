@@ -18,9 +18,41 @@ public class MusterEntity {
 	private BigDecimal averagePrice13;
 	private BigDecimal averagePrice21;
 	private BigDecimal averagePrice34;
+	private BigDecimal turnover_rate_f;
+	private BigDecimal average_turnover_rate_f;
+	private BigDecimal volume_ratio;
+	private BigDecimal average_volume_ratio;
+	private BigDecimal total_mv;
+	private BigDecimal circ_mv;
+	private BigDecimal total_share;
+	private BigDecimal float_share;
+	private BigDecimal free_share;	
 
-	public MusterEntity(String itemID, BigDecimal close, BigDecimal amount, BigDecimal latestPrice, Integer limited, BigDecimal highest, BigDecimal lowest, 
-			BigDecimal averageAmount, BigDecimal averagePrice, BigDecimal averagePrice8, BigDecimal averagePrice13, BigDecimal averagePrice21, BigDecimal averagePrice34, BigDecimal lowest21, BigDecimal lowest34) {
+	public MusterEntity(String itemID, 
+			BigDecimal close, 
+			BigDecimal amount, 
+			BigDecimal latestPrice, 
+			Integer limited, 
+			BigDecimal highest, 
+			BigDecimal lowest, 
+			BigDecimal averageAmount, 
+			BigDecimal averagePrice, 
+			BigDecimal averagePrice8, 
+			BigDecimal averagePrice13, 
+			BigDecimal averagePrice21, 
+			BigDecimal averagePrice34, 
+			BigDecimal lowest21, 
+			BigDecimal lowest34, 
+			BigDecimal turnover_rate_f, 
+			BigDecimal average_turnover_rate_f, 
+			BigDecimal volume_ratio, 
+			BigDecimal average_volume_ratio,
+			BigDecimal total_mv,
+			BigDecimal circ_mv,
+			BigDecimal total_share,
+			BigDecimal float_share,
+			BigDecimal free_share
+			) {
 		this.itemID = itemID;
 		this.close = close;
 		this.amount = amount;
@@ -36,6 +68,16 @@ public class MusterEntity {
 		this.averagePrice13 = averagePrice13;
 		this.averagePrice21 = averagePrice21;
 		this.averagePrice34 = averagePrice34;
+		this.turnover_rate_f = turnover_rate_f;
+		this.average_turnover_rate_f = average_turnover_rate_f;
+		this.volume_ratio = volume_ratio;
+		this.average_volume_ratio = average_volume_ratio;
+		this.total_mv = total_mv;
+		this.circ_mv = circ_mv;
+		this.total_share = total_share;
+		this.float_share = float_share;
+		this.free_share = free_share;
+		
 	}
 	
 	public MusterEntity(String txt) {
@@ -55,8 +97,90 @@ public class MusterEntity {
 		this.averagePrice34 = new BigDecimal(ss[12]);
 		this.lowest21 = new BigDecimal(ss[13]);
 		this.lowest34 = new BigDecimal(ss[14]);
+		this.turnover_rate_f = new BigDecimal(ss[15]);
+		this.average_turnover_rate_f = new BigDecimal(ss[16]);
+		this.volume_ratio = new BigDecimal(ss[17]);
+		this.average_volume_ratio = new BigDecimal(ss[18]);
+		this.total_mv = new BigDecimal(ss[19]);
+		this.circ_mv = new BigDecimal(ss[20]);
+		this.total_share = new BigDecimal(ss[21]);
+		this.float_share = new BigDecimal(ss[22]);
+		this.free_share = new BigDecimal(ss[23]);
 	}
 	
+	public BigDecimal getTotal_share() {
+		return total_share;
+	}
+
+	public void setTotal_share(BigDecimal total_share) {
+		this.total_share = total_share;
+	}
+
+	public BigDecimal getFloat_share() {
+		return float_share;
+	}
+
+	public void setFloat_share(BigDecimal float_share) {
+		this.float_share = float_share;
+	}
+
+	public BigDecimal getFree_share() {
+		return free_share;
+	}
+
+	public void setFree_share(BigDecimal free_share) {
+		this.free_share = free_share;
+	}
+
+	public BigDecimal getTotal_mv() {
+		return total_mv;
+	}
+
+	public void setTotal_mv(BigDecimal total_mv) {
+		this.total_mv = total_mv;
+	}
+
+	public BigDecimal getCirc_mv() {
+		return circ_mv;
+	}
+
+	public void setCirc_mv(BigDecimal circ_mv) {
+		this.circ_mv = circ_mv;
+	}
+
+	public BigDecimal getAverage_turnover_rate_f() {
+		return average_turnover_rate_f;
+	}
+
+	public void setAverage_turnover_rate_f(BigDecimal average_turnover_rate_f) {
+		this.average_turnover_rate_f = average_turnover_rate_f;
+	}
+
+	public BigDecimal getAverage_volume_ratio() {
+		return average_volume_ratio;
+	}
+
+	public void setAverage_volume_ratio(BigDecimal average_volume_ratio) {
+		this.average_volume_ratio = average_volume_ratio;
+	}
+
+	public BigDecimal getTurnover_rate_f() {
+		return turnover_rate_f;
+	}
+
+	public void setTurnover_rate_f(BigDecimal turnover_rate_f) {
+		this.turnover_rate_f = turnover_rate_f;
+	}
+
+	public BigDecimal getVolume_ratio() {
+		return volume_ratio;
+	}
+
+	public void setVolume_ratio(BigDecimal volume_ratio) {
+		this.volume_ratio = volume_ratio;
+	}
+
+
 	public BigDecimal getLowest34() {
 		return lowest34;
 	}
@@ -88,7 +212,16 @@ public class MusterEntity {
 				this.averagePrice21 + "," + 
 				this.averagePrice34 + "," + 
 				this.lowest21 + "," +  
-				this.lowest34 + "\n"; 
+				this.lowest34 + "," +  
+				this.turnover_rate_f + "," + 
+				this.average_turnover_rate_f + "," + 
+				this.volume_ratio + "," +  
+				this.average_volume_ratio + "," +  
+				this.total_mv + "," +  
+				this.circ_mv + "," +  
+				this.total_share + "," +  
+				this.float_share + "," +  
+				this.free_share + "\n"; 
 	}
 
 	public BigDecimal getLowest21() {
@@ -189,10 +322,14 @@ public class MusterEntity {
 	@Override
 	public String toString() {
 		return "MusterEntity [itemID=" + itemID + ", close=" + close + ", amount=" + amount + ", latestPrice="
-				+ latestPrice + ", limited=" + limited + ", highest=" + highest + ", lowest=" + lowest
-				+ ", averageAmount=" + averageAmount + ", averagePrice=" + averagePrice + ", averagePrice8="
-				+ averagePrice8 + ", averagePrice13=" + averagePrice13 + ", averagePrice21=" + averagePrice21
-				+ ", averagePrice34=" + averagePrice34 + "]";
+				+ latestPrice + ", limited=" + limited + ", highest=" + highest + ", lowest=" + lowest + ", lowest21="
+				+ lowest21 + ", lowest34=" + lowest34 + ", averageAmount=" + averageAmount + ", averagePrice="
+				+ averagePrice + ", averagePrice8=" + averagePrice8 + ", averagePrice13=" + averagePrice13
+				+ ", averagePrice21=" + averagePrice21 + ", averagePrice34=" + averagePrice34 + ", turnover_rate_f="
+				+ turnover_rate_f + ", average_turnover_rate_f=" + average_turnover_rate_f + ", volume_ratio="
+				+ volume_ratio + ", average_volume_ratio=" + average_volume_ratio + ", total_mv=" + total_mv
+				+ ", circ_mv=" + circ_mv + ", total_share=" + total_share + ", float_share=" + float_share
+				+ ", free_share=" + free_share + "]";
 	}
 
 	

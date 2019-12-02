@@ -1,6 +1,7 @@
 package com.rhb.istock.kdata;
 
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 
 public class Muster {
 	private String itemID;
@@ -20,6 +21,68 @@ public class Muster {
 	private BigDecimal averagePrice34;
 	private BigDecimal lowest21;
 	private BigDecimal lowest34;
+	private BigDecimal turnover_rate_f;
+	private BigDecimal average_turnover_rate_f;
+	private BigDecimal volume_ratio;
+	private BigDecimal average_volume_ratio;
+	private BigDecimal total_mv;
+	private BigDecimal circ_mv;
+	private BigDecimal total_share;
+	private BigDecimal float_share;
+	private BigDecimal free_share;	
+	private DecimalFormat df = new DecimalFormat("#.00");
+
+	public BigDecimal getTotal_share() {
+		return total_share;
+	}
+
+	public void setTotal_share(BigDecimal total_share) {
+		this.total_share = total_share;
+	}
+
+	public BigDecimal getFloat_share() {
+		return float_share;
+	}
+
+	public void setFloat_share(BigDecimal float_share) {
+		this.float_share = float_share;
+	}
+
+	public BigDecimal getFree_share() {
+		return free_share;
+	}
+
+	public void setFree_share(BigDecimal free_share) {
+		this.free_share = free_share;
+	}
+
+	public BigDecimal getTotal_mv() {
+		return total_mv;
+	}
+
+	public void setTotal_mv(BigDecimal total_mv) {
+		this.total_mv = total_mv;
+	}
+
+	public BigDecimal getCirc_mv() {
+		return circ_mv;
+	}
+
+	public void setCirc_mv(BigDecimal circ_mv) {
+		this.circ_mv = circ_mv;
+	}
+
+	public String getAverage_turnover_rate_f_str() {
+		return df.format(this.average_turnover_rate_f);
+	}
+
+	public String getTurnover_rate_f_str() {
+		return df.format(this.turnover_rate_f);
+	}
+	
+	public String getTurnover_volume_str() {
+		return df.format(this.turnover_rate_f) + "，" + df.format(volume_ratio);
+	}
 	
 	public boolean isAboveAveragePrice(Integer period) {
 		if(period == 8) {
@@ -34,7 +97,35 @@ public class Muster {
 			return latestPrice.compareTo(averagePrice)==1;
 		}		
 	}
-	
+
+	public BigDecimal getAverage_turnover_rate_f() {
+		return average_turnover_rate_f;
+	}
+
+	public void setAverage_turnover_rate_f(BigDecimal average_turnover_rate_f) {
+		this.average_turnover_rate_f = average_turnover_rate_f;
+	}
+
+	public BigDecimal getAverage_volume_ratio() {
+		return average_volume_ratio;
+	}
+
+	public void setAverage_volume_ratio(BigDecimal average_volume_ratio) {
+		this.average_volume_ratio = average_volume_ratio;
+	}
+
+	public BigDecimal getTurnover_rate_f() {
+		return turnover_rate_f;
+	}
+	public void setTurnover_rate_f(BigDecimal turnover_rate_f) {
+		this.turnover_rate_f = turnover_rate_f;
+	}
+	public BigDecimal getVolume_ratio() {
+		return volume_ratio;
+	}
+	public void setVolume_ratio(BigDecimal volume_ratio) {
+		this.volume_ratio = volume_ratio;
+	}
 	public BigDecimal getLowest34() {
 		return lowest34;
 	}
@@ -141,12 +232,24 @@ public class Muster {
 		//return latestPrice.subtract(close).divide(close,BigDecimal.ROUND_HALF_UP).compareTo(new BigDecimal(-0.095))<=0;
 	}
 	
-	public boolean isUp() {
-		return  latestPrice.compareTo(averagePrice8)==1 &&
-				averagePrice8.compareTo(averagePrice13)==1 &&
-				averagePrice13.compareTo(averagePrice21)==1 ;
-				//averagePrice21.compareTo(averagePrice34)==1 &&
-				//averagePrice34.compareTo(averagePrice)==1;
+	public boolean isUp(Integer period) {
+		if(period == 21) {
+			return  latestPrice.compareTo(averagePrice8)==1 &&
+					averagePrice8.compareTo(averagePrice13)==1 &&
+					averagePrice13.compareTo(averagePrice21)==1 ;
+			
+		}else if(period == 34) {
+			return  latestPrice.compareTo(averagePrice8)==1 &&
+					averagePrice8.compareTo(averagePrice13)==1 &&
+					averagePrice13.compareTo(averagePrice21)==1 &&
+					averagePrice21.compareTo(averagePrice34)==1;
+		}else {
+			return  latestPrice.compareTo(averagePrice8)==1 &&
+					averagePrice8.compareTo(averagePrice13)==1 &&
+					averagePrice13.compareTo(averagePrice21)==1 &&
+					averagePrice21.compareTo(averagePrice34)==1 &&
+					averagePrice34.compareTo(averagePrice)==1;
+		}
 	}
 	
 	public boolean isDrop(Integer period) {
@@ -241,4 +344,17 @@ public class Muster {
 	public void setClose(BigDecimal close) {
 		this.close = close;
 	}
+
+	@Override
+	public String toString() {
+		return "Muster [itemID=" + itemID + ", itemName=" + itemName + ", industry=" + industry + ", close=" + close
+				+ ", amount=" + amount + ", limited=" + limited + ", latestPrice=" + latestPrice + ", highest="
+				+ highest + ", lowest=" + lowest + ", averageAmount=" + averageAmount + ", averagePrice=" + averagePrice
+				+ ", averagePrice8=" + averagePrice8 + ", averagePrice13=" + averagePrice13 + ", averagePrice21="
+				+ averagePrice21 + ", averagePrice34=" + averagePrice34 + ", lowest21=" + lowest21 + ", lowest34="
+				+ lowest34 + ", turnover_rate_f=" + turnover_rate_f + ", average_turnover_rate_f="
+				+ average_turnover_rate_f + ", volume_ratio=" + volume_ratio + ", average_volume_ratio="
+				+ average_volume_ratio + ", total_mv=" + total_mv + ", circ_mv=" + circ_mv + "]";
+	}
+	
 }

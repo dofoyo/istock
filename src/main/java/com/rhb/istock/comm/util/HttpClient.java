@@ -78,10 +78,12 @@ public class HttpClient {
 		try {
 			URL url = new URL(strUrl);
 			URI uri = new URI(url.getProtocol(), url.getHost(), url.getPath(), url.getQuery(), null);
-			HttpGet httpGet = new HttpGet(uri);
 			
+			HttpGet httpGet = new HttpGet(uri);
 			response = httpclient.execute(httpGet);
-	
+			
+			//System.out.println(response.toString());
+			
 			if (response.getStatusLine().getStatusCode() == 200) {
 				resultString = EntityUtils.toString(response.getEntity(), "UTF-8");
 			}

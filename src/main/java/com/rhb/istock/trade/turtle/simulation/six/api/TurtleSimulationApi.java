@@ -125,8 +125,8 @@ public class TurtleSimulationApi {
 
 		
 		turtleMusterSimulation.simulate(theBeginDate, theEndDate); 
-		turtleMusterSimulation_hunt.simulate(theBeginDate, theEndDate);
-		turtleMusterSimulation_avb_plus.simulate(theBeginDate, theEndDate);
+		//turtleMusterSimulation_hunt.simulate(theBeginDate, theEndDate);
+		//turtleMusterSimulation_avb_plus.simulate(theBeginDate, theEndDate);
 		
 		turtleSimulationRepository.evictAmountsCache();
 		turtleSimulationRepository.evictBreakersCache();

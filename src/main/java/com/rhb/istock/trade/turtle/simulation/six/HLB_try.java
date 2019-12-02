@@ -18,18 +18,22 @@ import org.slf4j.LoggerFactory;
 import com.rhb.istock.fund.Account;
 import com.rhb.istock.kdata.Muster;
 /*
- * 盘整
- * 
  * 操作策略
  * 买入：突破89日高点
  * 卖出：跌破21日均线
- * 筛选范围：全部股票中筛选出21个，再从中最多选出5个突破的，同时考虑换手率和量比。
+ * 筛选范围：全部股票中筛选出21个，再从中最多选出5个突破的
  * 筛选依据：89天的高点和低点形成的通道越窄、价格越低
- * 仓位控制：满仓，每只股票的均衡市值
+ * 仓位控制：每只股票的仓位5万
  *
+ * 此程序设计的目的是找出换手率和量比
+ * 此程序执行完成后，根据simulation_detail.csv文件，分析买入时换手率和量比指标对收益带来的影响
+ * 根据2009.8.1 -- 2019.11.14的测试结果表明，当：
+ *  0.18 < 换手率 < 8.63
+ *  量比 < 3.22
+ *  时，hlb策略的收益最大，为933%。
  */
-public class HLB {
-	protected static final Logger logger = LoggerFactory.getLogger(HLB_try.class);
+public class HLB_try {
+	protected static final Logger logger = LoggerFactory.getLogger(HLB.class);
 
 	private Account account = null;
 	private BigDecimal initCash = null;
@@ -37,20 +41,14 @@ public class HLB {
 	private StringBuffer dailyAmount_sb = new StringBuffer("date,cash,value,total\n");
 	private StringBuffer breakers_sb = new StringBuffer();
 	private Integer pool = 21;
-	private Integer top = 3;
-/*	private BigDecimal turnover_rate_f_max = new BigDecimal(8.63);
-	private BigDecimal turnover_rate_f_min = new BigDecimal(0.18);
-	private BigDecimal volumn_ratio = new BigDecimal(3.22);
-*/	
-	private BigDecimal turnover_rate_f = new BigDecimal(14.8);
-	private BigDecimal volumn_ratio = new BigDecimal(1.58);
+	private Integer top = 5;
 	
-	public HLB(BigDecimal initCash) {
+	public HLB_try(BigDecimal initCash) {
 		account = new Account(initCash);
 		this.initCash = initCash;
 	}
 	
-	public void doIt(Map<String,Muster> musters, LocalDate date, Integer sseiFlag) {
+	public void doIt(Map<String,Muster> musters, LocalDate date) {
 		Muster muster;
 		account.setLatestDate(date);
 		
@@ -66,14 +64,13 @@ public class HLB {
 		for(String itemID: holdItemIDs) {
 			muster = musters.get(itemID);
 			if(muster!=null) {
-/*				if(muster.isDrop(21) && !muster.isDownLimited()) { 		//跌破21日均线就卖
-					account.drop(itemID, "跌破dropline", muster.getLatestPrice());
-				}	*/
-				if(sseiFlag==0 && muster.isDrop(21) && !muster.isDownLimited()) { 		//跌破21日均线就卖
-					account.drop(itemID, "跌破dropline", muster.getLatestPrice());
-				}				
-				if(sseiFlag==1 && muster.isDropLowest(21) && !muster.isDownLimited()) { 		//跌破21日低点就卖
-					account.drop(itemID, "跌破lowest", muster.getLatestPrice());
+				if(muster.isDrop(21) && !muster.isDownLimited()) {
+					account.drop(itemID, "跌破dropLine", muster.getLatestPrice()); 
+					account.dropHoldState(itemID);
+				}
+				if(muster.isDropLowest(21) && !muster.isDownLimited()) {
+					account.drop(itemID, "跌破lowest", muster.getLatestPrice()); 
+					account.dropHoldState(itemID);
 				}
 			}
 		}				
@@ -85,8 +82,24 @@ public class HLB {
 		
 		//确定突破走势的股票
 		List<Muster> breakers = this.getBreakers(new ArrayList<Muster>(musters.values()));
-		//breakers.addAll(keeps.getUps(musters));
 		
+		//买入，每次买入100股，用于测试买入的胜率
+		breakers_sb.append(date.toString() + ",");
+		for(Muster breaker : breakers) {
+			if(!holdItemIDs.contains(breaker.getItemID())) {
+				account.refreshHoldsPrice(breaker.getItemID(), breaker.getLatestPrice());
+				account.open(breaker.getItemID(),breaker.getItemName(), breaker.getIndustry(), this.getQuantity(breaker.getLatestPrice()), breaker.getTurnover_volume_str(), breaker.getLatestPrice());
+			}
+			breakers_sb.append(breaker.getItemID());
+			breakers_sb.append(",");
+		}
+		breakers_sb.deleteCharAt(breakers_sb.length()-1);
+		breakers_sb.append("\n");
+		
+		
+		
+		/*	
+		//先卖后买，完成调仓和开仓
 		breakers_sb.append(date.toString() + ",");
 		StringBuffer sb = new StringBuffer();
 		for(Muster breaker : breakers) {
@@ -101,7 +114,6 @@ public class HLB {
 		breakers_sb.deleteCharAt(breakers_sb.length()-1);
 		breakers_sb.append("\n");
 		
-		//先卖后买，完成调仓和开仓
 		if(!dds.isEmpty()) {
 			Set<String> holdOrderIDs;
 			for(String itemID: holdItemIDs) {
@@ -117,7 +129,7 @@ public class HLB {
 			
 			account.openAll(dds);			//后买
 		}
-
+*/
 		dailyAmount_sb.append(account.getDailyAmount() + "\n");
 	}
 	
@@ -146,7 +158,7 @@ public class HLB {
 			@Override
 			public int compare(Muster o1, Muster o2) {
 					if(o1.getHLGap().compareTo(o2.getHLGap())==0){
-						return o1.getTotal_mv().compareTo(o2.getTotal_mv()); //a-z
+						return o1.getLatestPrice().compareTo(o2.getLatestPrice()); //a-z
 					}else {
 						return o1.getHLGap().compareTo(o2.getHLGap());//A-Z
 					}
@@ -170,10 +182,6 @@ public class HLB {
 					&& !m.isDownLimited() 
 					&& m.isUpBreaker() 
 					&& m.isUp(21)
-					//&& m.getTurnover_rate_f().compareTo(turnover_rate_f_max)<0
-					//&& m.getTurnover_rate_f().compareTo(turnover_rate_f_min)>0
-					//&& m.getTurnover_rate_f().compareTo(turnover_rate_f)<0
-					//&& m.getVolume_ratio().compareTo(volumn_ratio)<0
 					) {
 				breakers.add(m);
 			}
@@ -206,5 +214,10 @@ public class HLB {
 			}
 			logger.info(sb.toString());
 		}
+	}
+	
+	private Integer getQuantity(BigDecimal price) {
+		BigDecimal ee = new BigDecimal(50000);
+		return ee.divide(price,BigDecimal.ROUND_DOWN).divide(new BigDecimal(100),BigDecimal.ROUND_DOWN).intValue()*100;
 	}
 }
