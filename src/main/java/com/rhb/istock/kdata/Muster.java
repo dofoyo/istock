@@ -19,18 +19,30 @@ public class Muster {
 	private BigDecimal averagePrice13;
 	private BigDecimal averagePrice21;
 	private BigDecimal averagePrice34;
-	private BigDecimal lowest21;
 	private BigDecimal lowest34;
-	private BigDecimal turnover_rate_f;
+	private BigDecimal lowest21;
+	private BigDecimal lowest13;
+	private BigDecimal lowest8;
+	private BigDecimal lowest5;
+	private BigDecimal turnover_rate_f;  //换手率（自由流通股）
 	private BigDecimal average_turnover_rate_f;
-	private BigDecimal volume_ratio;
+	private BigDecimal volume_ratio;    //量比
 	private BigDecimal average_volume_ratio;
 	private BigDecimal total_mv;
 	private BigDecimal circ_mv;
 	private BigDecimal total_share;
 	private BigDecimal float_share;
 	private BigDecimal free_share;	
+	private BigDecimal amount5;
 	private DecimalFormat df = new DecimalFormat("#.00");
+	
+	public BigDecimal getAmount5() {
+		return amount5;
+	}
+
+	public void setAmount5(BigDecimal amount5) {
+		this.amount5 = amount5;
+	}
 
 	public BigDecimal getTotal_share() {
 		return total_share;
@@ -80,8 +92,8 @@ public class Muster {
 		return df.format(this.turnover_rate_f);
 	}
 	
-	public String getTurnover_volume_str() {
-		return df.format(this.turnover_rate_f) + "，" + df.format(volume_ratio);
+	public String getNote() {
+		return df.format(total_mv);
 	}
 	
 	public boolean isAboveAveragePrice(Integer period) {
@@ -120,9 +132,15 @@ public class Muster {
 	public void setTurnover_rate_f(BigDecimal turnover_rate_f) {
 		this.turnover_rate_f = turnover_rate_f;
 	}
+	
 	public BigDecimal getVolume_ratio() {
 		return volume_ratio;
 	}
+	
+	public BigDecimal cal_volume_ratio() {
+		return amount.divide(amount5,BigDecimal.ROUND_HALF_UP);
+	}
+	
 	public void setVolume_ratio(BigDecimal volume_ratio) {
 		this.volume_ratio = volume_ratio;
 	}
@@ -267,7 +285,13 @@ public class Muster {
 	}
 	
 	public boolean isDropLowest(Integer period) {
-		if(period == 21) {
+		if(period == 5) {
+			return latestPrice.compareTo(lowest5)==-1;
+		}else if(period == 8) {
+			return latestPrice.compareTo(lowest8)==-1;
+		}else if(period == 13) {
+			return latestPrice.compareTo(lowest13)==-1;
+		}else if(period == 21) {
 			return latestPrice.compareTo(lowest21)==-1;
 		}else if(period == 34) {
 			return latestPrice.compareTo(lowest34)==-1;
@@ -345,16 +369,27 @@ public class Muster {
 		this.close = close;
 	}
 
-	@Override
-	public String toString() {
-		return "Muster [itemID=" + itemID + ", itemName=" + itemName + ", industry=" + industry + ", close=" + close
-				+ ", amount=" + amount + ", limited=" + limited + ", latestPrice=" + latestPrice + ", highest="
-				+ highest + ", lowest=" + lowest + ", averageAmount=" + averageAmount + ", averagePrice=" + averagePrice
-				+ ", averagePrice8=" + averagePrice8 + ", averagePrice13=" + averagePrice13 + ", averagePrice21="
-				+ averagePrice21 + ", averagePrice34=" + averagePrice34 + ", lowest21=" + lowest21 + ", lowest34="
-				+ lowest34 + ", turnover_rate_f=" + turnover_rate_f + ", average_turnover_rate_f="
-				+ average_turnover_rate_f + ", volume_ratio=" + volume_ratio + ", average_volume_ratio="
-				+ average_volume_ratio + ", total_mv=" + total_mv + ", circ_mv=" + circ_mv + "]";
+	public BigDecimal getLowest13() {
+		return lowest13;
 	}
-	
+
+	public void setLowest13(BigDecimal lowest13) {
+		this.lowest13 = lowest13;
+	}
+
+	public BigDecimal getLowest8() {
+		return lowest8;
+	}
+
+	public void setLowest8(BigDecimal lowest8) {
+		this.lowest8 = lowest8;
+	}
+
+	public BigDecimal getLowest5() {
+		return lowest5;
+	}
+
+	public void setLowest5(BigDecimal lowest5) {
+		this.lowest5 = lowest5;
+	}	
 }

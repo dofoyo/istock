@@ -61,12 +61,18 @@ public class AVB {
 		for(String itemID: holdItemIDs) {
 			muster = musters.get(itemID);
 			if(muster!=null) {
-				if(sseiFlag==0 && muster.isDrop(21) && !muster.isDownLimited()) { 		//跌破21日均线就卖
+/*				if(muster.isDrop(21) && !muster.isDownLimited()) { 		//跌破21日均线就卖
+					account.drop(itemID, "跌破dropline", muster.getLatestPrice());
+				}*/
+				if(muster.isDropLowest(21) && !muster.isDownLimited()) { 		//跌破21日低点就卖
+					account.drop(itemID, "跌破lowest", muster.getLatestPrice());
+				}
+				/*if(sseiFlag==0 && muster.isDrop(21) && !muster.isDownLimited()) { 		//跌破21日均线就卖
 					account.drop(itemID, "跌破dropline", muster.getLatestPrice());
 				}				
 				if(sseiFlag==1 && muster.isDropLowest(21) && !muster.isDownLimited()) { 		//跌破21日低点就卖
 					account.drop(itemID, "跌破lowest", muster.getLatestPrice());
-				}
+				}*/
 			}
 		}				
 		
@@ -150,6 +156,7 @@ public class AVB {
 					&& !m.isDownLimited() 
 					&& m.isUpBreaker()
 					&& m.isUp(21)
+					//&& m.cal_volume_ratio().compareTo(new BigDecimal(2))==1
 					) {
 				breakers.add(m);
 			}

@@ -80,7 +80,8 @@ public class FinanceStatementsRepositoryFromSina implements FinanceStatementsRep
 		for(int m=1; m<j; m++){
 			String period = cells[m][0];
 			Integer year = Integer.parseInt(period.substring(0, 4));
-			if(period.contains("1231") && year>=theYear){ //2006年后才有现金流分析
+			//if(period.contains("1231") && year>=theYear){ //2006年后才有现金流分析
+			if(year>=theYear){ //2006年后才有现金流分析
 				BalanceSheet bs = new BalanceSheet();
 				bs.setPeriod(cells[m][0]);
 				if(lines.length==69){  //保险
@@ -128,8 +129,17 @@ public class FinanceStatementsRepositoryFromSina implements FinanceStatementsRep
 					bs.setAssets(ParseString.toDouble(cells[m][23]));
 					bs.setDebt(ParseString.toDouble(cells[m][42]));
 					bs.setGoodwill(ParseString.toDouble(cells[m][19]));
+				}else if(lines.length == 95){ //
+					bs.setCash(ParseString.toDouble(cells[m][3]));
+					bs.setInventories(ParseString.toDouble(cells[m][16]));
+					bs.setAccountsReceivable(ParseString.toDouble(cells[m][8]));
+					bs.setNotesReceivable(ParseString.toDouble(cells[m][7]));
+					bs.setPayables(ParseString.toDouble(cells[m][54]));
+					bs.setAssets(ParseString.toDouble(cells[m][47]));
+					bs.setDebt(ParseString.toDouble(cells[m][81]));
+					bs.setGoodwill(ParseString.toDouble(cells[m][42]));
 				}else {
-					System.out.println("can NOT read " + stockid + " reports, lines is " + lines.length);
+					System.out.println("can NOT read " + stockid + " balance sheet, lines is " + lines.length);
 				}
 				balancesheets.put(period,bs);
 			}
@@ -137,8 +147,8 @@ public class FinanceStatementsRepositoryFromSina implements FinanceStatementsRep
 		
 /*		for(Map.Entry<String, BalanceSheet> entry : balancesheets.entrySet()){
 			System.out.println(entry.getValue());
-		}
-*/		
+		}*/
+		
 		return balancesheets;
 		
 	}
@@ -187,7 +197,7 @@ public class FinanceStatementsRepositoryFromSina implements FinanceStatementsRep
 		for(int m=1; m<j; m++){
 			String period = cells[m][0];
 			Integer year = Integer.parseInt(period.substring(0, 4));
-			if(period.contains("1231") && year>=theYear){
+			if(year>=theYear){
 				CashFlow fs = new CashFlow();
 				fs.setPeriod(period);
 				if(lines.length>90){
@@ -261,10 +271,40 @@ public class FinanceStatementsRepositoryFromSina implements FinanceStatementsRep
 			String period = cells[m][0];
 			Integer year = Integer.parseInt(period.substring(0, 4));
 
-			if(period.contains("1231") && year>=theYear){
+			if(year>=theYear){
 				ProfitStatement fs = new ProfitStatement();
 				fs.setPeriod(period);
-				if(lines.length > 50){
+				if(lines.length == 32){
+					fs.setAllOperatingRevenue(ParseString.toDouble(cells[m][2]));
+					fs.setOperatingRevenue(ParseString.toDouble(cells[m][3]));
+					fs.setAllOperatingCost(ParseString.toDouble(cells[m][4]));
+					fs.setOperatingCost(ParseString.toDouble(cells[m][5]));
+					fs.setTax(ParseString.toDouble(cells[m][6]));
+					fs.setSalesExpense(ParseString.toDouble(cells[m][7]));
+					fs.setOperatingExpense(ParseString.toDouble(cells[m][8]));
+					fs.setFinanceExpense(ParseString.toDouble(cells[m][9]));
+					fs.setSearchExpense(ParseString.toDouble(cells[m][10]));
+				}else if(lines.length == 35){	//银行
+					fs.setAllOperatingRevenue(ParseString.toDouble(cells[m][2]));
+					fs.setOperatingRevenue(ParseString.toDouble(cells[m][2]));
+					fs.setAllOperatingCost(ParseString.toDouble(cells[m][14]));
+					fs.setTax(ParseString.toDouble(cells[m][15]));
+					fs.setOperatingCost(ParseString.toDouble(cells[m][16]));
+					fs.setSearchExpense(ParseString.toDouble(cells[m][17]));
+					fs.setOperatingExpense(ParseString.toDouble(cells[m][19]));
+					fs.setFinanceExpense(0.00);
+					fs.setSalesExpense(0.00);
+				}else if(lines.length == 36){ //券商
+					fs.setAllOperatingRevenue(ParseString.toDouble(cells[m][2]));
+					fs.setOperatingRevenue(ParseString.toDouble(cells[m][2]));
+					fs.setAllOperatingCost(ParseString.toDouble(cells[m][15]));
+					fs.setTax(ParseString.toDouble(cells[m][16]));
+					fs.setOperatingCost(ParseString.toDouble(cells[m][17]));
+					fs.setSearchExpense(ParseString.toDouble(cells[m][18]));
+					fs.setOperatingExpense(ParseString.toDouble(cells[m][20]));
+					fs.setFinanceExpense(0.00);
+					fs.setSalesExpense(0.00);
+/*				}else if(lines.length > 50){
 					fs.setAllOperatingRevenue(ParseString.toDouble(cells[m][2]));
 					fs.setOperatingRevenue(ParseString.toDouble(cells[m][3]));
 					fs.setAllOperatingCost(ParseString.toDouble(cells[m][9]));
@@ -273,24 +313,8 @@ public class FinanceStatementsRepositoryFromSina implements FinanceStatementsRep
 					fs.setFinanceExpense(ParseString.toDouble(cells[m][24]));
 					fs.setSalesExpense(ParseString.toDouble(cells[m][22]));
 					fs.setTax(ParseString.toDouble(cells[m][39]));
-				}else if(lines.length > 35){ //券商
-					fs.setAllOperatingRevenue(ParseString.toDouble(cells[m][2]));
-					fs.setOperatingRevenue(ParseString.toDouble(cells[m][2]));
-					fs.setAllOperatingCost(ParseString.toDouble(cells[m][15]));
-					fs.setOperatingCost(0.00);
-					fs.setOperatingExpense(0.00);
-					fs.setFinanceExpense(0.00);
-					fs.setSalesExpense(0.00);
-					fs.setTax(ParseString.toDouble(cells[m][24]));
-				}else if(lines.length > 20){	//银行
-					fs.setAllOperatingRevenue(ParseString.toDouble(cells[m][2]));
-					fs.setOperatingRevenue(ParseString.toDouble(cells[m][3]));
-					fs.setAllOperatingCost(ParseString.toDouble(cells[m][4]));
-					fs.setOperatingCost(ParseString.toDouble(cells[m][5]));
-					fs.setOperatingExpense(ParseString.toDouble(cells[m][8]));
-					fs.setFinanceExpense(ParseString.toDouble(cells[m][9]));
-					fs.setSalesExpense(ParseString.toDouble(cells[m][7]));
-					fs.setTax(ParseString.toDouble(cells[m][20]));
+*/				}else {
+					System.out.println("can NOT read " + stockid + " ProfitStatement, lines is " + lines.length);
 				}
 				profitstatements.put(period,fs);
 			}

@@ -151,6 +151,7 @@ public class SHB {
 					&& !m.isDownLimited() 
 					&& m.isUpBreaker() 
 					&& m.isUp(21)
+					//&& m.cal_volume_ratio().compareTo(new BigDecimal(2))==1
 					) {
 				breakers.add(m);
 			}

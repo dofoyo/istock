@@ -88,7 +88,7 @@ public class HLB_try {
 		for(Muster breaker : breakers) {
 			if(!holdItemIDs.contains(breaker.getItemID())) {
 				account.refreshHoldsPrice(breaker.getItemID(), breaker.getLatestPrice());
-				account.open(breaker.getItemID(),breaker.getItemName(), breaker.getIndustry(), this.getQuantity(breaker.getLatestPrice()), breaker.getTurnover_volume_str(), breaker.getLatestPrice());
+				account.open(breaker.getItemID(),breaker.getItemName(), breaker.getIndustry(), this.getQuantity(breaker.getLatestPrice()), breaker.getNote(), breaker.getLatestPrice());
 			}
 			breakers_sb.append(breaker.getItemID());
 			breakers_sb.append(",");

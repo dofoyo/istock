@@ -10,8 +10,11 @@ public class MusterEntity {
 	private Integer limited;
 	private BigDecimal highest;
 	private BigDecimal lowest;
-	private BigDecimal lowest21;
 	private BigDecimal lowest34;
+	private BigDecimal lowest21;
+	private BigDecimal lowest13;
+	private BigDecimal lowest8;
+	private BigDecimal lowest5;
 	private BigDecimal averageAmount;
 	private BigDecimal averagePrice;
 	private BigDecimal averagePrice8;
@@ -27,6 +30,7 @@ public class MusterEntity {
 	private BigDecimal total_share;
 	private BigDecimal float_share;
 	private BigDecimal free_share;	
+	private BigDecimal amount5;	
 
 	public MusterEntity(String itemID, 
 			BigDecimal close, 
@@ -51,7 +55,11 @@ public class MusterEntity {
 			BigDecimal circ_mv,
 			BigDecimal total_share,
 			BigDecimal float_share,
-			BigDecimal free_share
+			BigDecimal free_share,
+			BigDecimal lowest13, 
+			BigDecimal lowest8, 
+			BigDecimal lowest5,
+			BigDecimal amount5
 			) {
 		this.itemID = itemID;
 		this.close = close;
@@ -77,7 +85,10 @@ public class MusterEntity {
 		this.total_share = total_share;
 		this.float_share = float_share;
 		this.free_share = free_share;
-		
+		this.lowest13 = lowest13;
+		this.lowest8 = lowest8;
+		this.lowest5 = lowest5;
+		this.amount5 = amount5;
 	}
 	
 	public MusterEntity(String txt) {
@@ -106,6 +117,10 @@ public class MusterEntity {
 		this.total_share = new BigDecimal(ss[21]);
 		this.float_share = new BigDecimal(ss[22]);
 		this.free_share = new BigDecimal(ss[23]);
+		this.lowest13 = new BigDecimal(ss[24]);
+		this.lowest8 = new BigDecimal(ss[25]);
+		this.lowest5 = new BigDecimal(ss[26]);
+		this.amount5 = new BigDecimal(ss[27]);
 	}
 	
 	public BigDecimal getTotal_share() {
@@ -221,7 +236,11 @@ public class MusterEntity {
 				this.circ_mv + "," +  
 				this.total_share + "," +  
 				this.float_share + "," +  
-				this.free_share + "\n"; 
+				this.free_share + "," +
+				this.lowest13 + "," +  
+				this.lowest8 + "," +  
+				this.lowest5 + "," +  
+				this.amount5 + "\n"; 
 	}
 
 	public BigDecimal getLowest21() {
@@ -319,18 +338,36 @@ public class MusterEntity {
 		this.averagePrice34 = averagePrice34;
 	}
 
-	@Override
-	public String toString() {
-		return "MusterEntity [itemID=" + itemID + ", close=" + close + ", amount=" + amount + ", latestPrice="
-				+ latestPrice + ", limited=" + limited + ", highest=" + highest + ", lowest=" + lowest + ", lowest21="
-				+ lowest21 + ", lowest34=" + lowest34 + ", averageAmount=" + averageAmount + ", averagePrice="
-				+ averagePrice + ", averagePrice8=" + averagePrice8 + ", averagePrice13=" + averagePrice13
-				+ ", averagePrice21=" + averagePrice21 + ", averagePrice34=" + averagePrice34 + ", turnover_rate_f="
-				+ turnover_rate_f + ", average_turnover_rate_f=" + average_turnover_rate_f + ", volume_ratio="
-				+ volume_ratio + ", average_volume_ratio=" + average_volume_ratio + ", total_mv=" + total_mv
-				+ ", circ_mv=" + circ_mv + ", total_share=" + total_share + ", float_share=" + float_share
-				+ ", free_share=" + free_share + "]";
+	public BigDecimal getLowest13() {
+		return lowest13;
 	}
 
-	
+	public void setLowest13(BigDecimal lowest13) {
+		this.lowest13 = lowest13;
+	}
+
+	public BigDecimal getLowest8() {
+		return lowest8;
+	}
+
+	public void setLowest8(BigDecimal lowest8) {
+		this.lowest8 = lowest8;
+	}
+
+	public BigDecimal getLowest5() {
+		return lowest5;
+	}
+
+	public void setLowest5(BigDecimal lowest5) {
+		this.lowest5 = lowest5;
+	}
+
+	public BigDecimal getAmount5() {
+		return amount5;
+	}
+
+	public void setAmount5(BigDecimal amount5) {
+		this.amount5 = amount5;
+	}
+
 }

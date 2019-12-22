@@ -3,6 +3,7 @@ package com.rhb.istock.fdata;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -11,16 +12,22 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import com.rhb.istock.comm.util.Progress;
 import com.rhb.istock.fdata.repository.FinanceStatementsRepository;
 import com.rhb.istock.fdata.repository.ReportDateRepository;
 import com.rhb.istock.fdata.spider.DownloadFinancialStatements;
 import com.rhb.istock.fdata.spider.DownloadReportedStockList;
+import com.rhb.istock.item.ItemService;
 
 @Service("financialStatementServiceImp")
 public class FinancialStatementServiceImp implements FinancialStatementService {
 	@Value("${fdataPath}")
 	private String fdataPath;
 
+	@Autowired
+	@Qualifier("itemServiceImp")
+	ItemService itemService;
+	
 	@Autowired
 	@Qualifier("financeStatementsRepositoryFromSina")
 	FinanceStatementsRepository financeStatementsRepository;
@@ -98,6 +105,33 @@ public class FinancialStatementServiceImp implements FinancialStatementService {
 	//@Override
 	public String getReportDate(String stockcode, Integer year) {
 		return reportDateRepository.getReportDate(stockcode, year);
+	}
+
+	@Override
+	public void downloadReports(String stockcode) {
+    	Map<String,String> downloadUrls = new HashMap<String,String>();
+		downloadUrls.put(stockcode+"_balancesheet.xls",downloadFinancialStatements.downloadBalanceSheetUrl(stockcode));
+		downloadUrls.put(stockcode+"_cashflow.xls",downloadFinancialStatements.downloadCashFlowUrl(stockcode));
+		downloadUrls.put(stockcode+"_profitstatement.xls",downloadFinancialStatements.downloadProfitStatementUrl(stockcode));
+		
+    	//开始下载
+		downloadFinancialStatements.down(downloadUrls);
+	}
+
+	@Override
+	public void downloadAllReports() {
+		long beginTime=System.currentTimeMillis(); 
+		System.out.println("download all reports begin......");
+
+		List<String> ids = itemService.getItemIDs();
+		int i=1;
+		for(String id : ids) {
+			Progress.show(ids.size(), i++, id.substring(2));
+			this.downloadReports(id.substring(2));
+		}
+		
+		long used = (System.currentTimeMillis() - beginTime)/1000; 
+		System.out.println("用时：" + used + "秒");          
 	}
 
 }

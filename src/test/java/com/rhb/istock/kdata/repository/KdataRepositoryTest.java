@@ -30,8 +30,8 @@ public class KdataRepositoryTest {
 	
 	@Test
 	public void testGetDailyKdata() {
-		String id="sh603920";
-		LocalDate date = LocalDate.parse("2019-11-11");
+		String id="sz002456";
+		LocalDate date = LocalDate.parse("2019-12-11");
 
 /*		System.out.println("kdataRepositoryDzh");
 		KdataEntity kdata1 = kdataRepositoryDzh.getDailyKdata(id);

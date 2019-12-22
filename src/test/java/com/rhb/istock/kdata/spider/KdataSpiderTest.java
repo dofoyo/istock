@@ -42,7 +42,7 @@ public class KdataSpiderTest {
 		kdataSpiderTushare.downFactors(itemID);
 	}
 	
-	//@Test
+	@Test
 	public void testDownKdataByIDs() {
 		long beginTime=System.currentTimeMillis(); 
 
@@ -51,10 +51,10 @@ public class KdataSpiderTest {
 		for(ItemEntity item : items){
 			Progress.show(items.size(),i++, " testDwnKdataByIDs  " + item.getItemId());
 			try {
-				kdataSpiderTushare.downKdatas(item.getItemId());
-				kdataSpiderTushare.downFactors(item.getItemId());
+				//kdataSpiderTushare.downKdatas(item.getItemId());
+				//kdataSpiderTushare.downFactors(item.getItemId());
 				kdataSpiderTushare.downBasics(item.getItemId());
-				//Thread.sleep(300); //一分钟200个
+				Thread.sleep(300); //一分钟200个
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -68,7 +68,7 @@ public class KdataSpiderTest {
 
 	//@Test
 	public void testDownKdataByDate() {
-		LocalDate date = LocalDate.parse("2019-12-02");
+		LocalDate date = LocalDate.parse("2019-12-16");
 		try {
 			//kdataSpiderTushare.downKdatas(date);
 			kdataSpiderTushare.downFactors(date); //此处仅供测试，正式使用时，factor的日期要比kdata的日期提前一个交易日

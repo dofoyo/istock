@@ -30,13 +30,21 @@ public class Kdata {
 
 			BigDecimal highest = new BigDecimal(0);
 			BigDecimal lowest = new BigDecimal(10000);
+			BigDecimal lowest5 = new BigDecimal(10000);
+			BigDecimal lowest8 = new BigDecimal(10000);
+			BigDecimal lowest13 = new BigDecimal(10000);
 			BigDecimal lowest21 = new BigDecimal(10000);
 			BigDecimal lowest34 = new BigDecimal(10000);
 			BigDecimal totalAmount = new BigDecimal(0);
 			BigDecimal totalPrice = new BigDecimal(0);
 			BigDecimal total_turnover_rate_f = new BigDecimal(0);
 			BigDecimal total_volume_ratio = new BigDecimal(0);
-			
+
+			BigDecimal amount5 = new BigDecimal(0);
+
+			int l = bars.size()-5;
+			int m = bars.size()-8;
+			int n = bars.size()-13;
 			int j = bars.size()-21;
 			int k = bars.size()-34;
 			int i = 0;
@@ -47,13 +55,29 @@ public class Kdata {
 				totalPrice = totalPrice.add(kbar.getClose());
 				total_turnover_rate_f = total_turnover_rate_f.add(kbar.getTurnover_rate_f());
 				total_volume_ratio = total_volume_ratio.add(kbar.getVolume_ratio());
-						
-				if(i>=j && lowest21.compareTo(kbar.getLow())==1) {
-					lowest21 =  kbar.getLow();
+
+				if(i>=k && lowest34.compareTo(kbar.getClose())==1) {
+					lowest34 =  kbar.getClose();
 				}
 
-				if(i>=k && lowest34.compareTo(kbar.getLow())==1) {
-					lowest34 =  kbar.getLow();
+				if(i>=j && lowest21.compareTo(kbar.getClose())==1) {
+					lowest21 =  kbar.getClose();
+				}
+
+				if(i>=n && lowest13.compareTo(kbar.getClose())==1) {
+					lowest13 =  kbar.getClose();
+				}
+				
+				if(i>=m && lowest8.compareTo(kbar.getClose())==1) {
+					lowest8 =  kbar.getClose();
+				}
+				
+				if(i>=l && lowest5.compareTo(kbar.getClose())==1) {
+					lowest5 =  kbar.getClose();
+				}
+				
+				if(i>=l) {
+					amount5 = amount5.add(kbar.getAmount());
 				}
 				
 				i++;
@@ -64,15 +88,19 @@ public class Kdata {
 			BigDecimal averagePrice = totalPrice.divide(new BigDecimal(this.bars.size()),BigDecimal.ROUND_HALF_UP);
 			BigDecimal average_turnover_rate_f = total_turnover_rate_f.divide(new BigDecimal(this.bars.size()),BigDecimal.ROUND_HALF_UP);
 			BigDecimal average_volume_ratio = total_volume_ratio.divide(new BigDecimal(this.bars.size()),BigDecimal.ROUND_HALF_UP);
-
+			
 			features.put("highest", highest);
 			features.put("lowest", lowest);
-			features.put("lowest21", lowest21);
 			features.put("lowest34", lowest34);
+			features.put("lowest21", lowest21);
+			features.put("lowest13", lowest13);
+			features.put("lowest8", lowest8);
+			features.put("lowest5", lowest5);
 			features.put("averageAmount", averageAmount);
 			features.put("averagePrice", averagePrice);
 			features.put("average_turnover_rate_f", average_turnover_rate_f);
 			features.put("average_volume_ratio", average_volume_ratio);
+			features.put("amount5", amount5);
 		}
 		
 		return this.features;

@@ -16,7 +16,7 @@ import com.rhb.istock.kdata.spider.KdataRealtimeSpider;
 import com.rhb.istock.selector.SelectorService;
 import com.rhb.istock.trade.turtle.operation.TurtleOperationService;
 
-@Component
+//@Component
 public class IstockScheduledTask {
 	@Autowired
 	@Qualifier("kdataServiceImp")

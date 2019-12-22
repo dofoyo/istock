@@ -62,7 +62,7 @@ public class DownloadFinancialStatementsFromSina implements
 		int i = 0;
 		for(Map.Entry<String, String> entry : urls.entrySet()){
 			HttpDownload.saveToFile(entry.getValue(), fdataPath + subPath + entry.getKey());
-			System.out.print(i++ + "/" + urls.size() + "\r");
+			//System.out.print(i++ + "/" + urls.size() + "\r");
 
 			//System.out.print(entry.getKey() + " have downloaded!");		
 			
@@ -75,7 +75,7 @@ public class DownloadFinancialStatementsFromSina implements
 			} 
 			
 		}
-		System.out.print("共下载了 " + urls.size() + " 份。");
+		//System.out.print("共下载了 " + urls.size() + " 份。");
 
 	}
 

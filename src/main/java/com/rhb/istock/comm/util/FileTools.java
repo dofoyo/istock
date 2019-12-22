@@ -8,8 +8,11 @@ import java.io.FileWriter;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class FileTools {
 	private static final String SEP = System.getProperty("line.separator");
@@ -69,6 +72,21 @@ public class FileTools {
 		File file = new File(path);
 		return file.exists();
 	}
+	
+	public static void writeTextFile(String path, Map<LocalDate,Set<String>> content, boolean append) {
+		StringBuffer sb = new StringBuffer();
+		for(Map.Entry<LocalDate, Set<String>> entry : content.entrySet()) {
+			sb.append(entry.getKey());
+			sb.append(",");
+			for(String str : entry.getValue()) {
+				sb.append(str);
+				sb.append(",");
+			}
+			sb.replace(sb.length()-1, sb.length(), "\n");
+		}
+		
+		writeTextFile(path,sb.toString(),append);
+	}
 
 	public static void writeTextFile(String path, String content, boolean append) {
 		try {
@@ -77,15 +95,11 @@ public class FileTools {
 			if (file.exists() == false) { // 如果文本文件不存在则创建它
 				file.createNewFile();
 				file = new File(path); // 重新实例化
-				FileWriter filewriter = new FileWriter(file, append);
-				filewriter.write(content);
-				filewriter.close();
-
-			} else {
-				FileWriter filewriter = new FileWriter(file, append);
-				filewriter.write(content);
-				filewriter.close();
 			}
+			
+			FileWriter filewriter = new FileWriter(file, append);
+			filewriter.write(content);
+			filewriter.close();
 
 			//System.out.println("have saved " + path + ". ");
 		} catch (Exception d) {

@@ -301,7 +301,7 @@ public class KdataSpiderTushare implements KdataSpider {
 		int i=0;
 		for(String id : ids) {
 			Progress.show(ids.size(),i++,id);
-			this.downFactors(id);
+			this.downBasics(id);
 			Thread.sleep(300); //一分钟200次
 		}
 		

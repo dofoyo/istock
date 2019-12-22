@@ -248,7 +248,7 @@ public class Account {
 		
 		//logger.info("buy " + itemID + " " + quantity + " units on " + price + " yuan.");
 		Order order = new Order(this.getOrderID(),itemID,itemName, industry,LocalDate.parse(endDate.toString()),price,quantity);
-		order.setNote("open，" + note);
+		order.setNote(note);
 
 		//System.out.println(order); //----------------------------------------------
 
@@ -294,7 +294,7 @@ public class Account {
 		BigDecimal quota = this.cash.divide(new BigDecimal(position),BigDecimal.ROUND_DOWN);
 		for(Muster item : items) {
 			this.prices.put(item.getItemID(), item.getLatestPrice());
-			this.open(item.getItemID(), item.getItemName(), item.getIndustry(), this.getQuantity(quota, item.getLatestPrice()), item.getTurnover_volume_str() , item.getLatestPrice());
+			this.open(item.getItemID(), item.getItemName(), item.getIndustry(), this.getQuantity(quota, item.getLatestPrice()), item.getNote() , item.getLatestPrice());
 		}
 	}
 	
@@ -313,7 +313,7 @@ public class Account {
 	public void dropByOrderID(String orderID, String note, BigDecimal price) {
 		Order openOrder = holds.get(Integer.parseInt(orderID));
 		Order dropOrder = new Order(openOrder.getOrderID(),openOrder.getItemID(),openOrder.getItemName(),openOrder.getIndustry(), LocalDate.parse(endDate.toString()), price, openOrder.getQuantity());
-		dropOrder.setNote("drop，" + note);
+		dropOrder.setNote(note);
 
 		//System.out.println(dropOrder); //----------------------------------------------
 	

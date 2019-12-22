@@ -150,11 +150,13 @@ public class Blue {
 		Collections.sort(ms, new Comparator<Muster>() {
 			@Override
 			public int compare(Muster o1, Muster o2) {
-				if(o1.getHLGap().compareTo(o2.getHLGap())==0){
+				return o2.cal_volume_ratio().compareTo(o1.cal_volume_ratio()); //Z-A
+
+/*				if(o1.getHLGap().compareTo(o2.getHLGap())==0){
 					return o1.getLatestPrice().compareTo(o2.getLatestPrice()); //a-z
 				}else {
 					return o1.getHLGap().compareTo(o2.getHLGap());//A-Z
-				}
+				}*/
 /*				if(o1.getHLGap().compareTo(o2.getHLGap())==0){
 					if(o1.getLNGap().compareTo(o2.getLNGap())==0){  
 						return o1.getLatestPrice().compareTo(o2.getLatestPrice()); //a-z
@@ -190,6 +192,7 @@ public class Blue {
 					&& !muster.isDownLimited() 
 					&& muster.isUpBreaker() 
 					&& muster.isUp(21)
+					//&& muster.cal_volume_ratio().compareTo(new BigDecimal(2))==1
 					) {
 				tops.add(muster);
 			}

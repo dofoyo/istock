@@ -37,13 +37,14 @@ public class HLB {
 	private StringBuffer dailyAmount_sb = new StringBuffer("date,cash,value,total\n");
 	private StringBuffer breakers_sb = new StringBuffer();
 	private Integer pool = 21;
-	private Integer top = 3;
+	private Integer top = 13;
 /*	private BigDecimal turnover_rate_f_max = new BigDecimal(8.63);
 	private BigDecimal turnover_rate_f_min = new BigDecimal(0.18);
 	private BigDecimal volumn_ratio = new BigDecimal(3.22);
 */	
-	private BigDecimal turnover_rate_f = new BigDecimal(14.8);
-	private BigDecimal volumn_ratio = new BigDecimal(1.58);
+	//private BigDecimal turnover_rate_f = new BigDecimal(14.8);
+	//private BigDecimal volumn_ratio = new BigDecimal(1.58);
+	//private BigDecimal total_mv = new BigDecimal("7000000000");
 	
 	public HLB(BigDecimal initCash) {
 		account = new Account(initCash);
@@ -66,15 +67,18 @@ public class HLB {
 		for(String itemID: holdItemIDs) {
 			muster = musters.get(itemID);
 			if(muster!=null) {
-/*				if(muster.isDrop(21) && !muster.isDownLimited()) { 		//跌破21日均线就卖
-					account.drop(itemID, "跌破dropline", muster.getLatestPrice());
-				}	*/
-				if(sseiFlag==0 && muster.isDrop(21) && !muster.isDownLimited()) { 		//跌破21日均线就卖
+				if(muster.isDrop(21) && !muster.isDownLimited()) { 		//跌破21日均线就卖
+					account.drop(itemID, "1", muster.getLatestPrice());
+				}
+/*				if(muster.isDropLowest(13) && !muster.isDownLimited()) { 		//跌破21日低点就卖
+					account.drop(itemID, "1", muster.getLatestPrice());
+				}*/
+/*				if(sseiFlag==0 && muster.isDrop(21) && !muster.isDownLimited()) { 		//跌破21日均线就卖
 					account.drop(itemID, "跌破dropline", muster.getLatestPrice());
 				}				
 				if(sseiFlag==1 && muster.isDropLowest(21) && !muster.isDownLimited()) { 		//跌破21日低点就卖
 					account.drop(itemID, "跌破lowest", muster.getLatestPrice());
-				}
+				}*/
 			}
 		}				
 		
@@ -109,7 +113,7 @@ public class HLB {
 				muster = musters.get(itemID);
 				if(muster!=null) {
 					for(String holdOrderID : holdOrderIDs) {
-						account.dropByOrderID(holdOrderID, "调仓", muster.getLatestPrice());   //先卖
+						account.dropByOrderID(holdOrderID, "0", muster.getLatestPrice());   //先卖
 						dds.add(muster);						
 					}
 				}
@@ -145,12 +149,13 @@ public class HLB {
 		Collections.sort(musters, new Comparator<Muster>() {
 			@Override
 			public int compare(Muster o1, Muster o2) {
-					if(o1.getHLGap().compareTo(o2.getHLGap())==0){
-						return o1.getTotal_mv().compareTo(o2.getTotal_mv()); //a-z
-					}else {
-						return o1.getHLGap().compareTo(o2.getHLGap());//A-Z
-					}
-				
+				//return o1.getHLGap().compareTo(o2.getHLGap());//A-Z
+			
+				if(o1.getHLGap().compareTo(o2.getHLGap())==0){
+					return o1.getLatestPrice().compareTo(o2.getLatestPrice()); //a-z
+				}else {
+					return o1.getHLGap().compareTo(o2.getHLGap());//A-Z
+				}
 			}
 		});
 		
@@ -169,11 +174,12 @@ public class HLB {
 					&& !m.isUpLimited() 
 					&& !m.isDownLimited() 
 					&& m.isUpBreaker() 
-					&& m.isUp(21)
+					//&& m.isUp(21)
+					//&& m.getVolume_ratio().compareTo(new BigDecimal(2))==1
 					//&& m.getTurnover_rate_f().compareTo(turnover_rate_f_max)<0
 					//&& m.getTurnover_rate_f().compareTo(turnover_rate_f_min)>0
 					//&& m.getTurnover_rate_f().compareTo(turnover_rate_f)<0
-					//&& m.getVolume_ratio().compareTo(volumn_ratio)<0
+					//&& m.getTotal_mv().compareTo(total_mv)<0
 					) {
 				breakers.add(m);
 			}

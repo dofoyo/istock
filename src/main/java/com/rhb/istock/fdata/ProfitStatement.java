@@ -11,11 +11,20 @@ public class ProfitStatement {
 	private double salesExpense = 0.0; 			//销售费用
 	private double financeExpense = 0.0; 		//财务费用
 	private double tax = 0.0; 					//营业税金及附加
+	private double searchExpense = 0.0;			//研发费用
 	
 	public double getProfit(){
-		return operatingRevenue - operatingCost - operatingExpense - salesExpense - financeExpense; 
+		return operatingRevenue - operatingCost - operatingExpense - salesExpense - financeExpense - tax - searchExpense; 
 	}
 	
+	public double getSearchExpense() {
+		return searchExpense;
+	}
+
+	public void setSearchExpense(double searchExpense) {
+		this.searchExpense = searchExpense;
+	}
+
 	public String getPeriod() {
 		return period;
 	}

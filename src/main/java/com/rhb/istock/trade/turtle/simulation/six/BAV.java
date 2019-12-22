@@ -157,7 +157,8 @@ public class BAV {
 		Collections.sort(ms, new Comparator<Muster>() {
 			@Override
 			public int compare(Muster o1, Muster o2) {
-				return o2.getAverageAmount().compareTo(o1.getAverageAmount()); //Z-A
+				//return o2.getAverageAmount().compareTo(o1.getAverageAmount()); //Z-A
+				return o2.cal_volume_ratio().compareTo(o1.cal_volume_ratio()); //Z-A
 
 				
 /*				if(o1.getHLGap().compareTo(o2.getHLGap())==0){
@@ -190,6 +191,7 @@ public class BAV {
 					&& !muster.isUpLimited() 
 					&& muster.isUpBreaker() 
 					&& muster.isUp(21)
+					//&& muster.cal_volume_ratio().compareTo(new BigDecimal(2))==1
 					) {
 				tops.add(muster);
 			}

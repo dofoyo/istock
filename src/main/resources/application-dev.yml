@@ -2,6 +2,7 @@ fdataPath: D:/dev/istock-data/fdata/
 sinaKdataPath: D:/dev/istock-data/kdata/sina
 dzhKdataPath: D:/dev/istock-data/kdata/dzh
 tushareKdataPath: D:/dev/istock-data/kdata/tushare
+tushareFdataPath: D:/dev/istock-data/fdata/tushare
 kdataPath163: D:/dev/istock-data/kdata/163
 reportPath: D:/dev/istock-data/reports
 musterPath: d:/dev/istock-data/kdata/muster
@@ -14,6 +15,8 @@ topicsFile: D:/dev/istock-data/topics.txt
 fvaluesOfHLFile: D:/dev/istock-data/fvaluesOfHL.txt
 dailyMeansFile: D:/dev/istock-data/dailyMeans.txt
 sz50File: D:/dev/istock-data/sz50.csv
+huaFile: d:/dev/istock-data/hua.txt
+mcstFile: d:/dev/istock-data/mcst.txt
 openDuration: 89
 dropDuration: 21
 

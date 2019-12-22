@@ -2,7 +2,6 @@ package com.rhb.istock.trade.turtle.simulation.six;
 
 import java.time.LocalDate;
 import java.util.Map;
-import java.util.TreeMap;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,16 +23,24 @@ public class TurtleMusterSimulationTest {
 	@Autowired
 	@Qualifier("turtleSimulationRepository")
 	TurtleSimulationRepository turtleSimulationRepository;
-	
+
+	@Autowired
+	@Qualifier("turtleMusterSimulationAnalysis")
+	TurtleMusterSimulationAnalysis turtleMusterSimulationAnalysis;
 	
 	//@Test
-	public void test() {
+	public void getDailyMeans() {
 		LocalDate beginDate = LocalDate.parse("2019-06-01");
 		LocalDate endDate = LocalDate.parse("2019-06-14");
 		//turtleMusterSimulation.generateDailyRatios(beginDate,endDate);
 		
 		Map<String,Map<String,String>> results = turtleSimulationRepository.getDailyMeans();
 		System.out.println(results);
+	}
+	
+	@Test
+	public void generateRecords() {
+		turtleMusterSimulationAnalysis.generateRecords("hlb");
 	}
 
 

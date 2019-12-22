@@ -110,6 +110,7 @@ public class KdataServiceImp implements KdataService{
 		for(int i=0,j=0; i<count && j<entity.getBarSize(); j++) {
 			bar = entity.getBar(date);
 			if(bar!=null) {
+				//System.out.println(date.toString() + ":" + bar.toString());
 				kdata.addBar(date, bar.getOpen(), 
 						bar.getHigh(), bar.getLow(), 
 						bar.getClose(), bar.getAmount(),
@@ -163,7 +164,7 @@ public class KdataServiceImp implements KdataService{
 		LocalDate lastDownDate = lastDownDate1.isBefore(lastDownDate2) ? lastDownDate2 : lastDownDate1;
 		logger.info("last down date " + lastDownDate);
 
-		List<LocalDate> dates = this.getKdata("sh000001", lastDownDate.plusDays(1), latestDate, true).getDates();
+		List<LocalDate> dates = this.getKdata("sh000001", lastDownDate.plusDays(1), latestDate, false).getDates();
 
 		//List<LocalDate> dates = kdataRealtimeSpider.getCalendar(lastDownDate,latestDate);
 		
@@ -335,8 +336,8 @@ public class KdataServiceImp implements KdataService{
 		BigDecimal close = lastBar.getClose();
 		BigDecimal amount = lastBar.getAmount();
 		BigDecimal trunover_rate_f = lastBar.getTurnover_rate_f();
-		BigDecimal volume_ratio = lastBar.getVolume_ratio();
 		BigDecimal total_mv = lastBar.getTotal_mv();
+		BigDecimal volume_ratio = lastBar.getVolume_ratio();
 		BigDecimal circ_mv = lastBar.getCirc_mv();
 		BigDecimal total_share = lastBar.getTotal_share();
 		BigDecimal float_share = lastBar.getFloat_share();
@@ -356,8 +357,12 @@ public class KdataServiceImp implements KdataService{
 		Map<String,BigDecimal> features = kdata.getFeatures();
 		BigDecimal highest = features.get("highest");
 		BigDecimal lowest = features.get("lowest");
-		BigDecimal lowest21 = features.get("lowest21");
 		BigDecimal lowest34 = features.get("lowest34");
+		BigDecimal lowest21 = features.get("lowest21");
+		BigDecimal lowest13 = features.get("lowest13");
+		BigDecimal lowest8 = features.get("lowest8");
+		BigDecimal lowest5 = features.get("lowest5");
+		BigDecimal amount5 = features.get("amount5");
 		BigDecimal averageAmount = features.get("averageAmount");
 		BigDecimal averagePrice = features.get("averagePrice");
 		BigDecimal average_turnover_rate_f = features.get("average_turnover_rate_f");
@@ -373,7 +378,7 @@ public class KdataServiceImp implements KdataService{
 				limited,highest,lowest,averageAmount,averagePrice,
 				a8,a13,a21,a34,lowest21,lowest34,trunover_rate_f,
 				average_turnover_rate_f,volume_ratio,average_volume_ratio,
-				total_mv,circ_mv,total_share,float_share,free_share);
+				total_mv,circ_mv,total_share,float_share,free_share,lowest13,lowest8,lowest5,amount5);
 	}
 	
 	@Override
@@ -453,6 +458,10 @@ public class KdataServiceImp implements KdataService{
 				muster.setTotal_share(entity.getTotal_share());
 				muster.setFloat_share(entity.getFloat_share());
 				muster.setFree_share(entity.getFree_share());
+				muster.setLowest13(entity.getLowest13());
+				muster.setLowest8(entity.getLowest8());
+				muster.setLowest5(entity.getLowest5());
+				muster.setAmount5(entity.getAmount5());
 				
 				musters.put(muster.getItemID(),muster);
 			}else {
@@ -504,6 +513,10 @@ public class KdataServiceImp implements KdataService{
 				muster.setTotal_share(entity.getTotal_share());
 				muster.setFloat_share(entity.getFloat_share());
 				muster.setFree_share(entity.getFree_share());
+				muster.setLowest13(entity.getLowest13());
+				muster.setLowest8(entity.getLowest8());
+				muster.setLowest5(entity.getLowest5());
+				muster.setAmount5(entity.getAmount5());
 
 				musters.put(muster.getItemID(),muster);
 			}
@@ -551,7 +564,11 @@ public class KdataServiceImp implements KdataService{
 						muster.getCirc_mv(),
 						muster.getTotal_share(),
 						muster.getFloat_share(),
-						muster.getFree_share()
+						muster.getFree_share(),
+						muster.getLowest13(),
+						muster.getLowest8(),
+						muster.getLowest5(),
+						muster.getAmount5()
 						));
 			}
 		}
@@ -612,6 +629,13 @@ public class KdataServiceImp implements KdataService{
 				muster.setAverage_volume_ratio(entity.getAverage_volume_ratio());
 				muster.setTotal_mv(entity.getTotal_mv());
 				muster.setCirc_mv(entity.getCirc_mv());
+				muster.setTotal_share(entity.getTotal_share());
+				muster.setFloat_share(entity.getFloat_share());
+				muster.setFree_share(entity.getFree_share());
+				muster.setLowest13(entity.getLowest13());
+				muster.setLowest8(entity.getLowest8());
+				muster.setLowest5(entity.getLowest5());
+				muster.setAmount5(entity.getAmount5());
 				
 				musters.put(muster.getItemID(),muster);				
 			}

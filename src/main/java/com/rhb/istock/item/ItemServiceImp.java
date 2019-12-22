@@ -72,6 +72,7 @@ public class ItemServiceImp implements ItemService {
 				item.setName(entity.getName());
 				item.setIndustry(entity.getIndustry());
 				item.setArea(entity.getArea());
+				item.setIpo(entity.getIpo());
 				break;
 			}
 		}
