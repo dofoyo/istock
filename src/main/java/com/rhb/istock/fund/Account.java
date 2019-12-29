@@ -53,6 +53,14 @@ public class Account {
 		prices = new TreeMap<String,BigDecimal>();
 	}
 	
+	public boolean isEnoughCash(Integer count) {
+		if(holds.size()==0) return true;
+		
+		BigDecimal aveCash = this.cash.divide(new BigDecimal(count),BigDecimal.ROUND_HALF_UP);
+		BigDecimal aveValue = this.value.divide(new BigDecimal(holds.size()), BigDecimal.ROUND_HALF_UP);
+		return aveCash.compareTo(aveValue)==1;
+	}
+	
 	/*
 	 * 各industry中，按盈利的股票数量和盈利的幅度排序
 	 * 
@@ -288,10 +296,14 @@ public class Account {
 	public void openAll(Set<Muster> items) {
 		if(items.isEmpty()) return;
 		
-		//int position = items.size()<3 ? 3 : items.size();
+		BigDecimal c = this.cash;
+/*		if(holds.size()==0 && items.size()==1) {
+			c = this.cash.divide(new BigDecimal(2),BigDecimal.ROUND_DOWN);
+		}
+*/		//int position = items.size()<3 ? 3 : items.size();
 		int position = items.size();
 		
-		BigDecimal quota = this.cash.divide(new BigDecimal(position),BigDecimal.ROUND_DOWN);
+		BigDecimal quota = c.divide(new BigDecimal(position),BigDecimal.ROUND_DOWN);
 		for(Muster item : items) {
 			this.prices.put(item.getItemID(), item.getLatestPrice());
 			this.open(item.getItemID(), item.getItemName(), item.getIndustry(), this.getQuantity(quota, item.getLatestPrice()), item.getNote() , item.getLatestPrice());
@@ -310,8 +322,8 @@ public class Account {
 		states.remove(itemID);
 	}
 	
-	public void dropByOrderID(String orderID, String note, BigDecimal price) {
-		Order openOrder = holds.get(Integer.parseInt(orderID));
+	public void dropByOrderID(Integer orderID, String note, BigDecimal price) {
+		Order openOrder = holds.get(orderID);
 		Order dropOrder = new Order(openOrder.getOrderID(),openOrder.getItemID(),openOrder.getItemName(),openOrder.getIndustry(), LocalDate.parse(endDate.toString()), price, openOrder.getQuantity());
 		dropOrder.setNote(note);
 
@@ -320,16 +332,15 @@ public class Account {
 		cash = cash.add(dropOrder.getAmount().subtract(dropOrder.getFeeAndTax())); 			//卖出时，现金增加
 		value = value.subtract(dropOrder.getAmount());		//市值减少
 		
-		holds.remove(Integer.parseInt(orderID));
+		holds.remove(orderID);
 		drops.put(dropOrder.getOrderID(), dropOrder);				
 	}
 
 	public void drop(String itemID, String note, BigDecimal price) {
-		Set<String> orderIDs = this.getHoldOrderIDs(itemID);
-		for(String orderID : orderIDs) {
+		Set<Integer> orderIDs = this.getHoldOrderIDs(itemID);
+		for(Integer orderID : orderIDs) {
 			this.dropByOrderID(orderID, note, price);
 		}
-		
 	}
 	
 	public void drop(String itemID, String note) {
@@ -371,7 +382,7 @@ public class Account {
 		}
 	}
 	
-	public void cancelByOrderID(String orderID) {
+	public void cancelByOrderID(Integer orderID) {
 		Order openOrder = holds.get(orderID);
 		if(openOrder!=null) {
 			Order stopOrder = new Order(openOrder.getOrderID(), openOrder.getItemID(),openOrder.getItemName(),openOrder.getIndustry(), LocalDate.parse(endDate.toString()), prices.get(openOrder.getItemID()), openOrder.getQuantity());
@@ -448,7 +459,7 @@ public class Account {
 		return ratio;
 	}
 	
-	public boolean isStupid(String itemID, String orderID, Integer days) {
+	public boolean isStupid(String itemID, Integer orderID, Integer days) {
 		boolean flag = false;
 		//Integer dd = Period.between(holds.get(orderID).getDate(), endDate).getDays();
 		if(Period.between(holds.get(orderID).getDate(), endDate).getDays() >= days && 
@@ -471,11 +482,11 @@ public class Account {
 		return false;
 	}
 	
-	public Set<String> getHoldOrderIDs(String itemID){
-		Set<String> ids = new HashSet<String>();
+	public Set<Integer> getHoldOrderIDs(String itemID){
+		Set<Integer> ids = new HashSet<Integer>();
 		for(Order order : holds.values()) {
 			if(order.getItemID().equals(itemID)) {
-				ids.add(orderIDFormat.format(order.getOrderID()));
+				ids.add(order.getOrderID());
 			}
 		}		
 		return ids;
@@ -574,6 +585,20 @@ public class Account {
 	
 	public BigDecimal getCash () {
 		return this.cash;
+	}
+	
+	public Integer isAboveAveValue(Integer orderID) {
+		if(holds.size()<=1) return 1;
+		Order order = holds.get(orderID);
+		return order.getAmount().compareTo(this.getAveValue());
+	}
+	
+	public BigDecimal getAveValue() {
+		if(holds.size()==0) {
+			return new BigDecimal(0);
+		}else {
+			return this.getValue().divide(new BigDecimal(holds.size()),BigDecimal.ROUND_HALF_UP);
+		}
 	}
 	
 	public BigDecimal getValue() {

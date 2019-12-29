@@ -62,7 +62,7 @@ public class PowerSimulation {
 				for(String itemID : powersID) {
 					muster = musters.get(itemID);
 					if(muster!=null) {
-						pd.put(itemID, date, muster.getLatestPrice(),muster.isUpLimited(),muster.isDownLimited(), muster.isDrop(21),muster.isDown());
+						pd.put(itemID, date, muster.getLatestPrice(),muster.isUpLimited(),muster.isDownLimited(), muster.isDropAve(21),muster.isDown());
 					}
 				}
 				

@@ -73,7 +73,7 @@ public class TurtleMusterSimulationAnalysis {
 			if(tmp.getItemID().equals(record.getItemID())) {
 				record.setSellDate(tmp.getSellDate());
 				record.addProfit(tmp.getProfit());
-				if(tmp.getSellType()==1) {
+				if(tmp.getSellType()>=1) {
 					results.add(record);
 					i++;
 					if(i>=records.size()) {

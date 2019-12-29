@@ -27,9 +27,13 @@ public interface KdataService {
 	public Kbar getLatestMarketData(String itemID);
 	public List<String> getLatestDailyTop(Integer top); 
 	
+	public void downKdatas()  throws Exception ;
 	public void downKdatasAndFactors()  throws Exception ;
+	public void downClosedDatas()  throws Exception ;
+	public void downClosedDatas(LocalDate date)  throws Exception ;
+	public void downFactors()  throws Exception ;
 	
-	public void generateMusters();  //用于simulation
+	public void generateMusters(LocalDate beginDate);  //用于simulation
 	public Map<String,Muster> getMusters(LocalDate date); //用于simulation
 	public Map<String,Muster> getMusters(LocalDate date, Set<String> excludeIndustrys); //用于simulation
 	public Map<String,Muster> getMusters(LocalDate date, String industry); //用于simulation

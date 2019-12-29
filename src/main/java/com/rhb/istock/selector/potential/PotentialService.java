@@ -129,7 +129,7 @@ public class PotentialService {
 		
 		for(Muster item : musters.values()) {
 			//if(item.getHLGap()<50 && item.getHNGap()<10) {
-			if(item.getHNGap()<10) {
+			if(item.isPotential()) {
 				potential =  new Potential(item.getItemID(),
 						item.getItemName(),
 						item.getIndustry(),

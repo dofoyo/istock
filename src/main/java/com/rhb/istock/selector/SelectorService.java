@@ -41,10 +41,12 @@ public interface SelectorService{
 	public List<String> getPowerIDs();
 	
 	public Map<LocalDate, BigDecimal> getMCSTs(String itemID, boolean cache);
-	public Map<LocalDate, BigDecimal[]> getBOLLs(String itemID, Integer period, boolean cache);
+	public Map<LocalDate, BigDecimal[]> getBOLLs(String itemID, boolean cache);
 	public Map<LocalDate, BigDecimal[]> getMACDs(String itemID, boolean cache);
-	public List<LocalDate> getHuaFirst(String itemID, LocalDate beginDate, LocalDate endDate);
 	public BigDecimal getMCST(String itemID, LocalDate endDate, Integer count, BigDecimal ratio);
+
+	public List<LocalDate> getHuaFirst(String itemID, LocalDate beginDate, LocalDate endDate, Integer boll_period, BigDecimal cst_ratio,BigDecimal volume_r);
+	public List<LocalDate> getHuaFirstPotentials(String itemID, LocalDate endDate,Integer period,BigDecimal mcst_ratio);
 
 
 }

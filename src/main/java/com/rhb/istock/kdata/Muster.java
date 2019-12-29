@@ -93,7 +93,7 @@ public class Muster {
 	}
 	
 	public String getNote() {
-		return df.format(total_mv);
+		return this.getHLGap().toString();
 	}
 	
 	public boolean isAboveAveragePrice(Integer period) {
@@ -201,7 +201,7 @@ public class Muster {
 	}
 
 	public boolean isPotential() {
-		return this.getHNGap()<10 && !this.isDrop(21);
+		return this.getHNGap()<10;
 	}
 	
 	public Integer getLimited() {
@@ -270,7 +270,7 @@ public class Muster {
 		}
 	}
 	
-	public boolean isDrop(Integer period) {
+	public boolean isDropAve(Integer period) {
 		if(period == 8) {
 			return latestPrice.compareTo(averagePrice8)==-1;
 		}else if(period == 13) {
@@ -296,7 +296,7 @@ public class Muster {
 		}else if(period == 34) {
 			return latestPrice.compareTo(lowest34)==-1;
 		}else {
-			return false;
+			return latestPrice.compareTo(lowest) == -1;
 		}
 	}
 	

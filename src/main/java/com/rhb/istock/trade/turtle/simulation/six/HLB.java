@@ -15,6 +15,7 @@ import java.util.TreeMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.rhb.istock.comm.util.Functions;
 import com.rhb.istock.fund.Account;
 import com.rhb.istock.kdata.Muster;
 /*
@@ -37,7 +38,9 @@ public class HLB {
 	private StringBuffer dailyAmount_sb = new StringBuffer("date,cash,value,total\n");
 	private StringBuffer breakers_sb = new StringBuffer();
 	private Integer pool = 21;
-	private Integer top = 13;
+	private Integer top = 3;
+	private Integer hlgap_min = 8;
+	private Integer hlgap_max = 25;
 /*	private BigDecimal turnover_rate_f_max = new BigDecimal(8.63);
 	private BigDecimal turnover_rate_f_min = new BigDecimal(0.18);
 	private BigDecimal volumn_ratio = new BigDecimal(3.22);
@@ -67,18 +70,18 @@ public class HLB {
 		for(String itemID: holdItemIDs) {
 			muster = musters.get(itemID);
 			if(muster!=null) {
-				if(muster.isDrop(21) && !muster.isDownLimited()) { 		//跌破21日均线就卖
+/*				if(muster.isDropAve(21) && !muster.isDownLimited()) { 		//跌破21日均线就卖
 					account.drop(itemID, "1", muster.getLatestPrice());
-				}
+				}*/
 /*				if(muster.isDropLowest(13) && !muster.isDownLimited()) { 		//跌破21日低点就卖
 					account.drop(itemID, "1", muster.getLatestPrice());
 				}*/
-/*				if(sseiFlag==0 && muster.isDrop(21) && !muster.isDownLimited()) { 		//跌破21日均线就卖
-					account.drop(itemID, "跌破dropline", muster.getLatestPrice());
+				if(sseiFlag==0 && muster.isDropAve(13) && !muster.isDownLimited()) { 		//跌破13日均线就卖
+					account.drop(itemID, "1", muster.getLatestPrice());
 				}				
-				if(sseiFlag==1 && muster.isDropLowest(21) && !muster.isDownLimited()) { 		//跌破21日低点就卖
-					account.drop(itemID, "跌破lowest", muster.getLatestPrice());
-				}*/
+				if(sseiFlag==1 && muster.isDropLowest(34) && !muster.isDownLimited()) { 		//跌破21日低点就卖
+					account.drop(itemID, "2", muster.getLatestPrice());
+				}
 			}
 		}				
 		
@@ -106,19 +109,24 @@ public class HLB {
 		breakers_sb.append("\n");
 		
 		//先卖后买，完成调仓和开仓
+		// 当cash不够买入新股时，要卖出市值高与平均值的股票。
+		//此举可避免高位加仓的现象出现
 		if(!dds.isEmpty()) {
-			Set<String> holdOrderIDs;
-			for(String itemID: holdItemIDs) {
-				holdOrderIDs = 	account.getHoldOrderIDs(itemID);
-				muster = musters.get(itemID);
-				if(muster!=null) {
-					for(String holdOrderID : holdOrderIDs) {
-						account.dropByOrderID(holdOrderID, "0", muster.getLatestPrice());   //先卖
-						dds.add(muster);						
+			//if(!account.isEnoughCash(dds.size())) {
+				Set<Integer> holdOrderIDs;
+				for(String itemID: holdItemIDs) {
+					holdOrderIDs = 	account.getHoldOrderIDs(itemID);
+					muster = musters.get(itemID);
+					if(muster!=null) {
+						for(Integer holdOrderID : holdOrderIDs) {
+							//if(account.isAboveAveValue(holdOrderID)==1) {
+								account.dropByOrderID(holdOrderID, "0", muster.getLatestPrice());   //先卖
+								dds.add(muster);						
+							//}
+						}
 					}
 				}
-			}
-			
+			//}
 			account.openAll(dds);			//后买
 		}
 
@@ -168,12 +176,14 @@ public class HLB {
 		distribution.show();
 */		
 		Muster m;
-		for(int i=0; i<musters.size() && i<pool; i++) {
+		for(int i=0; i<musters.size() && breakers.size()<top && i<pool; i++) {
+		//for(int i=0; i<musters.size() && i<pool; i++) {
 			m = musters.get(i);
 			if(m!=null 
 					&& !m.isUpLimited() 
 					&& !m.isDownLimited() 
 					&& m.isUpBreaker() 
+					//&& Functions.between(m.getHLGap(), hlgap_min, hlgap_max)
 					//&& m.isUp(21)
 					//&& m.getVolume_ratio().compareTo(new BigDecimal(2))==1
 					//&& m.getTurnover_rate_f().compareTo(turnover_rate_f_max)<0
@@ -182,9 +192,6 @@ public class HLB {
 					//&& m.getTotal_mv().compareTo(total_mv)<0
 					) {
 				breakers.add(m);
-			}
-			if(breakers.size()>=top) {
-				break;
 			}
 		}
 		

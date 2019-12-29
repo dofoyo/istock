@@ -67,7 +67,7 @@ public class HuaSimulation {
 	}
 	
 	public Integer[] simulate(String itemID, BigDecimal ratio, LocalDate beginDate, LocalDate endDate, Integer period) {
-		Map<LocalDate, BigDecimal[]> bolls = selectorService.getBOLLs(itemID,21, true);
+		Map<LocalDate, BigDecimal[]> bolls = selectorService.getBOLLs(itemID, true);
 		Map<LocalDate, BigDecimal> mcsts = selectorService.getMCSTs(itemID, true);
 		Map<LocalDate, BigDecimal[]> macds = selectorService.getMACDs(itemID, true);
 

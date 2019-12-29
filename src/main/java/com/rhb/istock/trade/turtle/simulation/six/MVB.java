@@ -60,7 +60,7 @@ public class MVB {
 		for(String itemID: holdItemIDs) {
 			muster = musters.get(itemID);
 			if(muster!=null) {
-				if(sseiFlag==0 && muster.isDrop(21) && !muster.isDownLimited()) { 		//跌破21日均线就卖
+				if(sseiFlag==0 && muster.isDropAve(21) && !muster.isDownLimited()) { 		//跌破21日均线就卖
 					account.drop(itemID, "跌破dropline", muster.getLatestPrice());
 				}				
 				if(sseiFlag==1 && muster.isDropLowest(21) && !muster.isDownLimited()) { 		//跌破21日低点就卖
@@ -94,12 +94,12 @@ public class MVB {
 		//logger.info("先卖后买，完成调仓");
 		if(!dds.isEmpty()) {
 			holdItemIDs = account.getItemIDsOfHolds();
-			Set<String> holdOrderIDs;
+			Set<Integer> holdOrderIDs;
 			for(String itemID: holdItemIDs) {
 				holdOrderIDs = 	account.getHoldOrderIDs(itemID);
 				muster = musters.get(itemID);
 				if(muster!=null) {
-					for(String holdOrderID : holdOrderIDs) {
+					for(Integer holdOrderID : holdOrderIDs) {
 						account.dropByOrderID(holdOrderID, "调仓", muster.getLatestPrice());   //先卖
 						dds.add(muster);						
 					}

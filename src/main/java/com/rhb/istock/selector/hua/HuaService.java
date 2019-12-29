@@ -5,8 +5,10 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -31,7 +33,10 @@ public class HuaService {
 	SelectorService selectorService;
 	
 	@Value("${huaFile}")
-	private String huaFile;
+	private String huaFile;	
+	
+	@Value("${huaPotentialFile}")
+	private String huaPotentialFile;
 
 	@Value("${mcstFile}")
 	private String mcstFile;
@@ -55,7 +60,42 @@ public class HuaService {
 		}
 	}
 	
-	public void generateHua(LocalDate beginDate, LocalDate endDate, boolean append) {
+	public void generateHuaPotentials(LocalDate endDate, Integer period, BigDecimal mcst_ratio, boolean append) {
+		long beginTime=System.currentTimeMillis(); 
+		System.out.println("generate Hua potentials begin......");
+
+		huas = new TreeMap<LocalDate,Set<String>>();
+		List<LocalDate> dates;
+		Set<String> tmp;
+		
+		List<String> ids = itemService.getItemIDs();
+		Set<String> excludes = new HashSet<String>();
+		excludes.add("sh600240");  //退市华业;
+		
+		int i=1;
+		for(String id : ids) {
+			Progress.show(ids.size(), i++, id);
+			if(!excludes.contains(id)) {
+				dates = selectorService.getHuaFirstPotentials(id, endDate, period, mcst_ratio);
+				for(LocalDate date : dates) {
+					if(huas.containsKey(date)) {
+						tmp = huas.get(date);
+					}else {
+						tmp = new HashSet<String>();
+						huas.put(date, tmp);
+					}
+					tmp.add(id);
+				}
+			}
+		}
+		
+		FileTools.writeTextFile(huaPotentialFile, huas, append);
+		
+		long used = (System.currentTimeMillis() - beginTime)/1000; 
+		System.out.println("generate Hua potential 用时：" + used + "秒");          
+	}
+	
+	public void generateHuaFirst(LocalDate beginDate, LocalDate endDate, Integer period, BigDecimal mcst_ratio, BigDecimal volume_r, boolean append) {
 		long beginTime=System.currentTimeMillis(); 
 		System.out.println("generate Hua begin......");
 
@@ -67,7 +107,7 @@ public class HuaService {
 		int i=1;
 		for(String id : ids) {
 			Progress.show(ids.size(), i++, id);
-			dates = selectorService.getHuaFirst(id, beginDate, endDate);
+			dates = selectorService.getHuaFirst(id, beginDate, endDate, period, mcst_ratio,volume_r);
 			for(LocalDate date : dates) {
 				if(huas.containsKey(date)) {
 					tmp = huas.get(date);
@@ -82,7 +122,7 @@ public class HuaService {
 		FileTools.writeTextFile(huaFile, huas, append);
 		
 		long used = (System.currentTimeMillis() - beginTime)/1000; 
-		System.out.println("用时：" + used + "秒");          
+		System.out.println("generate Hua 用时：" + used + "秒");          
 	}
 	
 	/*

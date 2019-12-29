@@ -1,5 +1,6 @@
 package com.rhb.istock.kdata.service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -24,20 +25,11 @@ public class KdataServiceTest {
 	KdataService kdataService;
 	
 	//@Test
-	public void downKdatas() {
-		try {
-			kdataService.downKdatasAndFactors();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-
-	@Test
 	public void generateMusters() {
-		kdataService.generateMusters();
-		kdataService.generateLatestMusters();
-		kdataService.updateLatestMusters();
+		LocalDate date = LocalDate.parse("2001.01.01");
+		kdataService.generateMusters(date);
+		//kdataService.generateLatestMusters();
+		//kdataService.updateLatestMusters();
 	}
 	
 	
@@ -52,6 +44,17 @@ public class KdataServiceTest {
 			}});
 		for(Muster muster : mm) {
 			System.out.println(muster);
+		}
+	}
+	
+	//@Test
+	public void downClosedDatas() {
+		LocalDate date = LocalDate.parse("2019-12-27");
+		try {
+			kdataService.downClosedDatas(date);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 }

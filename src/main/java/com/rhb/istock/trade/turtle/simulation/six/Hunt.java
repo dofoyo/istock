@@ -55,7 +55,7 @@ public class Hunt {
 			muster = musters.get(itemID);
 			if(muster!=null) {
 				account.refreshHoldsPrice(itemID, muster.getLatestPrice());
-				if(muster.isDrop(21) && !muster.isDownLimited()){
+				if(muster.isDropAve(21) && !muster.isDownLimited()){
 					account.drop(itemID, "跌破deadline", muster.getLatestPrice()); 
 					account.dropHoldState(itemID);
 				}
@@ -101,12 +101,12 @@ public class Hunt {
 		//先卖后买，完成调仓和开仓
 		//logger.info("先卖后买，完成调仓");
 		if(!dds.isEmpty()) {
-			Set<String> holdOrderIDs;
+			Set<Integer> holdOrderIDs;
 			for(String itemID: holdItemIDs) {
 				holdOrderIDs = 	account.getHoldOrderIDs(itemID);
 				muster = musters.get(itemID);
 				if(muster!=null) {
-					for(String holdOrderID : holdOrderIDs) {
+					for(Integer holdOrderID : holdOrderIDs) {
 						account.dropByOrderID(holdOrderID, "调仓", muster.getLatestPrice());   //先卖
 						dds.add(muster);						
 					}

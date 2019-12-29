@@ -61,18 +61,18 @@ public class AVB {
 		for(String itemID: holdItemIDs) {
 			muster = musters.get(itemID);
 			if(muster!=null) {
-/*				if(muster.isDrop(21) && !muster.isDownLimited()) { 		//跌破21日均线就卖
+/*				if(muster.isDropAve(21) && !muster.isDownLimited()) { 		//跌破21日均线就卖
 					account.drop(itemID, "跌破dropline", muster.getLatestPrice());
 				}*/
-				if(muster.isDropLowest(21) && !muster.isDownLimited()) { 		//跌破21日低点就卖
+/*				if(muster.isDropLowest(21) && !muster.isDownLimited()) { 		//跌破21日低点就卖
 					account.drop(itemID, "跌破lowest", muster.getLatestPrice());
-				}
-				/*if(sseiFlag==0 && muster.isDrop(21) && !muster.isDownLimited()) { 		//跌破21日均线就卖
-					account.drop(itemID, "跌破dropline", muster.getLatestPrice());
+				}*/
+				if(sseiFlag==0 && muster.isDropLowest(13) && !muster.isDownLimited()) { 		//跌破13日均线就卖
+					account.drop(itemID, "1", muster.getLatestPrice());
 				}				
-				if(sseiFlag==1 && muster.isDropLowest(21) && !muster.isDownLimited()) { 		//跌破21日低点就卖
-					account.drop(itemID, "跌破lowest", muster.getLatestPrice());
-				}*/
+				if(sseiFlag==1 && muster.isDropLowest(34) && !muster.isDownLimited()) { 		//跌破21日低点就卖
+					account.drop(itemID, "2", muster.getLatestPrice());
+				}
 			}
 		}				
 		
@@ -101,13 +101,13 @@ public class AVB {
 		//logger.info("先卖后买，完成调仓");
 		if(!dds.isEmpty()) {
 			holdItemIDs = account.getItemIDsOfHolds();
-			Set<String> holdOrderIDs;
+			Set<Integer> holdOrderIDs;
 			for(String itemID: holdItemIDs) {
 				holdOrderIDs = 	account.getHoldOrderIDs(itemID);
 				muster = musters.get(itemID);
 				if(muster!=null) {
-					for(String holdOrderID : holdOrderIDs) {
-						account.dropByOrderID(holdOrderID, "调仓", muster.getLatestPrice());   //先卖
+					for(Integer holdOrderID : holdOrderIDs) {
+						account.dropByOrderID(holdOrderID, "0", muster.getLatestPrice());   //先卖
 						dds.add(muster);						
 					}
 				}
@@ -155,7 +155,7 @@ public class AVB {
 					&& !m.isUpLimited() 
 					&& !m.isDownLimited() 
 					&& m.isUpBreaker()
-					&& m.isUp(21)
+					//&& m.isUp(21)
 					//&& m.cal_volume_ratio().compareTo(new BigDecimal(2))==1
 					) {
 				breakers.add(m);

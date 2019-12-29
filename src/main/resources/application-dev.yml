@@ -16,6 +16,7 @@ fvaluesOfHLFile: D:/dev/istock-data/fvaluesOfHL.txt
 dailyMeansFile: D:/dev/istock-data/dailyMeans.txt
 sz50File: D:/dev/istock-data/sz50.csv
 huaFile: d:/dev/istock-data/hua.txt
+huaPotentialFile: d:/dev/istock-data/huaPotential.txt
 mcstFile: d:/dev/istock-data/mcst.txt
 openDuration: 89
 dropDuration: 21

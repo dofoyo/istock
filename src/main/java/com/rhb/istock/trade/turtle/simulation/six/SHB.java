@@ -14,6 +14,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.rhb.istock.comm.util.Functions;
 import com.rhb.istock.fund.Account;
 import com.rhb.istock.kdata.Muster;
 
@@ -43,7 +44,7 @@ public class SHB {
 		this.initCash = initCash;
 	}
 	
-	public void doIt(Map<String,Muster> musters, LocalDate date, Integer sseiFlag) {
+	public void doIt(Map<String,Muster> musters, List<String> sz50, LocalDate date, Integer sseiFlag) {
 		//logger.info(date.toString());
 		Muster muster;
 		account.setLatestDate(date);
@@ -56,16 +57,17 @@ public class SHB {
 			}
 		}
 		
-		//卖出跌破dropline或lowest的股票
+		//卖出接近高点的股票
 		for(String itemID: holdItemIDs) {
 			muster = musters.get(itemID);
-			if(muster!=null) {
-				if(sseiFlag==0 && muster.isDrop(21) && !muster.isDownLimited()) { 		//跌破21日均线就卖
-					account.drop(itemID, "跌破dropline", muster.getLatestPrice());
-				}				
-				if(sseiFlag==1 && muster.isDropLowest(21) && !muster.isDownLimited()) { 		//跌破21日低点就卖
-					account.drop(itemID, "跌破lowest", muster.getLatestPrice());
-				}
+			if(muster!=null && !muster.isDownLimited()) {
+				if(Functions.ratio(muster.getHighest(), muster.getLatestPrice())<=3) { 		
+					account.drop(itemID, "接近高点" +muster.getHighest().toString(), muster.getLatestPrice());
+				}else if(muster.getHighest().compareTo(muster.getLatestPrice()) <=0) { 		
+					account.drop(itemID, "超出高点" + muster.getHighest().toString(), muster.getLatestPrice());
+				}else if(muster.getLatestPrice().compareTo(muster.getLowest())==-1) { 		
+					account.drop(itemID, "跌破低点" + muster.getLowest().toString(), muster.getLatestPrice());
+				}			
 			}
 		}				
 		
@@ -74,8 +76,8 @@ public class SHB {
 		Set<Muster> dds = new HashSet<Muster>();  //用set，无重复，表示不可加仓
 		//List<Muster> dds = new ArrayList<Muster>();  //用list，有重复，表示可以加仓
 		
-		//确定突破走势的股票
-		List<Muster> breakers = this.getTops(new ArrayList<Muster>(musters.values()));
+		//确定接近低点的股票
+		List<Muster> breakers = this.getTops(musters, sz50);
 		breakers_sb.append(date.toString() + ",");
 		StringBuffer sb = new StringBuffer();
 		for(Muster breaker : breakers) {
@@ -94,12 +96,12 @@ public class SHB {
 		//logger.info("先卖后买，完成调仓");
 		if(!dds.isEmpty()) {
 			holdItemIDs = account.getItemIDsOfHolds();
-			Set<String> holdOrderIDs;
+			Set<Integer> holdOrderIDs;
 			for(String itemID: holdItemIDs) {
 				holdOrderIDs = 	account.getHoldOrderIDs(itemID);
 				muster = musters.get(itemID);
 				if(muster!=null) {
-					for(String holdOrderID : holdOrderIDs) {
+					for(Integer holdOrderID : holdOrderIDs) {
 						account.dropByOrderID(holdOrderID, "调仓", muster.getLatestPrice());   //先卖
 						dds.add(muster);						
 					}
@@ -131,27 +133,35 @@ public class SHB {
 		return result;
 	}
 	
-	private List<Muster> getTops(List<Muster> musters){
+	private List<Muster> getTops(Map<String,Muster> musters, List<String> sz50){
+		List<Muster>  ms = new ArrayList<Muster>();
+
+		for(String id : sz50) {
+			if(musters.get(id) != null) {
+				ms.add(musters.get(id));
+			}
+		}
+		
 		List<Muster> breakers = new ArrayList<Muster>();
 
-		Collections.sort(musters, new Comparator<Muster>() {
+		Collections.sort(ms, new Comparator<Muster>() {
 			@Override
 			public int compare(Muster o1, Muster o2) {
-				//return o1.getFree_share().compareTo(o2.getFree_share()); //a-z
-				//return o1.getFloat_share().compareTo(o2.getFloat_share()); //a-z
-				return o1.getTotal_share().compareTo(o2.getTotal_share()); //a-z
+				return o1.getHLGap().compareTo(o2.getHLGap());
 			}
 		});
 
 		Muster m;
-		for(int i=0; i<musters.size() && i<pool; i++) {
-			m = musters.get(i);
+		for(int i=0; i<ms.size() && i<pool; i++) {
+			m = ms.get(i);
 			if(m!=null 
 					&& !m.isUpLimited() 
 					&& !m.isDownLimited() 
-					&& m.isUpBreaker() 
-					&& m.isUp(21)
-					//&& m.cal_volume_ratio().compareTo(new BigDecimal(2))==1
+					//&& m.isUpBreaker() 
+					//&& m.isUp(21)
+					//&& Functions.between(m.getVolume_ratio(), 2, 5)
+					&& m.getLatestPrice().compareTo(m.getLowest())==1
+					&& Functions.ratio(m.getLatestPrice(), m.getLowest())<=3  //买入接近低点的股票
 					) {
 				breakers.add(m);
 			}

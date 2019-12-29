@@ -28,17 +28,20 @@ public class TurtleMusterSimulationTest {
 	@Qualifier("turtleMusterSimulationAnalysis")
 	TurtleMusterSimulationAnalysis turtleMusterSimulationAnalysis;
 	
-	//@Test
-	public void getDailyMeans() {
-		LocalDate beginDate = LocalDate.parse("2019-06-01");
-		LocalDate endDate = LocalDate.parse("2019-06-14");
-		//turtleMusterSimulation.generateDailyRatios(beginDate,endDate);
-		
-		Map<String,Map<String,String>> results = turtleSimulationRepository.getDailyMeans();
-		System.out.println(results);
-	}
+	@Autowired
+	@Qualifier("turtleMusterSimulation_hua")
+	TurtleMusterSimulation_hua turtleMusterSimulation_hua;
 	
 	@Test
+	public void simulate() {
+		LocalDate beginDate = LocalDate.parse("2000-01-01");
+		LocalDate endDate = LocalDate.parse("2019-12-27");
+
+		turtleMusterSimulation.simulate(beginDate, endDate); 
+		turtleMusterSimulation_hua.simulate(beginDate, endDate);
+	}
+	
+	//@Test
 	public void generateRecords() {
 		turtleMusterSimulationAnalysis.generateRecords("hlb");
 	}

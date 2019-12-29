@@ -53,7 +53,7 @@ public class Blue {
 			muster = musters.get(itemID);
 			if(muster!=null) {
 				account.refreshHoldsPrice(itemID, muster.getLatestPrice());
-				if(sseiFlag==0 && muster.isDrop(21) && !muster.isDownLimited()) { 		//跌破21日均线就卖
+				if(sseiFlag==0 && muster.isDropAve(21) && !muster.isDownLimited()) { 		//跌破21日均线就卖
 					account.drop(itemID, "跌破dropline", muster.getLatestPrice());
 				}				
 				if(sseiFlag==1 && muster.isDropLowest(21) && !muster.isDownLimited()) { 		//跌破21日低点就卖
@@ -95,12 +95,12 @@ public class Blue {
 		
 		//先卖后买，完成调仓和开仓
 		if(!dds.isEmpty()) {
-			Set<String> holdOrderIDs;
+			Set<Integer> holdOrderIDs;
 			for(String itemID: holdItemIDs) {
 				holdOrderIDs = 	account.getHoldOrderIDs(itemID);
 				muster = musters.get(itemID);
 				if(muster!=null) {
-					for(String holdOrderID : holdOrderIDs) {
+					for(Integer holdOrderID : holdOrderIDs) {
 						account.dropByOrderID(holdOrderID, "调仓", muster.getLatestPrice());   //先卖
 						dds.add(muster);						
 					}

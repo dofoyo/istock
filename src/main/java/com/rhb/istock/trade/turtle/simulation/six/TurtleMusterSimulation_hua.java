@@ -110,7 +110,7 @@ public class TurtleMusterSimulation_hua {
 				//logger.info(String.format("\n%tF,%s,%.2f,%.2f", date,muster.getItemName(),muster.getClose(), muster.getVolume_ratio()));
 				if(!muster.isUpLimited() 
 						&& muster.isUp(21) 
-						&& muster.getLatestPrice().compareTo(muster.getClose())==1
+						&& muster.getLatestPrice().compareTo(muster.getClose())==1  //上涨
 						&& Functions.between(muster.getVolume_ratio(), 2, 10)
 						&& Functions.ratio(muster.getLatestPrice(), muster.getAveragePrice21())<=13
 						) {

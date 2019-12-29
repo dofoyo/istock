@@ -19,9 +19,9 @@ public class SelectorTest {
 	@Qualifier("selectorServiceImp")
 	SelectorService selectorServiceImp;
 	
-	//@Test
+	@Test
 	public void getMCSTs() {
-		String itemID = "sz002456";
+		String itemID = "sz002252";
 		Map<LocalDate, BigDecimal> mcsts = selectorServiceImp.getMCSTs(itemID, false);
 		for(Map.Entry<LocalDate, BigDecimal> mcst : mcsts.entrySet()) {
 			System.out.printf("%tF %.2f\n",mcst.getKey(), mcst.getValue());
@@ -31,8 +31,7 @@ public class SelectorTest {
 	//@Test
 	public void getBOLLs() {
 		String itemID = "sz002456";
-		Integer period = 21;
-		Map<LocalDate, BigDecimal[]> bolls = selectorServiceImp.getBOLLs(itemID,period, false);
+		Map<LocalDate, BigDecimal[]> bolls = selectorServiceImp.getBOLLs(itemID, false);
 		for(Map.Entry<LocalDate, BigDecimal[]> mcst : bolls.entrySet()) {
 			System.out.printf("%tF, %.2f, %.2f, %.2f\n ", mcst.getKey(), mcst.getValue()[0], mcst.getValue()[1], mcst.getValue()[2]);
 		}
@@ -48,12 +47,16 @@ public class SelectorTest {
 	}
 		
 	
-	@Test
+	//@Test
 	public void getHuaFirst() {
 		String itemID = "sh601319";
 		LocalDate beginDate = LocalDate.parse("2019-01-01");
 		LocalDate endDate = LocalDate.parse("2019-12-18");
-		List<LocalDate> results = selectorServiceImp.getHuaFirst(itemID, beginDate, endDate);
+		Integer boll_period = 21;  //表示多少日内，布林线突破过下轨
+		BigDecimal mcst_ratio = new BigDecimal(-0.13);
+		BigDecimal volume_r = new BigDecimal(2);
+
+		List<LocalDate> results = selectorServiceImp.getHuaFirst(itemID, beginDate, endDate,boll_period,mcst_ratio,volume_r);
 		for(LocalDate date : results) {
 			System.out.println(date);
 		}

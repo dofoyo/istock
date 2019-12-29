@@ -113,43 +113,45 @@ public class KdataSpiderTushare implements KdataSpider {
 	@Override
 	public void downFactors(LocalDate date) {
 		long beginTime=System.currentTimeMillis(); 
-		logger.info("KdataSpiderTushare.downloadFactor of " + date + "....");
-		
-		String result = this.downloadFactors(date);
-		JSONArray items = (new JSONObject(result)).getJSONObject("data").getJSONArray("items");	
-		while(items.length()==0) {
-			logger.error("\n factors file is NULL!!!!!!");
-			
-			try {
-				Thread.sleep(3000);  //等待3秒钟
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-			
-			result = this.downloadFactors(date);
-			items = (new JSONObject(result)).getJSONObject("data").getJSONArray("items");	
-		}
-		
-		JSONArray item;
-		for(int i=0; i<items.length(); i++) {
-			item = items.getJSONArray(i);
-			
-			Progress.show(items.length(),i, " KdataSpiderTushare.downloadFactor.setFactor " + item.getString(0));
-			
-			setFactor(item);
-		}
-		
-		
-		logger.info("\nKdataSpiderTushare.downloadFactor of " + date + " done!");
-		long used = (System.currentTimeMillis() - beginTime)/1000; 
-		logger.info("用时：" + used + "秒");          
-	}
-	
-	private String downloadFactors(LocalDate date) {
-		String result = null;
+		String info = String.format("KdataSpiderTushare.downloadFactors of %s ....", date.toString());
+		logger.info(info);
 		
 		String kdataFile = kdataPath + "/factor/factors_" + date + ".json";
 		
+		File file = new File(kdataFile);
+		if(!file.exists()) {
+			String result = this.downloadFactors(date);
+			JSONArray items = (new JSONObject(result)).getJSONObject("data").getJSONArray("items");	
+			while(items.length()==0) {
+				logger.error("\n factors file is NULL!!!!!!");
+				
+				try {
+					Thread.sleep(3000);  //等待3秒钟
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				
+				result = this.downloadFactors(date);
+				items = (new JSONObject(result)).getJSONObject("data").getJSONArray("items");	
+			}
+			
+			JSONArray item;
+			for(int i=0; i<items.length(); i++) {
+				item = items.getJSONArray(i);
+				
+				Progress.show(items.length(),i, " KdataSpiderTushare.downloadFactor.setFactor " + item.getString(0));
+				
+				setFactor(item);
+			}
+
+			FileTools.writeTextFile(kdataFile, result, false);
+		}
+		
+		long used = (System.currentTimeMillis() - beginTime)/1000; 
+		logger.info(info + "用时：" + used + "秒");          
+	}
+	
+	private String downloadFactors(LocalDate date) {
 		String url = "http://api.tushare.pro";
 		JSONObject args = new JSONObject();
 		args.put("api_name", "adj_factor");
@@ -160,10 +162,7 @@ public class KdataSpiderTushare implements KdataSpider {
 		
 		args.put("params", params);
 		
-		result = HttpClient.doPostJson(url, args.toString());
-		
-		FileTools.writeTextFile(kdataFile, result, false);
-		return result;
+		return HttpClient.doPostJson(url, args.toString());
 		
 	}
 	
@@ -231,7 +230,6 @@ public class KdataSpiderTushare implements KdataSpider {
 			dataItems.put(item);
 			FileTools.writeTextFile(factorFile, data.toString(), false);
 		}
-		
 	}
 
 	@Override
@@ -312,8 +310,103 @@ public class KdataSpiderTushare implements KdataSpider {
 
 	@Override
 	public void downBasics(LocalDate date) throws Exception {
-		// TODO Auto-generated method stub
+		long beginTime=System.currentTimeMillis(); 
+		String info = String.format("KdataSpiderTushare.downBasics of %s ....", date.toString());
+		logger.info(info);
 		
+		String kdataFile = kdataPath + "/basic/basics_" + date + ".json";
+		
+		File file = new File(kdataFile);
+		if(!file.exists()) {
+			String result = this.downloadBasics(date);
+			JSONArray items = (new JSONObject(result)).getJSONObject("data").getJSONArray("items");	
+			while(items.length()==0) {
+				logger.error("\n basics file is NULL!!!!!!");
+				
+				try {
+					Thread.sleep(3000);  //等待3秒钟
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				
+				result = this.downloadBasics(date);
+				items = (new JSONObject(result)).getJSONObject("data").getJSONArray("items");	
+			}
+			
+			JSONArray item;
+			for(int i=0; i<items.length(); i++) {
+				item = items.getJSONArray(i);
+				
+				Progress.show(items.length(),i, " KdataSpiderTushare.downBasics.setBasics " + item.getString(0));
+				
+				setBasics(item);
+			}
+
+			FileTools.writeTextFile(kdataFile, result, false);
+		}
+		
+		long used = (System.currentTimeMillis() - beginTime)/1000; 
+		logger.info(info + "用时：" + used + "秒");          
+		
+	}
+	
+	private String downloadBasics(LocalDate date) {
+		String url = "http://api.tushare.pro";
+		JSONObject args = new JSONObject();
+		args.put("api_name", "daily_basic");
+		args.put("token", "175936caa4637bc9ac8e5e75ac92eff6887739ca6be771b81653f278");
+		
+		JSONObject params = new JSONObject();
+		params.put("trade_date", date.format(dtf));
+		
+		args.put("params", params);
+		
+		return HttpClient.doPostJson(url, args.toString());
+	}
+	
+	private void setBasics(JSONArray item) {
+		if(item!=null && item.length()>0) {
+			JSONObject data;
+			JSONArray dataItems;
+			String id = item.getString(0);
+			String factorFile = kdataPath + "/basic/" + id+ "_basics.json";
+			File file = new File(factorFile);
+			if(file.exists()) {
+				data = new JSONObject(FileTools.readTextFile(factorFile));
+				dataItems = data.getJSONArray("items");
+			}else {
+				//"fields":["ts_code","trade_date","close","turnover_rate",
+				//"turnover_rate_f","volume_ratio","pe","pe_ttm","pb","ps","ps_ttm",
+				//"dv_ratio","dv_ttm","total_share","float_share","free_share","total_mv","circ_mv"]
+				data = new JSONObject();
+				
+				JSONArray dataFields = new JSONArray();
+				dataFields.put("ts_code");
+				dataFields.put("trade_date");
+				dataFields.put("close");
+				dataFields.put("turnover_rate");
+				dataFields.put("turnover_rate_f");
+				dataFields.put("volume_ratio");
+				dataFields.put("pe");
+				dataFields.put("pe_ttm");
+				dataFields.put("pb");
+				dataFields.put("ps");
+				dataFields.put("ps_ttm");
+				dataFields.put("dv_ratio");
+				dataFields.put("dv_ttm");
+				dataFields.put("total_share");
+				dataFields.put("float_share");
+				dataFields.put("free_share");
+				dataFields.put("total_mv");
+				dataFields.put("circ_mv");
+				data.put("fields",dataFields);
+				
+				dataItems = new JSONArray();
+				data.put("items", dataItems);
+			}
+			dataItems.put(item);
+			FileTools.writeTextFile(factorFile, data.toString(), false);
+		}
 	}
 
 }

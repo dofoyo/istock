@@ -160,7 +160,8 @@ public class SelectorServiceImp implements SelectorService{
 	}
 
 	@Override
-	public Map<LocalDate, BigDecimal[]> getBOLLs(String itemID, Integer period, boolean cache) {
+	public Map<LocalDate, BigDecimal[]> getBOLLs(String itemID, boolean cache) {
+		Integer period = 20;//布林线默认是20日
 		Map<LocalDate, BigDecimal[]> bolls = new TreeMap<LocalDate, BigDecimal[]>();
 		
 		Kdata kdata = kdataService.getKdata(itemID, cache);
@@ -204,14 +205,14 @@ public class SelectorServiceImp implements SelectorService{
 	}
 
 	@Override
-	public List<LocalDate> getHuaFirst(String itemID, LocalDate beginDate, LocalDate endDate) {
+	public List<LocalDate> getHuaFirst(String itemID, LocalDate beginDate, LocalDate endDate, Integer boll_period, BigDecimal mcst_ratio,BigDecimal volume_r){ 
 		List<LocalDate> results = new ArrayList<LocalDate>(); 
 		
-		Integer boll_period = 21;
-		BigDecimal mcst_ratio = new BigDecimal(-0.13);
-		BigDecimal volume_r = new BigDecimal(2);
+		//Integer boll_period = 21;  //表示多少日内，布林线突破过下轨
+		//BigDecimal mcst_ratio = new BigDecimal(-0.13);
+		//BigDecimal volume_r = new BigDecimal(2);
 		
-		Map<LocalDate, BigDecimal[]> bolls = this.getBOLLs(itemID,boll_period, true);
+		Map<LocalDate, BigDecimal[]> bolls = this.getBOLLs(itemID, true);
 		Map<LocalDate, BigDecimal> mcsts = this.getMCSTs(itemID, true);
 		//Map<LocalDate, BigDecimal[]> macds = this.getMACDs(itemID, true);
 		
@@ -386,6 +387,56 @@ public class SelectorServiceImp implements SelectorService{
 		public BigDecimal getLowestRatio(BigDecimal mcst) {
 			return this.lowest.subtract(mcst).divide(mcst, BigDecimal.ROUND_HALF_UP).abs();
 		}
+	}
+
+	/*
+	 * 截止endDate的一个period内，该股跌破过布林线下轨，并且股价在成本线之下
+	 * 
+	 */
+	@Override
+	public List<LocalDate> getHuaFirstPotentials(String itemID, LocalDate endDate, Integer period,BigDecimal mcst_ratio) {
+		List<LocalDate> results = new ArrayList<LocalDate>(); 
+		
+		Map<LocalDate, BigDecimal[]> bolls = this.getBOLLs(itemID, true);
+		Map<LocalDate, BigDecimal> mcsts = this.getMCSTs(itemID, true);
+		
+		Kdata kdata = kdataService.getKdata(itemID, true);
+		
+		Kbar bar;
+		BigDecimal mcst, boll_dn;
+		
+		List<LocalDate> dates = kdata.getDates();
+		
+		int toIndex = dates.indexOf(endDate);
+		if(toIndex == -1) {
+			for(LocalDate date : dates) {
+				if(date.isBefore(endDate)) {
+					toIndex ++;
+				}else {
+					break;
+				}
+			}
+		}
+		
+		if(toIndex>=0) {
+			int fromIndex = toIndex>=period ? toIndex-period+1 : 0;
+			
+			for(LocalDate date : dates.subList(fromIndex, toIndex)) {
+				bar = kdata.getBar(date);
+				mcst = mcsts.get(date);
+				boll_dn = bolls.get(date)==null ? null : bolls.get(date)[2];
+				
+				if(mcst!=null && this.isDown(bar.getClose(), mcst, mcst_ratio) 
+						&& boll_dn!=null && boll_dn.compareTo(bar.getClose()) == 1
+						) {
+					results.add(date);
+				}
+			}
+			
+			kdataService.evictKDataCache();
+		}
+		
+		return results;
 	}
 
 }

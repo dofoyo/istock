@@ -52,7 +52,7 @@ public class TurtleMusterSimulation {
 
 		BAV bav = new BAV(initCash);
 		Blue bhl = new Blue(initCash);
-		SHB bdt = new SHB(initCash);  //股本
+		SHB bdt = new SHB(initCash);  //量比
 
 		//MVB dtb = new MVB(initCash);  //市值
 		AVB avb = new AVB(initCash);
@@ -76,7 +76,7 @@ public class TurtleMusterSimulation {
 				
 				bav.doIt(musters, itemService.getSz50(date), date,sseiFlag);
 				bhl.doIt(musters, bluechipService.getBluechipIDs(date), date,sseiFlag);
-				bdt.doIt(musters, date,sseiFlag);
+				bdt.doIt(musters, itemService.getSz50(date),date,sseiFlag);
 				//dtb.doIt(musters, date,sseiFlag);
 				hlb.doIt(musters, date,sseiFlag);
 				avb.doIt(musters, date,sseiFlag);

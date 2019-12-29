@@ -214,8 +214,8 @@ public class Kelly {
 	}
 	
 	private void cancel(String itemID) {
-		Set<String> orderIDs = account.getHoldOrderIDs(itemID);
-		for(String orderID : orderIDs) {
+		Set<Integer> orderIDs = account.getHoldOrderIDs(itemID);
+		for(Integer orderID : orderIDs) {
 			if(account.isStupid(itemID, orderID, cancels)) {
 				account.cancelByOrderID(orderID);
 			}

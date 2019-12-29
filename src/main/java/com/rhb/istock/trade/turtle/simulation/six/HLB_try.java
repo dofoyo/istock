@@ -64,7 +64,7 @@ public class HLB_try {
 		for(String itemID: holdItemIDs) {
 			muster = musters.get(itemID);
 			if(muster!=null) {
-				if(muster.isDrop(21) && !muster.isDownLimited()) {
+				if(muster.isDropAve(21) && !muster.isDownLimited()) {
 					account.drop(itemID, "跌破dropLine", muster.getLatestPrice()); 
 					account.dropHoldState(itemID);
 				}

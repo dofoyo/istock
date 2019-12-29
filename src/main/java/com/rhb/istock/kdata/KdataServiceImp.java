@@ -293,7 +293,7 @@ public class KdataServiceImp implements KdataService{
 	}
 
 	@Override
-	public void generateMusters() {
+	public void generateMusters(LocalDate beginDate) {
 		long beginTime=System.currentTimeMillis(); 
 		logger.info("generateMusters ......");
 		
@@ -312,8 +312,10 @@ public class KdataServiceImp implements KdataService{
 			dates = kdata.getDates();
 			
 			for(LocalDate date : dates) {
-				entity = this.getMusterEntity(item.getItemID(), date, true);
-				if(entity!=null) musterRepositoryImp.saveTmpMuster(date, entity);
+				if(date.isAfter(beginDate)) {
+					entity = this.getMusterEntity(item.getItemID(), date, true);
+					if(entity!=null) musterRepositoryImp.saveTmpMuster(date, entity);
+				}
 			}
 			
 			this.evictKDataCache();
@@ -539,6 +541,10 @@ public class KdataServiceImp implements KdataService{
 			Progress.show(musters.size(),i++, " updateLatestMusters " + muster.getItemID());
 
 			kbar = this.getLatestMarketData(muster.getItemID());
+			if(kbar==null) {
+				this.generateLatestMusters();
+				kbar = this.getLatestMarketData(muster.getItemID());
+			}
 			if(kbar!=null) {
 				entities.add(new MusterEntity(
 						muster.getItemID(), 
@@ -671,7 +677,7 @@ public class KdataServiceImp implements KdataService{
 		Kdata ssei2 = this.getKdata(sseiID, date.plusDays(1), days2, true);
 		//Kdata ssei3 = getKdata(sseiID, date.plusDays(1), days3, true);
 		
-		flag = ssei2.isAboveAveragePrice(21) ? 1 : 0;
+		flag = ssei2.isAboveAveragePrice(89) && ssei2.isAboveAveragePrice(21) ? 1 : 0;
 		
 		/*if(//ssei3.isAboveAveragePrice()==1 &&
 				ssei2.isAboveAveragePrice()==1 &&
@@ -710,6 +716,58 @@ public class KdataServiceImp implements KdataService{
 		}
 		
 		return kdata;
+	}
+
+	@Override
+	public void downFactors() throws Exception {
+		logger.info("KdataService.downFactors..........");
+		
+		LocalDate latestDate = kdataRealtimeSpider.getLatestMarketDate("sh000001");
+		kdataSpider.downFactors(latestDate);
+		
+	}
+
+	@Override
+	public void downClosedDatas() throws Exception {
+		long beginTime=System.currentTimeMillis(); 
+
+		List<String> ids = itemService.getItemIDs();
+		int i=1;
+		for(String id : ids){
+			Progress.show(ids.size(),i++, " down closed  datas: " + id);
+			try {
+				kdataSpider.downKdatas(id);
+				kdataSpider.downFactors(id);
+				kdataSpider.downBasics(id);
+				//Thread.sleep(300); //一分钟200个
+			} catch (Exception e) {
+				e.printStackTrace();
+			} 
+		}
+
+		this.downSSEI();
+		
+		long used = (System.currentTimeMillis() - beginTime)/1000; 
+		System.out.println("用时：" + used + "秒");          
+	}
+	
+	@Override
+	public void downClosedDatas(LocalDate date) throws Exception {
+		long beginTime=System.currentTimeMillis(); 
+
+		this.downSSEI();
+
+		kdataSpider.downKdatas(date);
+		kdataSpider.downBasics(date);
+		
+		long used = (System.currentTimeMillis() - beginTime)/1000; 
+		System.out.println("用时：" + used + "秒");          
+	}
+
+	@Override
+	public void downKdatas() throws Exception {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

@@ -26,11 +26,22 @@ public class HuaServiceTest {
 		huaService.generateMcstBreakers(endDate,count, ratio);
 	}
 	
+	//@Test
+	public void generateHuaFirst() {
+		LocalDate beginDate = LocalDate.parse("2010-01-01");
+		LocalDate endDate = LocalDate.parse("2019-12-28");
+		Integer boll_period = 21;  //表示多少日内，布林线突破过下轨
+		BigDecimal mcst_ratio = new BigDecimal(-0.13);
+		BigDecimal volume_r = new BigDecimal(2);
+		huaService.generateHuaFirst(beginDate,endDate,boll_period, mcst_ratio,volume_r, false);
+	}
+	
 	@Test
-	public void generateHua() {
-		LocalDate beginDate = LocalDate.parse("2019-01-01");
-		LocalDate endDate = LocalDate.parse("2019-12-18");
-		huaService.generateHua(beginDate, endDate, true);
+	public void generateHuaPotentials() {
+		LocalDate endDate = LocalDate.parse("2019-12-28");
+		Integer period = 21;
+		BigDecimal mcst_ratio = new BigDecimal(0.13);
+		huaService.generateHuaPotentials(endDate,period, mcst_ratio, false);
 	}
 	
 	//@Test

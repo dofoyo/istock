@@ -30,30 +30,32 @@ public class PotentialServiceTest {
 	@Qualifier("kdataServiceImp")
 	KdataService kdataService;
 	
-	//@Test
+	@Test
 	public void getLatestPotentials() {
-		Map<String,Potential> ps = potentialService.getLatestPotentials();
-		System.out.println("There are " + ps.size() + " potentials.");
+		LocalDate date = LocalDate.of(2019, 12, 26);
+		List<Potential> potentials = new ArrayList<Potential>(potentialService.getPotentials(date).values());
 
-		List<Potential> potentials = new ArrayList<Potential>(ps.values());
 		
+/*		Map<String,Potential> ps = potentialService.getLatestPotentials();
+		List<Potential> potentials = new ArrayList<Potential>(ps.values());
+*/		
 		Collections.sort(potentials, new Comparator<Potential>() {
 			@Override
 			public int compare(Potential o1, Potential o2) {
-					if(o1.getHLGap().compareTo(o2.getHLGap())==0) {
-						return o2.getAverageAmount().compareTo(o1.getAverageAmount());
-					}else {
-						return o1.getHLGap().compareTo(o2.getHLGap());//A-Z
-					}
+				if(o1.getHLGap().compareTo(o2.getHLGap())==0) {
+					return o1.getHNGap().compareTo(o2.getHNGap());//A-Z
+				}else {
+					return o1.getHLGap().compareTo(o2.getHLGap());//A-Z
 				}
+			}
 			
 		});
 		
 		for(Potential p : potentials) {
-			if(p.getItemID().startsWith("sh")) {
-				System.out.println(p.getItemID());
-			}
+			System.out.printf("%s, %.2f, %.2f, %d, %d\n",p.getItemID(),p.getHighest(),p.getLatestPrice(),p.getHNGap(),p.getHLGap());
 		}
+
+		System.out.println("There are " + potentials.size() + " potentials.");
 	}
 	
 	//@Test

@@ -18,6 +18,15 @@ public class Functions {
 			return false;
 		}
 	}
+
+	public static boolean between(Integer value, Integer a, Integer b) {
+		if(value.compareTo(a)>=0 
+				&& value.compareTo(b)<=0) {
+			return true;
+		}else {
+			return false;
+		}
+	}
 	
 	public static BigDecimal EMA(BigDecimal close, BigDecimal pema, Integer period) {
 		if(pema==null) pema = close;
