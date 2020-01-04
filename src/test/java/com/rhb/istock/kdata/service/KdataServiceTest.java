@@ -24,9 +24,9 @@ public class KdataServiceTest {
 	@Qualifier("kdataServiceImp")
 	KdataService kdataService;
 	
-	//@Test
+	@Test
 	public void generateMusters() {
-		LocalDate date = LocalDate.parse("2001.01.01");
+		LocalDate date = LocalDate.parse("2001-01-03");
 		kdataService.generateMusters(date);
 		//kdataService.generateLatestMusters();
 		//kdataService.updateLatestMusters();

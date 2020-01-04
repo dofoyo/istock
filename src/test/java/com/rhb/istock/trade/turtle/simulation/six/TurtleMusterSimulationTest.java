@@ -32,18 +32,18 @@ public class TurtleMusterSimulationTest {
 	@Qualifier("turtleMusterSimulation_hua")
 	TurtleMusterSimulation_hua turtleMusterSimulation_hua;
 	
-	@Test
+	//@Test
 	public void simulate() {
-		LocalDate beginDate = LocalDate.parse("2000-01-01");
-		LocalDate endDate = LocalDate.parse("2019-12-27");
+		LocalDate beginDate = LocalDate.parse("2010-01-01");
+		LocalDate endDate = LocalDate.parse("2019-12-30");
 
 		turtleMusterSimulation.simulate(beginDate, endDate); 
-		turtleMusterSimulation_hua.simulate(beginDate, endDate);
+		//turtleMusterSimulation_hua.simulate(beginDate, endDate);
 	}
 	
-	//@Test
+	@Test
 	public void generateRecords() {
-		turtleMusterSimulationAnalysis.generateRecords("hlb");
+		turtleMusterSimulationAnalysis.generateRecords("bav");
 	}
 
 

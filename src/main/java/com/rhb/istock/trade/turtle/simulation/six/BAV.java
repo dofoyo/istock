@@ -38,6 +38,7 @@ public class BAV {
 	private StringBuffer breakers_sb = new StringBuffer();
 	
 	private BigDecimal valueRatio = new BigDecimal(3);  //每只股票不能超过市值的1/3
+	private Integer pool = 21;
 	private Integer top = 3;
 
 	public BAV(BigDecimal initCash) {
@@ -55,67 +56,60 @@ public class BAV {
 			muster = musters.get(itemID);
 			if(muster!=null) {
 				account.refreshHoldsPrice(itemID, muster.getLatestPrice());
-				if(sseiFlag==0 && muster.isDropLowest(13) && !muster.isDownLimited()) { 		//跌破21日均线就卖
+				if(muster.isDropAve(21) && !muster.isDownLimited()) { 		//跌破21日均线就卖
+					account.drop(itemID, "2", muster.getLatestPrice());
+				}
+				
+				/*if(sseiFlag==0 && muster.isDropLowest(21) && !muster.isDownLimited()) { 		//跌破21日均线就卖
 					account.drop(itemID, "1", muster.getLatestPrice());
 				}				
 				if(sseiFlag==1 && muster.isDropLowest(34) && !muster.isDownLimited()) { 		//跌破21日低点就卖
 					account.drop(itemID, "2", muster.getLatestPrice());
-				}	
+				}*/	
 			}
 		}
 		
-		//确定突破走势的股票
-		Set<String> holdItemIDs = account.getItemIDsOfHolds();
-		Set<Muster> dds = new HashSet<Muster>();  //用set，无重复，表示不可加仓
-		List<Muster> breakers = this.getTops(musters, sz50);
-		breakers_sb.append(date.toString() + ",");
-		StringBuffer sb = new StringBuffer();
-		for(Muster breaker : breakers) {
-			if(!holdItemIDs.contains(breaker.getItemID())) {
-				dds.add(breaker);
-				sb.append(breaker.getItemName());
-				sb.append(",");
+		//行情好，才买入
+		//if(sseiFlag==1) {
+			//确定突破走势的股票
+			Set<String> holdItemIDs = account.getItemIDsOfHolds();
+			Set<Muster> dds = new HashSet<Muster>();  //用set，无重复，表示不可加仓
+			List<Muster> breakers = this.getBreakers(musters, sz50);
+			breakers_sb.append(date.toString() + ",");
+			StringBuffer sb = new StringBuffer();
+			for(Muster breaker : breakers) {
+				if(!holdItemIDs.contains(breaker.getItemID())) {
+					dds.add(breaker);
+					sb.append(breaker.getItemName());
+					sb.append(",");
+				}
+				breakers_sb.append(breaker.getItemID());
+				breakers_sb.append(",");
 			}
-			breakers_sb.append(breaker.getItemID());
-			breakers_sb.append(",");
-		}
-		breakers_sb.deleteCharAt(breakers_sb.length()-1);
-		breakers_sb.append("\n");
-		
-		//先卖后买，完成调仓和开仓
-		//logger.info("先卖后买，完成调仓");
-		if(!dds.isEmpty()) {
-			holdItemIDs = account.getItemIDsOfHolds();
-			Set<Integer> holdOrderIDs;
-			for(String itemID: holdItemIDs) {
-				holdOrderIDs = 	account.getHoldOrderIDs(itemID);
-				muster = musters.get(itemID);
-				if(muster!=null) {
-					for(Integer holdOrderID : holdOrderIDs) {
-						account.dropByOrderID(holdOrderID, "调仓", muster.getLatestPrice());   //先卖
-						dds.add(muster);						
+			breakers_sb.deleteCharAt(breakers_sb.length()-1);
+			breakers_sb.append("\n");
+			
+			//先卖后买，完成调仓和开仓
+			//logger.info("先卖后买，完成调仓");
+			if(!dds.isEmpty()) {
+				holdItemIDs = account.getItemIDsOfHolds();
+				Set<Integer> holdOrderIDs;
+				for(String itemID: holdItemIDs) {
+					holdOrderIDs = 	account.getHoldOrderIDs(itemID);
+					muster = musters.get(itemID);
+					if(muster!=null) {
+						for(Integer holdOrderID : holdOrderIDs) {
+							account.dropByOrderID(holdOrderID, "0", muster.getLatestPrice());   //先卖
+							dds.add(muster);						
+						}
 					}
 				}
+				
+				//System.out.println(dds.size());
+				account.openAll(dds);			//后买
 			}
-			
-			//System.out.println(dds.size());
-			account.openAll(dds);			//后买
-		}
-
+		//}
 		
-		
-/*		breakers_sb.append(date.toString() + ",");
-		for(Muster breaker : breakers) {
-			if(!holdIDs.contains(breaker.getItemID())) {
-				account.refreshHoldsPrice(breaker.getItemID(), breaker.getLatestPrice());
-				account.open(breaker.getItemID(),breaker.getItemName(), breaker.getIndustry(), this.getQuantity(account.getCash(),account.getTotal(),breaker.getLatestPrice()), "", breaker.getLatestPrice());
-			}
-			breakers_sb.append(breaker.getItemID());
-			breakers_sb.append(",");
-		}
-		breakers_sb.deleteCharAt(breakers_sb.length()-1);
-		breakers_sb.append("\n");
-*/		
 		dailyAmount_sb.append(account.getDailyAmount() + "\n");
 
 	}
@@ -145,7 +139,7 @@ public class BAV {
 		return ee.divide(price,BigDecimal.ROUND_DOWN).divide(new BigDecimal(100),BigDecimal.ROUND_DOWN).intValue()*100;
 	}
 	
-	private List<Muster> getTops(Map<String,Muster> musters, List<String> sz50){
+	private List<Muster> getBreakers(Map<String,Muster> musters, List<String> sz50){
 		List<Muster>  ms = new ArrayList<Muster>();
 
 		for(String id : sz50) {
@@ -157,16 +151,17 @@ public class BAV {
 		Collections.sort(ms, new Comparator<Muster>() {
 			@Override
 			public int compare(Muster o1, Muster o2) {
-				//return o2.getAverageAmount().compareTo(o1.getAverageAmount()); //Z-A
-				return o2.cal_volume_ratio().compareTo(o1.cal_volume_ratio()); //Z-A
+				return o2.getAmount5().compareTo(o1.getAmount5()); //Z-A
+				//return o2.getAmount().compareTo(o1.getAmount()); //Z-A
+				//return o2.cal_volume_ratio().compareTo(o1.cal_volume_ratio()); //Z-A
 
 				
-/*				if(o1.getHLGap().compareTo(o2.getHLGap())==0){
+				/*if(o1.getHLGap().compareTo(o2.getHLGap())==0){
 					return o1.getLatestPrice().compareTo(o2.getLatestPrice()); //Z-A
 				}else {
 					return o1.getHLGap().compareTo(o2.getHLGap());//A-Z
-				}
-*/				
+				}*/
+				
 /*				if(o1.getHLGap().compareTo(o2.getHLGap())==0){
 					if(o1.getLNGap().compareTo(o2.getLNGap())==0){  
 						return o1.getLatestPrice().compareTo(o2.getLatestPrice()); //a-z
@@ -185,23 +180,100 @@ public class BAV {
 			}
 		});
 		
-		List<Muster>  tops = new ArrayList<Muster>();
-		for(Muster muster : ms) {
-			if(muster!=null 
-					&& !muster.isUpLimited() 
-					&& muster.isUpBreaker() 
-					&& muster.isUp(21)
-					//&& muster.cal_volume_ratio().compareTo(new BigDecimal(2))==1
+		List<Muster>  breakers = new ArrayList<Muster>();
+		Muster m;
+		for(int i=0; i<ms.size() && i<pool && breakers.size()<top; i++) {
+			m = ms.get(i);
+			if(m!=null 
+					&& !m.isUpLimited() 
+					&& !m.isDownLimited() 
+					//&& m.isUpBreaker()
+					&& m.isBreaker()
+					//&& m.isUp(89)
+					//&& m.getN21Gap()<=13
+					//&& m.cal_volume_ratio().compareTo(new BigDecimal(2))==1
 					) {
-				tops.add(muster);
-			}
-			
-			if(tops.size()>=top) {
-				break;
+				breakers.add(m);
 			}
 		}
 		
-		return tops;
+		return breakers;
+	}
+	
+	class Breaker{
+		private String itemID;
+		private LocalDate breakDate;  //突破日期
+		private BigDecimal breakPrice;  //突破时的价格
+		private LocalDate downDate;   //回调破21日均线的时间
+		private BigDecimal downPrice;  //回调破21日均线的价格，此时的价格比breakPrice要小
+		private LocalDate upDate;  //回调结束，返回21均线上方的时间
+		private BigDecimal upPrice; //回调结束，返回21均线上方的时间，此时的价格要高于downPrice,则是买入时机
+		
+		public boolean isOk() {
+			return downDate!=null && upDate!=null && upPrice.compareTo(downPrice)==1;
+		}
+		
+		public boolean isBad() {
+			return false;
+		}
+		
+		public void up(LocalDate upDate, BigDecimal upPrice) {
+			this.upDate = upDate;
+			this.upPrice = upPrice;
+		}
+		public void down(LocalDate downDate, BigDecimal downPrice) {
+			this.downDate = downDate;
+			this.downPrice = downPrice;
+		}
+		public Breaker(String itemID, LocalDate breakDate, BigDecimal breakPrice) {
+			super();
+			this.itemID = itemID;
+			this.breakDate = breakDate;
+			this.breakPrice = breakPrice;
+		}
+		public String getItemID() {
+			return itemID;
+		}
+		public void setItemID(String itemID) {
+			this.itemID = itemID;
+		}
+		public LocalDate getBreakDate() {
+			return breakDate;
+		}
+		public void setBreakDate(LocalDate breakDate) {
+			this.breakDate = breakDate;
+		}
+		public BigDecimal getBreakPrice() {
+			return breakPrice;
+		}
+		public void setBreakPrice(BigDecimal breakPrice) {
+			this.breakPrice = breakPrice;
+		}
+		public LocalDate getDownDate() {
+			return downDate;
+		}
+		public void setDownDate(LocalDate downDate) {
+			this.downDate = downDate;
+		}
+		public BigDecimal getDownPrice() {
+			return downPrice;
+		}
+		public void setDownPrice(BigDecimal downPrice) {
+			this.downPrice = downPrice;
+		}
+		public LocalDate getUpDate() {
+			return upDate;
+		}
+		public void setUpDate(LocalDate upDate) {
+			this.upDate = upDate;
+		}
+		public BigDecimal getUpPrice() {
+			return upPrice;
+		}
+		public void setUpPrice(BigDecimal upPrice) {
+			this.upPrice = upPrice;
+		}
+		
 	}
 
 

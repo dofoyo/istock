@@ -70,64 +70,64 @@ public class HLB {
 		for(String itemID: holdItemIDs) {
 			muster = musters.get(itemID);
 			if(muster!=null) {
-/*				if(muster.isDropAve(21) && !muster.isDownLimited()) { 		//跌破21日均线就卖
+				if(muster.isDropAve(21) && !muster.isDownLimited()) { 		//跌破21日均线就卖
 					account.drop(itemID, "1", muster.getLatestPrice());
-				}*/
+				}
 /*				if(muster.isDropLowest(13) && !muster.isDownLimited()) { 		//跌破21日低点就卖
 					account.drop(itemID, "1", muster.getLatestPrice());
 				}*/
-				if(sseiFlag==0 && muster.isDropAve(13) && !muster.isDownLimited()) { 		//跌破13日均线就卖
+/*				if(sseiFlag==0 && muster.isDropAve(13) && !muster.isDownLimited()) { 		//跌破13日均线就卖
 					account.drop(itemID, "1", muster.getLatestPrice());
 				}				
 				if(sseiFlag==1 && muster.isDropLowest(34) && !muster.isDownLimited()) { 		//跌破21日低点就卖
 					account.drop(itemID, "2", muster.getLatestPrice());
-				}
+				}*/
 			}
-		}				
-		
-		holdItemIDs = account.getItemIDsOfHolds();
-		
-		Set<Muster> dds = new HashSet<Muster>();  //用set，无重复，表示不可加仓
-		//List<Muster> dds = new ArrayList<Muster>();  //用list，有重复，表示可以加仓
-		
-		//确定突破走势的股票
-		List<Muster> breakers = this.getBreakers(new ArrayList<Muster>(musters.values()));
-		//breakers.addAll(keeps.getUps(musters));
-		
-		breakers_sb.append(date.toString() + ",");
-		StringBuffer sb = new StringBuffer();
-		for(Muster breaker : breakers) {
-			if(!holdItemIDs.contains(breaker.getItemID())) {
-				dds.add(breaker);
-				sb.append(breaker.getItemName());
-				sb.append(",");
-			}
-			breakers_sb.append(breaker.getItemID());
-			breakers_sb.append(",");
 		}
-		breakers_sb.deleteCharAt(breakers_sb.length()-1);
-		breakers_sb.append("\n");
 		
-		//先卖后买，完成调仓和开仓
-		// 当cash不够买入新股时，要卖出市值高与平均值的股票。
-		//此举可避免高位加仓的现象出现
-		if(!dds.isEmpty()) {
-			//if(!account.isEnoughCash(dds.size())) {
-				Set<Integer> holdOrderIDs;
-				for(String itemID: holdItemIDs) {
-					holdOrderIDs = 	account.getHoldOrderIDs(itemID);
-					muster = musters.get(itemID);
-					if(muster!=null) {
-						for(Integer holdOrderID : holdOrderIDs) {
-							//if(account.isAboveAveValue(holdOrderID)==1) {
-								account.dropByOrderID(holdOrderID, "0", muster.getLatestPrice());   //先卖
-								dds.add(muster);						
-							//}
+			holdItemIDs = account.getItemIDsOfHolds();
+			
+			Set<Muster> dds = new HashSet<Muster>();  //用set，无重复，表示不可加仓
+			//List<Muster> dds = new ArrayList<Muster>();  //用list，有重复，表示可以加仓
+			
+			//确定突破走势的股票
+			List<Muster> breakers = this.getBreakers(new ArrayList<Muster>(musters.values()));
+			//breakers.addAll(keeps.getUps(musters));
+			
+			breakers_sb.append(date.toString() + ",");
+			StringBuffer sb = new StringBuffer();
+			for(Muster breaker : breakers) {
+				if(!holdItemIDs.contains(breaker.getItemID())) {
+					dds.add(breaker);
+					sb.append(breaker.getItemName());
+					sb.append(",");
+				}
+				breakers_sb.append(breaker.getItemID());
+				breakers_sb.append(",");
+			}
+			breakers_sb.deleteCharAt(breakers_sb.length()-1);
+			breakers_sb.append("\n");
+			
+			//先卖后买，完成调仓和开仓
+			// 当cash不够买入新股时，要卖出市值高与平均值的股票。
+			//此举可避免高位加仓的现象出现
+			if(!dds.isEmpty()) {
+				//if(!account.isEnoughCash(dds.size())) {
+					Set<Integer> holdOrderIDs;
+					for(String itemID: holdItemIDs) {
+						holdOrderIDs = 	account.getHoldOrderIDs(itemID);
+						muster = musters.get(itemID);
+						if(muster!=null) {
+							for(Integer holdOrderID : holdOrderIDs) {
+								//if(account.isAboveAveValue(holdOrderID)==1) {
+									account.dropByOrderID(holdOrderID, "0", muster.getLatestPrice());   //先卖
+									dds.add(muster);						
+								//}
+							}
 						}
 					}
-				}
-			//}
-			account.openAll(dds);			//后买
+				//}
+				account.openAll(dds);			//后买
 		}
 
 		dailyAmount_sb.append(account.getDailyAmount() + "\n");

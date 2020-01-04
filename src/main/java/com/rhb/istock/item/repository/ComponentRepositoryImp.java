@@ -15,13 +15,25 @@ import com.rhb.istock.comm.util.FileTools;
 public class ComponentRepositoryImp implements ComponentRepository {
 	@Value("${sz50File}")
 	private String sz50File;
+
+	@Value("${hs300File}")
+	private String hs300File;
 	
 	@Override
 	@Cacheable("sz50Components")
 	public List<Component> getSz50Components() {
+		return this.getComponents(sz50File);
+	}
+
+	@Override
+	public List<Component> getHs300Components() {
+		return this.getComponents(hs300File);
+	}
+	
+	private List<Component> getComponents(String file) {
 		List<Component> components = new ArrayList<Component>();
 		Component component;
-		String[] lines = FileTools.readTextFile(sz50File).split("\n");
+		String[] lines = FileTools.readTextFile(file).split("\n");
 		String[] columns;
 		String endDate;
 		int i=0;
@@ -47,5 +59,6 @@ public class ComponentRepositoryImp implements ComponentRepository {
 		}
 		return components;
 	}
+
 
 }

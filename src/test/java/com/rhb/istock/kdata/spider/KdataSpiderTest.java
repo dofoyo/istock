@@ -68,7 +68,7 @@ public class KdataSpiderTest {
 
 	@Test
 	public void testDownKdataByDate() {
-		LocalDate date = LocalDate.parse("2019-12-25");
+		LocalDate date = LocalDate.parse("2020-01-03");
 		try {
 			//kdataSpiderTushare.downKdatas(date);
 			kdataSpiderTushare.downFactors(date); //此处仅供测试，正式使用时，factor的日期要比kdata的日期提前一个交易日

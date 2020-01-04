@@ -126,7 +126,7 @@ public class KdataSpiderTushare implements KdataSpider {
 				logger.error("\n factors file is NULL!!!!!!");
 				
 				try {
-					Thread.sleep(3000);  //等待3秒钟
+					Thread.sleep(8000);  //等待8秒钟
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}

@@ -250,6 +250,13 @@ public class Muster {
 		//return latestPrice.subtract(close).divide(close,BigDecimal.ROUND_HALF_UP).compareTo(new BigDecimal(-0.095))<=0;
 	}
 	
+	public boolean isBreaker() {
+		return //this.latestPrice.compareTo(this.close)==1 &&
+				this.close.compareTo(this.averagePrice21)<=0 &&
+				this.latestPrice.compareTo(this.averagePrice21)==1 &&
+				this.averagePrice21.compareTo(this.averagePrice)==1;
+	}
+	
 	public boolean isUp(Integer period) {
 		if(period == 21) {
 			return  latestPrice.compareTo(averagePrice8)==1 &&
@@ -313,7 +320,7 @@ public class Muster {
 	}
 	
 	public boolean isDown() {
-		return  //latestPrice.compareTo(averagePrice8)==-1 && 
+		return  latestPrice.compareTo(averagePrice8)==-1 && 
 				averagePrice8.compareTo(averagePrice13)==-1 &&
 				averagePrice13.compareTo(averagePrice21)==-1 &&
 				averagePrice21.compareTo(averagePrice34)==-1 &&

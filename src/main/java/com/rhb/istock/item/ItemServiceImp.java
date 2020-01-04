@@ -143,8 +143,22 @@ public class ItemServiceImp implements ItemService {
 		Item item;
 		List<Component> components = componentRepository.getSz50Components();
 		for(Component component : components) {
-			if(
-					(date.isAfter(component.getBeginDate()) || date.isEqual(component.getBeginDate()))
+			if((date.isAfter(component.getBeginDate()) || date.isEqual(component.getBeginDate()))
+					&& (date.isBefore(component.getEndDate()) || date.isEqual(component.getEndDate()))
+				) {
+				items.add(component.getItemID());
+			}
+		}
+		return items;
+	}
+
+	@Override
+	public List<String> getHs300(LocalDate date) {
+		List<String> items = new ArrayList<String>();
+		Item item;
+		List<Component> components = componentRepository.getHs300Components();
+		for(Component component : components) {
+			if((date.isAfter(component.getBeginDate()) || date.isEqual(component.getBeginDate()))
 					&& (date.isBefore(component.getEndDate()) || date.isEqual(component.getEndDate()))
 				) {
 				items.add(component.getItemID());

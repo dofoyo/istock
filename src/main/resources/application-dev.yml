@@ -15,6 +15,7 @@ topicsFile: D:/dev/istock-data/topics.txt
 fvaluesOfHLFile: D:/dev/istock-data/fvaluesOfHL.txt
 dailyMeansFile: D:/dev/istock-data/dailyMeans.txt
 sz50File: D:/dev/istock-data/sz50.csv
+hs300File: D:/dev/istock-data/hs300.csv
 huaFile: d:/dev/istock-data/hua.txt
 huaPotentialFile: d:/dev/istock-data/huaPotential.txt
 mcstFile: d:/dev/istock-data/mcst.txt

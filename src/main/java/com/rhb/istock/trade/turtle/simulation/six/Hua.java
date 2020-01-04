@@ -3,8 +3,6 @@ package com.rhb.istock.trade.turtle.simulation.six;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -41,7 +39,7 @@ public class Hua {
 		this.initCash = initCash;
 	}
 	
-	public void doIt(Map<String,Muster> musters, Set<String> ids, LocalDate date) {
+	public void doIt(Map<String,Muster> musters, Set<String> ids, LocalDate date, Integer sseiFlag) {
 		//logger.info(date.toString());
 		Muster muster;
 		account.setLatestDate(date);
@@ -53,8 +51,8 @@ public class Hua {
 			muster = musters.get(itemID);
 			if(muster!=null) {
 				account.refreshHoldsPrice(itemID, muster.getLatestPrice());
-				if(muster.isDropAve(21) && !muster.isDownLimited()){
-					account.drop(itemID, "跌破deadline", muster.getLatestPrice()); 
+				if(muster.isDropLowest(8) && !muster.isDownLimited()){
+					account.drop(itemID, "1", muster.getLatestPrice()); 
 					account.dropHoldState(itemID);
 				}
 				
@@ -62,10 +60,18 @@ public class Hua {
 					account.drop(itemID, "跌破lowest", muster.getLatestPrice());
 					account.dropHoldState(itemID);
 				}	*/
+				
+/*				if(sseiFlag==0 && muster.isDropAve(13) && !muster.isDownLimited()) { 		//跌破13日均线就卖
+					account.drop(itemID, "1", muster.getLatestPrice());
+				}				
+				if(sseiFlag==1 && muster.isDropLowest(21) && !muster.isDownLimited()) { 		//跌破21日低点就卖
+					account.drop(itemID, "2", muster.getLatestPrice());
+				}*/
 			}
 		}				
 
 		//买入
+		//if(sseiFlag==1) {
 			List<Muster> potentials = this.getHuaItems(musters, ids);
 			
 			potentials_sb.append(date.toString() + ",");
@@ -90,7 +96,7 @@ public class Hua {
 					muster = musters.get(itemID);
 					if(muster!=null) {
 						for(Integer holdOrderID : holdOrderIDs) {
-							account.dropByOrderID(holdOrderID, "调仓", muster.getLatestPrice());   //先卖
+							account.dropByOrderID(holdOrderID, "0", muster.getLatestPrice());   //先卖
 							dds.add(muster);						
 						}
 					}
@@ -98,6 +104,7 @@ public class Hua {
 				
 				account.openAll(dds);			//后买
 			}
+		//}
 
 		dailyAmount_sb.append(account.getDailyAmount() + "\n");
 	}

@@ -14,4 +14,5 @@ public interface ItemService {
 	public String[] getTopicTops(Integer count);
 	public Set<String> getIndustrys();
 	public List<String> getSz50(LocalDate date);
+	public List<String> getHs300(LocalDate date);
 }

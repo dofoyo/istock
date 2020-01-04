@@ -14,6 +14,7 @@ import com.rhb.istock.item.ItemService;
 import com.rhb.istock.kdata.KdataService;
 import com.rhb.istock.kdata.spider.KdataRealtimeSpider;
 import com.rhb.istock.selector.SelectorService;
+import com.rhb.istock.selector.hua.HuaService;
 import com.rhb.istock.trade.turtle.operation.TurtleOperationService;
 
 @Component
@@ -42,6 +43,10 @@ public class IstockScheduledTask {
 	@Qualifier("kdataRealtimeSpiderImp")
 	KdataRealtimeSpider kdataRealtimeSpider;
 	
+	@Autowired
+	@Qualifier("huaService")
+	HuaService huaService;
+
 	protected static final Logger logger = LoggerFactory.getLogger(IstockScheduledTask.class);
 	
 	private boolean isTradeDate = false;  
@@ -80,8 +85,8 @@ public class IstockScheduledTask {
 			itemService.download();		// 1. 下载最新股票代码
 			itemService.init();  // 2. 
 			kdataService.downFactors(); // 3. 上一交易日的收盘数据要等开盘前才能下载到, 大约需要15分钟
-			turtleOperationService.init();  // 4.
 			kdataService.generateLatestMusters();
+			turtleOperationService.init();  // 4.
 		}
 	}
 
@@ -127,7 +132,7 @@ public class IstockScheduledTask {
 		}
 	}*/
 	
-	@Scheduled(cron="0 25 18 ? * 1-5") //周一至周五，每日18点 执行收盘
+	@Scheduled(cron="0 0 18 ? * 1-5") //周一至周五，每日18点 执行收盘
 	public void downloadKdatas()  throws Exception{
 		System.out.println("run scheduled of '0 0 18 ? * 1-5'");
 		long beginTime=System.currentTimeMillis(); 
@@ -135,6 +140,7 @@ public class IstockScheduledTask {
 		if(this.isTradeDate()) {
 			kdataService.downClosedDatas(LocalDate.now());
 			kdataService.generateMusters(LocalDate.parse("2001-01-01"));   //生成muster，需要192分钟，即3个多小时
+			huaService.generateHuaPotentials(LocalDate.now());
 		}
 
 		long used = (System.currentTimeMillis() - beginTime)/1000; 

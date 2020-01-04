@@ -24,8 +24,8 @@ public class PotentialView {
 		this.hnGap = hnGap;
 	}
 
-	public Integer getHlGap() {
-		return hlGap;
+	public String getHlGap() {
+		return String.format("%d",hlGap);
 	}
 
 	public void setHlGap(Integer hlGap) {

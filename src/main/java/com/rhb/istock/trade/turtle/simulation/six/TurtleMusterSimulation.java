@@ -51,10 +51,10 @@ public class TurtleMusterSimulation {
 		System.out.println("simulate from " + beginDate + " to " + endDate +" ......");
 
 		BAV bav = new BAV(initCash);
-		Blue bhl = new Blue(initCash);
-		SHB bdt = new SHB(initCash);  //量比
+		AVBPlus bhl = new AVBPlus(initCash);
+		HLBPlus bdt = new HLBPlus(initCash);  
 
-		//MVB dtb = new MVB(initCash);  //市值
+		//MVB dtb = new MVB(initCash);  
 		AVB avb = new AVB(initCash);
 		HLB hlb = new HLB(initCash);
 
@@ -74,9 +74,9 @@ public class TurtleMusterSimulation {
 				
 				//System.out.println("\n sseiFlag=" + sseiFlag);
 				
-				bav.doIt(musters, itemService.getSz50(date), date,sseiFlag);
-				bhl.doIt(musters, bluechipService.getBluechipIDs(date), date,sseiFlag);
-				bdt.doIt(musters, itemService.getSz50(date),date,sseiFlag);
+				bav.doIt(musters, itemService.getHs300(date), date,sseiFlag);
+				bhl.doIt(musters, date,sseiFlag);
+				bdt.doIt(musters, date,sseiFlag);
 				//dtb.doIt(musters, date,sseiFlag);
 				hlb.doIt(musters, date,sseiFlag);
 				avb.doIt(musters, date,sseiFlag);

@@ -51,6 +51,7 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 	SelectorService selectorService;
 	
 	DecimalFormat df = new DecimalFormat("0.00"); 
+	DecimalFormat df_integer = new DecimalFormat("000"); 
 
 	Turtle turtle = null;
 	
@@ -59,7 +60,7 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 	Map<String,Integer> avtops = null;
 	
 	Integer bxxtops = 8;
-	Integer tops = 21;
+	Integer tops = 55;
 	
 	protected static final Logger logger = LoggerFactory.getLogger(TurtleOperationServiceImp.class);
 	
@@ -264,8 +265,8 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 				view.setLow(df.format(potential.getLowest()));
 				view.setPclose(df.format(potential.getClose()));
 				view.setNow(df.format(potential.getLatestPrice()));
-				view.setHlgap(df.format(potential.getHLGap()));
-				view.setNhgap(df.format(potential.getHNGap()));
+				view.setHlgap(df_integer.format(potential.getHLGap()));
+				view.setNhgap(df_integer.format(potential.getHNGap()));
 				view.setStatus(potential.getStatus());
 				
 				view.setTopic(this.getTopic(potential.getItemID()));
@@ -311,7 +312,7 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 		
 		List<TurtleView> views = new ArrayList<TurtleView>();
 		
-		DecimalFormat df = new DecimalFormat("0.00"); 
+		//DecimalFormat df = new DecimalFormat("0.00"); 
 		Map<String,String> preyMap;
 
 		Tfeature feature;

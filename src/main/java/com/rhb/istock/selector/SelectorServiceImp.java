@@ -214,7 +214,7 @@ public class SelectorServiceImp implements SelectorService{
 		
 		Map<LocalDate, BigDecimal[]> bolls = this.getBOLLs(itemID, true);
 		Map<LocalDate, BigDecimal> mcsts = this.getMCSTs(itemID, true);
-		//Map<LocalDate, BigDecimal[]> macds = this.getMACDs(itemID, true);
+		Map<LocalDate, BigDecimal[]> macds = this.getMACDs(itemID, true);
 		
 		Kdata kdata = kdataService.getKdata(itemID, true);
 		//Kbar kbar = kdataService.getLatestMarketData(itemID);
@@ -222,7 +222,7 @@ public class SelectorServiceImp implements SelectorService{
 		
 		Kbar bar;
 		BigDecimal mcst, boll_dn, volume_ratio;
-		//BigDecimal macd;
+		BigDecimal macd;
 		
 		List<LocalDate> dates = kdata.getDates();
 		Integer i = null; 
@@ -241,9 +241,9 @@ public class SelectorServiceImp implements SelectorService{
 
 				//System.out.printf("\n%tF: mcst=%.2f, boll_dn=%.2f, close=%.2f\n", date, mcst, boll_dn, bar.getClose());
 				
-				//macd = macds.get(date)==null ? null : macds.get(date)[2];
+				macd = macds.get(date)==null ? null : macds.get(date)[2];
 				if(i!=null && i<boll_period 
-						//&& macd!=null && macd.compareTo(BigDecimal.ZERO)==1
+						&& macd!=null && macd.compareTo(BigDecimal.ZERO)==1
 						&& volume_ratio.compareTo(volume_r) == 1
 						) {
 					results.add(date);

@@ -28,8 +28,8 @@ import com.rhb.istock.kdata.Muster;
  * 仓位控制：满仓，每只股票的均衡市值
  *
  */
-public class AVB {
-	protected static final Logger logger = LoggerFactory.getLogger(AVB.class);
+public class AVBPlus {
+	protected static final Logger logger = LoggerFactory.getLogger(AVBPlus.class);
 
 	private Account account = null;
 	private BigDecimal initCash = null;
@@ -39,7 +39,7 @@ public class AVB {
 	private Integer pool = 21;
 	private Integer top = 3;
 	
-	public AVB(BigDecimal initCash) {
+	public AVBPlus(BigDecimal initCash) {
 		account = new Account(initCash);
 		this.initCash = initCash;
 	}
@@ -61,22 +61,23 @@ public class AVB {
 		for(String itemID: holdItemIDs) {
 			muster = musters.get(itemID);
 			if(muster!=null) {
-				if(muster.isDropAve(21) && !muster.isDownLimited()) { 		//跌破21日均线就卖
-					account.drop(itemID, "1", muster.getLatestPrice());
-				}
+/*				if(muster.isDropAve(21) && !muster.isDownLimited()) { 		//跌破21日均线就卖
+					account.drop(itemID, "跌破dropline", muster.getLatestPrice());
+				}*/
 /*				if(muster.isDropLowest(21) && !muster.isDownLimited()) { 		//跌破21日低点就卖
 					account.drop(itemID, "跌破lowest", muster.getLatestPrice());
 				}*/
-/*				if(sseiFlag==0 && muster.isDropLowest(13) && !muster.isDownLimited()) { 		//跌破13日均线就卖
+				if(sseiFlag==0 && muster.isDropLowest(13) && !muster.isDownLimited()) { 		//跌破13日均线就卖
 					account.drop(itemID, "1", muster.getLatestPrice());
 				}				
 				if(sseiFlag==1 && muster.isDropLowest(34) && !muster.isDownLimited()) { 		//跌破21日低点就卖
 					account.drop(itemID, "2", muster.getLatestPrice());
-				}*/
+				}
 			}
 		}				
 		
 		//行情好，才买入
+		if(sseiFlag==1) {
 			holdItemIDs = account.getItemIDsOfHolds();
 			
 			Set<Muster> dds = new HashSet<Muster>();  //用set，无重复，表示不可加仓
@@ -117,6 +118,7 @@ public class AVB {
 				//System.out.println(dds.size());
 				account.openAll(dds);			//后买
 			}
+		}
 
 		dailyAmount_sb.append(account.getDailyAmount() + "\n");
 	}
@@ -150,7 +152,7 @@ public class AVB {
 		});
 
 		Muster m;
-		for(int i=0; i<musters.size() && i<pool && breakers.size()<top; i++) {
+		for(int i=0; i<musters.size() && i<pool; i++) {
 			m = musters.get(i);
 			if(m!=null 
 					&& !m.isUpLimited() 
@@ -160,6 +162,9 @@ public class AVB {
 					//&& m.cal_volume_ratio().compareTo(new BigDecimal(2))==1
 					) {
 				breakers.add(m);
+			}
+			if(breakers.size()>=top) {
+				break;
 			}
 		}
 		

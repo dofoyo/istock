@@ -4,4 +4,5 @@ import java.util.List;
 
 public interface ComponentRepository {
 	public List<Component> getSz50Components();
+	public List<Component> getHs300Components();
 }

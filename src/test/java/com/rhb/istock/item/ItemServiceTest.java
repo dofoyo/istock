@@ -42,10 +42,19 @@ public class ItemServiceTest {
 		}
 	}
 	
-	@Test
+	//@Test
 	public void getSz50() {
 		LocalDate date = LocalDate.parse("2019-11-01");
 		List<String> items = itemService.getSz50(date);
+		for(String item : items) {
+			System.out.println(item);
+		}
+	}
+	
+	@Test
+	public void getHs300() {
+		LocalDate date = LocalDate.parse("2005-04-08");
+		List<String> items = itemService.getHs300(date);
 		for(String item : items) {
 			System.out.println(item);
 		}

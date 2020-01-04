@@ -60,6 +60,13 @@ public class HuaService {
 		}
 	}
 	
+	public void generateHuaPotentials(LocalDate date) {
+		Integer period = 21;
+		BigDecimal mcst_ratio = new BigDecimal(0.13);
+		this.generateHuaPotentials(date,period, mcst_ratio, false);
+	}
+
+	
 	public void generateHuaPotentials(LocalDate endDate, Integer period, BigDecimal mcst_ratio, boolean append) {
 		long beginTime=System.currentTimeMillis(); 
 		System.out.println("generate Hua potentials begin......");

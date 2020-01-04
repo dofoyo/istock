@@ -63,7 +63,7 @@ public class TurtleMusterSimulation_hua {
 		//List<LocalDate> dates = kdataService.getMusterDates();
 
 		Map<String,Muster> musters;
-		//Integer sseiFlag;
+		Integer sseiFlag;
 
 		long days = endDate.toEpochDay()- beginDate.toEpochDay();
 		int i=1;
@@ -72,8 +72,8 @@ public class TurtleMusterSimulation_hua {
 
 			musters = kdataService.getMusters(date);
 			if(musters!=null && musters.size()>0) {
-				//sseiFlag = kdataService.getSseiFlag(date);
-				dtb.doIt(musters, this.getIDs(musters, date), date);
+				sseiFlag = kdataService.getSseiFlag(date);
+				dtb.doIt(musters, this.getIDs(musters, date), date, sseiFlag);
 			}
 		}
 		
