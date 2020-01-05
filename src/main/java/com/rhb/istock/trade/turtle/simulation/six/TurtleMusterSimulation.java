@@ -2,6 +2,8 @@ package com.rhb.istock.trade.turtle.simulation.six;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -11,6 +13,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import com.rhb.istock.comm.util.Functions;
 import com.rhb.istock.comm.util.Progress;
 import com.rhb.istock.item.ItemService;
 import com.rhb.istock.kdata.KdataService;
@@ -48,6 +51,7 @@ public class TurtleMusterSimulation {
 	 */
 	public void simulate(LocalDate beginDate, LocalDate endDate) {
 		long beginTime=System.currentTimeMillis(); 
+		System.out.println("Functions.ratio(this.averagePrice21, this.averagePrice)<=13");
 		System.out.println("simulate from " + beginDate + " to " + endDate +" ......");
 
 		BAV bav = new BAV(initCash);
@@ -59,6 +63,9 @@ public class TurtleMusterSimulation {
 		HLB hlb = new HLB(initCash);
 
 		Map<String,Muster> musters;
+		
+		List<Map<String,Muster>> previous = new ArrayList<Map<String,Muster>>();
+		Integer previous_period  =8; //历史纪录区间，主要用于后面判断21均线的趋势
 
 		Integer sseiFlag;
 		
@@ -68,13 +75,15 @@ public class TurtleMusterSimulation {
 			Progress.show((int)days, i++, "  simulate: " + date.toString());
 
 			musters = kdataService.getMusters(date);
+			previous.add(musters);
+			if(previous.size()>=previous_period) {
+				previous.remove(0);
+			}
 			
 			if(musters!=null && musters.size()>0) {
 				sseiFlag = kdataService.getSseiFlag(date);
 				
-				//System.out.println("\n sseiFlag=" + sseiFlag);
-				
-				bav.doIt(musters, itemService.getHs300(date), date,sseiFlag);
+				bav.doIt(musters,previous.get(0), itemService.getHs300(date), date,sseiFlag);
 				bhl.doIt(musters, date,sseiFlag);
 				bdt.doIt(musters, date,sseiFlag);
 				//dtb.doIt(musters, date,sseiFlag);

@@ -668,34 +668,8 @@ public class KdataServiceImp implements KdataService{
 	@Override
 	public Integer getSseiFlag(LocalDate date) {
 		Integer flag = 1;
-		
-		Integer days1 = 13;
-		Integer days2 = 21;
-		Integer days3 = 34;
-		
-		//Kdata ssei1 = getKdata(sseiID, date.plusDays(1), days1, true);
-		Kdata ssei2 = this.getKdata(sseiID, date.plusDays(1), days2, true);
-		//Kdata ssei3 = getKdata(sseiID, date.plusDays(1), days3, true);
-		
-		flag = ssei2.isAboveAveragePrice(89) && ssei2.isAboveAveragePrice(21) ? 1 : 0;
-		
-		/*if(//ssei3.isAboveAveragePrice()==1 &&
-				ssei2.isAboveAveragePrice()==1 &&
-				ssei1.isAboveAveragePrice()==1) {
-			flag = 1;
-		}
-
-		if(//ssei3.isAboveAveragePrice()==1 &&
-				ssei2.isAboveAveragePrice()==1 &&
-				ssei1.isAboveAveragePrice()<=0) {
-			flag = 0;
-		}
-		
-		if(ssei2.isAboveAveragePrice()==-1) {
-			//flag = -1;
-			flag = 0;
-		}*/
-		
+		Kdata ssei = this.getKdata(sseiID, date.plusDays(1), openDuration, true);
+		flag = ssei.isAboveAveragePrice(openDuration) && ssei.isAboveAveragePrice(21) ? 1 : 0;
 		return flag;
 	}
 

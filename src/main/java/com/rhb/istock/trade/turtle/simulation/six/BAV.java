@@ -46,7 +46,7 @@ public class BAV {
 		this.initCash = initCash;
 	}
 	
-	public void doIt(Map<String,Muster> musters, List<String> sz50, LocalDate date, Integer sseiFlag) {
+	public void doIt(Map<String,Muster> musters,Map<String,Muster> previous, List<String> sz50, LocalDate date, Integer sseiFlag) {
 		Muster muster;
 		account.setLatestDate(date);
 		
@@ -74,7 +74,7 @@ public class BAV {
 			//确定突破走势的股票
 			Set<String> holdItemIDs = account.getItemIDsOfHolds();
 			Set<Muster> dds = new HashSet<Muster>();  //用set，无重复，表示不可加仓
-			List<Muster> breakers = this.getBreakers(musters, sz50);
+			List<Muster> breakers = this.getBreakers(musters,previous, sz50);
 			breakers_sb.append(date.toString() + ",");
 			StringBuffer sb = new StringBuffer();
 			for(Muster breaker : breakers) {
@@ -139,7 +139,7 @@ public class BAV {
 		return ee.divide(price,BigDecimal.ROUND_DOWN).divide(new BigDecimal(100),BigDecimal.ROUND_DOWN).intValue()*100;
 	}
 	
-	private List<Muster> getBreakers(Map<String,Muster> musters, List<String> sz50){
+	private List<Muster> getBreakers(Map<String,Muster> musters,Map<String,Muster> previous, List<String> sz50){
 		List<Muster>  ms = new ArrayList<Muster>();
 
 		for(String id : sz50) {
@@ -151,8 +151,9 @@ public class BAV {
 		Collections.sort(ms, new Comparator<Muster>() {
 			@Override
 			public int compare(Muster o1, Muster o2) {
-				return o2.getAmount5().compareTo(o1.getAmount5()); //Z-A
-				//return o2.getAmount().compareTo(o1.getAmount()); //Z-A
+				//return o2.getAverageAmount().compareTo(o1.getAverageAmount()); //Z-A
+				//return o2.getAmount5().compareTo(o1.getAmount5()); //Z-A
+				return o2.getAmount().compareTo(o1.getAmount()); //Z-A
 				//return o2.cal_volume_ratio().compareTo(o1.cal_volume_ratio()); //Z-A
 
 				
@@ -181,14 +182,17 @@ public class BAV {
 		});
 		
 		List<Muster>  breakers = new ArrayList<Muster>();
-		Muster m;
+		Muster m,p;
 		for(int i=0; i<ms.size() && i<pool && breakers.size()<top; i++) {
 			m = ms.get(i);
-			if(m!=null 
+			p = previous.get(m.getItemID());
+			if(m!=null && p!=null
 					&& !m.isUpLimited() 
 					&& !m.isDownLimited() 
 					//&& m.isUpBreaker()
 					&& m.isBreaker()
+					//&& m.getAveragePrice21().compareTo(p.getAveragePrice21())==1
+					&& m.getAverageAmount().compareTo(p.getAverageAmount())==1
 					//&& m.isUp(89)
 					//&& m.getN21Gap()<=13
 					//&& m.cal_volume_ratio().compareTo(new BigDecimal(2))==1

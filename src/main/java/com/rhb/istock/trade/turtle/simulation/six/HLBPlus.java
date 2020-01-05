@@ -85,6 +85,7 @@ public class HLBPlus {
 			}
 		}
 		
+		if(sseiFlag==1) {
 			holdItemIDs = account.getItemIDsOfHolds();
 			
 			Set<Muster> dds = new HashSet<Muster>();  //用set，无重复，表示不可加仓
@@ -128,6 +129,7 @@ public class HLBPlus {
 					}
 				//}
 				account.openAll(dds);			//后买
+			}
 		}
 
 		dailyAmount_sb.append(account.getDailyAmount() + "\n");

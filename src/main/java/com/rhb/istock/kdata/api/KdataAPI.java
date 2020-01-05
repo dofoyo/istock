@@ -49,14 +49,18 @@ public class KdataAPI {
 			kdatas.setName(item.getName());
 			
 			List<LocalDate> dates = kdataService.getKdata(itemID, theEndDate, true).getDates();
-			Kbar bar;
+			Kbar bar=null;
 			for(LocalDate date : dates) {
 				bar = kdataService.getKbar(itemID, date, true);
 				kdatas.addKdata(date, bar.getOpen(), bar.getHigh(), bar.getLow(), bar.getClose());
 			}
+			
+			Kbar latestBar;
 			if(theEndDate==null) {
-				bar = kdataService.getLatestMarketData(itemID);
-				kdatas.addKdata(bar.getDate(), bar.getOpen(), bar.getHigh(), bar.getLow(), bar.getClose());
+				latestBar = kdataService.getLatestMarketData(itemID);
+				if(bar==null || !bar.getDate().equals(latestBar.getDate())) {
+					kdatas.addKdata(latestBar.getDate(), latestBar.getOpen(), latestBar.getHigh(), latestBar.getLow(), latestBar.getClose());
+				}
 			}
 		}
 		

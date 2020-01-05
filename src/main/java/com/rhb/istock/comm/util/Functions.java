@@ -7,7 +7,7 @@ import java.util.List;
 
 public class Functions {
 	public static Integer ratio(BigDecimal a, BigDecimal b) {
-		return a.divide(b,BigDecimal.ROUND_HALF_UP).subtract(new BigDecimal(1)).multiply(new BigDecimal(100)).intValue();
+		return a.divide(b,BigDecimal.ROUND_HALF_UP).subtract(new BigDecimal(1)).multiply(new BigDecimal(100)).add(new BigDecimal(0.5)).intValue();
 	}
 	
 	public static boolean between(BigDecimal value, Integer a, Integer b) {

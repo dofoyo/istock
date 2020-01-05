@@ -85,15 +85,18 @@ public class TurtleSimulationApi {
 			
 			LocalDate latestDate = kdataService.getLatestMarketDate("sh000001");
 			List<LocalDate> dates = kdataService.getKdata(itemID, theEndDate, true).getDates();
-			Kbar bar;
+			Kbar bar=null;
 			for(LocalDate date : dates) {
 				bar = kdataService.getKbar(itemID, date, true);
 				kdatas.addKdata(date, bar.getOpen(), bar.getHigh(), bar.getLow(), bar.getClose());
 			}
 			
+			Kbar latestBar;
 			if(theEndDate.equals(latestDate)) {
-				bar = kdataService.getLatestMarketData(itemID);
-				kdatas.addKdata(theEndDate, bar.getOpen(), bar.getHigh(), bar.getLow(), bar.getClose());
+				latestBar = kdataService.getLatestMarketData(itemID);
+				if(bar==null || !bar.getDate().equals(latestBar.getDate())) {
+					kdatas.addKdata(theEndDate, latestBar.getOpen(), latestBar.getHigh(), latestBar.getLow(), latestBar.getClose());
+				}
 			}			
 			
 			kdatas.addBuys(turtleSimulationRepository.getBuys(itemID,type));

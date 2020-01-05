@@ -111,7 +111,7 @@ public class TurtleMusterSimulation_hua {
 				if(!muster.isUpLimited() 
 						&& muster.isUp(21) 
 						&& muster.getLatestPrice().compareTo(muster.getClose())==1  //上涨
-						&& Functions.between(muster.getVolume_ratio(), 2, 10)
+						&& Functions.between(muster.getVolume_ratio(), 3, 13)
 						&& Functions.ratio(muster.getLatestPrice(), muster.getAveragePrice21())<=13
 						) {
 					//logger.info(" ok\n");

@@ -3,6 +3,8 @@ package com.rhb.istock.kdata;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 
+import com.rhb.istock.comm.util.Functions;
+
 public class Muster {
 	private String itemID;
 	private String itemName;
@@ -254,7 +256,9 @@ public class Muster {
 		return //this.latestPrice.compareTo(this.close)==1 &&
 				this.close.compareTo(this.averagePrice21)<=0 &&
 				this.latestPrice.compareTo(this.averagePrice21)==1 &&
-				this.averagePrice21.compareTo(this.averagePrice)==1;
+				this.averagePrice21.compareTo(this.averagePrice)==1 &&
+				Functions.ratio(this.averagePrice21, this.averagePrice)<=8;
+		
 	}
 	
 	public boolean isUp(Integer period) {
@@ -269,25 +273,27 @@ public class Muster {
 					averagePrice13.compareTo(averagePrice21)==1 &&
 					averagePrice21.compareTo(averagePrice34)==1;
 		}else {
-			return  latestPrice.compareTo(averagePrice8)==1 &&
+			/*return  latestPrice.compareTo(averagePrice8)==1 &&
 					averagePrice8.compareTo(averagePrice13)==1 &&
 					averagePrice13.compareTo(averagePrice21)==1 &&
 					averagePrice21.compareTo(averagePrice34)==1 &&
-					averagePrice34.compareTo(averagePrice)==1;
+					averagePrice34.compareTo(averagePrice)==1;*/
+			return  latestPrice.compareTo(averagePrice21)==1 &&
+					averagePrice21.compareTo(averagePrice)==1;
 		}
 	}
 	
 	public boolean isDropAve(Integer period) {
 		if(period == 8) {
-			return latestPrice.compareTo(averagePrice8)==-1;
+			return latestPrice.compareTo(averagePrice8)==-1 && Functions.ratio(latestPrice, averagePrice8)<=-1;
 		}else if(period == 13) {
-			return latestPrice.compareTo(averagePrice13)==-1;
+			return latestPrice.compareTo(averagePrice13)==-1 && Functions.ratio(latestPrice, averagePrice13)<=-1;
 		}else if(period == 21) {
-			return latestPrice.compareTo(averagePrice21)==-1;
+			return latestPrice.compareTo(averagePrice21)==-1 && Functions.ratio(latestPrice, averagePrice21)<=-1;
 		}else if(period == 34) {
-			return latestPrice.compareTo(averagePrice34)==-1;
+			return latestPrice.compareTo(averagePrice34)==-1 && Functions.ratio(latestPrice, averagePrice34)<=-1;
 		}else {
-			return latestPrice.compareTo(averagePrice)==-1;
+			return latestPrice.compareTo(averagePrice)==-1 && Functions.ratio(latestPrice, averagePrice)<=-1;
 		}
 	}
 	
