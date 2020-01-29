@@ -34,8 +34,8 @@ public class TurtleMusterSimulationTest {
 	
 	//@Test
 	public void simulate() {
-		LocalDate beginDate = LocalDate.parse("2010-01-01");
-		LocalDate endDate = LocalDate.parse("2019-12-30");
+		LocalDate beginDate = LocalDate.parse("2019-01-01");
+		LocalDate endDate = LocalDate.parse("2020-01-17");
 
 		turtleMusterSimulation.simulate(beginDate, endDate); 
 		//turtleMusterSimulation_hua.simulate(beginDate, endDate);
@@ -43,7 +43,7 @@ public class TurtleMusterSimulationTest {
 	
 	@Test
 	public void generateRecords() {
-		turtleMusterSimulationAnalysis.generateRecords("bav");
+		turtleMusterSimulationAnalysis.generateRecords("dtb");
 	}
 
 

@@ -433,6 +433,7 @@ public class KdataServiceImp implements KdataService{
 		for(MusterEntity entity : entities.values()) {
 			item = itemService.getItem(entity.getItemID());
 			if(item!=null) {
+			//if(item!=null && item.getItemID().startsWith("sz300")) {
 				muster = new Muster();
 				muster.setItemID(entity.getItemID());
 				muster.setItemName(item.getName());
@@ -742,6 +743,23 @@ public class KdataServiceImp implements KdataService{
 	public void downKdatas() throws Exception {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public List<LocalDate> getMusterDates(Integer count, LocalDate endDate) {
+		List<LocalDate> ds = null;
+		
+		List<LocalDate> dates = this.getMusterDates();
+		int i=0;
+		for(LocalDate d : dates) {
+			if(d.isAfter(endDate)) {
+				break;
+			}
+			i++;
+		}
+		ds = dates.subList(i>=count ? i-count+1 : 0, i);
+		
+		return ds;
 	}
 
 }

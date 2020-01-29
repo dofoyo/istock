@@ -51,30 +51,32 @@ public class TurtleMusterSimulation {
 	 */
 	public void simulate(LocalDate beginDate, LocalDate endDate) {
 		long beginTime=System.currentTimeMillis(); 
-		System.out.println("Functions.ratio(this.averagePrice21, this.averagePrice)<=13");
+		//System.out.println("Functions.ratio(this.averagePrice21, this.averagePrice)<=13");
 		System.out.println("simulate from " + beginDate + " to " + endDate +" ......");
 
 		BAV bav = new BAV(initCash);
 		AVBPlus bhl = new AVBPlus(initCash);
 		HLBPlus bdt = new HLBPlus(initCash);  
 
-		//MVB dtb = new MVB(initCash);  
+		LPB dtb = new LPB(initCash);  
 		AVB avb = new AVB(initCash);
 		HLB hlb = new HLB(initCash);
 
 		Map<String,Muster> musters;
 		
 		List<Map<String,Muster>> previous = new ArrayList<Map<String,Muster>>();
-		Integer previous_period  =8; //历史纪录区间，主要用于后面判断21均线的趋势
+		Integer previous_period  = 8; //历史纪录区间，主要用于后面判断21均线的趋势
 
 		Integer sseiFlag;
 		
 		long days = endDate.toEpochDay()- beginDate.toEpochDay();
 		int i=1;
 		for(LocalDate date = beginDate; (date.isBefore(endDate) || date.equals(endDate)); date = date.plusDays(1)) {
-			Progress.show((int)days, i++, "  simulate: " + date.toString());
 
 			musters = kdataService.getMusters(date);
+
+			Progress.show((int)days, i++, "  simulate: " + date.toString() + ", musters.size()=" + musters.size() + " ");
+			
 			previous.add(musters);
 			if(previous.size()>=previous_period) {
 				previous.remove(0);
@@ -86,7 +88,7 @@ public class TurtleMusterSimulation {
 				bav.doIt(musters,previous.get(0), itemService.getHs300(date), date,sseiFlag);
 				bhl.doIt(musters, date,sseiFlag);
 				bdt.doIt(musters, date,sseiFlag);
-				//dtb.doIt(musters, date,sseiFlag);
+				dtb.doIt(musters,previous.get(0), date,sseiFlag);
 				hlb.doIt(musters, date,sseiFlag);
 				avb.doIt(musters, date,sseiFlag);
 			}
@@ -95,7 +97,7 @@ public class TurtleMusterSimulation {
 		Map<String, String> bavResult = bav.result();
 		Map<String, String> bhlResult = bhl.result();
 		Map<String, String> bdtResult = bdt.result();
-		//Map<String, String> dtbResult = dtb.result();
+		Map<String, String> dtbResult = dtb.result();
 
 		Map<String, String> avbResult = avb.result();
 		Map<String, String> hlbResult = hlb.result();
@@ -104,7 +106,7 @@ public class TurtleMusterSimulation {
 		turtleSimulationRepository.save("bhl", bhlResult.get("breakers"), bhlResult.get("CSV"), bhlResult.get("dailyAmount"));
 		turtleSimulationRepository.save("bdt", bdtResult.get("breakers"), bdtResult.get("CSV"), bdtResult.get("dailyAmount"));
 		
-		//turtleSimulationRepository.save("dtb", dtbResult.get("breakers"), dtbResult.get("CSV"), dtbResult.get("dailyAmount"));
+		turtleSimulationRepository.save("dtb", dtbResult.get("breakers"), dtbResult.get("CSV"), dtbResult.get("dailyAmount"));
 		turtleSimulationRepository.save("hlb", hlbResult.get("breakers"), hlbResult.get("CSV"), hlbResult.get("dailyAmount"));
 		turtleSimulationRepository.save("avb", avbResult.get("breakers"), avbResult.get("CSV"), avbResult.get("dailyAmount"));
 		

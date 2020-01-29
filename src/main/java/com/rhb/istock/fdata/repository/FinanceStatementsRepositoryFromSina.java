@@ -81,9 +81,9 @@ public class FinanceStatementsRepositoryFromSina implements FinanceStatementsRep
 			String period = cells[m][0];
 			Integer year = Integer.parseInt(period.substring(0, 4));
 			//if(period.contains("1231") && year>=theYear){ //2006年后才有现金流分析
-			if(year>=theYear){ //2006年后才有现金流分析
+			if(year>=theYear && period.contains("1231")){ //2006年后才有现金流分析
 				BalanceSheet bs = new BalanceSheet();
-				bs.setPeriod(cells[m][0]);
+				bs.setPeriod(period);
 				if(lines.length==69){  //保险
 					bs.setCash(ParseString.toDouble(cells[m][3]));
 					bs.setInventories(0.0);

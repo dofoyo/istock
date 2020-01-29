@@ -65,7 +65,6 @@ public class HuaService {
 		BigDecimal mcst_ratio = new BigDecimal(0.13);
 		this.generateHuaPotentials(date,period, mcst_ratio, false);
 	}
-
 	
 	public void generateHuaPotentials(LocalDate endDate, Integer period, BigDecimal mcst_ratio, boolean append) {
 		long beginTime=System.currentTimeMillis(); 
@@ -100,6 +99,16 @@ public class HuaService {
 		
 		long used = (System.currentTimeMillis() - beginTime)/1000; 
 		System.out.println("generate Hua potential 用时：" + used + "秒");          
+	}
+	
+	public void generateLatestHuaFirst() {
+		LocalDate beginDate = LocalDate.parse("2010-01-01");
+		LocalDate endDate = LocalDate.now();
+		Integer boll_period = 21;  //表示多少日内，布林线突破过下轨
+		BigDecimal mcst_ratio = new BigDecimal(-0.13);
+		BigDecimal volume_r = new BigDecimal(2);
+		this.generateHuaFirst(beginDate,endDate,boll_period, mcst_ratio,volume_r, true);
+		
 	}
 	
 	public void generateHuaFirst(LocalDate beginDate, LocalDate endDate, Integer period, BigDecimal mcst_ratio, BigDecimal volume_r, boolean append) {

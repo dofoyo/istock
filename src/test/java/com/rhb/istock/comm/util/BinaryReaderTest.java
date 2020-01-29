@@ -24,7 +24,7 @@ public class BinaryReaderTest {
 		}
 	}
 	
-	@Test
+	//@Test
 	public void test1() {
 		double or1 = 120.0;
 		double or3 = 100.0;
@@ -33,5 +33,11 @@ public class BinaryReaderTest {
 		
 		System.out.println(rate1);
 		System.out.println(rate2);
+	}
+	
+	@Test
+	public void test2() {
+		String itemID = "300022";
+		System.out.println(itemID.startsWith("300"));
 	}
 }

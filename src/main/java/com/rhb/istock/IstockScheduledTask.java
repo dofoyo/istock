@@ -14,6 +14,7 @@ import com.rhb.istock.item.ItemService;
 import com.rhb.istock.kdata.KdataService;
 import com.rhb.istock.kdata.spider.KdataRealtimeSpider;
 import com.rhb.istock.selector.SelectorService;
+import com.rhb.istock.selector.bav.BavService;
 import com.rhb.istock.selector.hua.HuaService;
 import com.rhb.istock.trade.turtle.operation.TurtleOperationService;
 
@@ -47,6 +48,10 @@ public class IstockScheduledTask {
 	@Qualifier("huaService")
 	HuaService huaService;
 
+	@Autowired
+	@Qualifier("bavService")
+	BavService bavService;
+	
 	protected static final Logger logger = LoggerFactory.getLogger(IstockScheduledTask.class);
 	
 	private boolean isTradeDate = false;  
@@ -85,6 +90,7 @@ public class IstockScheduledTask {
 			itemService.download();		// 1. 下载最新股票代码
 			itemService.init();  // 2. 
 			kdataService.downFactors(); // 3. 上一交易日的收盘数据要等开盘前才能下载到, 大约需要15分钟
+			kdataService.downSSEI();
 			kdataService.generateLatestMusters();
 			turtleOperationService.init();  // 4.
 		}
@@ -141,6 +147,9 @@ public class IstockScheduledTask {
 			kdataService.downClosedDatas(LocalDate.now());
 			kdataService.generateMusters(LocalDate.parse("2001-01-01"));   //生成muster，需要192分钟，即3个多小时
 			huaService.generateHuaPotentials(LocalDate.now());
+			huaService.generateLatestHuaFirst();
+			bavService.generateBAV(LocalDate.now(),13);
+			
 		}
 
 		long used = (System.currentTimeMillis() - beginTime)/1000; 

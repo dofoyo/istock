@@ -1,5 +1,6 @@
 package com.rhb.istock.kdata.service;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -27,23 +28,30 @@ public class KdataServiceTest {
 	@Test
 	public void generateMusters() {
 		LocalDate date = LocalDate.parse("2001-01-03");
-		kdataService.generateMusters(date);
-		//kdataService.generateLatestMusters();
-		//kdataService.updateLatestMusters();
+		//kdataService.generateMusters(date);
+		kdataService.generateLatestMusters();
+		kdataService.updateLatestMusters();
 	}
 	
 	
 	//@Test
 	public void getLastMusters() {
-		Map<String,Muster> musters = kdataService.getLatestMusters();
+		LocalDate date = LocalDate.parse("2020-01-09");
+		Map<String,Muster> musters = kdataService.getMusters(date);
 		List<Muster> mm = new ArrayList<Muster>(musters.values());
 		Collections.sort(mm, new Comparator<Muster>() {
 			@Override
 			public int compare(Muster o1, Muster o2) {
-				return o1.getHLGap().compareTo(o2.getHLGap());
+				return o1.getTotal_mv().compareTo(o2.getTotal_mv());
 			}});
+		String str = null;
+		BigDecimal b = new BigDecimal(500000000).multiply(new BigDecimal(100));
 		for(Muster muster : mm) {
-			System.out.println(muster);
+			if(muster.getTotal_mv().compareTo(b)==-1) {
+				str = String.format("%s: %.2f\n", muster.getItemName(), muster.getTotal_mv());
+				System.out.println(str);
+			}
+
 		}
 	}
 	

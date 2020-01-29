@@ -162,6 +162,7 @@ public class HLBPlus {
 				//return o1.getHLGap().compareTo(o2.getHLGap());//A-Z
 			
 				if(o1.getHLGap().compareTo(o2.getHLGap())==0){
+					//return o2.cal_volume_ratio().compareTo(o1.cal_volume_ratio()); //a-z
 					return o1.getLatestPrice().compareTo(o2.getLatestPrice()); //a-z
 				}else {
 					return o1.getHLGap().compareTo(o2.getHLGap());//A-Z
@@ -178,13 +179,15 @@ public class HLBPlus {
 		distribution.show();
 */		
 		Muster m;
-		for(int i=0; i<musters.size() && breakers.size()<top && i<pool; i++) {
+		BigDecimal max_mc = new BigDecimal(100000000).multiply(new BigDecimal(300));
+		for(int i=0,j=0; i<musters.size() && breakers.size()<top && j<pool; i++) {
 		//for(int i=0; i<musters.size() && i<pool; i++) {
 			m = musters.get(i);
 			if(m!=null 
 					&& !m.isUpLimited() 
 					&& !m.isDownLimited() 
 					&& m.isUpBreaker() 
+					//&& m.getTotal_mv().compareTo(max_mc)==-1
 					//&& Functions.between(m.getHLGap(), hlgap_min, hlgap_max)
 					//&& m.isUp(21)
 					//&& m.getVolume_ratio().compareTo(new BigDecimal(2))==1
@@ -194,6 +197,9 @@ public class HLBPlus {
 					//&& m.getTotal_mv().compareTo(total_mv)<0
 					) {
 				breakers.add(m);
+			}
+			if(m.getTotal_mv().compareTo(max_mc)==-1) {
+				j++;
 			}
 		}
 		
