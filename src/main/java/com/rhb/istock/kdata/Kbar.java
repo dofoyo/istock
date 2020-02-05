@@ -18,7 +18,8 @@ public class Kbar {
 	private BigDecimal circ_mv;
 	private BigDecimal total_share;
 	private BigDecimal float_share;
-	private BigDecimal free_share;	
+	private BigDecimal free_share;
+	private BigDecimal pe;
 
 	public Kbar(BigDecimal open, 
 			BigDecimal high, 
@@ -33,7 +34,8 @@ public class Kbar {
 			BigDecimal circ_mv,
 			BigDecimal total_share,
 			BigDecimal float_share,
-			BigDecimal free_share
+			BigDecimal free_share,
+			BigDecimal pe
 			) {
 		this.open = open;
 		this.high = high;
@@ -49,6 +51,7 @@ public class Kbar {
 		this.total_share = total_share;
 		this.float_share = float_share;
 		this.free_share = free_share;
+		this.pe = pe;
 	}
 
 	public Kbar(String open, 
@@ -64,7 +67,8 @@ public class Kbar {
 			String circ_mv,
 			String total_share,
 			String float_share,
-			String free_share
+			String free_share,
+			String pe
 			) {
 		this.open = new BigDecimal(open);
 		this.high = new BigDecimal(high);
@@ -86,8 +90,18 @@ public class Kbar {
 		this.total_share = new BigDecimal(total_share);
 		this.float_share = new BigDecimal(float_share);
 		this.free_share = new BigDecimal(free_share);
+		this.pe = new BigDecimal(pe);
 		
 	}
+	
+	public BigDecimal getPe() {
+		return pe;
+	}
+
+	public void setPe(BigDecimal pe) {
+		this.pe = pe;
+	}
+
 	public BigDecimal getTotal_share() {
 		return total_share;
 	}

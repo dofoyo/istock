@@ -27,9 +27,10 @@ public class KdataEntity {
 					BigDecimal circ_mv,
 					BigDecimal total_share,
 					BigDecimal float_share,
-					BigDecimal free_share
+					BigDecimal free_share,
+					BigDecimal pe
 					) {
-		this.bars.put(date, new KbarEntity(open, high, low, close, amount, quantity, turnover_rate_f, volume_ratio,total_mv,circ_mv,total_share,float_share,free_share));
+		this.bars.put(date, new KbarEntity(open, high, low, close, amount, quantity, turnover_rate_f, volume_ratio,total_mv,circ_mv,total_share,float_share,free_share,pe));
 	}
 	
 	public void addBar(String date,
@@ -45,9 +46,11 @@ public class KdataEntity {
 				String circ_mv,
 				String total_share,
 				String float_share,
-				String free_share
+				String free_share,
+				String pe
 				) {
-		this.bars.put(LocalDate.parse(date), new KbarEntity(new BigDecimal(open), new BigDecimal(high), new BigDecimal(low), new BigDecimal(close), new BigDecimal(amount), new BigDecimal(quantity), new BigDecimal(turnover_rate_f), new BigDecimal(volume_ratio), new BigDecimal(total_mv), new BigDecimal(circ_mv), new BigDecimal(total_share), new BigDecimal(float_share), new BigDecimal(free_share)));
+		this.bars.put(LocalDate.parse(date), 
+				new KbarEntity(new BigDecimal(open), new BigDecimal(high), new BigDecimal(low), new BigDecimal(close), new BigDecimal(amount), new BigDecimal(quantity), new BigDecimal(turnover_rate_f), new BigDecimal(volume_ratio), new BigDecimal(total_mv), new BigDecimal(circ_mv), new BigDecimal(total_share), new BigDecimal(float_share), new BigDecimal(free_share),new BigDecimal(pe)));
 	}
 	
 	public LocalDate getLastDate() {

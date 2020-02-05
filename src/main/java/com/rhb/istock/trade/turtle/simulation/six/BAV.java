@@ -14,6 +14,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.rhb.istock.comm.util.Functions;
 import com.rhb.istock.fund.Account;
 import com.rhb.istock.kdata.Muster;
 
@@ -159,14 +160,19 @@ public class BAV {
 		
 		List<Muster>  breakers = new ArrayList<Muster>();
 		Muster m,p;
+		Integer r, ratio=8;
 		for(int i=0; i<ms.size() && i<pool && breakers.size()<top; i++) {
 			m = ms.get(i);
 			p = previous.get(m.getItemID());
+			r = Functions.ratio(m.getAveragePrice21(), m.getAveragePrice());
 			if(m!=null && p!=null
+					//&& m.getPe().compareTo(BigDecimal.ZERO)>0 // && m.getPe().compareTo(new BigDecimal(170))<0
 					&& !m.isUpLimited() 
 					&& !m.isDownLimited() 
 					//&& m.isUpBreaker()
 					&& m.isBreaker(8)
+					//&& r<=ratio && r>0
+					//&& m.isAboveAveragePrice(21) && !p.isAboveAveragePrice(21)
 					//&& m.getAveragePrice21().compareTo(p.getAveragePrice21())==1
 					&& m.getAverageAmount().compareTo(p.getAverageAmount())==1
 					//&& m.cal_volume_ratio().compareTo(p.cal_volume_ratio())==1

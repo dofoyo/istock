@@ -100,6 +100,13 @@ public class TurtleApi{
 		List<TurtleView> views = ts.getPotentials("avb");
 		return new ResponseContent<List<TurtleView>>(ResponseEnum.SUCCESS, views);
 	}
+	
+	@GetMapping("/turtle/potentials/lpb")
+	public ResponseContent<List<TurtleView>> getPotentialsOfLpb() {
+		List<TurtleView> views = ts.getPotentials("lpb");
+		return new ResponseContent<List<TurtleView>>(ResponseEnum.SUCCESS, views);
+	}
+	
 	/*	
 	@GetMapping("/turtle/potentials/redo")
 	public ResponseContent<String> redoPotentials() {

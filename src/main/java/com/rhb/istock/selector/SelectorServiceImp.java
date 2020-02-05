@@ -25,6 +25,7 @@ import com.rhb.istock.selector.favor.FavorService;
 import com.rhb.istock.selector.hlt.HighLowTopService;
 import com.rhb.istock.selector.hold.HoldEntity;
 import com.rhb.istock.selector.hold.HoldService;
+import com.rhb.istock.selector.lpb.LpbService;
 import com.rhb.istock.selector.potential.Potential;
 import com.rhb.istock.selector.potential.PotentialService;
 
@@ -59,6 +60,10 @@ public class SelectorServiceImp implements SelectorService{
 	@Autowired
 	@Qualifier("kdataServiceImp")
 	KdataService kdataService;
+	
+	@Autowired
+	@Qualifier("lpbService")
+	LpbService lpbService;
 
 	
 	@Override
@@ -437,6 +442,24 @@ public class SelectorServiceImp implements SelectorService{
 		}
 		
 		return results;
+	}
+
+	@Override
+	public Map<String,String> getLpbs() {
+		Map<String,String> ids = new HashMap<String,String>();
+		String str = lpbService.getLpb();
+		if(str!=null && str.length()>11) {
+			String id,order;
+			String[] ss = str.substring(11).split(",");
+			for(String s : ss) {
+				if(s.length()>8) {
+					id = s.substring(0, 8);
+					order = s.substring(8);
+					ids.put(id,order);
+				}
+			}
+		}
+		return ids;
 	}
 
 }

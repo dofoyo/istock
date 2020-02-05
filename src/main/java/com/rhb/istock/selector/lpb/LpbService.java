@@ -1,5 +1,6 @@
 package com.rhb.istock.selector.lpb;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -15,7 +16,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.rhb.istock.comm.util.FileTools;
-import com.rhb.istock.item.ItemService;
 import com.rhb.istock.kdata.KdataService;
 import com.rhb.istock.kdata.Muster;
 
@@ -39,7 +39,13 @@ public class LpbService {
 		FileTools.writeTextFile(lpbFile, sb.toString(), false);
 	}
 	
-	private String generateLPB(LocalDate endDate) {
+	public String getLpb() {
+		List<LocalDate> dates = kdataService.getLastMusterDates();
+		LocalDate date = dates.get(dates.size()-1);
+		return this.generateLPB(date);
+	}
+	
+	public String generateLPB(LocalDate endDate) {
 		Map<String,Muster> musters = kdataService.getMusters(endDate);
 		Integer previous_period = 8;
 		StringBuffer sb = new StringBuffer(endDate.toString() + ":");
@@ -64,6 +70,7 @@ public class LpbService {
 					m = ms.get(i);
 					p = previous.get(m.getItemID());
 					if(m!=null && p!=null
+							&& m.getPe().compareTo(BigDecimal.ZERO)>0 && m.getPe().compareTo(new BigDecimal(233))<0
 							&& !m.isUpLimited() 
 							&& !m.isDownLimited() 
 							&& m.isBreaker(8)
@@ -83,7 +90,7 @@ public class LpbService {
 			sb.append(" No muster!");
 		}
 		
-		logger.info(sb.toString());
+		//logger.info(sb.toString());
 		
 		return sb.toString();
 	}

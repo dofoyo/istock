@@ -51,7 +51,7 @@ public class KdataRepositoryDzh implements KdataRepository{
 			amount = new BigDecimal(columns[6]);
 			quantity = new BigDecimal(columns[7]);
 
-			kdata.addBar(date, open, high, low, close, amount,quantity,zero,zero,zero,zero,zero,zero,zero);
+			kdata.addBar(date, open, high, low, close, amount,quantity,zero,zero,zero,zero,zero,zero,zero,zero);
 		}
 		return kdata;
 	}

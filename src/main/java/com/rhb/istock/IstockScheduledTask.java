@@ -16,6 +16,7 @@ import com.rhb.istock.kdata.spider.KdataRealtimeSpider;
 import com.rhb.istock.selector.SelectorService;
 import com.rhb.istock.selector.bav.BavService;
 import com.rhb.istock.selector.hua.HuaService;
+import com.rhb.istock.selector.lpb.LpbService;
 import com.rhb.istock.trade.turtle.operation.TurtleOperationService;
 
 @Component
@@ -51,6 +52,10 @@ public class IstockScheduledTask {
 	@Autowired
 	@Qualifier("bavService")
 	BavService bavService;
+	
+	@Autowired
+	@Qualifier("lpbService")
+	LpbService lpbService;
 	
 	protected static final Logger logger = LoggerFactory.getLogger(IstockScheduledTask.class);
 	
@@ -96,37 +101,14 @@ public class IstockScheduledTask {
 		}
 	}
 
-	@Scheduled(cron="0 45/5 9 ? * 1-5")  //周一至周五，每日9点45分，每5分钟刷新一次 
-	public void updateLatestMusters0() throws Exception {
-		System.out.println("run scheduled of '0 45/5 9 ? * 1-5'");
-		if(this.isTradeDate()) {
-			kdataService.updateLatestMusters();
-		}
-	}
-	
-	@Scheduled(cron="0 5/5 10-11 ? * 1-5")  //周一至周五，每日10点-11点，每5分钟刷新一次 
+	@Scheduled(cron="0 45/5 9-14 ? * 1-5")  //周一至周五，每日9:45 - 15点，每5分钟刷新一次 
 	public void updateLatestMusters1() throws Exception {
-		System.out.println("run scheduled of '0 */5 10-11 ? * 1-5'");
+		System.out.println("run scheduled of '0 5/5 10-14 ? * 1-5'");
 		if(this.isTradeDate()) {
 			kdataService.updateLatestMusters();
 		}
 	}
 
-	@Scheduled(cron="0 5-30/5 11 ? * 1-5")  //周一至周五，每日11点-11点30，每5分钟刷新一次 
-	public void updateLatestMusters2() throws Exception {
-		System.out.println("run scheduled of '0 5-30/5 11 ? * 1-5'");
-		if(this.isTradeDate()) {
-			kdataService.updateLatestMusters();
-		}
-	}
-	
-	@Scheduled(cron="0 5/5 13-15 ? * 1-5")  //周一至周五，每日13点-15点，每5分钟刷新一次 
-	public void updateLatestMusters3() throws Exception {
-		System.out.println("run scheduled of '0 */5 13-15 ? * 1-5'");
-		if(this.isTradeDate()) {
-			kdataService.updateLatestMusters();
-		}
-	}
 	
 /*	@Scheduled(cron="0 50 9 ? * 1-5") //周一至周五，每日9:50点
 	public void downloadReports() {
@@ -145,10 +127,11 @@ public class IstockScheduledTask {
 
 		if(this.isTradeDate()) {
 			kdataService.downClosedDatas(LocalDate.now());
-			kdataService.generateMusters(LocalDate.parse("2001-01-01"));   //生成muster，需要192分钟，即3个多小时
+			kdataService.generateMusters(LocalDate.parse("2000-01-01"));   //生成muster，需要192分钟，即3个多小时
 			huaService.generateHuaPotentials(LocalDate.now());
 			huaService.generateLatestHuaFirst();
 			bavService.generateBAV(LocalDate.now(),13);
+			lpbService.generateLPB(LocalDate.now(), 13);
 			
 		}
 

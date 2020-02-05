@@ -20,6 +20,12 @@ public class SelectorTest {
 	SelectorService selectorServiceImp;
 	
 	@Test
+	public void getLpb() {
+		Map<String,String> ids = selectorServiceImp.getLpbs();
+		System.out.println(ids);
+	}
+	
+	//@Test
 	public void getMCSTs() {
 		String itemID = "sz002252";
 		Map<LocalDate, BigDecimal> mcsts = selectorServiceImp.getMCSTs(itemID, false);

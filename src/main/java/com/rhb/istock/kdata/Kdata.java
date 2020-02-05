@@ -195,10 +195,11 @@ public class Kdata {
 			BigDecimal circ_mv,
 			BigDecimal total_share,
 			BigDecimal float_share,
-			BigDecimal free_share
+			BigDecimal free_share,
+			BigDecimal pe
 			) {
 		this.bars.put(date, new Kbar(open, high, low, close, amount, quantity,date, 
-				turnover_rate_f, volume_ratio,total_mv,circ_mv,total_share,float_share,free_share));
+				turnover_rate_f, volume_ratio,total_mv,circ_mv,total_share,float_share,free_share,pe));
 	}
 	
 	public Kbar getBar(LocalDate date){

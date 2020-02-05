@@ -11,14 +11,20 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest
-public class BavServiceTest {
+public class LpbServiceTest {
 	@Autowired
 	@Qualifier("lpbService")
 	LpbService lpbService;
 	
-	@Test
-	public void generateBAV() {
-		LocalDate endDate = LocalDate.parse("2020-01-18");
+	//@Test
+	public void generateLPB() {
+		LocalDate endDate = LocalDate.parse("2020-02-05");
 		lpbService.generateLPB(endDate,13);
+	}
+	
+	@Test
+	public void getLpb() {
+		String  str = lpbService.getLpb();
+		System.out.println(str);
 	}
 }

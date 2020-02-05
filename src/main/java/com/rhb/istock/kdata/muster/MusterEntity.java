@@ -31,6 +31,7 @@ public class MusterEntity {
 	private BigDecimal float_share;
 	private BigDecimal free_share;	
 	private BigDecimal amount5;	
+	private BigDecimal pe;	
 
 	public MusterEntity(String itemID, 
 			BigDecimal close, 
@@ -59,7 +60,8 @@ public class MusterEntity {
 			BigDecimal lowest13, 
 			BigDecimal lowest8, 
 			BigDecimal lowest5,
-			BigDecimal amount5
+			BigDecimal amount5,
+			BigDecimal pe
 			) {
 		this.itemID = itemID;
 		this.close = close;
@@ -89,6 +91,7 @@ public class MusterEntity {
 		this.lowest8 = lowest8;
 		this.lowest5 = lowest5;
 		this.amount5 = amount5;
+		this.pe = pe;
 	}
 	
 	public MusterEntity(String txt) {
@@ -121,8 +124,17 @@ public class MusterEntity {
 		this.lowest8 = new BigDecimal(ss[25]);
 		this.lowest5 = new BigDecimal(ss[26]);
 		this.amount5 = new BigDecimal(ss[27]);
+		this.pe = new BigDecimal(ss[28]);
 	}
 	
+	public BigDecimal getPe() {
+		return pe;
+	}
+
+	public void setPe(BigDecimal pe) {
+		this.pe = pe;
+	}
+
 	public BigDecimal getTotal_share() {
 		return total_share;
 	}
@@ -240,7 +252,8 @@ public class MusterEntity {
 				this.lowest13 + "," +  
 				this.lowest8 + "," +  
 				this.lowest5 + "," +  
-				this.amount5 + "\n"; 
+				this.amount5 + "," +  
+				this.pe + "\n"; 
 	}
 
 	public BigDecimal getLowest21() {

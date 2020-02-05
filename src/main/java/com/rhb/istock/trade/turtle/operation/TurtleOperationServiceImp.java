@@ -233,11 +233,25 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 
 		return views;
 	}
+	
+	private List<TurtleView> getLpb(){
+		Map<String,String> ids = selectorService.getLpbs();
+		List<TurtleView> views = this.getTurtleViews(new ArrayList(ids.keySet()), "LPB"); 
+		for(TurtleView view : views) {
+			view.setLabel(ids.get(view.getItemID()));
+		}
+		return views;
+	}
+	
 
 	@Override
 	public List<TurtleView> getPotentials(String type) {
 		long beginTime=System.currentTimeMillis(); 
 		logger.info("getting potential views ......");
+		
+		if(type.equals("lpb")) {
+			return this.getLpb();
+		}
 		
 		List<TurtleView> views = new ArrayList<TurtleView>();
 		TurtleView view;

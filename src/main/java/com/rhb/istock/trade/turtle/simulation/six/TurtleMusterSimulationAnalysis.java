@@ -66,25 +66,22 @@ public class TurtleMusterSimulationAnalysis {
 		});
 
 		List<Record> results = new ArrayList<Record>();
-		Record record = records.get(0);
+		Record previous = null;
+		
 		Record tmp;
-		for(int i=1; i<records.size(); i++) {
+		for(int i=0; i<records.size(); i++) {
 			tmp = records.get(i);
-			if(tmp.getItemID().equals(record.getItemID())) {
-				record.setSellDate(tmp.getSellDate());
-				record.addProfit(tmp.getProfit());
+			if(previous==null && tmp.getSellType()>=1) {
+				results.add(tmp);
+			}else if(previous==null && tmp.getSellType()==0) {
+				previous = tmp;
+			}else if(previous!=null) {
+				previous.setSellDate(tmp.getSellDate());
+				previous.addProfit(tmp.getProfit());
 				if(tmp.getSellType()>=1) {
-					results.add(record);
-					i++;
-					if(i>=records.size()) {
-						break;
-					}else {
-						record = records.get(i);
-					}
+					results.add(previous);
+					previous = null;
 				}
-			}else {
-				results.add(record);
-				record = tmp;
 			}
 		}
 		

@@ -36,8 +36,17 @@ public class Muster {
 	private BigDecimal float_share;
 	private BigDecimal free_share;	
 	private BigDecimal amount5;
+	private BigDecimal pe;
 	private DecimalFormat df = new DecimalFormat("#.00");
 	
+	public BigDecimal getPe() {
+		return pe;
+	}
+
+	public void setPe(BigDecimal pe) {
+		this.pe = pe;
+	}
+
 	public BigDecimal getAmount5() {
 		return amount5;
 	}
@@ -95,7 +104,7 @@ public class Muster {
 	}
 	
 	public String getNote() {
-		return this.getHLGap().toString();
+		return Integer.toString(this.getPe().intValue());
 	}
 	
 	public boolean isAboveAveragePrice(Integer period) {
@@ -254,12 +263,10 @@ public class Muster {
 	
 	public boolean isBreaker(Integer ratio) {
 		Integer r = Functions.ratio(this.averagePrice21, this.averagePrice);
-		
 		return //this.latestPrice.compareTo(this.close)==1 &&
 				this.close.compareTo(this.averagePrice21)<=0 &&
 				this.latestPrice.compareTo(this.averagePrice21)==1 &&
 				r<=ratio && r>0;
-		
 	}
 	
 	public boolean isUp(Integer period) {
