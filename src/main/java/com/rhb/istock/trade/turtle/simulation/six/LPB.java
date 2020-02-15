@@ -159,21 +159,29 @@ public class LPB {
 		
 		List<Muster>  breakers = new ArrayList<Muster>();
 		Muster m,p;
-		Integer r, ratio=8;
+		Integer ratio=8;
 		StringBuffer sb = new StringBuffer(date.toString() + ":");
+		BigDecimal previousAverageAmount;
 		for(int i=0; i<ms.size() && i<this.pool && breakers.size()<this.top; i++) {
 			m = ms.get(i);
 			p = previous.get(m.getItemID());
-			r = Functions.ratio(m.getAveragePrice21(), m.getAveragePrice());
-			if(m!=null && p!=null
-					&& m.getPe().compareTo(BigDecimal.ZERO)>0 //&& m.getPe().compareTo(new BigDecimal(233))<0
+			if(p==null) {
+				previousAverageAmount = BigDecimal.ZERO;
+			}else {
+				previousAverageAmount = p.getAverageAmount();
+			}
+			//r = Functions.ratio(m.getAveragePrice21(), m.getAveragePrice());
+			if(m!=null 
+					&& p!=null
+					&& m.getPe().compareTo(BigDecimal.ZERO)>0 && m.getPe().compareTo(new BigDecimal(233))<0
 					&& !m.isUpLimited() 
 					&& !m.isDownLimited() 
 					//&& m.isUpBreaker()
-					&& m.isBreaker(8)
+					&& m.isBreaker(ratio)
 					//&& r<=ratio && r>0
 					//&& m.getPrviousAverageAmountRatio()>0
-					&& m.getAverageAmount().compareTo(p.getAverageAmount())==1
+					&& m.getAverageAmount().compareTo(previousAverageAmount)==1
+					//&& m.isAboveAverageAmount()
 					//&& m.getHLGap()<=55
 					//&& p.isDown(21)
 					//&& m.cal_volume_ratio().compareTo(p.cal_volume_ratio())==1

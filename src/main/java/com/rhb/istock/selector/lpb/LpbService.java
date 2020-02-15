@@ -74,7 +74,7 @@ public class LpbService {
 							&& !m.isUpLimited() 
 							&& !m.isDownLimited() 
 							&& m.isBreaker(8)
-							&& m.getHLGap()<=55
+							//&& m.getHLGap()<=55
 							&& m.getAverageAmount().compareTo(p.getAverageAmount())==1
 							) {
 						sb.append(m.getItemID() + "(" + String.format("%04d",i) + ")" +",");

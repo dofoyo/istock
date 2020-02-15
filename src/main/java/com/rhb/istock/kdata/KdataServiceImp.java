@@ -690,7 +690,10 @@ public class KdataServiceImp implements KdataService{
 	public Integer getSseiFlag(LocalDate date) {
 		Integer flag = 1;
 		Kdata ssei = this.getKdata(sseiID, date.plusDays(1), openDuration, true);
-		flag = ssei.isAboveAveragePrice(openDuration) && ssei.isAboveAveragePrice(21) ? 1 : 0;
+		flag = ssei.isAboveAveragePrice(openDuration) && ssei.isAboveAveragePrice(21) && ssei.isAboveAverageAmount() ? 1 : 0;
+/*		if(flag==1) {
+			logger.info("***********" +  date.toString() +  " up!");
+		}*/
 		return flag;
 	}
 

@@ -138,6 +138,10 @@ public class Muster {
 			return latestPrice.compareTo(averagePrice)==1;
 		}		
 	}
+	
+	public boolean isAboveAverageAmount() {
+		return this.amount.compareTo(averageAmount)>=0;
+	}
 
 	public BigDecimal getAverage_turnover_rate_f() {
 		return average_turnover_rate_f;

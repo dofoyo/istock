@@ -173,11 +173,18 @@ public class BAV {
 		List<Muster>  breakers = new ArrayList<Muster>();
 		Muster m,p;
 		Integer ratio=8;
+		BigDecimal previousAverageAmount;
 		for(int i=0; i<ms.size() && i<pool && breakers.size()<top; i++) {
 			m = ms.get(i);
 			p = previous.get(m.getItemID());
+			if(p==null) {
+				previousAverageAmount = BigDecimal.ZERO;
+			}else {
+				previousAverageAmount = p.getAverageAmount();
+			}
 			//r = Functions.ratio(m.getAveragePrice21(), m.getAveragePrice());
-			if(m!=null && p!=null
+			if(m!=null 
+					//&& p!=null
 					//&& m.getPe().compareTo(BigDecimal.ZERO)>0 // && m.getPe().compareTo(new BigDecimal(170))<0
 					&& !m.isUpLimited() 
 					&& !m.isDownLimited() 
@@ -185,7 +192,8 @@ public class BAV {
 					&& m.isBreaker(ratio)
 					//&& r<=ratio && r>0
 					//&& m.isAboveAveragePrice(21) && !p.isAboveAveragePrice(21)
-					&& m.getAverageAmount().compareTo(p.getAverageAmount())==1
+					&& m.getAverageAmount().compareTo(previousAverageAmount)==1
+					//&& m.isAboveAverageAmount()
 					//&& m.isUp(89)
 					//&& m.getN21Gap()<=13
 					//&& m.cal_volume_ratio().compareTo(new BigDecimal(2))==1

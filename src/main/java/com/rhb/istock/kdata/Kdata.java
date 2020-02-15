@@ -172,6 +172,10 @@ public class Kdata {
 		return price.compareTo(avaragePrice)==1;
 	}
 	
+	public boolean isAboveAverageAmount() {
+		return this.getLastBar().getAmount().compareTo(this.getFeatures().get("averagePrice"))>=0;
+	}
+	
 	public Kbar getLastBar() {
 		return this.bars.lastEntry().getValue();
 	}
