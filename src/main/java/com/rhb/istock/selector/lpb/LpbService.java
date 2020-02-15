@@ -77,7 +77,7 @@ public class LpbService {
 							&& m.getHLGap()<=55
 							&& m.getAverageAmount().compareTo(p.getAverageAmount())==1
 							) {
-						sb.append(m.getItemID() + "(" + i + ")" +",");
+						sb.append(m.getItemID() + "(" + String.format("%04d",i) + ")" +",");
 					}
 				}
 				

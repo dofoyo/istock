@@ -57,6 +57,13 @@ public class HLBPlus {
 	public void doIt(Map<String,Muster> musters, LocalDate date, Integer sseiFlag) {
 		Muster muster;
 		account.setLatestDate(date);
+
+		/*if(sseiFlag==1) {
+				this.top = 8;
+			}else {
+				this.top = 1;
+			}*/
+		
 		
 		Set<String> holdItemIDs = account.getItemIDsOfHolds();
 		for(String itemID : holdItemIDs) {

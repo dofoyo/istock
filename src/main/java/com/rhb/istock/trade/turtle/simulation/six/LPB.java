@@ -39,7 +39,7 @@ public class LPB {
 	
 	private BigDecimal valueRatio = new BigDecimal(3);  //每只股票不能超过市值的1/3
 	private Integer pool = 55;
-	private Integer top = 3;
+	private Integer top = 1;
 
 	public LPB(BigDecimal initCash) {
 		account = new Account(initCash);
@@ -49,6 +49,13 @@ public class LPB {
 	public void doIt(Map<String,Muster> musters,Map<String,Muster> previous, LocalDate date, Integer sseiFlag) {
 		Muster muster;
 		account.setLatestDate(date);
+		
+		if(sseiFlag==1) {
+			this.top = 8;
+		}else {
+			this.top = 1;
+		}
+		
 		
 		//卖出
 		Set<String> holdIDs = account.getItemIDsOfHolds();
@@ -154,23 +161,20 @@ public class LPB {
 		Muster m,p;
 		Integer r, ratio=8;
 		StringBuffer sb = new StringBuffer(date.toString() + ":");
-		for(int i=0; i<ms.size() && i<pool && breakers.size()<top; i++) {
+		for(int i=0; i<ms.size() && i<this.pool && breakers.size()<this.top; i++) {
 			m = ms.get(i);
 			p = previous.get(m.getItemID());
 			r = Functions.ratio(m.getAveragePrice21(), m.getAveragePrice());
-			if(m!=null && p!=null 
-					&& m.getPe().compareTo(BigDecimal.ZERO)>0 && m.getPe().compareTo(new BigDecimal(233))<0
+			if(m!=null && p!=null
+					&& m.getPe().compareTo(BigDecimal.ZERO)>0 //&& m.getPe().compareTo(new BigDecimal(233))<0
 					&& !m.isUpLimited() 
 					&& !m.isDownLimited() 
 					//&& m.isUpBreaker()
 					&& m.isBreaker(8)
 					//&& r<=ratio && r>0
-					//&& m.isAboveAveragePrice(21) && !p.isAboveAveragePrice(21)
-					//&& m.getAveragePrice8().compareTo(p.getAveragePrice8())==1
+					//&& m.getPrviousAverageAmountRatio()>0
 					&& m.getAverageAmount().compareTo(p.getAverageAmount())==1
-					//&& m.getAveragePrice().compareTo(p.getAveragePrice())==1
-					//&& m.getAmount5().compareTo(p.getAmount5())==1
-					&& m.getHLGap()<=55
+					//&& m.getHLGap()<=55
 					//&& p.isDown(21)
 					//&& m.cal_volume_ratio().compareTo(p.cal_volume_ratio())==1
 					//&& m.isUp(89)

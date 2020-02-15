@@ -454,7 +454,7 @@ public class SelectorServiceImp implements SelectorService{
 			for(String s : ss) {
 				if(s.length()>8) {
 					id = s.substring(0, 8);
-					order = s.substring(8);
+					order = s.substring(9,s.indexOf(")"));
 					ids.put(id,order);
 				}
 			}

@@ -65,7 +65,7 @@ public class TurtleMusterSimulation {
 		Map<String,Muster> musters;
 		
 		List<Map<String,Muster>> previous = new ArrayList<Map<String,Muster>>();
-		Integer previous_period  = 8; //历史纪录区间，主要用于后面判断21均线的趋势
+		Integer previous_period  = 8; //历史纪录区间，主要用于后面判断
 
 		Integer sseiFlag;
 		
@@ -77,12 +77,12 @@ public class TurtleMusterSimulation {
 
 			Progress.show((int)days, i++, "  simulate: " + date.toString() + ", musters.size()=" + musters.size() + " ");
 			
-			previous.add(musters);
-			if(previous.size()>=previous_period) {
-				previous.remove(0);
-			}
-			
 			if(musters!=null && musters.size()>0) {
+				previous.add(musters);
+				if(previous.size()>=previous_period) {
+					previous.remove(0);
+				}
+				
 				sseiFlag = kdataService.getSseiFlag(date);
 				
 				bav.doIt(musters,previous.get(0), itemService.getHs300(date), date,sseiFlag);

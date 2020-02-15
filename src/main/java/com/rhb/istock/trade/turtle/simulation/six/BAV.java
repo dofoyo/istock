@@ -24,7 +24,7 @@ import com.rhb.istock.kdata.Muster;
  *
  * 买入：突破89日高点
  * 卖出：跌破21日均线
- * 筛选范围：沪深300中筛选出突破21日均线的
+ * 筛选范围：沪深成分股(hscf)中筛选出突破21日均线的
  * 筛选依据：89天日均成交量，越高越好
  * 仓位控制：满仓，每只股票的均衡市值
  *
@@ -40,16 +40,23 @@ public class BAV {
 	
 	private BigDecimal valueRatio = new BigDecimal(3);  //每只股票不能超过市值的1/3
 	private Integer pool = 21;
-	private Integer top = 3;
+	private Integer top = 1;
 
 	public BAV(BigDecimal initCash) {
 		account = new Account(initCash);
 		this.initCash = initCash;
 	}
 	
-	public void doIt(Map<String,Muster> musters,Map<String,Muster> previous, List<String> sz50, LocalDate date, Integer sseiFlag) {
+	public void doIt(Map<String,Muster> musters,Map<String,Muster> previous, List<String> hscf, LocalDate date, Integer sseiFlag) {
 		Muster muster;
 		account.setLatestDate(date);
+
+		if(sseiFlag==1) {
+				this.top = 8;
+			}else {
+				this.top = 1;
+			}
+
 		
 		//卖出
 		Set<String> holdIDs = account.getItemIDsOfHolds();
@@ -75,7 +82,7 @@ public class BAV {
 			//确定突破走势的股票
 			Set<String> holdItemIDs = account.getItemIDsOfHolds();
 			Set<Muster> dds = new HashSet<Muster>();  //用set，无重复，表示不可加仓
-			List<Muster> breakers = this.getBreakers(musters,previous, sz50);
+			List<Muster> breakers = this.getBreakers(musters,previous, hscf);
 			breakers_sb.append(date.toString() + ",");
 			StringBuffer sb = new StringBuffer();
 			for(Muster breaker : breakers) {
@@ -140,10 +147,10 @@ public class BAV {
 		return ee.divide(price,BigDecimal.ROUND_DOWN).divide(new BigDecimal(100),BigDecimal.ROUND_DOWN).intValue()*100;
 	}
 	
-	private List<Muster> getBreakers(Map<String,Muster> musters,Map<String,Muster> previous, List<String> sz50){
+	private List<Muster> getBreakers(Map<String,Muster> musters, Map<String,Muster> previous, List<String> szcf){
 		List<Muster>  ms = new ArrayList<Muster>();
 
-		for(String id : sz50) {
+		for(String id : szcf) {
 			if(musters.get(id) != null) {
 				ms.add(musters.get(id));
 			}
@@ -152,6 +159,11 @@ public class BAV {
 		Collections.sort(ms, new Comparator<Muster>() {
 			@Override
 			public int compare(Muster o1, Muster o2) {
+/*				if(o2.getPrviousAverageAmountRatio().equals(o1.getPrviousAverageAmountRatio())) {
+					return o1.getLatestPrice().compareTo(o2.getLatestPrice());
+				}else {
+					return o2.getPrviousAverageAmountRatio().compareTo(o1.getPrviousAverageAmountRatio()); //Z-A
+				}*/
 				return o2.getAmount().compareTo(o1.getAmount()); //Z-A
 				//return o2.getAverageAmount().compareTo(o1.getAverageAmount()); //Z-A
 				//return o1.getLatestPrice().compareTo(o2.getLatestPrice()); //a-z
@@ -160,22 +172,20 @@ public class BAV {
 		
 		List<Muster>  breakers = new ArrayList<Muster>();
 		Muster m,p;
-		Integer r, ratio=8;
+		Integer ratio=8;
 		for(int i=0; i<ms.size() && i<pool && breakers.size()<top; i++) {
 			m = ms.get(i);
 			p = previous.get(m.getItemID());
-			r = Functions.ratio(m.getAveragePrice21(), m.getAveragePrice());
+			//r = Functions.ratio(m.getAveragePrice21(), m.getAveragePrice());
 			if(m!=null && p!=null
 					//&& m.getPe().compareTo(BigDecimal.ZERO)>0 // && m.getPe().compareTo(new BigDecimal(170))<0
 					&& !m.isUpLimited() 
 					&& !m.isDownLimited() 
 					//&& m.isUpBreaker()
-					&& m.isBreaker(8)
+					&& m.isBreaker(ratio)
 					//&& r<=ratio && r>0
 					//&& m.isAboveAveragePrice(21) && !p.isAboveAveragePrice(21)
-					//&& m.getAveragePrice21().compareTo(p.getAveragePrice21())==1
 					&& m.getAverageAmount().compareTo(p.getAverageAmount())==1
-					//&& m.cal_volume_ratio().compareTo(p.cal_volume_ratio())==1
 					//&& m.isUp(89)
 					//&& m.getN21Gap()<=13
 					//&& m.cal_volume_ratio().compareTo(new BigDecimal(2))==1

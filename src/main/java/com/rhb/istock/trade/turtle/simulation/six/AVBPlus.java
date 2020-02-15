@@ -14,6 +14,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.rhb.istock.comm.util.Functions;
 import com.rhb.istock.fund.Account;
 import com.rhb.istock.kdata.Muster;
 
@@ -49,6 +50,12 @@ public class AVBPlus {
 		Muster muster;
 		account.setLatestDate(date);
 
+/*		if(sseiFlag==1) {
+			this.top = 8;
+		}else {
+			this.top = 1;
+		}*/
+		
 		Set<String> holdItemIDs = account.getItemIDsOfHolds();
 		for(String itemID : holdItemIDs) {
 			muster = musters.get(itemID);
@@ -147,7 +154,14 @@ public class AVBPlus {
 		Collections.sort(musters, new Comparator<Muster>() {
 			@Override
 			public int compare(Muster o1, Muster o2) {
+/*				if(o2.getPrviousAverageAmountRatio().equals(o1.getPrviousAverageAmountRatio())) {
+					return o1.getLatestPrice().compareTo(o2.getLatestPrice());
+				}else {
+					return o2.getPrviousAverageAmountRatio().compareTo(o1.getPrviousAverageAmountRatio()); //Z-A
+				}*/
+				
 				return o2.getAverageAmount().compareTo(o1.getAverageAmount()); //Z-A
+
 			}
 		});
 

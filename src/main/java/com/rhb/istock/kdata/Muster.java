@@ -38,7 +38,24 @@ public class Muster {
 	private BigDecimal amount5;
 	private BigDecimal pe;
 	private DecimalFormat df = new DecimalFormat("#.00");
+	private BigDecimal prviousAverageAmount=null;
+
+	public Integer getPrviousAverageAmountRatio1() {
+		if(this.prviousAverageAmount==null) {
+			return 0;
+		}else {
+			return Functions.ratio(this.averageAmount, this.prviousAverageAmount);
+		}
+	}
 	
+	public BigDecimal getPrviousAverageAmount() {
+		return prviousAverageAmount;
+	}
+
+	public void setPrviousAverageAmount(BigDecimal prviousAverageAmount) {
+		this.prviousAverageAmount = prviousAverageAmount;
+	}
+
 	public BigDecimal getPe() {
 		return pe;
 	}
@@ -104,7 +121,8 @@ public class Muster {
 	}
 	
 	public String getNote() {
-		return Integer.toString(this.getPe().intValue());
+		//return String.format("%d，%d，%d", this.averageAmount.intValue(),this.prviousAverageAmount.intValue(),this.getPrviousAverageAmountRatio());
+		return "";
 	}
 	
 	public boolean isAboveAveragePrice(Integer period) {

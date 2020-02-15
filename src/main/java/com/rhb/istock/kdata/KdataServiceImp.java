@@ -427,15 +427,28 @@ public class KdataServiceImp implements KdataService{
 		Map<String,Muster> musters = new HashMap<String,Muster>();
 		if(date==null) return musters;
 		
+/*		Integer period = 8;
+		List<LocalDate> dates = musterRepositoryImp.getMusterDates();
+		Integer index = dates.indexOf(date);
+		Integer previousIndex = index>(period-1) ? index-(period-1) : 0;
+		LocalDate previousDate = dates.get(previousIndex);
+*/		
+		Map<String, MusterEntity> entities = musterRepositoryImp.getMusters(date);
+//		Map<String, MusterEntity> previousEntities = musterRepositoryImp.getMusters(previousDate);
+		
+		MusterEntity previousEntity;
 		Muster muster;
 		Item item;
-		
-		Map<String, MusterEntity> entities = musterRepositoryImp.getMusters(date);
-		
 		for(MusterEntity entity : entities.values()) {
 			item = itemService.getItem(entity.getItemID());
 			if(item!=null) {
 			//if(item!=null && item.getItemID().startsWith("sz300")) {
+//				previousEntity = previousEntities.get(entity.getItemID());
+				
+/*				if(previousEntity==null) {
+					System.out.println("************ index=" + previousIndex + ",date=" + previousDate  + ", itemID=" + entity.getItemID()+ " has NO kdata***************");
+				}*/
+				
 				muster = new Muster();
 				muster.setItemID(entity.getItemID());
 				muster.setItemName(item.getName());
@@ -468,6 +481,8 @@ public class KdataServiceImp implements KdataService{
 				muster.setLowest5(entity.getLowest5());
 				muster.setAmount5(entity.getAmount5());
 				muster.setPe(entity.getPe());
+//				muster.setPrviousAverageAmount(previousEntity==null ? muster.getAverageAmount() : previousEntity.getAverageAmount());
+				
 				musters.put(muster.getItemID(),muster);
 			}else {
 				//logger.info(String.format("item of %s is null", entity.getItemID()));
