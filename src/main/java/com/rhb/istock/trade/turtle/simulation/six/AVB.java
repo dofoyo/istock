@@ -168,6 +168,7 @@ public class AVB {
 					&& !m.isUpLimited() 
 					&& !m.isDownLimited() 
 					&& m.isUpBreaker()
+					//&& m.isAboveAverageAmount()
 					//&& m.isUp(21)
 					//&& m.cal_volume_ratio().compareTo(new BigDecimal(2))==1
 					) {

@@ -49,6 +49,7 @@ public interface SelectorService{
 	public List<LocalDate> getHuaFirstPotentials(String itemID, LocalDate endDate,Integer period,BigDecimal mcst_ratio);
 	
 	public Map<String,String> getLpbs();
+	public Map<String,String> getBavs();
 
 
 }

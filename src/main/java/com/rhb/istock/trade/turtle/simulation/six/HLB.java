@@ -188,6 +188,7 @@ public class HLB {
 					&& !m.isUpLimited() 
 					&& !m.isDownLimited() 
 					&& m.isUpBreaker() 
+					//&& m.isAboveAverageAmount()
 					//&& Functions.between(m.getHLGap(), hlgap_min, hlgap_max)
 					//&& m.isUp(21)
 					//&& m.getVolume_ratio().compareTo(new BigDecimal(2))==1

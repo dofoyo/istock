@@ -194,6 +194,7 @@ public class HLBPlus {
 					&& !m.isUpLimited() 
 					&& !m.isDownLimited() 
 					&& m.isUpBreaker() 
+					//&& m.isAboveAverageAmount()
 					//&& m.getTotal_mv().compareTo(max_mc)==-1
 					//&& Functions.between(m.getHLGap(), hlgap_min, hlgap_max)
 					//&& m.isUp(21)

@@ -20,6 +20,7 @@ import com.rhb.istock.kdata.Kbar;
 import com.rhb.istock.kdata.Kdata;
 import com.rhb.istock.kdata.KdataService;
 import com.rhb.istock.selector.aat.AverageAmountTopService;
+import com.rhb.istock.selector.bav.BavService;
 import com.rhb.istock.selector.bluechip.BluechipService;
 import com.rhb.istock.selector.favor.FavorService;
 import com.rhb.istock.selector.hlt.HighLowTopService;
@@ -64,7 +65,10 @@ public class SelectorServiceImp implements SelectorService{
 	@Autowired
 	@Qualifier("lpbService")
 	LpbService lpbService;
-
+	
+	@Autowired
+	@Qualifier("bavService")
+	BavService bavService;
 	
 	@Override
 	public List<HoldEntity> getHolds() {
@@ -448,6 +452,24 @@ public class SelectorServiceImp implements SelectorService{
 	public Map<String,String> getLpbs() {
 		Map<String,String> ids = new HashMap<String,String>();
 		String str = lpbService.getLpb();
+		if(str!=null && str.length()>11) {
+			String id,order;
+			String[] ss = str.substring(11).split(",");
+			for(String s : ss) {
+				if(s.length()>8) {
+					id = s.substring(0, 8);
+					order = s.substring(9,s.indexOf(")"));
+					ids.put(id,order);
+				}
+			}
+		}
+		return ids;
+	}
+
+	@Override
+	public Map<String, String> getBavs() {
+		Map<String,String> ids = new HashMap<String,String>();
+		String str = bavService.getBAV();
 		if(str!=null && str.length()>11) {
 			String id,order;
 			String[] ss = str.substring(11).split(",");

@@ -18,8 +18,14 @@ public class SelectorTest {
 	@Autowired
 	@Qualifier("selectorServiceImp")
 	SelectorService selectorServiceImp;
-	
+
 	@Test
+	public void getBav() {
+		Map<String,String> ids = selectorServiceImp.getBavs();
+		System.out.println(ids);
+	}
+	
+	//@Test
 	public void getLpb() {
 		Map<String,String> ids = selectorServiceImp.getLpbs();
 		System.out.println(ids);

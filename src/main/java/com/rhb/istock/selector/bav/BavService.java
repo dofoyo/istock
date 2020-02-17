@@ -1,5 +1,6 @@
 package com.rhb.istock.selector.bav;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -33,6 +34,12 @@ public class BavService {
 	private String bavFile;	
 	
 	protected static final Logger logger = LoggerFactory.getLogger(BavService.class);
+
+	public String getBAV() {
+		List<LocalDate> dates = kdataService.getLastMusterDates();
+		LocalDate date = dates.get(dates.size()-1);
+		return this.generateBAV(date);
+	}
 	
 	public void generateBAV(LocalDate endDate, Integer days) {
 		List<LocalDate> dates = kdataService.getMusterDates(days, endDate);
@@ -61,6 +68,9 @@ public class BavService {
 					}
 				}
 				
+				//System.out.println("************  hs300 = " + ms.size());
+				
+				
 				Collections.sort(ms, new Comparator<Muster>() {
 					@Override
 					public int compare(Muster o1, Muster o2) {
@@ -69,17 +79,25 @@ public class BavService {
 				});
 				
 				Muster m,p;
+				BigDecimal previousAverageAmount;
 				for(int i=0; i<ms.size(); i++) {
 					m = ms.get(i);
 					p = previous.get(m.getItemID());
-					if(m!=null && p!=null
+					if(p==null) {
+						previousAverageAmount = BigDecimal.ZERO;
+					}else {
+						previousAverageAmount = p.getAverageAmount();
+					}
+					if(m!=null
 							&& !m.isUpLimited() 
 							&& !m.isDownLimited() 
 							&& m.isBreaker(8)
-							&& m.getAverageAmount().compareTo(p.getAverageAmount())==1
+							&& m.getAverageAmount().compareTo(previousAverageAmount)==1
 							) {
-						sb.append(m.getItemID() + "(" + i + ")" +",");
+						sb.append(m.getItemID() + "(" + String.format("%04d",i) + ")" +",");
 					}
+					
+					//logger.info(String.format("%d %s %.0f",i,m.getItemID(),m.getAmount()));
 				}
 				
 				sb.append("\n");
@@ -91,7 +109,7 @@ public class BavService {
 			sb.append(" No muster!");
 		}
 		
-		logger.info(sb.toString());
+		//logger.info(sb.toString());
 		
 		return sb.toString();
 	}

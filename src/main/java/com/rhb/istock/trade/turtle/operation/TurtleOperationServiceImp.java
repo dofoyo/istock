@@ -243,6 +243,15 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 		return views;
 	}
 	
+	private List<TurtleView> getBav(){
+		Map<String,String> ids = selectorService.getBavs();
+		List<TurtleView> views = this.getTurtleViews(new ArrayList(ids.keySet()), "BAV"); 
+		for(TurtleView view : views) {
+			view.setLabel(ids.get(view.getItemID()));
+		}
+		return views;
+	}
+	
 
 	@Override
 	public List<TurtleView> getPotentials(String type) {
@@ -251,6 +260,10 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 		
 		if(type.equals("lpb")) {
 			return this.getLpb();
+		}
+
+		if(type.equals("bav")) {
+			return this.getBav();
 		}
 		
 		List<TurtleView> views = new ArrayList<TurtleView>();
