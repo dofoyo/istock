@@ -106,13 +106,13 @@ public class KdataRepositoryTushare implements KdataRepository{
 						kdata.addBar(date,open,high,low,close,amount,quantity,turnover_rate_f,volume_ratio,total_mv,circ_mv,total_share,float_share,free_share,pe);
 					}
 					
-					if(nowFactor==null){
+/*					if(nowFactor==null){
 						logger.error("The nowFactor of " + itemID + " on " + date.toString() + " is NULL.");
 					}
 
 					if(roof==null){
 						logger.error("The roof of " + itemID + " is NULL.");
-					}
+					}*/
 				}
 			}
 		}

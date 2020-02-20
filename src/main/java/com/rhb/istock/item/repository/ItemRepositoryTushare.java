@@ -1,6 +1,8 @@
 package com.rhb.istock.item.repository;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,6 +51,15 @@ public class ItemRepositoryTushare implements ItemRepository{
 			System.err.println(item);
 			//e.printStackTrace();
 		}
+		
+		Collections.sort(entities, new Comparator<ItemEntity>() {
+
+			@Override
+			public int compare(ItemEntity o1, ItemEntity o2) {
+				return o1.getItemId().compareTo(o2.getItemId());
+			}
+			
+		});
 		
 		return entities;
 	}

@@ -97,11 +97,12 @@ public class IstockScheduledTask {
 			kdataService.downFactors(); // 3. 上一交易日的收盘数据要等开盘前才能下载到, 大约需要15分钟
 			kdataService.downSSEI();
 			kdataService.generateLatestMusters();
+			kdataService.updateLatestMusters();
 			turtleOperationService.init();  // 4.
 		}
 	}
 
-	@Scheduled(cron="0 45/5 9-14 ? * 1-5")  //周一至周五，每日9:45 - 15点，每5分钟刷新一次 
+	@Scheduled(cron="0 0/5 10-14 ? * 1-5")  //周一至周五，每日9:45 - 15点，每5分钟刷新一次 
 	public void updateLatestMusters1() throws Exception {
 		System.out.println("run scheduled of '0 5/5 10-14 ? * 1-5'");
 		if(this.isTradeDate()) {

@@ -400,23 +400,30 @@ public class KdataServiceImp implements KdataService{
 		LocalDate date = kdataRealtimeSpider.getLatestMarketDate("sh000001");
 
 		//LocalDate date = kdataRepository.getLastDate();
+		Integer count = 0, nullCount=0;
 		if(musterRepositoryImp.isMustersExist(date)) {
 			System.out.println("The last musters of " + date + " has already exists! pass!");
 		}else {
 			MusterEntity entity;
-
+			
+			itemService.cacheEvict();
 			List<Item> items = itemService.getItems();
+			count = items.size();
 			int i=1;
 			for(Item item : items) {
 				Progress.show(items.size(),i++, " generateLatestMusters: " + item.getItemID());//进度条
 				
 				entity = this.getMusterEntity(item.getItemID(), date, false);
-				if(entity!=null) musterRepositoryImp.saveMuster(date, entity);
+				if(entity!=null) {
+					musterRepositoryImp.saveMuster(date, entity);
+				}else {
+					nullCount ++;
+				}
 
 			}
 		}
 		
-		logger.info("generateLatestMusters done!");
+		logger.info("generateLatestMusters done! There are " + count.toString() + " items. There are "+ nullCount +" + No Data");
 		long used = (System.currentTimeMillis() - beginTime)/1000; 
 		logger.info("用时：" + used + "秒");          
 		

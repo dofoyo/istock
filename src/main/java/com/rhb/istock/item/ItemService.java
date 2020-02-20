@@ -15,4 +15,5 @@ public interface ItemService {
 	public Set<String> getIndustrys();
 	public List<String> getSz50(LocalDate date);
 	public List<String> getHs300(LocalDate date);
+	public void cacheEvict();
 }

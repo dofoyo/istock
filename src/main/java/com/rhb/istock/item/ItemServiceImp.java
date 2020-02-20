@@ -167,4 +167,9 @@ public class ItemServiceImp implements ItemService {
 		return items;
 	}
 
+	@Override
+	public void cacheEvict() {
+		itemRepository.cacheEvict();		
+	}
+
 }
