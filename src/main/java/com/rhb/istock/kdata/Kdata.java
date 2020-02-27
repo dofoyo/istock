@@ -120,17 +120,20 @@ public class Kdata {
 		if(this.averagePrices == null) {
 			this.averagePrices = new HashMap<String,BigDecimal>();
 			
+			BigDecimal totalPrice5 = new BigDecimal(0);
 			BigDecimal totalPrice8 = new BigDecimal(0);
 			BigDecimal totalPrice13 = new BigDecimal(0);
 			BigDecimal totalPrice21 = new BigDecimal(0);
 			BigDecimal totalPrice34 = new BigDecimal(0);
 
+			Integer a5 = this.bars.size() - 5;
 			Integer a8 = this.bars.size() - 8;
 			Integer a13 = this.bars.size() - 13;
 			Integer a21 = this.bars.size() - 21;
 			Integer a34 = this.bars.size() - 34;
 			Integer i=0;
 			for(Kbar kbar : bars.values()) {
+				totalPrice5  = i>= a5  ? totalPrice5.add(kbar.getClose()) : totalPrice5;
 				totalPrice8  = i>= a8  ? totalPrice8.add(kbar.getClose()) : totalPrice8;
 				totalPrice13 = i>= a13 ? totalPrice13.add(kbar.getClose()) : totalPrice13;
 				totalPrice21 = i>= a21 ? totalPrice21.add(kbar.getClose()) : totalPrice21;
@@ -139,11 +142,13 @@ public class Kdata {
 				i++;
 			}
 				
+			BigDecimal averagePrice5 = totalPrice5.divide(new BigDecimal(5),BigDecimal.ROUND_HALF_UP);
 			BigDecimal averagePrice8 = totalPrice8.divide(new BigDecimal(8),BigDecimal.ROUND_HALF_UP);
 			BigDecimal averagePrice13 = totalPrice13.divide(new BigDecimal(13),BigDecimal.ROUND_HALF_UP);
 			BigDecimal averagePrice21 = totalPrice21.divide(new BigDecimal(21),BigDecimal.ROUND_HALF_UP);
 			BigDecimal averagePrice34 = totalPrice34.divide(new BigDecimal(34),BigDecimal.ROUND_HALF_UP);
 
+			averagePrices.put("a5", averagePrice5);
 			averagePrices.put("a8", averagePrice8);
 			averagePrices.put("a13", averagePrice13);
 			averagePrices.put("a21", averagePrice21);

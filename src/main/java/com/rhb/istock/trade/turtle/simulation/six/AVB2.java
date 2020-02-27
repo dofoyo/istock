@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -20,14 +21,17 @@ import com.rhb.istock.kdata.Muster;
 
 /*
  * 成交量
- * 相比avb：
- * 1、行情好时才买入
- * 2、行情好时，跌破21日低点才卖出；行情不好时，跌破13低点就卖出
  * 
+ * 操作策略
+ * 买入：突破89日高点
+ * 卖出：跌破21日均线
+ * 筛选范围：全部股票中筛选出21个，再从中最多选出5个突破的（可能会选不出来）
+ * 筛选依据：89天日均成交量，越高越好
+ * 仓位控制：满仓，每只股票的均衡市值
  *
  */
-public class AVBPlus {
-	protected static final Logger logger = LoggerFactory.getLogger(AVBPlus.class);
+public class AVB2 {
+	protected static final Logger logger = LoggerFactory.getLogger(AVB2.class);
 
 	private Account account = null;
 	private BigDecimal initCash = null;
@@ -36,8 +40,9 @@ public class AVBPlus {
 	private StringBuffer breakers_sb = new StringBuffer();
 	private Integer pool = 21;
 	private Integer top = 3;
+	private Map<String,Integer> breakers = new HashMap<String,Integer>();
 	
-	public AVBPlus(BigDecimal initCash) {
+	public AVB2(BigDecimal initCash) {
 		account = new Account(initCash);
 		this.initCash = initCash;
 	}
@@ -46,6 +51,18 @@ public class AVBPlus {
 		//logger.info(date.toString());
 		Muster muster;
 		account.setLatestDate(date);
+
+		Integer value;
+		Map.Entry<String, Integer> entry;
+		for (Iterator<Map.Entry<String, Integer>> iterator = this.breakers.entrySet().iterator(); iterator.hasNext();){
+		    entry = iterator.next();
+			value = entry.getValue();
+			if(value>=13) {    //突破后13日内回调有效
+				iterator.remove();
+			}else {
+				entry.setValue(value++);
+			}
+		}
 
 /*		if(sseiFlag==1) {
 			this.top = 8;
@@ -65,33 +82,36 @@ public class AVBPlus {
 		for(String itemID: holdItemIDs) {
 			muster = musters.get(itemID);
 			if(muster!=null) {
-/*				if(muster.isDropAve(21) && !muster.isDownLimited()) { 		//跌破21日均线就卖
-					account.drop(itemID, "跌破dropline", muster.getLatestPrice());
-				}*/
+				if(muster.isDropAve(21) && !muster.isDownLimited()) { 		//跌破21日均线就卖
+					account.drop(itemID, "1", muster.getLatestPrice());
+				}
 /*				if(muster.isDropLowest(21) && !muster.isDownLimited()) { 		//跌破21日低点就卖
 					account.drop(itemID, "跌破lowest", muster.getLatestPrice());
 				}*/
-				if(sseiFlag==0 && muster.isDropLowest(13) && !muster.isDownLimited()) { 		//跌破13日均线就卖
+/*				if(sseiFlag==0 && muster.isDropLowest(13) && !muster.isDownLimited()) { 		//跌破13日均线就卖
 					account.drop(itemID, "1", muster.getLatestPrice());
 				}				
 				if(sseiFlag==1 && muster.isDropLowest(34) && !muster.isDownLimited()) { 		//跌破21日低点就卖
 					account.drop(itemID, "2", muster.getLatestPrice());
-				}
+				}*/
 			}
 		}				
 		
 		//行情好，才买入
-		if(sseiFlag==1) {
 			holdItemIDs = account.getItemIDsOfHolds();
 			
 			Set<Muster> dds = new HashSet<Muster>();  //用set，无重复，表示不可加仓
 			//List<Muster> dds = new ArrayList<Muster>();  //用list，有重复，表示可以加仓
 			
 			//确定突破走势的股票
-			List<Muster> breakers = this.getTops(new ArrayList<Muster>(musters.values()));
+			//List<Muster> breakers = this.getTops(new ArrayList<Muster>(musters.values()));
+			this.setBreakers(new ArrayList<Muster>(musters.values()));
+			List<Muster> bs = this.getBreakers(musters);
+
+			
 			breakers_sb.append(date.toString() + ",");
 			StringBuffer sb = new StringBuffer();
-			for(Muster breaker : breakers) {
+			for(Muster breaker : bs) {
 				if(!holdItemIDs.contains(breaker.getItemID())) {
 					dds.add(breaker);
 					sb.append(breaker.getItemName());
@@ -122,7 +142,6 @@ public class AVBPlus {
 				//System.out.println(dds.size());
 				account.openAll(dds);			//后买
 			}
-		}
 
 		dailyAmount_sb.append(account.getDailyAmount() + "\n");
 	}
@@ -144,9 +163,36 @@ public class AVBPlus {
 		result.put("winIndustrys", account.getWinIndustrys());
 		return result;
 	}
+
+	private List<Muster> getBreakers(Map<String,Muster> musters){
+		List<Muster> bs = new ArrayList<Muster>();
+		String id;
+		Integer days;
+		Muster m;
+		Map.Entry<String, Integer> entry;
+		for (Iterator<Map.Entry<String, Integer>> iterator = this.breakers.entrySet().iterator(); iterator.hasNext();){
+		    entry = iterator.next();
+			id = entry.getKey();
+			days = entry.getValue();
+			if(musters.containsKey(id)) {
+				m = musters.get(id);
+				if(m.getLatestPrice().compareTo(m.getAveragePrice13())<0
+						&& m.getLatestPrice().compareTo(m.getAveragePrice21())>=0
+						) {  //突破后跌破13日线
+					bs.add(musters.get(id));
+					iterator.remove();
+				}else if(m.getLatestPrice().compareTo(m.getAveragePrice21())<0) {
+					iterator.remove();
+				}
+			}
+		}
+		
+		return bs;
+	}
+
 	
-	private List<Muster> getTops(List<Muster> musters){
-		List<Muster> breakers = new ArrayList<Muster>();
+	private void setBreakers(List<Muster> musters){
+		//List<Muster> breakers = new ArrayList<Muster>();
 
 		Collections.sort(musters, new Comparator<Muster>() {
 			@Override
@@ -156,14 +202,12 @@ public class AVBPlus {
 				}else {
 					return o2.getPrviousAverageAmountRatio().compareTo(o1.getPrviousAverageAmountRatio()); //Z-A
 				}*/
-				
 				return o2.getAverageAmount().compareTo(o1.getAverageAmount()); //Z-A
-
 			}
 		});
 
 		Muster m;
-		for(int i=0; i<musters.size() && i<pool; i++) {
+		for(int i=0; i<musters.size() && i<pool && breakers.size()<top; i++) {
 			m = musters.get(i);
 			if(m!=null 
 					&& !m.isUpLimited() 
@@ -172,15 +216,12 @@ public class AVBPlus {
 					//&& m.isAboveAverageAmount()
 					//&& m.isUp(21)
 					//&& m.cal_volume_ratio().compareTo(new BigDecimal(2))==1
+					&& !breakers.containsKey(m.getItemID())
 					) {
-				breakers.add(m);
-			}
-			if(breakers.size()>=top) {
-				break;
+				breakers.put(m.getItemID(),0);
 			}
 		}
 		
-		return breakers;
 	}
 	
 }

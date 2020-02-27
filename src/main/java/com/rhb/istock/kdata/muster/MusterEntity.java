@@ -5,7 +5,6 @@ import java.math.BigDecimal;
 public class MusterEntity {
 	private String itemID;
 	private BigDecimal close;
-	private BigDecimal amount;
 	private BigDecimal latestPrice; 
 	private Integer limited;
 	private BigDecimal highest;
@@ -17,6 +16,7 @@ public class MusterEntity {
 	private BigDecimal lowest5;
 	private BigDecimal averageAmount;
 	private BigDecimal averagePrice;
+	private BigDecimal averagePrice5;
 	private BigDecimal averagePrice8;
 	private BigDecimal averagePrice13;
 	private BigDecimal averagePrice21;
@@ -32,10 +32,13 @@ public class MusterEntity {
 	private BigDecimal free_share;	
 	private BigDecimal amount5;	
 	private BigDecimal pe;	
-
+	private BigDecimal latestHighest; //当日最高价
+	private BigDecimal latestLowest; //当日最低价
+	private BigDecimal latestAmount; ////当日交易金额
+	
 	public MusterEntity(String itemID, 
 			BigDecimal close, 
-			BigDecimal amount, 
+			BigDecimal latestAmount, 
 			BigDecimal latestPrice, 
 			Integer limited, 
 			BigDecimal highest, 
@@ -61,11 +64,14 @@ public class MusterEntity {
 			BigDecimal lowest8, 
 			BigDecimal lowest5,
 			BigDecimal amount5,
-			BigDecimal pe
+			BigDecimal pe,
+			BigDecimal  latestHighest, //当日最高价
+			BigDecimal  latestLowest, //当日最低价
+			BigDecimal  averagePrice5 ////当日交易金额
 			) {
 		this.itemID = itemID;
 		this.close = close;
-		this.amount = amount;
+		this.latestAmount = latestAmount;
 		this.latestPrice = latestPrice;
 		this.limited = limited;
 		this.highest = highest;
@@ -92,13 +98,17 @@ public class MusterEntity {
 		this.lowest5 = lowest5;
 		this.amount5 = amount5;
 		this.pe = pe;
+		this.latestHighest = latestHighest;
+		this.latestLowest = latestLowest;
+		this.averagePrice5 = averagePrice5;
+		
 	}
 	
 	public MusterEntity(String txt) {
 		String[] ss = txt.split(",");
 		this.itemID = ss[0];
 		this.close = new BigDecimal(ss[1]);
-		this.amount = new BigDecimal(ss[2]);
+		this.latestAmount = new BigDecimal(ss[2]);
 		this.latestPrice = new BigDecimal(ss[3]);
 		this.limited = Integer.parseInt(ss[4]);
 		this.highest = new BigDecimal(ss[5]);
@@ -125,8 +135,43 @@ public class MusterEntity {
 		this.lowest5 = new BigDecimal(ss[26]);
 		this.amount5 = new BigDecimal(ss[27]);
 		this.pe = new BigDecimal(ss[28]);
+		this.latestHighest = new BigDecimal(ss[29]);
+		this.latestLowest = new BigDecimal(ss[30]);
+		this.averagePrice5 = new BigDecimal(ss[31]);
 	}
 	
+	public BigDecimal getAveragePrice5() {
+		return averagePrice5;
+	}
+
+	public void setAveragePrice5(BigDecimal averagePrice5) {
+		this.averagePrice5 = averagePrice5;
+	}
+
+	public BigDecimal getLatestHighest() {
+		return latestHighest;
+	}
+
+	public void setLatestHighest(BigDecimal latestHighest) {
+		this.latestHighest = latestHighest;
+	}
+
+	public BigDecimal getLatestLowest() {
+		return latestLowest;
+	}
+
+	public void setLatestLowest(BigDecimal latestLowest) {
+		this.latestLowest = latestLowest;
+	}
+
+	public BigDecimal getLatestAmount() {
+		return latestAmount;
+	}
+
+	public void setLatestAmount(BigDecimal latestAmount) {
+		this.latestAmount = latestAmount;
+	}
+
 	public BigDecimal getPe() {
 		return pe;
 	}
@@ -227,7 +272,7 @@ public class MusterEntity {
 	public String toText() {
 		return this.itemID + "," + 
 				this.close + "," + 
-				this.amount + "," + 
+				this.latestAmount + "," + 
 				this.latestPrice + "," + 
 				this.limited + "," +
 				this.highest + "," + 
@@ -253,7 +298,10 @@ public class MusterEntity {
 				this.lowest8 + "," +  
 				this.lowest5 + "," +  
 				this.amount5 + "," +  
-				this.pe + "\n"; 
+				this.pe + "," +
+				this.latestHighest + "," + 
+				this.latestLowest + "," +
+				this.averagePrice5 + "\n"; 
 	}
 
 	public BigDecimal getLowest21() {
@@ -269,12 +317,6 @@ public class MusterEntity {
 	}
 	public void setItemID(String itemID) {
 		this.itemID = itemID;
-	}
-	public BigDecimal getAmount() {
-		return amount;
-	}
-	public void setAmount(BigDecimal amount) {
-		this.amount = amount;
 	}
 	public BigDecimal getAverageAmount() {
 		return averageAmount;

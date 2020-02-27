@@ -164,7 +164,7 @@ public class BAV {
 				}else {
 					return o2.getPrviousAverageAmountRatio().compareTo(o1.getPrviousAverageAmountRatio()); //Z-A
 				}*/
-				return o2.getAmount().compareTo(o1.getAmount()); //Z-A
+				return o2.getLatestAmount().compareTo(o1.getLatestAmount()); //Z-A
 				//return o2.getAverageAmount().compareTo(o1.getAverageAmount()); //Z-A
 				//return o1.getLatestPrice().compareTo(o2.getLatestPrice()); //a-z
 			}

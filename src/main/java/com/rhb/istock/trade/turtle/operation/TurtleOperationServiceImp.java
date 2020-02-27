@@ -240,6 +240,16 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 		for(TurtleView view : views) {
 			view.setLabel(ids.get(view.getItemID()));
 		}
+		
+		Collections.sort(views, new Comparator<TurtleView>() {
+			@Override
+			public int compare(TurtleView o1, TurtleView o2) {
+				BigDecimal now1 = new BigDecimal(o1.getNow());
+				BigDecimal now2 = new BigDecimal(o2.getNow());
+				
+				return now1.compareTo(now2);
+			}
+		});
 		return views;
 	}
 	

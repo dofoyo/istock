@@ -74,7 +74,7 @@ public class BavService {
 				Collections.sort(ms, new Comparator<Muster>() {
 					@Override
 					public int compare(Muster o1, Muster o2) {
-						return o2.getAmount().compareTo(o1.getAmount()); //Z-A
+						return o2.getLatestAmount().compareTo(o1.getLatestAmount()); //Z-A
 					}
 				});
 				

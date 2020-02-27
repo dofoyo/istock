@@ -337,7 +337,7 @@ public class KdataServiceImp implements KdataService{
 		
 		Kbar lastBar = kdata.getLastBar(); //是endDate的前一个交易日
 		BigDecimal close = lastBar.getClose();
-		BigDecimal amount = lastBar.getAmount();
+		//BigDecimal amount = lastBar.getAmount();
 		BigDecimal trunover_rate_f = lastBar.getTurnover_rate_f();
 		BigDecimal total_mv = lastBar.getTotal_mv();
 		BigDecimal volume_ratio = lastBar.getVolume_ratio();
@@ -351,11 +351,17 @@ public class KdataServiceImp implements KdataService{
 		//System.out.println(volume_ratio);
 		
 		BigDecimal latestPrice = close;
+		BigDecimal latestHighest = lastBar.getHigh();
+		BigDecimal latestLowest = lastBar.getLow();
+		BigDecimal latestAmount = lastBar.getAmount();
 		Integer limited = 0;
 		Kbar kbar = this.getKbar(itemID, endDate, cache);
 		if(kbar!=null) {
 			latestPrice = kbar.getClose();
 			limited = kbar.isLimited();
+			latestHighest = kbar.getHigh();
+			latestLowest = kbar.getLow();
+			latestAmount = kbar.getAmount();
 		}
 
 		Map<String,BigDecimal> features = kdata.getFeatures();
@@ -373,16 +379,17 @@ public class KdataServiceImp implements KdataService{
 		BigDecimal average_volume_ratio = features.get("average_volume_ratio");
 		
 		Map<String,BigDecimal> averagePrices = kdata.getAveragePrices();
+		BigDecimal a5 = averagePrices.get("a5");
 		BigDecimal a8 = averagePrices.get("a8");
 		BigDecimal a13 = averagePrices.get("a13");
 		BigDecimal a21 = averagePrices.get("a21");
 		BigDecimal a34 = averagePrices.get("a34");
 		
-		return new MusterEntity(itemID,close,amount,latestPrice,
+		return new MusterEntity(itemID,close,latestAmount,latestPrice,
 				limited,highest,lowest,averageAmount,averagePrice,
 				a8,a13,a21,a34,lowest21,lowest34,trunover_rate_f,
 				average_turnover_rate_f,volume_ratio,average_volume_ratio,
-				total_mv,circ_mv,total_share,float_share,free_share,lowest13,lowest8,lowest5,amount5,pe);
+				total_mv,circ_mv,total_share,float_share,free_share,lowest13,lowest8,lowest5,amount5,pe,latestHighest,latestLowest,a5);
 	}
 	
 	@Override
@@ -461,7 +468,7 @@ public class KdataServiceImp implements KdataService{
 				muster.setItemName(item.getName());
 				muster.setIndustry(item.getIndustry());
 				muster.setClose(entity.getClose());
-				muster.setAmount(entity.getAmount());
+				muster.setLatestAmount(entity.getLatestAmount());
 				muster.setLatestPrice(entity.getLatestPrice());
 				muster.setLimited(entity.getLimited());
 				muster.setHighest(entity.getHighest());
@@ -488,6 +495,9 @@ public class KdataServiceImp implements KdataService{
 				muster.setLowest5(entity.getLowest5());
 				muster.setAmount5(entity.getAmount5());
 				muster.setPe(entity.getPe());
+				muster.setLatestHighest(entity.getLatestHighest());
+				muster.setLatestLowest(entity.getLatestLowest());
+				muster.setAveragePrice5(entity.getAveragePrice5());
 //				muster.setPrviousAverageAmount(previousEntity==null ? muster.getAverageAmount() : previousEntity.getAverageAmount());
 				
 				musters.put(muster.getItemID(),muster);
@@ -518,7 +528,7 @@ public class KdataServiceImp implements KdataService{
 				muster.setItemName(itemName);
 				muster.setIndustry(industry);
 				muster.setClose(entity.getClose());
-				muster.setAmount(entity.getAmount());
+				muster.setLatestAmount(entity.getLatestAmount());
 				muster.setLatestPrice(entity.getLatestPrice());
 				muster.setLimited(entity.getLimited());
 				muster.setHighest(entity.getHighest());
@@ -545,6 +555,9 @@ public class KdataServiceImp implements KdataService{
 				muster.setLowest5(entity.getLowest5());
 				muster.setAmount5(entity.getAmount5());
 				muster.setPe(entity.getPe());
+				muster.setLatestHighest(entity.getLatestHighest());
+				muster.setLatestLowest(entity.getLatestLowest());
+				muster.setAveragePrice5(entity.getAveragePrice5());
 
 				musters.put(muster.getItemID(),muster);
 			}
@@ -601,7 +614,10 @@ public class KdataServiceImp implements KdataService{
 						muster.getLowest8(),
 						muster.getLowest5(),
 						muster.getAmount5(),
-						muster.getPe()
+						muster.getPe(),
+						kbar.getHigh(),
+						kbar.getLow(),
+						muster.getAveragePrice5()
 						));
 			}
 		}
@@ -643,7 +659,7 @@ public class KdataServiceImp implements KdataService{
 				muster.setItemName(itemService.getItem(entity.getItemID()).getName());
 				muster.setIndustry(itemService.getItem(entity.getItemID()).getIndustry());
 				muster.setClose(entity.getClose());
-				muster.setAmount(entity.getAmount());
+				muster.setLatestAmount(entity.getLatestAmount());
 				muster.setLatestPrice(entity.getLatestPrice());
 				muster.setLimited(entity.getLimited());
 				muster.setHighest(entity.getHighest());
@@ -670,6 +686,9 @@ public class KdataServiceImp implements KdataService{
 				muster.setLowest5(entity.getLowest5());
 				muster.setAmount5(entity.getAmount5());
 				muster.setPe(entity.getPe());
+				muster.setLatestHighest(entity.getLatestHighest());
+				muster.setLatestLowest(entity.getLatestLowest());
+				muster.setAveragePrice5(entity.getAveragePrice5());
 
 				musters.put(muster.getItemID(),muster);				
 			}

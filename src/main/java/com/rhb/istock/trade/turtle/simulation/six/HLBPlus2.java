@@ -7,7 +7,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -26,7 +25,7 @@ import com.rhb.istock.kdata.Muster;
  * 2、行情好时，跌破34日低点才卖出；行情不好时，跌破13均线就卖出
  *
  */
-public class HLBPlus {
+public class HLBPlus2 {
 	protected static final Logger logger = LoggerFactory.getLogger(HLB_try.class);
 
 	private Account account = null;
@@ -38,9 +37,7 @@ public class HLBPlus {
 	private Integer top = 3;
 	private Integer hlgap_min = 8;
 	private Integer hlgap_max = 25;
-	private Map<String,Integer> breakers = new HashMap<String,Integer>();
-
-	/*	private BigDecimal turnover_rate_f_max = new BigDecimal(8.63);
+/*	private BigDecimal turnover_rate_f_max = new BigDecimal(8.63);
 	private BigDecimal turnover_rate_f_min = new BigDecimal(0.18);
 	private BigDecimal volumn_ratio = new BigDecimal(3.22);
 */	
@@ -48,7 +45,7 @@ public class HLBPlus {
 	//private BigDecimal volumn_ratio = new BigDecimal(1.58);
 	//private BigDecimal total_mv = new BigDecimal("7000000000");
 	
-	public HLBPlus(BigDecimal initCash) {
+	public HLBPlus2(BigDecimal initCash) {
 		account = new Account(initCash);
 		this.initCash = initCash;
 	}
@@ -57,18 +54,6 @@ public class HLBPlus {
 		Muster muster;
 		account.setLatestDate(date);
 
-		Integer value;
-		Map.Entry<String, Integer> entry;
-		for (Iterator<Map.Entry<String, Integer>> iterator = this.breakers.entrySet().iterator(); iterator.hasNext();){
-		    entry = iterator.next();
-			value = entry.getValue();
-			if(value>=13) {    //突破后13日内回调有效
-				iterator.remove();
-			}else {
-				entry.setValue(value++);
-			}
-		}
-		
 		/*if(sseiFlag==1) {
 				this.top = 8;
 			}else {
@@ -110,14 +95,12 @@ public class HLBPlus {
 			//List<Muster> dds = new ArrayList<Muster>();  //用list，有重复，表示可以加仓
 			
 			//确定突破走势的股票
-			this.setBreakers(new ArrayList<Muster>(musters.values()));
-			List<Muster> bs = this.getBreakers(musters);
-//			List<Muster> breakers = this.getBreakers(new ArrayList<Muster>(musters.values()));
+			List<Muster> breakers = this.getBreakers(new ArrayList<Muster>(musters.values()));
 			//breakers.addAll(keeps.getUps(musters));
 			
 			breakers_sb.append(date.toString() + ",");
 			StringBuffer sb = new StringBuffer();
-			for(Muster breaker : bs) {
+			for(Muster breaker : breakers) {
 				if(!holdItemIDs.contains(breaker.getItemID())) {
 					dds.add(breaker);
 					sb.append(breaker.getItemName());
@@ -172,34 +155,9 @@ public class HLBPlus {
 		result.put("winIndustrys", account.getWinIndustrys());
 		return result;
 	}
-
-	private List<Muster> getBreakers(Map<String,Muster> musters){
-		List<Muster> bs = new ArrayList<Muster>();
-		String id;
-		Integer days;
-		Muster m;
-		Map.Entry<String, Integer> entry;
-		for (Iterator<Map.Entry<String, Integer>> iterator = this.breakers.entrySet().iterator(); iterator.hasNext();){
-		    entry = iterator.next();
-			id = entry.getKey();
-			days = entry.getValue();
-			if(musters.containsKey(id)) {
-				m = musters.get(id);
-				if(m.getLatestPrice().compareTo(m.getAveragePrice13())<0
-						&& m.getLatestPrice().compareTo(m.getAveragePrice21())>=0) {  //突破后跌破13日线
-					bs.add(musters.get(id));
-					iterator.remove();
-				}else if(m.getLatestPrice().compareTo(m.getAveragePrice21())<0) {
-					iterator.remove();
-				}
-			}
-		}
-		
-		return bs;
-	}
-
 	
-	private void setBreakers(List<Muster> musters){
+	private List<Muster> getBreakers(List<Muster> musters){
+		List<Muster> breakers = new ArrayList<Muster>();
 
 		Collections.sort(musters, new Comparator<Muster>() {
 			@Override
@@ -241,15 +199,15 @@ public class HLBPlus {
 					//&& m.getTurnover_rate_f().compareTo(turnover_rate_f_min)>0
 					//&& m.getTurnover_rate_f().compareTo(turnover_rate_f)<0
 					//&& m.getTotal_mv().compareTo(total_mv)<0
-					&& !breakers.containsKey(m.getItemID())
 					) {
-				this.breakers.put(m.getItemID(),0);
+				breakers.add(m);
 			}
 			if(m.getTotal_mv().compareTo(max_mc)==-1) {
 				j++;
 			}
 		}
 		
+		return breakers;
 	}
 	
 	class Distribution {

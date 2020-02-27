@@ -10,13 +10,16 @@ public class Muster {
 	private String itemName;
 	private String industry;
 	private BigDecimal close; 		//上一交易日收盘价
-	private BigDecimal amount;
 	private Integer limited;        //当日是否一字板
 	private BigDecimal latestPrice;  //当日收盘价
-	private BigDecimal highest;
-	private BigDecimal lowest;
+	private BigDecimal latestHighest; //当日最高价
+	private BigDecimal latestLowest; //当日最低价
+	private BigDecimal latestAmount;  ////当日交易金额
+	private BigDecimal highest;  //区间最大值
+	private BigDecimal lowest;   //区间最小值
 	private BigDecimal averageAmount;
 	private BigDecimal averagePrice;
+	private BigDecimal averagePrice5; 
 	private BigDecimal averagePrice8;
 	private BigDecimal averagePrice13;
 	private BigDecimal averagePrice21;
@@ -39,6 +42,38 @@ public class Muster {
 	private BigDecimal pe;
 	private DecimalFormat df = new DecimalFormat("#.00");
 	private BigDecimal prviousAverageAmount=null;
+
+	public BigDecimal getAveragePrice5() {
+		return averagePrice5;
+	}
+
+	public void setAveragePrice5(BigDecimal averagePrice5) {
+		this.averagePrice5 = averagePrice5;
+	}
+
+	public BigDecimal getLatestHighest() {
+		return latestHighest;
+	}
+
+	public void setLatestHighest(BigDecimal latestHighest) {
+		this.latestHighest = latestHighest;
+	}
+
+	public BigDecimal getLatestLowest() {
+		return latestLowest;
+	}
+
+	public void setLatestLowest(BigDecimal latestLowest) {
+		this.latestLowest = latestLowest;
+	}
+
+	public BigDecimal getLatestAmount() {
+		return latestAmount;
+	}
+
+	public void setLatestAmount(BigDecimal latestAmount) {
+		this.latestAmount = latestAmount;
+	}
 
 	public Integer getPrviousAverageAmountRatio1() {
 		if(this.prviousAverageAmount==null) {
@@ -140,7 +175,7 @@ public class Muster {
 	}
 	
 	public boolean isAboveAverageAmount() {
-		return this.amount.compareTo(averageAmount)>=0;
+		return this.latestAmount.compareTo(averageAmount)>=0;
 	}
 
 	public BigDecimal getAverage_turnover_rate_f() {
@@ -171,7 +206,7 @@ public class Muster {
 	}
 	
 	public BigDecimal cal_volume_ratio() {
-		return amount.divide(amount5,BigDecimal.ROUND_HALF_UP);
+		return this.latestAmount.divide(amount5,BigDecimal.ROUND_HALF_UP);
 	}
 	
 	public void setVolume_ratio(BigDecimal volume_ratio) {
@@ -278,6 +313,11 @@ public class Muster {
 		//return latestPrice.subtract(close).divide(close,BigDecimal.ROUND_HALF_UP).compareTo(new BigDecimal(0.095))>=0;
 	}
 
+	public boolean isUpThan(Integer percent) {
+		return latestPrice.subtract(close).divide(close,BigDecimal.ROUND_HALF_UP).compareTo(new BigDecimal(percent*1.0/100))>=0;
+		//return latestPrice.subtract(close).divide(close,BigDecimal.ROUND_HALF_UP).compareTo(new BigDecimal(0.095))>=0;
+	}
+	
 	public boolean isDownLimited() {
 		return limited==1 || latestPrice.subtract(close).divide(close,BigDecimal.ROUND_HALF_UP).compareTo(new BigDecimal(-0.095))<=0;
 		//return latestPrice.subtract(close).divide(close,BigDecimal.ROUND_HALF_UP).compareTo(new BigDecimal(-0.095))<=0;
@@ -409,12 +449,7 @@ public class Muster {
 	public void setItemID(String itemID) {
 		this.itemID = itemID;
 	}
-	public BigDecimal getAmount() {
-		return amount;
-	}
-	public void setAmount(BigDecimal amount) {
-		this.amount = amount;
-	}
+
 	public BigDecimal getAverageAmount() {
 		return averageAmount;
 	}

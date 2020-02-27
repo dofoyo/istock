@@ -121,7 +121,7 @@ public class IstockScheduledTask {
 		}
 	}*/
 	
-	@Scheduled(cron="0 0 18 ? * 1-5") //周一至周五，每日18点 执行收盘
+	@Scheduled(cron="0 15 18 ? * 1-5") //周一至周五，每日18点 执行收盘
 	public void downloadKdatas()  throws Exception{
 		System.out.println("run scheduled of '0 0 18 ? * 1-5'");
 		long beginTime=System.currentTimeMillis(); 

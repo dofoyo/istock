@@ -56,10 +56,10 @@ public class TurtleMusterSimulation {
 
 		BAV bav = new BAV(initCash);
 		AVBPlus bhl = new AVBPlus(initCash);
-		HLBPlus bdt = new HLBPlus(initCash);  
+		HLB2 bdt = new HLB2(initCash);  
 
 		LPB dtb = new LPB(initCash);  
-		AVB avb = new AVB(initCash);
+		AVB2 avb = new AVB2(initCash);
 		HLB hlb = new HLB(initCash);
 
 		Map<String,Muster> musters;
@@ -74,6 +74,7 @@ public class TurtleMusterSimulation {
 		for(LocalDate date = beginDate; (date.isBefore(endDate) || date.equals(endDate)); date = date.plusDays(1)) {
 
 			musters = kdataService.getMusters(date);
+			//musters = kdataService.getk
 
 			Progress.show((int)days, i++, "  simulate: " + date.toString() + ", musters.size()=" + musters.size() + " ");
 			

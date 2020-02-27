@@ -20,13 +20,17 @@ import com.rhb.istock.comm.util.Functions;
 import com.rhb.istock.fund.Account;
 import com.rhb.istock.kdata.Muster;
 /*
+ * 盘整
  * 
- * 相比hlb：
- * 1、行情好时才买入
- * 2、行情好时，跌破34日低点才卖出；行情不好时，跌破13均线就卖出
+ * 操作策略
+ * 买入：突破89日高点后,13日内在13日均线处买入
+ * 卖出：跌破21日均线
+ * 筛选范围：全部股票中筛选出21个，再从中最多选出5个突破的，同时考虑换手率和量比。
+ * 筛选依据：89天的高点和低点形成的通道越窄、价格越低
+ * 仓位控制：满仓，每只股票的均衡市值
  *
  */
-public class HLBPlus {
+public class HLB2 {
 	protected static final Logger logger = LoggerFactory.getLogger(HLB_try.class);
 
 	private Account account = null;
@@ -39,8 +43,7 @@ public class HLBPlus {
 	private Integer hlgap_min = 8;
 	private Integer hlgap_max = 25;
 	private Map<String,Integer> breakers = new HashMap<String,Integer>();
-
-	/*	private BigDecimal turnover_rate_f_max = new BigDecimal(8.63);
+/*	private BigDecimal turnover_rate_f_max = new BigDecimal(8.63);
 	private BigDecimal turnover_rate_f_min = new BigDecimal(0.18);
 	private BigDecimal volumn_ratio = new BigDecimal(3.22);
 */	
@@ -48,7 +51,7 @@ public class HLBPlus {
 	//private BigDecimal volumn_ratio = new BigDecimal(1.58);
 	//private BigDecimal total_mv = new BigDecimal("7000000000");
 	
-	public HLBPlus(BigDecimal initCash) {
+	public HLB2(BigDecimal initCash) {
 		account = new Account(initCash);
 		this.initCash = initCash;
 	}
@@ -56,7 +59,6 @@ public class HLBPlus {
 	public void doIt(Map<String,Muster> musters, LocalDate date, Integer sseiFlag) {
 		Muster muster;
 		account.setLatestDate(date);
-
 		Integer value;
 		Map.Entry<String, Integer> entry;
 		for (Iterator<Map.Entry<String, Integer>> iterator = this.breakers.entrySet().iterator(); iterator.hasNext();){
@@ -69,12 +71,11 @@ public class HLBPlus {
 			}
 		}
 		
-		/*if(sseiFlag==1) {
-				this.top = 8;
-			}else {
-				this.top = 1;
-			}*/
-		
+/*		if(sseiFlag==1) {
+			this.top = 8;
+		}else {
+			this.top = 1;
+		}*/
 		
 		Set<String> holdItemIDs = account.getItemIDsOfHolds();
 		for(String itemID : holdItemIDs) {
@@ -88,22 +89,21 @@ public class HLBPlus {
 		for(String itemID: holdItemIDs) {
 			muster = musters.get(itemID);
 			if(muster!=null) {
-/*				if(muster.isDropAve(21) && !muster.isDownLimited()) { 		//跌破21日均线就卖
+				if(muster.isDropAve(21) && !muster.isDownLimited()) { 		//跌破21日均线就卖
 					account.drop(itemID, "1", muster.getLatestPrice());
-				}*/
+				}
 /*				if(muster.isDropLowest(13) && !muster.isDownLimited()) { 		//跌破21日低点就卖
 					account.drop(itemID, "1", muster.getLatestPrice());
 				}*/
-				if(sseiFlag==0 && muster.isDropAve(13) && !muster.isDownLimited()) { 		//跌破13日均线就卖
+/*				if(sseiFlag==0 && muster.isDropAve(13) && !muster.isDownLimited()) { 		//跌破13日均线就卖
 					account.drop(itemID, "1", muster.getLatestPrice());
 				}				
-				if(sseiFlag==1 && muster.isDropLowest(34) && !muster.isDownLimited()) { 		//跌破34日低点就卖
+				if(sseiFlag==1 && muster.isDropLowest(34) && !muster.isDownLimited()) { 		//跌破21日低点就卖
 					account.drop(itemID, "2", muster.getLatestPrice());
-				}
+				}*/
 			}
 		}
 		
-		if(sseiFlag==1) {
 			holdItemIDs = account.getItemIDsOfHolds();
 			
 			Set<Muster> dds = new HashSet<Muster>();  //用set，无重复，表示不可加仓
@@ -112,7 +112,6 @@ public class HLBPlus {
 			//确定突破走势的股票
 			this.setBreakers(new ArrayList<Muster>(musters.values()));
 			List<Muster> bs = this.getBreakers(musters);
-//			List<Muster> breakers = this.getBreakers(new ArrayList<Muster>(musters.values()));
 			//breakers.addAll(keeps.getUps(musters));
 			
 			breakers_sb.append(date.toString() + ",");
@@ -149,7 +148,6 @@ public class HLBPlus {
 					}
 				//}
 				account.openAll(dds);			//后买
-			}
 		}
 
 		dailyAmount_sb.append(account.getDailyAmount() + "\n");
@@ -172,7 +170,7 @@ public class HLBPlus {
 		result.put("winIndustrys", account.getWinIndustrys());
 		return result;
 	}
-
+	
 	private List<Muster> getBreakers(Map<String,Muster> musters){
 		List<Muster> bs = new ArrayList<Muster>();
 		String id;
@@ -186,7 +184,8 @@ public class HLBPlus {
 			if(musters.containsKey(id)) {
 				m = musters.get(id);
 				if(m.getLatestPrice().compareTo(m.getAveragePrice13())<0
-						&& m.getLatestPrice().compareTo(m.getAveragePrice21())>=0) {  //突破后跌破13日线
+						&& m.getLatestPrice().compareTo(m.getAveragePrice21())>=0
+						) {  //突破后跌破13日线
 					bs.add(musters.get(id));
 					iterator.remove();
 				}else if(m.getLatestPrice().compareTo(m.getAveragePrice21())<0) {
@@ -197,9 +196,9 @@ public class HLBPlus {
 		
 		return bs;
 	}
-
 	
 	private void setBreakers(List<Muster> musters){
+		//List<Muster> breakers = new ArrayList<Muster>();
 
 		Collections.sort(musters, new Comparator<Muster>() {
 			@Override
@@ -207,7 +206,6 @@ public class HLBPlus {
 				//return o1.getHLGap().compareTo(o2.getHLGap());//A-Z
 			
 				if(o1.getHLGap().compareTo(o2.getHLGap())==0){
-					//return o2.cal_volume_ratio().compareTo(o1.cal_volume_ratio()); //a-z
 					return o1.getLatestPrice().compareTo(o2.getLatestPrice()); //a-z
 				}else {
 					return o1.getHLGap().compareTo(o2.getHLGap());//A-Z
@@ -224,8 +222,7 @@ public class HLBPlus {
 		distribution.show();
 */		
 		Muster m;
-		BigDecimal max_mc = new BigDecimal(100000000).multiply(new BigDecimal(300));
-		for(int i=0,j=0; i<musters.size() && breakers.size()<top && j<pool; i++) {
+		for(int i=0; i<musters.size() && i<pool; i++) {
 		//for(int i=0; i<musters.size() && i<pool; i++) {
 			m = musters.get(i);
 			if(m!=null 
@@ -233,7 +230,6 @@ public class HLBPlus {
 					&& !m.isDownLimited() 
 					&& m.isUpBreaker() 
 					//&& m.isAboveAverageAmount()
-					//&& m.getTotal_mv().compareTo(max_mc)==-1
 					//&& Functions.between(m.getHLGap(), hlgap_min, hlgap_max)
 					//&& m.isUp(21)
 					//&& m.getVolume_ratio().compareTo(new BigDecimal(2))==1
@@ -243,13 +239,9 @@ public class HLBPlus {
 					//&& m.getTotal_mv().compareTo(total_mv)<0
 					&& !breakers.containsKey(m.getItemID())
 					) {
-				this.breakers.put(m.getItemID(),0);
-			}
-			if(m.getTotal_mv().compareTo(max_mc)==-1) {
-				j++;
+				breakers.put(m.getItemID(),0);
 			}
 		}
-		
 	}
 	
 	class Distribution {
