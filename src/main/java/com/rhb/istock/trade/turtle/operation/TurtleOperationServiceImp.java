@@ -233,6 +233,25 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 
 		return views;
 	}
+
+	private List<TurtleView> getHlb2(){
+		Map<String,String> ids = selectorService.getHlb2();
+		List<TurtleView> views = this.getTurtleViews(new ArrayList(ids.keySet()), "HLB2"); 
+		for(TurtleView view : views) {
+			view.setLabel(ids.get(view.getItemID()));
+		}
+		
+		Collections.sort(views, new Comparator<TurtleView>() {
+			@Override
+			public int compare(TurtleView o1, TurtleView o2) {
+				BigDecimal now1 = new BigDecimal(o1.getNow());
+				BigDecimal now2 = new BigDecimal(o2.getNow());
+				
+				return now1.compareTo(now2);
+			}
+		});
+		return views;
+	}
 	
 	private List<TurtleView> getLpb(){
 		Map<String,String> ids = selectorService.getLpbs();
@@ -255,10 +274,19 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 	
 	private List<TurtleView> getBav(){
 		Map<String,String> ids = selectorService.getBavs();
-		List<TurtleView> views = this.getTurtleViews(new ArrayList(ids.keySet()), "BAV"); 
+		List<TurtleView> views = this.getTurtleViews(new ArrayList<String>(ids.keySet()), "BAV"); 
 		for(TurtleView view : views) {
 			view.setLabel(ids.get(view.getItemID()));
 		}
+		Collections.sort(views, new Comparator<TurtleView>() {
+			@Override
+			public int compare(TurtleView o1, TurtleView o2) {
+				BigDecimal now1 = new BigDecimal(o1.getLabel());
+				BigDecimal now2 = new BigDecimal(o2.getLabel());
+				
+				return now1.compareTo(now2);
+			}
+		});
 		return views;
 	}
 	
@@ -267,6 +295,10 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 	public List<TurtleView> getPotentials(String type) {
 		long beginTime=System.currentTimeMillis(); 
 		logger.info("getting potential views ......");
+
+		if(type.equals("hlb2")) {
+			return this.getHlb2();
+		}
 		
 		if(type.equals("lpb")) {
 			return this.getLpb();

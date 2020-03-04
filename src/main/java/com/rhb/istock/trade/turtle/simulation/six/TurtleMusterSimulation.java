@@ -54,7 +54,7 @@ public class TurtleMusterSimulation {
 		//System.out.println("Functions.ratio(this.averagePrice21, this.averagePrice)<=13");
 		System.out.println("simulate from " + beginDate + " to " + endDate +" ......");
 
-		BAV bav = new BAV(initCash);
+		BAV2 bav = new BAV2(initCash);
 		AVBPlus bhl = new AVBPlus(initCash);
 		HLB2 bdt = new HLB2(initCash);  
 

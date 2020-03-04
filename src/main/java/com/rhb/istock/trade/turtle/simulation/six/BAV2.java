@@ -20,16 +20,17 @@ import com.rhb.istock.kdata.Muster;
 
 
 /*
- * LPB - Lowest Price Break
  * 操作策略
  *
- * 买入：全部股票中按金额从小到大排序筛选出最小的55个，再从中选出3个突破21日均线的（可能会选不出来）而且89日成交量放大的买入
+ * 买入：突破21日均线,且averageAmount近8日上涨
  * 卖出：跌破21日均线
+ * 筛选范围：所有股票
+ * 排序依据：当日成交量，越高越好
  * 仓位控制：满仓，每只股票的均衡市值
  *
  */
-public class LPB {
-	protected static final Logger logger = LoggerFactory.getLogger(LPB.class);
+public class BAV2 {
+	protected static final Logger logger = LoggerFactory.getLogger(BAV2.class);
 
 	private Account account = null;
 	private BigDecimal initCash = null;
@@ -38,24 +39,24 @@ public class LPB {
 	private StringBuffer breakers_sb = new StringBuffer();
 	
 	private BigDecimal valueRatio = new BigDecimal(3);  //每只股票不能超过市值的1/3
-	private Integer pool = 55;
+	private Integer pool = 21;
 	private Integer top = 1;
 
-	public LPB(BigDecimal initCash) {
+	public BAV2(BigDecimal initCash) {
 		account = new Account(initCash);
 		this.initCash = initCash;
 	}
 	
-	public void doIt(Map<String,Muster> musters,Map<String,Muster> previous, LocalDate date, Integer sseiFlag) {
+	public void doIt(Map<String,Muster> musters,Map<String,Muster> previous, List<String> hscf, LocalDate date, Integer sseiFlag) {
 		Muster muster;
 		account.setLatestDate(date);
-		
+/*
 		if(sseiFlag==1) {
 			this.top = 8;
 		}else {
 			this.top = 1;
-		}
-		
+		}*/
+
 		
 		//卖出
 		Set<String> holdIDs = account.getItemIDsOfHolds();
@@ -81,7 +82,7 @@ public class LPB {
 			//确定突破走势的股票
 			Set<String> holdItemIDs = account.getItemIDsOfHolds();
 			Set<Muster> dds = new HashSet<Muster>();  //用set，无重复，表示不可加仓
-			List<Muster> breakers = this.getBreakers(musters,previous,date);
+			List<Muster> breakers = this.getBreakers(musters,previous, hscf);
 			breakers_sb.append(date.toString() + ",");
 			StringBuffer sb = new StringBuffer();
 			for(Muster breaker : breakers) {
@@ -146,22 +147,37 @@ public class LPB {
 		return ee.divide(price,BigDecimal.ROUND_DOWN).divide(new BigDecimal(100),BigDecimal.ROUND_DOWN).intValue()*100;
 	}
 	
-	private List<Muster> getBreakers(Map<String,Muster> musters,Map<String,Muster> previous, LocalDate date){
-		List<Muster>  ms = new ArrayList<Muster>(musters.values());
+	private List<Muster> getBreakers(Map<String,Muster> musters, Map<String,Muster> previous, List<String> szcf){
+/*		List<Muster>  ms = new ArrayList<Muster>();
 
+		for(String id : szcf) {
+			if(musters.get(id) != null) {
+				ms.add(musters.get(id));
+			}
+		}*/
+		
+		List<Muster>  ms = new ArrayList<Muster>(musters.values());
+		
 		Collections.sort(ms, new Comparator<Muster>() {
 			@Override
 			public int compare(Muster o1, Muster o2) {
-				return o1.getLatestPrice().compareTo(o2.getLatestPrice()); //a-z
+/*				if(o2.getPrviousAverageAmountRatio().equals(o1.getPrviousAverageAmountRatio())) {
+					return o1.getLatestPrice().compareTo(o2.getLatestPrice());
+				}else {
+					return o2.getPrviousAverageAmountRatio().compareTo(o1.getPrviousAverageAmountRatio()); //Z-A
+				}*/
+				//return o2.getAmount5().compareTo(o1.getAmount5()); //Z-A
+				return o2.getLatestAmount().compareTo(o1.getLatestAmount()); //Z-A
+				//return o2.getAverageAmount().compareTo(o1.getAverageAmount()); //Z-A
+				//return o1.getLatestPrice().compareTo(o2.getLatestPrice()); //a-z
 			}
 		});
 		
 		List<Muster>  breakers = new ArrayList<Muster>();
 		Muster m,p;
 		Integer ratio=8;
-		StringBuffer sb = new StringBuffer(date.toString() + ":");
 		BigDecimal previousAverageAmount;
-		for(int i=0; i<ms.size() && i<this.pool && breakers.size()<this.top; i++) {
+		for(int i=0; i<ms.size() && i<pool && breakers.size()<top; i++) {
 			m = ms.get(i);
 			p = previous.get(m.getItemID());
 			if(p==null) {
@@ -171,31 +187,24 @@ public class LPB {
 			}
 			//r = Functions.ratio(m.getAveragePrice21(), m.getAveragePrice());
 			if(m!=null 
-					&& p!=null
-					&& m.getPe().compareTo(BigDecimal.ZERO)>0 && m.getPe().compareTo(new BigDecimal(233))<0
+					//&& p!=null
+					//&& m.getPe().compareTo(BigDecimal.ZERO)>0 // && m.getPe().compareTo(new BigDecimal(170))<0
 					&& !m.isUpLimited() 
 					&& !m.isDownLimited() 
 					//&& m.isUpBreaker()
 					&& m.isBreaker(ratio)
 					//&& r<=ratio && r>0
-					//&& m.getPrviousAverageAmountRatio()>0
+					//&& m.isAboveAveragePrice(21) && !p.isAboveAveragePrice(21)
 					&& m.getAverageAmount().compareTo(previousAverageAmount)==1
 					//&& m.isAboveAverageAmount()
-					//&& m.getHLGap()<=55
-					//&& p.isDown(21)
-					//&& m.cal_volume_ratio().compareTo(p.cal_volume_ratio())==1
 					//&& m.isUp(89)
 					//&& m.getN21Gap()<=13
 					//&& m.cal_volume_ratio().compareTo(new BigDecimal(2))==1
 					) {
 				breakers.add(m);
-				sb.append(m.getItemID() + "(" + i + ")" +",");
 			}
 		}
 		
-		//logger.info(sb.toString());
-		
 		return breakers;
 	}
-	
 }

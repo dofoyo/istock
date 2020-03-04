@@ -23,6 +23,7 @@ import com.rhb.istock.selector.aat.AverageAmountTopService;
 import com.rhb.istock.selector.bav.BavService;
 import com.rhb.istock.selector.bluechip.BluechipService;
 import com.rhb.istock.selector.favor.FavorService;
+import com.rhb.istock.selector.hlb2.Hlb2Service;
 import com.rhb.istock.selector.hlt.HighLowTopService;
 import com.rhb.istock.selector.hold.HoldEntity;
 import com.rhb.istock.selector.hold.HoldService;
@@ -69,6 +70,10 @@ public class SelectorServiceImp implements SelectorService{
 	@Autowired
 	@Qualifier("bavService")
 	BavService bavService;
+
+	@Autowired
+	@Qualifier("hlb2Service")
+	Hlb2Service hlb2Service;
 	
 	@Override
 	public List<HoldEntity> getHolds() {
@@ -452,6 +457,24 @@ public class SelectorServiceImp implements SelectorService{
 	public Map<String,String> getLpbs() {
 		Map<String,String> ids = new HashMap<String,String>();
 		String str = lpbService.getLpb();
+		if(str!=null && str.length()>11) {
+			String id,order;
+			String[] ss = str.substring(11).split(",");
+			for(String s : ss) {
+				if(s.length()>8) {
+					id = s.substring(0, 8);
+					order = s.substring(9,s.indexOf(")"));
+					ids.put(id,order);
+				}
+			}
+		}
+		return ids;
+	}
+	
+	@Override
+	public Map<String,String> getHlb2() {
+		Map<String,String> ids = new HashMap<String,String>();
+		String str = hlb2Service.getHLB2();
 		if(str!=null && str.length()>11) {
 			String id,order;
 			String[] ss = str.substring(11).split(",");

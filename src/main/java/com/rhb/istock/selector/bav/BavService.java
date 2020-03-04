@@ -58,18 +58,19 @@ public class BavService {
 			List<LocalDate> previousDates = kdataService.getMusterDates(previous_period, endDate);
 			if(previousDates!=null) {
 				Map<String,Muster> previous = kdataService.getMusters(previousDates.get(0));
-				Integer sseiFlag = kdataService.getSseiFlag(endDate);
-				List<String> hs300 = itemService.getHs300(endDate);
+				//Integer sseiFlag = kdataService.getSseiFlag(endDate);
+				//List<String> hs300 = itemService.getHs300(endDate);
 				
-				List<Muster>  ms = new ArrayList<Muster>();
+/*				List<Muster>  ms = new ArrayList<Muster>();
 				for(String id : hs300) {
 					if(musters.get(id) != null) {
 						ms.add(musters.get(id));
 					}
-				}
+				}*/
 				
 				//System.out.println("************  hs300 = " + ms.size());
 				
+				List<Muster>  ms = new ArrayList<Muster>(musters.values()); 
 				
 				Collections.sort(ms, new Comparator<Muster>() {
 					@Override

@@ -497,5 +497,23 @@ public class Muster {
 
 	public void setLowest5(BigDecimal lowest5) {
 		this.lowest5 = lowest5;
+	}
+
+	@Override
+	public String toString() {
+		return "Muster [itemID=" + itemID + ", itemName=" + itemName + ", industry=" + industry + ", close=" + close
+				+ ", limited=" + limited + ", latestPrice=" + latestPrice + ", latestHighest=" + latestHighest
+				+ ", latestLowest=" + latestLowest + ", latestAmount=" + latestAmount + ", highest=" + highest
+				+ ", lowest=" + lowest + ", averageAmount=" + averageAmount + ", averagePrice=" + averagePrice
+				+ ", averagePrice5=" + averagePrice5 + ", averagePrice8=" + averagePrice8 + ", averagePrice13="
+				+ averagePrice13 + ", averagePrice21=" + averagePrice21 + ", averagePrice34=" + averagePrice34
+				+ ", lowest34=" + lowest34 + ", lowest21=" + lowest21 + ", lowest13=" + lowest13 + ", lowest8="
+				+ lowest8 + ", lowest5=" + lowest5 + ", turnover_rate_f=" + turnover_rate_f
+				+ ", average_turnover_rate_f=" + average_turnover_rate_f + ", volume_ratio=" + volume_ratio
+				+ ", average_volume_ratio=" + average_volume_ratio + ", total_mv=" + total_mv + ", circ_mv=" + circ_mv
+				+ ", total_share=" + total_share + ", float_share=" + float_share + ", free_share=" + free_share
+				+ ", amount5=" + amount5 + ", pe=" + pe + ", df=" + df + ", prviousAverageAmount="
+				+ prviousAverageAmount + "]";
 	}	
+	
 }
