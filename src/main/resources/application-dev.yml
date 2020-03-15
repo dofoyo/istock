@@ -21,6 +21,7 @@ huaPotentialFile: d:/dev/istock-data/huaPotential.txt
 mcstFile: d:/dev/istock-data/mcst.txt
 bavFile: d:/dev/istock-data/bav.txt
 lpbFile: d:/dev/istock-data/lpb.txt
+lpb2File: d:/dev/istock-data/lpb2.txt
 hlb2File: d:/dev/istock-data/hlb2.txt
 openDuration: 89
 dropDuration: 21

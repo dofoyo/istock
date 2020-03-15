@@ -56,7 +56,7 @@ public class TurtleMusterSimulation {
 
 		BAV2 bav = new BAV2(initCash);
 		AVBPlus bhl = new AVBPlus(initCash);
-		HLB2 bdt = new HLB2(initCash);  
+		LPB2 bdt = new LPB2(initCash);  
 
 		LPB dtb = new LPB(initCash);  
 		AVB2 avb = new AVB2(initCash);
@@ -88,7 +88,7 @@ public class TurtleMusterSimulation {
 				
 				bav.doIt(musters, previous.get(0), itemService.getHs300(date), date,sseiFlag);
 				bhl.doIt(musters, date,sseiFlag);
-				bdt.doIt(musters, date,sseiFlag);
+				bdt.doIt(musters, previous.get(0), date,sseiFlag);
 				dtb.doIt(musters, previous.get(0), date,sseiFlag);
 				hlb.doIt(musters, date,sseiFlag);
 				avb.doIt(musters, date,sseiFlag);

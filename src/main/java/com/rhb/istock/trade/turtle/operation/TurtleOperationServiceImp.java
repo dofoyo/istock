@@ -234,6 +234,26 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 		return views;
 	}
 
+	private List<TurtleView> getLpb2(){
+		Map<String,String> ids = selectorService.getLpb2();
+		List<TurtleView> views = this.getTurtleViews(new ArrayList(ids.keySet()), "LPB2"); 
+		for(TurtleView view : views) {
+			view.setLabel(ids.get(view.getItemID()));
+		}
+		
+		Collections.sort(views, new Comparator<TurtleView>() {
+			@Override
+			public int compare(TurtleView o1, TurtleView o2) {
+				//BigDecimal now1 = new BigDecimal(o1.getNow());
+				//BigDecimal now2 = new BigDecimal(o2.getNow());
+				
+				//return now1.compareTo(now2);
+				return o1.getLabel().compareTo(o2.getLabel());
+			}
+		});
+		return views;
+	}
+	
 	private List<TurtleView> getHlb2(){
 		Map<String,String> ids = selectorService.getHlb2();
 		List<TurtleView> views = this.getTurtleViews(new ArrayList(ids.keySet()), "HLB2"); 
@@ -296,6 +316,10 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 		long beginTime=System.currentTimeMillis(); 
 		logger.info("getting potential views ......");
 
+		if(type.equals("lpb2")) {
+			return this.getLpb2();
+		}
+		
 		if(type.equals("hlb2")) {
 			return this.getHlb2();
 		}

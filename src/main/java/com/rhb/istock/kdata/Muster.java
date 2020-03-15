@@ -43,6 +43,20 @@ public class Muster {
 	private DecimalFormat df = new DecimalFormat("#.00");
 	private BigDecimal prviousAverageAmount=null;
 
+	public Integer getAverageGap() {
+		BigDecimal h = averagePrice5.compareTo(averagePrice8)==1 ? averagePrice5 : averagePrice8;
+		h = h.compareTo(averagePrice13)==1 ? h : averagePrice13;
+		h = h.compareTo(averagePrice21)==1 ? h : averagePrice21;
+		h = h.compareTo(averagePrice34)==1 ? h : averagePrice34;
+
+		BigDecimal l = averagePrice5.compareTo(averagePrice8)==-1 ? averagePrice5 : averagePrice8;
+		l = l.compareTo(averagePrice13)==-1 ? l : averagePrice13;
+		l = l.compareTo(averagePrice21)==-1 ? l : averagePrice21;
+		l = l.compareTo(averagePrice34)==-1 ? l : averagePrice34;
+
+		return Functions.ratio(h, l);
+	}
+	
 	public BigDecimal getAveragePrice5() {
 		return averagePrice5;
 	}
@@ -329,6 +343,16 @@ public class Muster {
 				this.close.compareTo(this.averagePrice21)<=0 &&
 				this.latestPrice.compareTo(this.averagePrice21)==1 &&
 				r<=ratio && r>0;
+	}
+	
+	public boolean isBreaker() {
+		BigDecimal h = averagePrice5.compareTo(averagePrice8)==1 ? averagePrice5 : averagePrice8;
+		h = h.compareTo(averagePrice13)==1 ? h : averagePrice13;
+		h = h.compareTo(averagePrice21)==1 ? h : averagePrice21;
+		h = h.compareTo(averagePrice34)==1 ? h : averagePrice34;
+
+		return this.close.compareTo(h)<=0 &&
+				this.latestPrice.compareTo(h)==1;
 	}
 	
 	public boolean isUp(Integer period) {
