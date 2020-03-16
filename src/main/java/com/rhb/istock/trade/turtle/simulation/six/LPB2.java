@@ -50,11 +50,11 @@ public class LPB2 {
 		Muster muster;
 		account.setLatestDate(date);
 		
-/*		if(sseiFlag==1) {
+		if(sseiFlag==1) {
 			this.top = 3;
 		}else {
 			this.top = 1;
-		}*/
+		}
 		
 		
 		//卖出
@@ -63,16 +63,16 @@ public class LPB2 {
 			muster = musters.get(itemID);
 			if(muster!=null) {
 				account.refreshHoldsPrice(itemID, muster.getLatestPrice());
-				if(muster.isDropAve(21) && !muster.isDownLimited()) { 		//跌破21日均线就卖
+/*				if(muster.isDropAve(21) && !muster.isDownLimited()) { 		//跌破21日均线就卖
 					account.drop(itemID, "2", muster.getLatestPrice());
-				}
+				}*/
 				
-				/*if(sseiFlag==0 && muster.isDropLowest(21) && !muster.isDownLimited()) { 		//跌破21日均线就卖
+				if(sseiFlag==0 && muster.isDropAve(13) && !muster.isDownLimited()) { 		//跌破21日均线就卖
 					account.drop(itemID, "1", muster.getLatestPrice());
 				}				
-				if(sseiFlag==1 && muster.isDropLowest(34) && !muster.isDownLimited()) { 		//跌破21日低点就卖
+				if(sseiFlag==1 && muster.isDropAve(21) && !muster.isDownLimited()) { 		//跌破21日低点就卖
 					account.drop(itemID, "2", muster.getLatestPrice());
-				}*/	
+				}	
 			}
 		}
 		
@@ -164,9 +164,15 @@ public class LPB2 {
 		Muster m,p;
 		Integer ratio=8;
 		StringBuffer sb = new StringBuffer(date.toString() + ":");
+		BigDecimal previousAverageAmount;
 		for(int i=0; i<ms.size() && i<this.pool && breakers.size()<this.top; i++) {
 			m = ms.get(i);
 			p = previous.get(m.getItemID());
+			if(p==null) {
+				previousAverageAmount = BigDecimal.ZERO;
+			}else {
+				previousAverageAmount = p.getAverageAmount();
+			}
 			if(m!=null 
 					&& p!=null
 					//&& m.getPe().compareTo(BigDecimal.ZERO)>0 && m.getPe().compareTo(new BigDecimal(233))<0
@@ -174,6 +180,7 @@ public class LPB2 {
 					&& !m.isDownLimited() 
 					//&& m.isUpBreaker()
 					&& m.isBreaker(ratio)
+					//&& m.isBreaker()
 					//&& r<=ratio && r>0
 					//&& m.getPrviousAverageAmountRatio()>0
 					//&& m.getAverageAmount().compareTo(previousAverageAmount)==1

@@ -42,6 +42,15 @@ public class Muster {
 	private BigDecimal pe;
 	private DecimalFormat df = new DecimalFormat("#.00");
 	private BigDecimal prviousAverageAmount=null;
+	private Integer prviousAverageGap=null;
+	
+	public Integer getPrviousAverageGap() {
+		return prviousAverageGap;
+	}
+
+	public void setPrviousAverageGap(Integer prviousAverageGap) {
+		this.prviousAverageGap = prviousAverageGap;
+	}
 
 	public Integer getAverageGap() {
 		BigDecimal h = averagePrice5.compareTo(averagePrice8)==1 ? averagePrice5 : averagePrice8;

@@ -69,13 +69,20 @@ public class Lpb2Service {
 				
 				Muster m,p;
 				Integer ratio=8;
+				//BigDecimal previousAverageAmount;
 				for(int i=0; i<ms.size(); i++) {
 					m = ms.get(i);
 					p = previous.get(m.getItemID());
+					/*if(p==null) {
+						previousAverageAmount = BigDecimal.ZERO;
+					}else {
+						previousAverageAmount = p.getAverageAmount();
+					}*/
 					if(m!=null && p!=null
 							&& !m.isUpLimited() 
 							&& !m.isDownLimited() 
 							&& m.isBreaker(ratio)
+							//&& m.getAverageAmount().compareTo(previousAverageAmount)==1
 							&& p.getAverageGap()<ratio
 							&& m.getAveragePrice21().compareTo(p.getAveragePrice21())==1
 							) {
