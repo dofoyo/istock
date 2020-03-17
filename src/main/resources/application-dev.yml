@@ -23,6 +23,7 @@ bavFile: d:/dev/istock-data/bav.txt
 lpbFile: d:/dev/istock-data/lpb.txt
 lpb2File: d:/dev/istock-data/lpb2.txt
 hlb2File: d:/dev/istock-data/hlb2.txt
+txtFile: d:/dev/istock-data/ids.txt
 openDuration: 89
 dropDuration: 21
 
