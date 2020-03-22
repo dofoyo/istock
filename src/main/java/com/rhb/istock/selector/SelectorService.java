@@ -52,6 +52,7 @@ public interface SelectorService{
 	public Map<String,String> getHlb2();
 	public Map<String,String> getLpbs();
 	public Map<String,String> getBavs();
+	public Map<String,String> getDrums();
 
 
 }

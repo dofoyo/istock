@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import com.rhb.istock.comm.util.Functions;
+
 public class Kdata {
 	private String itemID;
 	private TreeMap<LocalDate,Kbar> bars;
@@ -18,6 +20,12 @@ public class Kdata {
 	public Kdata(String itemID) {
 		this.itemID = itemID;
 		this.bars = new TreeMap<LocalDate,Kbar>();
+	}
+	
+	public Integer getRatio() {
+		BigDecimal p1 = bars.lastEntry().getValue().getClose();
+		BigDecimal p2 = bars.firstEntry().getValue().getClose();
+		return Functions.ratio(p1, p2);
 	}
 	
 	public Integer getSize() {

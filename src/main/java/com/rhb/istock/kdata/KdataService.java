@@ -1,5 +1,6 @@
 package com.rhb.istock.kdata;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +13,9 @@ public interface KdataService {
 	
 	public void downSSEI();  //下载上证指数
 	public Integer getSseiFlag(LocalDate date); 
+	public Integer getSseiRatio(LocalDate date, Integer period);
+	
+	public BigDecimal getHighestPrice(String itemID, LocalDate beginDate, boolean byCache);
 	
 	public Kdata getKdata(String itemID, LocalDate endDate, Integer count, boolean byCache);
 	public Kdata getKdata(String itemID, LocalDate beginDate, LocalDate endDate, boolean byCache);

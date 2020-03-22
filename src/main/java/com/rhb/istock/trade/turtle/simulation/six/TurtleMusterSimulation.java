@@ -59,7 +59,7 @@ public class TurtleMusterSimulation {
 		LPB2 bdt = new LPB2(initCash);  
 
 		LPB dtb = new LPB(initCash);  
-		AVB2 avb = new AVB2(initCash);
+		Drum avb = new Drum(initCash);
 		HLB hlb = new HLB(initCash);
 
 		Map<String,Muster> musters;
@@ -67,7 +67,7 @@ public class TurtleMusterSimulation {
 		List<Map<String,Muster>> previous = new ArrayList<Map<String,Muster>>();
 		Integer previous_period  = 8; //历史纪录区间，主要用于后面判断
 
-		Integer sseiFlag;
+		Integer sseiFlag, sseiRatio;
 		
 		long days = endDate.toEpochDay()- beginDate.toEpochDay();
 		int i=1;
@@ -85,13 +85,14 @@ public class TurtleMusterSimulation {
 				}
 				
 				sseiFlag = kdataService.getSseiFlag(date);
+				sseiRatio = kdataService.getSseiRatio(date, previous_period);
 				
-				bav.doIt(musters, previous.get(0), itemService.getHs300(date), date,sseiFlag);
-				bhl.doIt(musters, date,sseiFlag);
-				bdt.doIt(musters, previous.get(0), date,sseiFlag);
-				dtb.doIt(musters, previous.get(0), date,sseiFlag);
-				hlb.doIt(musters, date,sseiFlag);
-				avb.doIt(musters, date,sseiFlag);
+				bav.doIt(musters, previous.get(0), itemService.getHs300(date), date, sseiFlag);
+				bhl.doIt(musters, date, sseiFlag);
+				bdt.doIt(musters, previous.get(0), date, sseiFlag);
+				dtb.doIt(musters, previous.get(0), date, sseiFlag);
+				hlb.doIt(musters, date, sseiFlag);
+				avb.doIt(musters, previous.get(0), date, sseiFlag, sseiRatio);
 			}
 		}
 		

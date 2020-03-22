@@ -711,12 +711,20 @@ public class KdataServiceImp implements KdataService{
 			e.printStackTrace();
 		}
 	}
+	
+	@Override
+	public Integer getSseiRatio(LocalDate date, Integer period) {
+		Kdata ssei = this.getKdata(sseiID, date.plusDays(1), openDuration, true);
+		return ssei.getRatio();
+	}
 
 	@Override
 	public Integer getSseiFlag(LocalDate date) {
 		Integer flag = 1;
 		Kdata ssei = this.getKdata(sseiID, date.plusDays(1), openDuration, true);
-		flag = ssei.isAboveAveragePrice(openDuration) && ssei.isAboveAveragePrice(21) && ssei.isAboveAverageAmount() ? 1 : 0;
+		//flag = ssei.isAboveAveragePrice(openDuration) && ssei.isAboveAveragePrice(21) && ssei.isAboveAverageAmount() ? 1 : 0;
+		//flag = (ssei.isAboveAveragePrice(openDuration) && ssei.isAboveAveragePrice(21)) || ssei.isAboveAverageAmount() ? 1 : 0;
+		flag = (ssei.isAboveAveragePrice(openDuration) && ssei.isAboveAveragePrice(21)) ? 1 : 0;
 /*		if(flag==1) {
 			logger.info("***********" +  date.toString() +  " up!");
 		}*/
@@ -810,5 +818,24 @@ public class KdataServiceImp implements KdataService{
 		
 		return ds;
 	}
+
+	@Override
+	public BigDecimal getHighestPrice(String itemID, LocalDate beginDate, boolean byCache) {
+		BigDecimal highest = null;
+
+		KdataEntity entity = this.getEntity(itemID, byCache);
+		LocalDate date;
+		KbarEntity bar;
+		for(Map.Entry<LocalDate, KbarEntity> entry : entity.getBars().entrySet()) {
+				date = entry.getKey();
+				if(date.isAfter(beginDate)) {
+					bar = entry.getValue();
+					highest = highest==null || highest.compareTo(bar.getHigh())==-1 ? bar.getHigh() : highest;
+				}
+		}
+		
+		return highest;
+	}
+
 
 }

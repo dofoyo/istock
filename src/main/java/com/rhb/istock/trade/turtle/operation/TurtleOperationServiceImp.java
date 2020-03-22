@@ -292,6 +292,25 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 		return views;
 	}
 	
+	private List<TurtleView> getDrum(){
+		Map<String,String> ids = selectorService.getDrums();
+		List<TurtleView> views = this.getTurtleViews(new ArrayList(ids.keySet()), "DRUM"); 
+		for(TurtleView view : views) {
+			view.setLabel(ids.get(view.getItemID()));
+		}
+		
+		Collections.sort(views, new Comparator<TurtleView>() {
+			@Override
+			public int compare(TurtleView o1, TurtleView o2) {
+				BigDecimal now1 = new BigDecimal(o1.getNow());
+				BigDecimal now2 = new BigDecimal(o2.getNow());
+				
+				return now1.compareTo(now2);
+			}
+		});
+		return views;
+	}
+	
 	private List<TurtleView> getBav(){
 		Map<String,String> ids = selectorService.getBavs();
 		List<TurtleView> views = this.getTurtleViews(new ArrayList<String>(ids.keySet()), "BAV"); 
@@ -318,19 +337,17 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 
 		if(type.equals("lpb2")) {
 			return this.getLpb2();
-		}
-		
-		if(type.equals("hlb2")) {
+		}else if(type.equals("hlb2")) {
 			return this.getHlb2();
+		}else if(type.equals("lpb")) {
+			return this.getLpb();
+		}else if(type.equals("bav")) {
+			return this.getBav();
+		}else if(type.equals("drum")) {
+			return this.getDrum();
 		}
 		
-		if(type.equals("lpb")) {
-			return this.getLpb();
-		}
-
-		if(type.equals("bav")) {
-			return this.getBav();
-		}
+		
 		
 		List<TurtleView> views = new ArrayList<TurtleView>();
 		TurtleView view;

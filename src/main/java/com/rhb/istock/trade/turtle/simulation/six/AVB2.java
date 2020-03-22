@@ -20,14 +20,7 @@ import com.rhb.istock.fund.Account;
 import com.rhb.istock.kdata.Muster;
 
 /*
- * 成交量
- * 
- * 操作策略
- * 买入：突破89日高点
- * 卖出：跌破21日均线
- * 筛选范围：全部股票中筛选出21个，再从中最多选出5个突破的（可能会选不出来）
- * 筛选依据：89天日均成交量，越高越好
- * 仓位控制：满仓，每只股票的均衡市值
+ * 放量新高后回调
  *
  */
 public class AVB2 {

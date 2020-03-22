@@ -22,6 +22,7 @@ import com.rhb.istock.kdata.KdataService;
 import com.rhb.istock.selector.aat.AverageAmountTopService;
 import com.rhb.istock.selector.bav.BavService;
 import com.rhb.istock.selector.bluechip.BluechipService;
+import com.rhb.istock.selector.drum.DrumService;
 import com.rhb.istock.selector.favor.FavorService;
 import com.rhb.istock.selector.hlb2.Hlb2Service;
 import com.rhb.istock.selector.hlt.HighLowTopService;
@@ -67,6 +68,10 @@ public class SelectorServiceImp implements SelectorService{
 	@Autowired
 	@Qualifier("lpbService")
 	LpbService lpbService;
+
+	@Autowired
+	@Qualifier("drumService")
+	DrumService drumService;
 	
 	@Autowired
 	@Qualifier("bavService")
@@ -458,6 +463,24 @@ public class SelectorServiceImp implements SelectorService{
 		return results;
 	}
 
+	@Override
+	public Map<String,String> getDrums() {
+		Map<String,String> ids = new HashMap<String,String>();
+		String str = drumService.getDrum();
+		if(str!=null && str.length()>11) {
+			String id,order;
+			String[] ss = str.substring(11).split(",");
+			for(String s : ss) {
+				if(s.length()>8) {
+					id = s.substring(0, 8);
+					order = s.substring(9,s.indexOf(")"));
+					ids.put(id,order);
+				}
+			}
+		}
+		return ids;
+	}
+	
 	@Override
 	public Map<String,String> getLpbs() {
 		Map<String,String> ids = new HashMap<String,String>();
