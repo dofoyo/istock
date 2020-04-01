@@ -55,11 +55,23 @@ public class KdataServiceTest {
 		}
 	}
 	
-	@Test
+	//@Test
 	public void downClosedDatas() {
 		LocalDate date = LocalDate.parse("2020-02-26");
 		try {
 			kdataService.downClosedDatas(date);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	@Test
+	public void getSseiRatio() {
+		LocalDate date = LocalDate.parse("2020-03-20");
+		try {
+			System.out.println(kdataService.getSseiFlag(date));
+			System.out.println(kdataService.getSseiRatio(date, 8));
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

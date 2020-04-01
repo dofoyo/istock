@@ -74,7 +74,7 @@ public class Drum {
 				//走势弱于大盘
 				ratio = Functions.ratio(muster.getClose(),pre.getClose());
 				if((ratio < sseiRatio || muster.isDropAve(21)) && !muster.isDownLimited()) {
-					account.drop(itemID, "3", muster.getLatestPrice());
+					account.drop(itemID, sseiRatio.toString(), muster.getLatestPrice());
 				}
 			}
 		}
@@ -161,22 +161,21 @@ public class Drum {
 		
 		List<Muster>  breakers = new ArrayList<Muster>();
 		Muster m,p;
-		Integer ratio;
+		Integer ratio, r;
 		StringBuffer sb = new StringBuffer(date.toString() + ":");
 		for(int i=0; i<ms.size() && breakers.size()<this.top; i++) {
 			m = ms.get(i);
 			p = previous.get(m.getItemID());
 			if(m!=null && p!=null) {
 				ratio = Functions.ratio(m.getAveragePrice21(), m.getAveragePrice());
-				if(Functions.ratio(m.getClose(),p.getClose()) >= sseiRatio
+				r = Functions.ratio(m.getClose(),p.getClose());
+				if(!m.isUpLimited() && !m.isDownLimited()
+					&& r >= sseiRatio
 					//&& m.isBreaker(13)
 					//&& m.isBreaker()
-					&& ratio<=5
-					&& ratio >0
+					&& ratio<=5 && ratio >0
 					//&& m.isUp(21)
 					&& m.getAveragePrice21().compareTo(p.getAveragePrice21())==1
-					&& !m.isUpLimited() 
-					&& !m.isDownLimited() 
 					) {
 				breakers.add(m);
 				sb.append(m.getItemID() + "(" + i + ")" +",");

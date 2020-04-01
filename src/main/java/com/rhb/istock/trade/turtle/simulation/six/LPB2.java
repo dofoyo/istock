@@ -50,11 +50,11 @@ public class LPB2 {
 		Muster muster;
 		account.setLatestDate(date);
 		
-		if(sseiFlag==1) {
+		/*if(sseiFlag==1) {
 			this.top = 3;
 		}else {
 			this.top = 1;
-		}
+		}*/
 		
 		
 		//卖出
@@ -162,24 +162,26 @@ public class LPB2 {
 		
 		List<Muster>  breakers = new ArrayList<Muster>();
 		Muster m,p;
-		Integer ratio=8;
+		Integer ratio=8, r2;
 		StringBuffer sb = new StringBuffer(date.toString() + ":");
-		BigDecimal previousAverageAmount;
+		//BigDecimal previousAverageAmount;
 		for(int i=0; i<ms.size() && i<this.pool && breakers.size()<this.top; i++) {
 			m = ms.get(i);
 			p = previous.get(m.getItemID());
-			if(p==null) {
+			/*if(p==null) {
 				previousAverageAmount = BigDecimal.ZERO;
 			}else {
 				previousAverageAmount = p.getAverageAmount();
-			}
-			if(m!=null 
-					&& p!=null
+			}*/
+			r2 = Functions.ratio(m.getLatestPrice(), m.getClose());
+
+			if(m!=null && p!=null
 					//&& m.getPe().compareTo(BigDecimal.ZERO)>0 && m.getPe().compareTo(new BigDecimal(233))<0
 					&& !m.isUpLimited() 
 					&& !m.isDownLimited() 
 					//&& m.isUpBreaker()
 					&& m.isBreaker(ratio)
+					&& r2<5
 					//&& m.isBreaker()
 					//&& r<=ratio && r>0
 					//&& m.getPrviousAverageAmountRatio()>0

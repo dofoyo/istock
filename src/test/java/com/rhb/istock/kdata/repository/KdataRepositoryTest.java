@@ -1,6 +1,7 @@
 package com.rhb.istock.kdata.repository;
 
 import java.time.LocalDate;
+import java.util.Map;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -30,8 +31,8 @@ public class KdataRepositoryTest {
 	
 	@Test
 	public void testGetDailyKdata() {
-		String id="sz002456";
-		LocalDate date = LocalDate.parse("2019-12-11");
+		String id="sz000627";
+		//LocalDate date = LocalDate.parse("2019-12-11");
 
 /*		System.out.println("kdataRepositoryDzh");
 		KdataEntity kdata1 = kdataRepositoryDzh.getDailyKdata(id);
@@ -43,8 +44,12 @@ public class KdataRepositoryTest {
 
 		System.out.println("kdataRepositoryTushare");
 		KdataEntity kdata3 = kdataRepositoryTushare.getKdata(id);
-		System.out.println(kdata3.getBarSize());
-		System.out.println(kdata3.getBar(date));
+		//List<LocalDate> dates = kdata3.
+		//System.out.println(kdata3.getBarSize());
+		//System.out.println(kdata3.getBar(date));
+		for(Map.Entry<LocalDate,KbarEntity> entry : kdata3.getBars().entrySet()) {
+			System.out.format("%tF,%s\n",entry.getKey(),entry.getValue().getStr());
+		}
 	
 	}
 	

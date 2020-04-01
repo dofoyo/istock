@@ -25,6 +25,8 @@ public class Kdata {
 	public Integer getRatio() {
 		BigDecimal p1 = bars.lastEntry().getValue().getClose();
 		BigDecimal p2 = bars.firstEntry().getValue().getClose();
+		//System.out.format("last date: %tF, %.2f\n",bars.lastEntry().getValue().getDate(),bars.lastEntry().getValue().getClose());
+		//System.out.format("first date: %tF, %.2f\n",bars.firstEntry().getValue().getDate(),bars.firstEntry().getValue().getClose());
 		return Functions.ratio(p1, p2);
 	}
 	

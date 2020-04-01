@@ -148,6 +148,10 @@ public class KbarEntity {
 				+ volume_ratio + ", total_mv=" + total_mv + ", circ_mv=" + circ_mv + ", total_share=" + total_share
 				+ ", float_share=" + float_share + ", free_share=" + free_share + "]";
 	}
+	
+	public String getStr() {
+		return String.format("%.2f,%.2f,%.2f", close,quantity,amount);
+	}
 
 	public BigDecimal getTotal_share() {
 		return total_share;

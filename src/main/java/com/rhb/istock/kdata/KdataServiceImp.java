@@ -714,7 +714,7 @@ public class KdataServiceImp implements KdataService{
 	
 	@Override
 	public Integer getSseiRatio(LocalDate date, Integer period) {
-		Kdata ssei = this.getKdata(sseiID, date.plusDays(1), openDuration, true);
+		Kdata ssei = this.getKdata(sseiID, date.plusDays(1), period, true);
 		return ssei.getRatio();
 	}
 

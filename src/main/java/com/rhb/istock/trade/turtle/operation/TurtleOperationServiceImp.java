@@ -471,21 +471,8 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 				BigDecimal nh1 = new BigDecimal(o1.getNhgap());
 				BigDecimal nh2 = new BigDecimal(o2.getNhgap());
 				
-				//BigDecimal hl1 = new BigDecimal(o1.getHlgap());
-				//BigDecimal hl2 = new BigDecimal(o2.getHlgap());
-				
 				return nh1.compareTo(nh2);
 
-				/*
-				if(o1.getStatus().equals(o2.getStatus())) {
-					if(nh1.compareTo(nh2)==0) {
-						return hl1.compareTo(hl2);
-					}else {
-						return nh1.compareTo(nh2);
-					}
-				}else {
-					return (o2.getStatus()).compareTo(o1.getStatus());
-				}*/
 			}
 		});	
 		
