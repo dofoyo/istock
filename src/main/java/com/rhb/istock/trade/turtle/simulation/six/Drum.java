@@ -60,6 +60,12 @@ public class Drum {
 			pre = previous.get(itemID);
 			if(muster!=null && pre!=null) {
 				account.refreshHoldsPrice(itemID, muster.getLatestPrice());
+				
+				//涨幅超过21%，则跌破8日线卖出
+				if(account.getUpRatio(itemID)>=21 && muster.isDropAve(8) && !muster.isDownLimited()) {
+					account.drop(itemID, "0", muster.getLatestPrice());
+				}
+				
 /*				if(muster.isDropAve(21) && !muster.isDownLimited()) { 		//跌破21日均线就卖
 					account.drop(itemID, "2", muster.getLatestPrice());
 				}*/

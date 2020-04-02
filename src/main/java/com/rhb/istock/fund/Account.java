@@ -18,6 +18,7 @@ import java.util.TreeMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.rhb.istock.comm.util.Functions;
 import com.rhb.istock.kdata.Muster;
 
 public class Account {
@@ -267,6 +268,9 @@ public class Account {
 		
 		if(!states.containsKey(itemID)) {
 			states.put(itemID, new HoldState(itemID,price));
+		}else {
+			HoldState hs = states.get(itemID);
+			hs.setHold(true);
 		}
 		
 	}
@@ -333,7 +337,11 @@ public class Account {
 		value = value.subtract(dropOrder.getAmount());		//市值减少
 		
 		holds.remove(orderID);
-		drops.put(dropOrder.getOrderID(), dropOrder);				
+		drops.put(dropOrder.getOrderID(), dropOrder);
+		
+		HoldState hs = states.get(openOrder.getItemID());
+		hs.setHold(false);
+		
 	}
 
 	public void drop(String itemID, String note, BigDecimal price) {
@@ -419,6 +427,15 @@ public class Account {
 		}
 	}
 	
+	public Integer getUpRatio(String itemID) {
+		HoldState hs = states.get(itemID);
+		if(hs!=null && hs.isHold) {
+			return Functions.ratio(hs.getLatestPrice(), hs.getBuyPrice());
+		}else {
+			return 0;
+		}
+	}
+	
 	public Set<String> getItemIDsOfLost(Integer days) {
 		Set<String> ids = new HashSet<String>();
 		for(HoldState state : states.values()) {
@@ -490,6 +507,22 @@ public class Account {
 			}
 		}		
 		return ids;
+	}
+	
+	public String getHoldString() {
+		StringBuffer sb = new StringBuffer();
+		for(Order order : holds.values()) {
+			sb.append(order.toString()+"\n");
+		}
+		return sb.toString();
+	}
+	
+	public String getHoldStateString() {
+		StringBuffer sb = new StringBuffer();
+		for(HoldState hs : states.values()) {
+			sb.append(hs.toString()+"\n");
+		}
+		return sb.toString();
 	}
 	
 	public Integer getLots(String itemID) {
@@ -712,14 +745,25 @@ public class Account {
 		private BigDecimal buyPrice;
 		private BigDecimal latestPrice;
 		private Integer holdsDays;
+		private boolean isHold;
 		
 		public HoldState(String itemID, BigDecimal buyPrice) {
 			this.itemID = itemID;
 			this.buyPrice = buyPrice;
 			this.latestPrice = buyPrice;
 			this.holdsDays = 1;
+			this.isHold = true;
 		}
 		
+		public boolean isHold() {
+			return isHold;
+		}
+
+		public void setHold(boolean isHold) {
+			this.isHold = isHold;
+		}
+
+
 		public boolean isLost(Integer days) {
 			return holdsDays>=days && latestPrice.compareTo(buyPrice)==-1;
 		}
@@ -740,9 +784,11 @@ public class Account {
 			return latestPrice;
 		}
 		public void setLatestPrice(BigDecimal latestPrice) {
-			this.latestPrice = latestPrice;
-			this.holdsDays = this.holdsDays + 1;
-			//logger.info("itemID=" + this.itemID + ",holdsDays=" + this.holdsDays);
+			if(isHold) {
+				this.latestPrice = latestPrice;
+				this.holdsDays = this.holdsDays + 1;
+				//logger.info("itemID=" + this.itemID + ",holdsDays=" + this.holdsDays);
+			}
 		}
 		public Integer getHoldsDays() {
 			return holdsDays;
@@ -751,10 +797,13 @@ public class Account {
 			this.holdsDays = holdsDays;
 		}
 
-		public String toString(Integer days) {
-			return "HoldState [itemID=" + itemID + ", isLost=" + isLost(days) + ", buyPrice=" + buyPrice + ", latestPrice=" + latestPrice
-					+ ", holdsDays=" + holdsDays + "]";
+		@Override
+		public String toString() {
+			return "HoldState [itemID=" + itemID + ", buyPrice=" + buyPrice + ", latestPrice=" + latestPrice
+					+ ", holdsDays=" + holdsDays + ", isHold=" + isHold + "]";
 		}
+
+		
 		
 	}
 	
