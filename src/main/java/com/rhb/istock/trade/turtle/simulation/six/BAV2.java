@@ -24,7 +24,7 @@ import com.rhb.istock.kdata.Muster;
  *
  * 买入：突破21日均线,且averageAmount近8日上涨
  * 卖出：跌破21日均线
- * 筛选范围：所有股票
+ * 筛选范围：入选成分指数的股票
  * 排序依据：当日成交量，越高越好
  * 仓位控制：满仓，每只股票的均衡市值
  *
@@ -192,7 +192,7 @@ public class BAV2 {
 					&& !m.isUpLimited() 
 					&& !m.isDownLimited() 
 					//&& m.isUpBreaker()
-					&& m.isBreaker(ratio)
+					&& m.isJustBreaker(ratio)
 					//&& r<=ratio && r>0
 					//&& m.isAboveAveragePrice(21) && !p.isAboveAveragePrice(21)
 					&& m.getAverageAmount().compareTo(previousAverageAmount)==1

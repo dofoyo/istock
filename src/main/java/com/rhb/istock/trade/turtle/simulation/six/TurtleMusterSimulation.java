@@ -54,7 +54,7 @@ public class TurtleMusterSimulation {
 		//System.out.println("Functions.ratio(this.averagePrice21, this.averagePrice)<=13");
 		System.out.println("simulate from " + beginDate + " to " + endDate +" ......");
 
-		BAV2 bav = new BAV2(initCash);
+		BAV3 bav = new BAV3(initCash);
 		AVBPlus bhl = new AVBPlus(initCash);
 		LPB2 bdt = new LPB2(initCash);  
 
@@ -87,7 +87,7 @@ public class TurtleMusterSimulation {
 				sseiFlag = kdataService.getSseiFlag(date);
 				sseiRatio = kdataService.getSseiRatio(date, previous_period);
 				
-				bav.doIt(musters, previous.get(0), itemService.getHs300(date), date, sseiFlag);
+				bav.doIt(musters, previous.get(0), date, sseiFlag);
 				bhl.doIt(musters, date, sseiFlag);
 				bdt.doIt(musters, previous.get(0), date, sseiFlag);
 				dtb.doIt(musters, previous.get(0), date, sseiFlag);

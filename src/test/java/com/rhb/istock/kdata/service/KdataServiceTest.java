@@ -25,12 +25,12 @@ public class KdataServiceTest {
 	@Qualifier("kdataServiceImp")
 	KdataService kdataService;
 	
-	//@Test
+	@Test
 	public void generateMusters() {
 		LocalDate date = LocalDate.parse("2000-01-01");
-		//kdataService.generateMusters(date);
-		kdataService.generateLatestMusters();
-		kdataService.updateLatestMusters();
+		kdataService.generateMusters(date);
+		//kdataService.generateLatestMusters();
+		//kdataService.updateLatestMusters();
 	}
 	
 	
@@ -66,7 +66,7 @@ public class KdataServiceTest {
 		}
 	}
 	
-	@Test
+	//@Test
 	public void getSseiRatio() {
 		LocalDate date = LocalDate.parse("2020-03-20");
 		try {
@@ -75,6 +75,24 @@ public class KdataServiceTest {
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}
+	}
+	
+	//@Test
+	public void getMusters() {
+		LocalDate date = LocalDate.parse("2020-01-09");
+		Map<String,Muster> musters = kdataService.getMusters(date);
+		List<Muster> mm = new ArrayList<Muster>(musters.values());
+		Collections.sort(mm, new Comparator<Muster>() {
+			@Override
+			public int compare(Muster o1, Muster o2) {
+				return o1.getTotal_mv().compareTo(o2.getTotal_mv());
+			}});
+		for(Muster muster : mm) {
+			if(muster.getItemID().startsWith("sz300")) {
+				System.out.println(muster);
+			}
+
 		}
 	}
 }

@@ -52,7 +52,7 @@ public class KdataSpiderTest {
 			Progress.show(items.size(),i++, " testDwnKdataByIDs  " + item.getItemId());
 			try {
 				kdataSpiderTushare.downKdatas(item.getItemId());
-				//kdataSpiderTushare.downFactors(item.getItemId());
+				kdataSpiderTushare.downFactors(item.getItemId());
 				kdataSpiderTushare.downBasics(item.getItemId());
 				Thread.sleep(300); //一分钟200个
 			} catch (Exception e) {
@@ -66,7 +66,7 @@ public class KdataSpiderTest {
 
 	}
 
-	@Test
+	//@Test
 	public void testDownKdataByDate() {
 		LocalDate date = LocalDate.parse("2020-01-03");
 		try {

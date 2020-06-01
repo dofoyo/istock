@@ -180,7 +180,7 @@ public class LPB2 {
 					&& !m.isUpLimited() 
 					&& !m.isDownLimited() 
 					//&& m.isUpBreaker()
-					&& m.isBreaker(ratio)
+					&& m.isJustBreaker(ratio)
 					&& r2<5
 					//&& m.isBreaker()
 					//&& r<=ratio && r>0

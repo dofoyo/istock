@@ -166,9 +166,10 @@ public class AVBPlus {
 		for(int i=0; i<musters.size() && i<pool; i++) {
 			m = musters.get(i);
 			if(m!=null 
-					&& !m.isUpLimited() 
-					&& !m.isDownLimited() 
-					&& m.isUpBreaker()
+					//&& !m.isUpLimited() 
+					//&& !m.isDownLimited() 
+					//&& m.isUpBreaker()
+					&& m.isGapBreaker()
 					//&& m.isAboveAverageAmount()
 					//&& m.isUp(21)
 					//&& m.cal_volume_ratio().compareTo(new BigDecimal(2))==1

@@ -346,10 +346,18 @@ public class Muster {
 		//return latestPrice.subtract(close).divide(close,BigDecimal.ROUND_HALF_UP).compareTo(new BigDecimal(-0.095))<=0;
 	}
 	
-	public boolean isBreaker(Integer ratio) {
+	public boolean isJustBreaker(Integer ratio) {
 		Integer r = Functions.ratio(this.averagePrice21, this.averagePrice);
 		return //this.latestPrice.compareTo(this.close)==1 &&
 				this.close.compareTo(this.averagePrice21)<=0 &&
+				this.latestPrice.compareTo(this.averagePrice21)==1 &&
+				r<=ratio && r>0;
+	}
+	
+	public boolean isBreaker(Integer ratio) {
+		Integer r = Functions.ratio(this.averagePrice21, this.averagePrice);
+		return //this.latestPrice.compareTo(this.close)==1 &&
+				//this.close.compareTo(this.averagePrice21)<=0 &&
 				this.latestPrice.compareTo(this.averagePrice21)==1 &&
 				r<=ratio && r>0;
 	}
@@ -450,6 +458,13 @@ public class Muster {
 	
 	public boolean isUpBreaker() {
 		return latestPrice.compareTo(highest)==1; 
+	}
+	
+	public boolean isGapBreaker() {
+		return latestPrice.compareTo(highest)==1 && 
+				latestLowest.compareTo(close)==1 && 
+				//Functions.ratio(latestLowest, close)>=3 &&
+				!latestLowest.equals(latestHighest); 
 	}
 	
 	public boolean isDownBreaker() {

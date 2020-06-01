@@ -47,7 +47,7 @@ public class BAV3 {
 		this.initCash = initCash;
 	}
 	
-	public void doIt(Map<String,Muster> musters,Map<String,Muster> previous, List<String> hscf, LocalDate date, Integer sseiFlag) {
+	public void doIt(Map<String,Muster> musters,Map<String,Muster> previous, LocalDate date, Integer sseiFlag) {
 		Muster muster;
 		account.setLatestDate(date);
 
@@ -83,9 +83,9 @@ public class BAV3 {
 			Set<String> holdItemIDs = account.getItemIDsOfHolds();
 			Set<Muster> dds = new HashSet<Muster>();  //用set，无重复，表示不可加仓
 			
-			List<Muster> breakers = this.getBreakers(musters,previous, hscf,1);
+			List<Muster> breakers = this.getBreakers(musters,previous,1);
 			if(!breakers.isEmpty()) {
-				breakers = this.getBreakers(musters, previous, hscf, 2);
+				breakers = this.getBreakers(musters, previous, 2);
 			}
 			
 			breakers_sb.append(date.toString() + ",");
@@ -152,7 +152,7 @@ public class BAV3 {
 		return ee.divide(price,BigDecimal.ROUND_DOWN).divide(new BigDecimal(100),BigDecimal.ROUND_DOWN).intValue()*100;
 	}
 	
-	private List<Muster> getBreakers(Map<String,Muster> musters, Map<String,Muster> previous, List<String> szcf, Integer type){
+	private List<Muster> getBreakers(Map<String,Muster> musters, Map<String,Muster> previous, Integer type){
 		List<Muster>  ms = new ArrayList<Muster>(musters.values());
 		
 		if(type==1) {
@@ -187,7 +187,7 @@ public class BAV3 {
 					&& m.getPe().compareTo(BigDecimal.ZERO)>0 && m.getPe().compareTo(new BigDecimal(233))<0
 					&& !m.isUpLimited() 
 					&& !m.isDownLimited() 
-					&& m.isBreaker(ratio)
+					&& m.isJustBreaker(ratio)
 					&& m.getAverageAmount().compareTo(previousAverageAmount)==1
 					) {
 				breakers.add(m);

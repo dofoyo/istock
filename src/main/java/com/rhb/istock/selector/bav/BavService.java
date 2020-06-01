@@ -92,7 +92,7 @@ public class BavService {
 					if(m!=null
 							&& !m.isUpLimited() 
 							&& !m.isDownLimited() 
-							&& m.isBreaker(8)
+							&& m.isJustBreaker(8)
 							&& m.getAverageAmount().compareTo(previousAverageAmount)==1
 							) {
 						sb.append(m.getItemID() + "(" + String.format("%04d",i) + ")" +",");

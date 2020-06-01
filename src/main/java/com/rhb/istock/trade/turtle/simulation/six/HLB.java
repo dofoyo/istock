@@ -186,8 +186,9 @@ public class HLB {
 			m = musters.get(i);
 			if(m!=null 
 					&& !m.isUpLimited() 
-					&& !m.isDownLimited() 
+					//&& !m.isDownLimited() 
 					&& m.isUpBreaker() 
+					//&& m.isGapBreaker() 
 					//&& m.isAboveAverageAmount()
 					//&& Functions.between(m.getHLGap(), hlgap_min, hlgap_max)
 					//&& m.isUp(21)

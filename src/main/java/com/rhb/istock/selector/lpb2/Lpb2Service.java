@@ -81,7 +81,7 @@ public class Lpb2Service {
 					if(m!=null && p!=null
 							&& !m.isUpLimited() 
 							&& !m.isDownLimited() 
-							&& m.isBreaker(ratio)
+							&& m.isJustBreaker(ratio)
 							//&& m.getAverageAmount().compareTo(previousAverageAmount)==1
 							&& p.getAverageGap()<ratio
 							&& m.getAveragePrice21().compareTo(p.getAveragePrice21())==1
