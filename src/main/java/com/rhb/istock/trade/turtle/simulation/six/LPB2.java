@@ -64,15 +64,20 @@ public class LPB2 {
 			if(muster!=null) {
 				account.refreshHoldsPrice(itemID, muster.getLatestPrice());
 /*				if(muster.isDropAve(21) && !muster.isDownLimited()) { 		//跌破21日均线就卖
-					account.drop(itemID, "2", muster.getLatestPrice());
+					account.dropWithTax(itemID, "2", muster.getLatestPrice());
 				}*/
 				
-				if(sseiFlag==0 && muster.isDropAve(13) && !muster.isDownLimited()) { 		//跌破21日均线就卖
-					account.drop(itemID, "1", muster.getLatestPrice());
+				if(sseiFlag==0 && muster.isDropAve(13) && !muster.isDownLimited()) { 		//大盘不好，跌破13日均线就卖
+					account.dropWithTax(itemID, "1", muster.getLatestPrice());
 				}				
-				if(sseiFlag==1 && muster.isDropAve(21) && !muster.isDownLimited()) { 		//跌破21日低点就卖
-					account.drop(itemID, "2", muster.getLatestPrice());
-				}	
+				if(sseiFlag==1 && muster.isDropAve(21) && !muster.isDownLimited()) { 		//大盘好，跌破21日低点就卖
+					account.dropWithTax(itemID, "2", muster.getLatestPrice());
+				}
+				
+				/*//涨幅超过21%，则跌破8日线
+				if(account.getUpRatio(itemID)>=21 && muster.isDropAve(8) && !muster.isDownLimited()) {
+					account.dropWithTax(itemID, "up "+account.getUpRatio(itemID).toString()+" and drop_ave8", muster.getLatestPrice());
+				}*/
 			}
 		}
 		
@@ -81,7 +86,7 @@ public class LPB2 {
 			//确定突破走势的股票
 			Set<String> holdItemIDs = account.getItemIDsOfHolds();
 			Set<Muster> dds = new HashSet<Muster>();  //用set，无重复，表示不可加仓
-			List<Muster> breakers = this.getBreakers(musters,previous,date);
+			List<Muster> breakers = this.getBreakers(musters,previous,date,sseiFlag);
 			breakers_sb.append(date.toString() + ",");
 			StringBuffer sb = new StringBuffer();
 			for(Muster breaker : breakers) {
@@ -146,7 +151,7 @@ public class LPB2 {
 		return ee.divide(price,BigDecimal.ROUND_DOWN).divide(new BigDecimal(100),BigDecimal.ROUND_DOWN).intValue()*100;
 	}
 	
-	private List<Muster> getBreakers(Map<String,Muster> musters,Map<String,Muster> previous, LocalDate date){
+	private List<Muster> getBreakers(Map<String,Muster> musters,Map<String,Muster> previous, LocalDate date, Integer sseiRatio){
 		List<Muster>  ms = new ArrayList<Muster>(musters.values());
 
 		Collections.sort(ms, new Comparator<Muster>() {
@@ -162,26 +167,27 @@ public class LPB2 {
 		
 		List<Muster>  breakers = new ArrayList<Muster>();
 		Muster m,p;
-		Integer ratio=8, r2;
+		Integer ratio=8, r2, r;
 		StringBuffer sb = new StringBuffer(date.toString() + ":");
 		//BigDecimal previousAverageAmount;
 		for(int i=0; i<ms.size() && i<this.pool && breakers.size()<this.top; i++) {
 			m = ms.get(i);
 			p = previous.get(m.getItemID());
-			/*if(p==null) {
-				previousAverageAmount = BigDecimal.ZERO;
+			if(p==null) {
+				r = null;
 			}else {
-				previousAverageAmount = p.getAverageAmount();
-			}*/
+				r = Functions.ratio(m.getClose(),p.getClose());
+			}
 			r2 = Functions.ratio(m.getLatestPrice(), m.getClose());
 
-			if(m!=null && p!=null
+			if(m!=null && p!=null && r!=null
 					//&& m.getPe().compareTo(BigDecimal.ZERO)>0 && m.getPe().compareTo(new BigDecimal(233))<0
 					&& !m.isUpLimited() 
 					&& !m.isDownLimited() 
 					//&& m.isUpBreaker()
-					&& m.isJustBreaker(ratio)
-					&& r2<5
+					&& m.isJustBreaker(ratio)   //刚刚突破21日线
+					//&& r >= sseiRatio   // 强于大盘
+					&& r2<5                     //当天涨幅不超过5%
 					//&& m.isBreaker()
 					//&& r<=ratio && r>0
 					//&& m.getPrviousAverageAmountRatio()>0
@@ -193,8 +199,8 @@ public class LPB2 {
 					//&& m.isUp(89)
 					//&& m.getN21Gap()<=13
 					//&& m.cal_volume_ratio().compareTo(new BigDecimal(2))==1
-					&& p.getAverageGap()<ratio
-					&& m.getAveragePrice21().compareTo(p.getAveragePrice21())==1
+					&& p.getAverageGap()<ratio    //均线在8%范围内纠缠
+					&& m.getAveragePrice21().compareTo(p.getAveragePrice21())==1   //上升趋势
 					) {
 				breakers.add(m);
 				sb.append(m.getItemID() + "(" + i + ")" +",");

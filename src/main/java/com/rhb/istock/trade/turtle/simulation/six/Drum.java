@@ -26,6 +26,8 @@ import com.rhb.istock.kdata.Muster;
  * 2. 近期走势强于大盘的最低价股
  * 
  * 卖出:
+ * 涨幅超过21%，跌破8日线
+ * 跌破21日均线
  * 近期走势弱于大盘
  * 
  *
@@ -61,26 +63,24 @@ public class Drum {
 			if(muster!=null && pre!=null) {
 				account.refreshHoldsPrice(itemID, muster.getLatestPrice());
 				
-				//涨幅超过21%，则跌破8日线卖出
+				//涨幅超过21%，则跌破8日线
 				if(account.getUpRatio(itemID)>=21 && muster.isDropAve(8) && !muster.isDownLimited()) {
-					account.drop(itemID, "0", muster.getLatestPrice());
+					account.dropWithTax(itemID, "up "+account.getUpRatio(itemID).toString()+" and drop_ave8", muster.getLatestPrice());
 				}
 				
-/*				if(muster.isDropAve(21) && !muster.isDownLimited()) { 		//跌破21日均线就卖
-					account.drop(itemID, "2", muster.getLatestPrice());
-				}*/
+				//跌破21日均线，同时成缩量
+				if(muster.isDropAve(21) 
+						&& muster.getAverageAmount5().compareTo(muster.getAverageAmount())==-1 
+						&& !muster.isDownLimited()) { 		
+					account.dropWithTax(itemID, "drop_ave21", muster.getLatestPrice());
+				}
 				
-				/*if(sseiFlag==0 && muster.isDropLowest(21) && !muster.isDownLimited()) { 		//跌破21日均线就卖
-					account.drop(itemID, "1", muster.getLatestPrice());
-				}				
-				if(sseiFlag==1 && muster.isDropLowest(34) && !muster.isDownLimited()) { 		//跌破21日低点就卖
-					account.drop(itemID, "2", muster.getLatestPrice());
-				}*/	
-				
-				//走势弱于大盘
+				//走势弱于大盘，同时成缩量
 				ratio = Functions.ratio(muster.getClose(),pre.getClose());
-				if((ratio < sseiRatio || muster.isDropAve(21)) && !muster.isDownLimited()) {
-					account.drop(itemID, sseiRatio.toString(), muster.getLatestPrice());
+				if(ratio < sseiRatio 
+						//&& muster.getAverageAmount5().compareTo(muster.getAverageAmount())==-1 
+						&& !muster.isDownLimited()) {
+					account.dropWithTax(itemID, sseiRatio.toString(), muster.getLatestPrice());
 				}
 			}
 		}
@@ -115,7 +115,7 @@ public class Drum {
 					muster = musters.get(itemID);
 					if(muster!=null) {
 						for(Integer holdOrderID : holdOrderIDs) {
-							account.dropByOrderID(holdOrderID, "0", muster.getLatestPrice());   //先卖
+							account.dropByOrderID(holdOrderID, "-", muster.getLatestPrice());   //先卖
 							dds.add(muster);						
 						}
 					}
@@ -176,12 +176,13 @@ public class Drum {
 				ratio = Functions.ratio(m.getAveragePrice21(), m.getAveragePrice());
 				r = Functions.ratio(m.getClose(),p.getClose());
 				if(!m.isUpLimited() && !m.isDownLimited()
-					&& r >= sseiRatio
+					&& r >= sseiRatio   // 强于大盘
 					//&& m.isBreaker(13)
 					//&& m.isBreaker()
 					&& ratio<=5 && ratio >0
 					//&& m.isUp(21)
-					&& m.getAveragePrice21().compareTo(p.getAveragePrice21())==1
+					&& m.getAveragePrice21().compareTo(p.getAveragePrice21())==1  //上升趋势
+					//&& m.getAverageAmount5().compareTo(m.getAverageAmount())==1  //成交量放大
 					) {
 				breakers.add(m);
 				sb.append(m.getItemID() + "(" + i + ")" +",");

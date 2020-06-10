@@ -64,15 +64,22 @@ public class BAV3 {
 			muster = musters.get(itemID);
 			if(muster!=null) {
 				account.refreshHoldsPrice(itemID, muster.getLatestPrice());
-				if(muster.isDropAve(21) && !muster.isDownLimited()) { 		//跌破21日均线就卖
-					account.drop(itemID, "2", muster.getLatestPrice());
+				
+				//跌破21日均线
+				if(muster.isDropAve(21) && !muster.isDownLimited()) { 		
+					account.dropWithTax(itemID, "2", muster.getLatestPrice());
 				}
 				
+				/*//涨幅超过21%，则跌破8日线
+				if(account.getUpRatio(itemID)>=21 && muster.isDropAve(8) && !muster.isDownLimited()) {
+					account.dropWithTax(itemID, "up "+account.getUpRatio(itemID).toString()+" and drop_ave8", muster.getLatestPrice());
+				}*/
+				
 				/*if(sseiFlag==0 && muster.isDropLowest(21) && !muster.isDownLimited()) { 		//跌破21日均线就卖
-					account.drop(itemID, "1", muster.getLatestPrice());
+					account.dropWithTax(itemID, "1", muster.getLatestPrice());
 				}				
 				if(sseiFlag==1 && muster.isDropLowest(34) && !muster.isDownLimited()) { 		//跌破21日低点就卖
-					account.drop(itemID, "2", muster.getLatestPrice());
+					account.dropWithTax(itemID, "2", muster.getLatestPrice());
 				}*/	
 			}
 		}

@@ -497,6 +497,10 @@ public class Muster {
 	public void setItemID(String itemID) {
 		this.itemID = itemID;
 	}
+	
+	public BigDecimal getAverageAmount5() {
+		return this.amount5.divide(new BigDecimal(5),BigDecimal.ROUND_HALF_DOWN);
+	}
 
 	public BigDecimal getAverageAmount() {
 		return averageAmount;

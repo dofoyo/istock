@@ -333,6 +333,23 @@ public class Account {
 
 		//System.out.println(dropOrder); //----------------------------------------------
 	
+		cash = cash.add(dropOrder.getAmount()); 			//卖出时，现金增加
+		value = value.subtract(dropOrder.getAmount());		//市值减少
+		
+		holds.remove(orderID);
+		drops.put(dropOrder.getOrderID(), dropOrder);
+		
+		HoldState hs = states.get(openOrder.getItemID());
+		hs.setHold(false);
+	}
+	
+	public void dropWithTaxByOrderID(Integer orderID, String note, BigDecimal price) {
+		Order openOrder = holds.get(orderID);
+		Order dropOrder = new Order(openOrder.getOrderID(),openOrder.getItemID(),openOrder.getItemName(),openOrder.getIndustry(), LocalDate.parse(endDate.toString()), price, openOrder.getQuantity());
+		dropOrder.setNote(note);
+
+		//System.out.println(dropOrder); //----------------------------------------------
+	
 		cash = cash.add(dropOrder.getAmount().subtract(dropOrder.getFeeAndTax())); 			//卖出时，现金增加
 		value = value.subtract(dropOrder.getAmount());		//市值减少
 		
@@ -341,13 +358,19 @@ public class Account {
 		
 		HoldState hs = states.get(openOrder.getItemID());
 		hs.setHold(false);
-		
 	}
 
 	public void drop(String itemID, String note, BigDecimal price) {
 		Set<Integer> orderIDs = this.getHoldOrderIDs(itemID);
 		for(Integer orderID : orderIDs) {
 			this.dropByOrderID(orderID, note, price);
+		}
+	}
+	
+	public void dropWithTax(String itemID, String note, BigDecimal price) {
+		Set<Integer> orderIDs = this.getHoldOrderIDs(itemID);
+		for(Integer orderID : orderIDs) {
+			this.dropWithTaxByOrderID(orderID, note, price);
 		}
 	}
 	
@@ -872,8 +895,8 @@ public class Account {
 		}
 		
 		private BigDecimal getFeeAndTax() {
-			return BigDecimal.ZERO;
-			//return this.getAmount().multiply(new BigDecimal(0.002));
+			//return BigDecimal.ZERO;
+			return this.getAmount().multiply(new BigDecimal(0.002));
 		}
 		
 		private BigDecimal getFee() {
