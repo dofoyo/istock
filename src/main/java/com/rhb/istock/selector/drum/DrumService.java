@@ -69,8 +69,8 @@ public class DrumService {
 					m = ms.get(i);
 					p = previous.get(m.getItemID());
 					if(m!=null && p!=null) {
-						ratio = Functions.ratio(m.getAveragePrice21(), m.getAveragePrice());
-						if(Functions.ratio(m.getClose(),p.getClose()) >= sseiRatio
+						ratio = Functions.growthRate(m.getAveragePrice21(), m.getAveragePrice());
+						if(Functions.growthRate(m.getClose(),p.getClose()) >= sseiRatio
 							&& ratio<=5
 							&& ratio >0
 							&& m.getAveragePrice21().compareTo(p.getAveragePrice21())==1

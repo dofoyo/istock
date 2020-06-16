@@ -176,9 +176,9 @@ public class LPB2 {
 			if(p==null) {
 				r = null;
 			}else {
-				r = Functions.ratio(m.getClose(),p.getClose());
+				r = Functions.growthRate(m.getClose(),p.getClose());
 			}
-			r2 = Functions.ratio(m.getLatestPrice(), m.getClose());
+			r2 = Functions.growthRate(m.getLatestPrice(), m.getClose());
 
 			if(m!=null && p!=null && r!=null
 					//&& m.getPe().compareTo(BigDecimal.ZERO)>0 && m.getPe().compareTo(new BigDecimal(233))<0

@@ -1,4 +1,4 @@
-package com.rhb.istock.fdata.spider;
+package com.rhb.istock.fdata.sina.spider;
 
 public interface DownloadReportDate {
 

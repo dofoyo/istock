@@ -24,6 +24,8 @@ public class TurtleApi{
 	@Qualifier("turtleOperationServiceImp")
 	TurtleOperationService ts;
 
+	private List<TurtleView> powers_views;
+	
 	@GetMapping("/turtle/topics")
 	public ResponseContent<String[]> getTopics() {
 		String[] topis = ts.getTopics();
@@ -32,8 +34,10 @@ public class TurtleApi{
 
 	@GetMapping("/turtle/powers")
 	public ResponseContent<List<TurtleView>> getPowers() {
-		List<TurtleView> views = ts.getPowers();
-		return new ResponseContent<List<TurtleView>>(ResponseEnum.SUCCESS, views);
+		if(powers_views==null) {
+			powers_views = ts.getPowers();
+		}
+		return new ResponseContent<List<TurtleView>>(ResponseEnum.SUCCESS, powers_views);
 	}
 
 	@GetMapping("/turtle/potentials/{type}/{date}")

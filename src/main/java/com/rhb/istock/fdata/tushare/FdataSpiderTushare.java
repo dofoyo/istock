@@ -1,4 +1,4 @@
-package com.rhb.istock.fdata.spider;
+package com.rhb.istock.fdata.tushare;
 
 import java.io.File;
 import java.util.List;
@@ -20,18 +20,29 @@ public class FdataSpiderTushare {
 
 	protected static final Logger logger = LoggerFactory.getLogger(FdataSpiderTushare.class);
 	
-	public boolean isExist(String itemID) {
-		String fdataFile = fdataPath + "/" + itemID + "_indicator.json";
-		File file = new File(fdataFile);
-		return file.exists();
+	public boolean isExistIndicator(String itemID) {
+		return isExist(itemID,"fina_indicator");
+	}
 
+	public boolean isExistCashflow(String itemID) {
+		return isExist(itemID,"cashflow");
 	}
 	
-	public void downIndicator(String itemID) throws Exception {
+	public boolean isExistIncome(String itemID) {
+		return isExist(itemID,"income");
+	}
+	
+	private boolean isExist(String itemID, String type) {
+		String fdataFile = fdataPath + "/" + itemID + "_"+type+".json";
+		File file = new File(fdataFile);
+		return file.exists();
+	}
+	
+	private void down(String itemID, String type) {
 		String tushareID = itemID.indexOf("sh")==0 ? itemID.substring(2)+".SH" : itemID.substring(2)+".SZ";
 		String url = "http://api.tushare.pro";
 		JSONObject args = new JSONObject();
-		args.put("api_name", "fina_indicator");
+		args.put("api_name", type);
 		args.put("token", "175936caa4637bc9ac8e5e75ac92eff6887739ca6be771b81653f278");
 		
 		JSONObject params = new JSONObject();
@@ -42,25 +53,19 @@ public class FdataSpiderTushare {
 		String str = HttpClient.doPostJson(url, args.toString());
 		JSONObject data = (new JSONObject(str)).getJSONObject("data");
 		
-		String kdataFile = fdataPath + "/" + itemID + "_indicator.json";
-		FileTools.writeTextFile(kdataFile, data.toString(), false);
-		
+		String kdataFile = fdataPath + "/" + itemID + "_"+type+".json";
+		FileTools.writeTextFile(kdataFile, data.toString(), false);		
 	}
 
-	public void downIndicators(List<String> ids) throws Exception {
-		long beginTime=System.currentTimeMillis(); 
-		logger.info("KdataSpiderTushare downBasics...");
-
-		int i=0;
-		for(String id : ids) {
-			Progress.show(ids.size(),i++,id);
-			this.downIndicator(id);
-			Thread.sleep(1000); 
-		}
-		
-		long used = (System.currentTimeMillis() - beginTime)/1000; 
-		logger.info("用时：" + used + "秒");          
-		
+	public void downIncome(String itemID) throws Exception {
+		this.down(itemID, "income");
 	}
-
+	
+	public void downCashflow(String itemID) throws Exception {
+		this.down(itemID, "cashflow");
+	}
+	
+	public void downIndicator(String itemID) throws Exception {
+		this.down(itemID, "fina_indicator");
+	}
 }

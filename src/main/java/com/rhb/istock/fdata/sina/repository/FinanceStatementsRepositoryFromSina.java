@@ -1,4 +1,4 @@
-package com.rhb.istock.fdata.repository;
+package com.rhb.istock.fdata.sina.repository;
 
 import java.io.File;
 import java.util.HashSet;
@@ -13,10 +13,10 @@ import org.springframework.stereotype.Service;
 
 import com.rhb.istock.comm.util.FileTools;
 import com.rhb.istock.comm.util.ParseString;
-import com.rhb.istock.fdata.BalanceSheet;
-import com.rhb.istock.fdata.CashFlow;
-import com.rhb.istock.fdata.ProfitStatement;
-import com.rhb.istock.fdata.spider.DownloadFinancialStatements;
+import com.rhb.istock.fdata.sina.BalanceSheet;
+import com.rhb.istock.fdata.sina.CashFlow;
+import com.rhb.istock.fdata.sina.ProfitStatement;
+import com.rhb.istock.fdata.sina.spider.DownloadFinancialStatements;
 
 @Service("financeStatementsRepositoryFromSina")
 public class FinanceStatementsRepositoryFromSina implements FinanceStatementsRepository {

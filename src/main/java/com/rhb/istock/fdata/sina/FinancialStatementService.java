@@ -1,4 +1,4 @@
-package com.rhb.istock.fdata;
+package com.rhb.istock.fdata.sina;
 
 import java.util.Map;
 import java.util.Set;

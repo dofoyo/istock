@@ -61,7 +61,7 @@ public class SHB {
 		for(String itemID: holdItemIDs) {
 			muster = musters.get(itemID);
 			if(muster!=null && !muster.isDownLimited()) {
-				if(Functions.ratio(muster.getHighest(), muster.getLatestPrice())<=3) { 		
+				if(Functions.growthRate(muster.getHighest(), muster.getLatestPrice())<=3) { 		
 					account.drop(itemID, "接近高点" +muster.getHighest().toString(), muster.getLatestPrice());
 				}else if(muster.getHighest().compareTo(muster.getLatestPrice()) <=0) { 		
 					account.drop(itemID, "超出高点" + muster.getHighest().toString(), muster.getLatestPrice());
@@ -161,7 +161,7 @@ public class SHB {
 					//&& m.isUp(21)
 					//&& Functions.between(m.getVolume_ratio(), 2, 5)
 					&& m.getLatestPrice().compareTo(m.getLowest())==1
-					&& Functions.ratio(m.getLatestPrice(), m.getLowest())<=3  //买入接近低点的股票
+					&& Functions.growthRate(m.getLatestPrice(), m.getLowest())<=3  //买入接近低点的股票
 					) {
 				breakers.add(m);
 			}

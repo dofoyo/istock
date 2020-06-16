@@ -1,4 +1,4 @@
-package com.rhb.istock.fdata.api;
+package com.rhb.istock.fdata.sina.api;
 
 import java.util.ArrayList;
 import java.util.List;

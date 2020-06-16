@@ -1,4 +1,4 @@
-package com.rhb.istock.fdata;
+package com.rhb.istock.fdata.sina;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -13,10 +13,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.rhb.istock.comm.util.Progress;
-import com.rhb.istock.fdata.repository.FinanceStatementsRepository;
-import com.rhb.istock.fdata.repository.ReportDateRepository;
-import com.rhb.istock.fdata.spider.DownloadFinancialStatements;
-import com.rhb.istock.fdata.spider.DownloadReportedStockList;
+import com.rhb.istock.fdata.sina.repository.FinanceStatementsRepository;
+import com.rhb.istock.fdata.sina.repository.ReportDateRepository;
+import com.rhb.istock.fdata.sina.spider.DownloadFinancialStatements;
+import com.rhb.istock.fdata.sina.spider.DownloadReportedStockList;
 import com.rhb.istock.item.ItemService;
 
 @Service("financialStatementServiceImp")

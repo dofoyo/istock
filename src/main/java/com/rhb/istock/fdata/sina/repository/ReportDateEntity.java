@@ -1,4 +1,4 @@
-package com.rhb.istock.fdata.repository;
+package com.rhb.istock.fdata.sina.repository;
 
 public class ReportDateEntity {
 	private String stockCode;

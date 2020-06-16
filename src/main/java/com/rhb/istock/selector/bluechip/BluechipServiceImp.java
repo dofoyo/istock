@@ -15,8 +15,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.rhb.istock.comm.util.Progress;
-import com.rhb.istock.fdata.FinancialStatement;
-import com.rhb.istock.fdata.FinancialStatementService;
+import com.rhb.istock.fdata.sina.FinancialStatement;
+import com.rhb.istock.fdata.sina.FinancialStatementService;
 import com.rhb.istock.selector.bluechip.repository.BluechipEntity;
 import com.rhb.istock.selector.bluechip.repository.BluechipRepository;
 

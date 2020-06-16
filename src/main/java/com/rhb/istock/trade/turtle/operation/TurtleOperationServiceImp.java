@@ -19,6 +19,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import com.rhb.istock.comm.util.Progress;
+import com.rhb.istock.fdata.tushare.FdataServiceTushare;
+import com.rhb.istock.fdata.tushare.GrowModel;
 import com.rhb.istock.item.Item;
 import com.rhb.istock.item.ItemService;
 import com.rhb.istock.kdata.Kbar;
@@ -49,6 +51,10 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 	@Autowired
 	@Qualifier("selectorServiceImp")
 	SelectorService selectorService;
+
+	@Autowired
+	@Qualifier("fdataServiceTushare")
+	FdataServiceTushare fdataServiceTushare;
 	
 	DecimalFormat df = new DecimalFormat("0.00"); 
 	DecimalFormat df_integer = new DecimalFormat("000"); 
@@ -176,7 +182,7 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 	public List<TurtleView> getFavors() {
 		Map<String, String> favors = selectorService.getFavors();
 
-		List<TurtleView> views = getTurtleViews(new ArrayList<String>(favors.keySet()),"favors");
+		List<TurtleView> views = getTurtleViews(new ArrayList<String>(favors.keySet()),"favors",true);
 		
 		for(TurtleView view : views) {
 			view.setName(favors.get(view.getItemID()));
@@ -236,7 +242,7 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 
 	private List<TurtleView> getLpb2(){
 		Map<String,String> ids = selectorService.getLpb2();
-		List<TurtleView> views = this.getTurtleViews(new ArrayList(ids.keySet()), "LPB2"); 
+		List<TurtleView> views = this.getTurtleViews(new ArrayList(ids.keySet()), "LPB2",true); 
 		for(TurtleView view : views) {
 			view.setLabel(ids.get(view.getItemID()));
 		}
@@ -256,7 +262,7 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 	
 	private List<TurtleView> getHlb2(){
 		Map<String,String> ids = selectorService.getHlb2();
-		List<TurtleView> views = this.getTurtleViews(new ArrayList(ids.keySet()), "HLB2"); 
+		List<TurtleView> views = this.getTurtleViews(new ArrayList(ids.keySet()), "HLB2",true); 
 		for(TurtleView view : views) {
 			view.setLabel(ids.get(view.getItemID()));
 		}
@@ -275,7 +281,7 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 	
 	private List<TurtleView> getLpb(){
 		Map<String,String> ids = selectorService.getLpbs();
-		List<TurtleView> views = this.getTurtleViews(new ArrayList(ids.keySet()), "LPB"); 
+		List<TurtleView> views = this.getTurtleViews(new ArrayList(ids.keySet()), "LPB",true); 
 		for(TurtleView view : views) {
 			view.setLabel(ids.get(view.getItemID()));
 		}
@@ -294,7 +300,7 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 	
 	private List<TurtleView> getDrum(){
 		Map<String,String> ids = selectorService.getDrums();
-		List<TurtleView> views = this.getTurtleViews(new ArrayList(ids.keySet()), "DRUM"); 
+		List<TurtleView> views = this.getTurtleViews(new ArrayList(ids.keySet()), "DRUM",true); 
 		for(TurtleView view : views) {
 			view.setLabel(ids.get(view.getItemID()));
 		}
@@ -313,7 +319,7 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 	
 	private List<TurtleView> getBav(){
 		Map<String,String> ids = selectorService.getBavs();
-		List<TurtleView> views = this.getTurtleViews(new ArrayList<String>(ids.keySet()), "BAV"); 
+		List<TurtleView> views = this.getTurtleViews(new ArrayList<String>(ids.keySet()), "BAV",true); 
 		for(TurtleView view : views) {
 			view.setLabel(ids.get(view.getItemID()));
 		}
@@ -416,7 +422,7 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 		return views;
 	}
 	
-	private List<TurtleView> getTurtleViews(List<String> itemIDs, String name) {
+	private List<TurtleView> getTurtleViews(List<String> itemIDs, String name, boolean reSort) {
 		long beginTime=System.currentTimeMillis(); 
 		logger.info("getting " + name + " views ......");
 		
@@ -465,16 +471,18 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 			}
 		}
 		
-		Collections.sort(views, new Comparator<TurtleView>() {
-			@Override
-			public int compare(TurtleView o1, TurtleView o2) {
-				BigDecimal nh1 = new BigDecimal(o1.getNhgap());
-				BigDecimal nh2 = new BigDecimal(o2.getNhgap());
-				
-				return nh1.compareTo(nh2);
+		if(reSort) {
+			Collections.sort(views, new Comparator<TurtleView>() {
+				@Override
+				public int compare(TurtleView o1, TurtleView o2) {
+					BigDecimal nh1 = new BigDecimal(o1.getNhgap());
+					BigDecimal nh2 = new BigDecimal(o2.getNhgap());
+					
+					return nh1.compareTo(nh2);
 
-			}
-		});	
+				}
+			});	
+		}
 		
 		logger.info("\ngetting "+name+" views done!");
 		long used = (System.currentTimeMillis() - beginTime)/1000; 
@@ -645,10 +653,21 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 
 	@Override
 	public List<TurtleView> getPowers() {
-		List<String> ps = selectorService.getPowerIDs();
+		//List<String> ps = selectorService.getPowerIDs();
+		String b_date = "20161231";
+		String e_date = "20191231";
+		Integer n = 3;
+		List<GrowModel> models = fdataServiceTushare.getGrowModels(b_date, e_date, n);
+		
+		List<String> ps = new ArrayList<String>();
+		for(GrowModel model : models) {
+			ps.add(model.getItemID());
+		}
+		
+		List<TurtleView> views = getTurtleViews(ps,"powers",false);
 
-		List<TurtleView> views = getTurtleViews(ps,"powers");
-
+		
+		
 		return views;
 	}
 

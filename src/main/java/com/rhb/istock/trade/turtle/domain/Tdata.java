@@ -134,12 +134,12 @@ public class Tdata {
 		BigDecimal highest = new BigDecimal(-1000000);
 		BigDecimal lowest = new BigDecimal(1000000);
 		for(Tbar bar : subBars) {
-			if(bar.getHigh().compareTo(highest)>0) {
+			if(bar!=null && bar.getHigh().compareTo(highest)>0) {
 				highest = bar.getHigh();
 				highestDate = bar.getDate();
 			}
 			
-			if(bar.getLow().compareTo(lowest)<0
+			if(bar!=null && bar.getLow().compareTo(lowest)<0
 					//&& bar.getLow().compareTo(new BigDecimal(0))==1
 					) {
 				lowest = bar.getLow();

@@ -1,4 +1,4 @@
-package com.rhb.istock.fdata;
+package com.rhb.istock.fdata.sina;
 
 public class CashFlow {
 	private String period = "";

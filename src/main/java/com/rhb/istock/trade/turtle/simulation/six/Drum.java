@@ -76,7 +76,7 @@ public class Drum {
 				}
 				
 				//走势弱于大盘，同时成缩量
-				ratio = Functions.ratio(muster.getClose(),pre.getClose());
+				ratio = Functions.growthRate(muster.getClose(),pre.getClose());
 				if(ratio < sseiRatio 
 						//&& muster.getAverageAmount5().compareTo(muster.getAverageAmount())==-1 
 						&& !muster.isDownLimited()) {
@@ -173,8 +173,8 @@ public class Drum {
 			m = ms.get(i);
 			p = previous.get(m.getItemID());
 			if(m!=null && p!=null) {
-				ratio = Functions.ratio(m.getAveragePrice21(), m.getAveragePrice());
-				r = Functions.ratio(m.getClose(),p.getClose());
+				ratio = Functions.growthRate(m.getAveragePrice21(), m.getAveragePrice());
+				r = Functions.growthRate(m.getClose(),p.getClose());
 				if(!m.isUpLimited() && !m.isDownLimited()
 					&& r >= sseiRatio   // 强于大盘
 					//&& m.isBreaker(13)

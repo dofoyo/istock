@@ -27,7 +27,7 @@ public class Kdata {
 		BigDecimal p2 = bars.firstEntry().getValue().getClose();
 		//System.out.format("last date: %tF, %.2f\n",bars.lastEntry().getValue().getDate(),bars.lastEntry().getValue().getClose());
 		//System.out.format("first date: %tF, %.2f\n",bars.firstEntry().getValue().getDate(),bars.firstEntry().getValue().getClose());
-		return Functions.ratio(p1, p2);
+		return Functions.growthRate(p1, p2);
 	}
 	
 	public Integer getSize() {

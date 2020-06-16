@@ -1,4 +1,4 @@
-package com.rhb.istock.fdata;
+package com.rhb.istock.fdata.tushare;
 
 import java.util.List;
 
@@ -10,7 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.rhb.istock.comm.util.Progress;
-import com.rhb.istock.fdata.spider.FdataSpiderTushare;
+import com.rhb.istock.fdata.tushare.FdataSpiderTushare;
 import com.rhb.istock.item.repository.ItemEntity;
 import com.rhb.istock.item.repository.ItemRepository;
 
@@ -34,9 +34,17 @@ public class FdataSpiderTushareTest {
 		for(ItemEntity item : items){
 			Progress.show(items.size(),i++, item.getItemId());
 			try {
-				if(!fdataSpiderTushare.isExist(item.getItemId())) {
+				if(!fdataSpiderTushare.isExistIndicator(item.getItemId())) {
 					fdataSpiderTushare.downIndicator(item.getItemId());
-					Thread.sleep(1000); //一分钟200个	
+					Thread.sleep(500); //一分钟200个	
+				}
+				if(!fdataSpiderTushare.isExistIncome(item.getItemId())) {
+					fdataSpiderTushare.downIncome(item.getItemId());
+					Thread.sleep(500); //一分钟200个	
+				}
+				if(!fdataSpiderTushare.isExistCashflow(item.getItemId())) {
+					fdataSpiderTushare.downCashflow(item.getItemId());
+					Thread.sleep(500); //一分钟200个	
 				}
 			} catch (Exception e) {
 				e.printStackTrace();

@@ -6,8 +6,25 @@ import java.math.RoundingMode;
 import java.util.List;
 
 public class Functions {
-	public static Integer ratio(BigDecimal a, BigDecimal b) {
+	//CAGR是Compound Annual Growth Rate的缩写，意思是复合年均增长率
+	public static Integer cagr(BigDecimal a, BigDecimal b, double n) {
+		Double r = a.divide(b,BigDecimal.ROUND_HALF_UP).doubleValue();
+		Double pow = Math.pow(r, 1/n);
+		Double gr = (pow-1+0.005)*100;
+		//Double gr = (pow-1)*100;
+		
+		//System.out.format("a=%.2f,b=%.2f,r=a/b=%.2f,pow=pow(%.2f,%.2f)=%.3f,gr=%d\n", a,b,r,r,n,pow,gr.intValue());
+		return gr.intValue();
+		
+	}
+	
+	public static Integer growthRate(BigDecimal a, BigDecimal b) {
 		return a.divide(b,BigDecimal.ROUND_HALF_UP).subtract(new BigDecimal(1)).multiply(new BigDecimal(100)).add(new BigDecimal(0.5)).intValue();
+	}
+	
+	// rate = a/b
+	public static Integer rate(BigDecimal a, BigDecimal b) {
+		return a.divide(b,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)).add(new BigDecimal(0.5)).intValue();
 	}
 	
 	public static boolean between(BigDecimal value, Integer a, Integer b) {

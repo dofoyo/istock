@@ -1,11 +1,11 @@
-package com.rhb.istock.fdata.repository;
+package com.rhb.istock.fdata.sina.repository;
 
 import java.util.Map;
 import java.util.Set;
 
-import com.rhb.istock.fdata.BalanceSheet;
-import com.rhb.istock.fdata.CashFlow;
-import com.rhb.istock.fdata.ProfitStatement;
+import com.rhb.istock.fdata.sina.BalanceSheet;
+import com.rhb.istock.fdata.sina.CashFlow;
+import com.rhb.istock.fdata.sina.ProfitStatement;
 
 
 public interface FinanceStatementsRepository {

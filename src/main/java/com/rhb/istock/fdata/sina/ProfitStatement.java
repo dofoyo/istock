@@ -1,4 +1,4 @@
-package com.rhb.istock.fdata;
+package com.rhb.istock.fdata.sina;
 
 public class ProfitStatement {
 	private String period = "";

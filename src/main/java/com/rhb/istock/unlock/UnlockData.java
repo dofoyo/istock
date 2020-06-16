@@ -21,7 +21,7 @@ public class UnlockData {
     	if(highest==null || annPrice==null || annPrice.equals(BigDecimal.ZERO)) {
     		return 0;
     	}else {
-        	return Functions.ratio(highest, this.annPrice);
+        	return Functions.growthRate(highest, this.annPrice);
     	}
     }
     public String getItemName() {

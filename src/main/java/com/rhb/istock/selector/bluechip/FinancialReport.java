@@ -6,17 +6,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
 
-import com.rhb.istock.fdata.BalanceSheet;
-import com.rhb.istock.fdata.CashFlow;
-import com.rhb.istock.fdata.ProfitStatement;
-/*
- * 如何根据经营活动现金流选股
- * 判断经营活动现金流否大于零？是比利润大还是比利润小？
- * 比利润大, 很好, 说明仅有很有的资金占用在应收款或库存上, 
- * 而比利润小, 则有可能被客户占用在应收款上没收回来或占用在存货上备货了。
- * 比利润小但大于零, 还可以接受。
- * 不仅比利润小, 还小于零，你要留神了，说不定是个地雷。
- */
+import com.rhb.istock.fdata.sina.BalanceSheet;
+import com.rhb.istock.fdata.sina.CashFlow;
+import com.rhb.istock.fdata.sina.ProfitStatement;
 
 public class FinancialReport {
 	private Map<String,BalanceSheet> balancesheets;

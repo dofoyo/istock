@@ -1,9 +1,10 @@
-package com.rhb.istock.fdata.api;
+package com.rhb.istock.fdata.sina.api;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -13,8 +14,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.rhb.istock.comm.api.ResponseContent;
 import com.rhb.istock.comm.api.ResponseEnum;
-import com.rhb.istock.fdata.FinancialStatement;
-import com.rhb.istock.fdata.FinancialStatementService;
+import com.rhb.istock.fdata.sina.FinancialStatement;
+import com.rhb.istock.fdata.sina.FinancialStatementService;
+import com.rhb.istock.fdata.tushare.FdataRepositoryTushare;
+import com.rhb.istock.fdata.tushare.Fina;
 import com.rhb.istock.item.Item;
 import com.rhb.istock.item.ItemService;
 
@@ -25,11 +28,45 @@ public class FdataAPI {
 	FinancialStatementService financialStatementService;
 
 	@Autowired
+	@Qualifier("fdataRepositoryTushare")
+	FdataRepositoryTushare fdataRepositoryTushare;
+	
+	
+	@Autowired
 	@Qualifier("itemServiceImp")
 	ItemService itemService;
 	
 	@GetMapping("/fdatas/{itemID}")
 	public ResponseContent<FdatasView> getFdatas(@PathVariable(value="itemID") String itemID) {
+		FdatasView view = null;
+		
+		Item item = itemService.getItem(itemID);
+		
+		if(item!=null) {
+			view = new FdatasView(item.getCode(),item.getName(),item.getIndustry());
+			Double revenue, profit, cash;
+			DecimalFormat df = new DecimalFormat("#.00");
+			double a = 100000000;
+			
+			Map<String,Fina> finas = fdataRepositoryTushare.getFinas(itemID);
+			for(Map.Entry<String, Fina> entry : finas.entrySet()) {
+				if(entry.getValue()!=null && entry.getValue().isValid()) {
+					revenue = entry.getValue().getIncome().getRevenue().doubleValue()/a;
+					profit = entry.getValue().getIndicator().getProfit_dedt().doubleValue()/a;
+					cash = entry.getValue().getCashflow().getN_cashflow_act().doubleValue()/a;
+					view.add(entry.getKey().substring(0,4), df.format(revenue), df.format(profit), df.format(cash));
+				}
+				fdataRepositoryTushare.init();
+			}
+			
+		}else {
+			System.out.println("Can NOT find " + itemID + "!!!");
+		}
+		
+		return new ResponseContent<FdatasView>(ResponseEnum.SUCCESS, view);
+	}
+
+	public ResponseContent<FdatasView> getFdatasFromSina(@PathVariable(value="itemID") String itemID) {
 		FdatasView view = null;
 		
 		Item item = itemService.getItem(itemID);
@@ -54,5 +91,4 @@ public class FdataAPI {
 		
 		return new ResponseContent<FdatasView>(ResponseEnum.SUCCESS, view);
 	}
-
 }

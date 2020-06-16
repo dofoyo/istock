@@ -1,4 +1,4 @@
-package com.rhb.istock.fdata.spider;
+package com.rhb.istock.fdata.sina.spider;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,7 +16,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rhb.istock.comm.util.HttpDownload;
 import com.rhb.istock.comm.util.ParseString;
-import com.rhb.istock.fdata.repository.ReportDateEntity;
+import com.rhb.istock.fdata.sina.repository.ReportDateEntity;
 
 @Service("downloadReportDateFromSina")
 public class DownloadReportDateFromSina implements DownloadReportDate {

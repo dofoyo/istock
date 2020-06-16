@@ -73,7 +73,7 @@ public class Swan {
 			muster = musters.get(itemID);
 			if(muster!=null) {
 				if(muster.isDropAve(21) && !muster.isDownLimited()) { 
-					ratio =  Functions.ratio(muster.getLatestPrice(),holds.get(itemID));
+					ratio =  Functions.growthRate(muster.getLatestPrice(),holds.get(itemID));
 					//logger.info(String.format("%.2f,%.2f,%d\n", holds.get(itemID), muster.getLatestPrice(), ratio));
 					if(ratio>55) {
 						account.drop(itemID, "1", muster.getLatestPrice());

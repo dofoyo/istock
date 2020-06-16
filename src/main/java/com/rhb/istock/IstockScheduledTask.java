@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import com.rhb.istock.fdata.FinancialStatementService;
+import com.rhb.istock.fdata.sina.FinancialStatementService;
 import com.rhb.istock.item.ItemService;
 import com.rhb.istock.kdata.KdataService;
 import com.rhb.istock.kdata.spider.KdataRealtimeSpider;

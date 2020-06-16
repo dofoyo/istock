@@ -453,7 +453,7 @@ public class Account {
 	public Integer getUpRatio(String itemID) {
 		HoldState hs = states.get(itemID);
 		if(hs!=null && hs.isHold) {
-			return Functions.ratio(hs.getLatestPrice(), hs.getBuyPrice());
+			return Functions.growthRate(hs.getLatestPrice(), hs.getBuyPrice());
 		}else {
 			return 0;
 		}
