@@ -30,7 +30,7 @@ public class Fina {
 	public boolean isOK() {
 		return this.cashflow.getN_cashflow_act().compareTo(BigDecimal.ZERO)==1
 				&& this.indicator.getProfit_dedt().compareTo(BigDecimal.ZERO)==1
-				&& this.getOperationMarginRatio()>=21  // 销售100元钱，净利润21元
+				&& this.getOperationMarginRatio()>=13  // 销售100元钱，净利润21元
 				;
 	}
 	

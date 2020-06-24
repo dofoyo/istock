@@ -46,7 +46,8 @@ public class TurtleMusterSimulationAnalysis {
 			itemID = columns[1];
 			itemName = columns[2];
 			buyDate = LocalDate.parse(columns[3],DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-			volumnRatio = new BigDecimal(columns[7]);
+			//volumnRatio = new BigDecimal(columns[7]);
+			volumnRatio = BigDecimal.ZERO;
 			sellDate = LocalDate.parse(columns[8],DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 			sellType = columns[11].equals("hold") ? 1 : Integer.parseInt(columns[11]);
 			profit = new BigDecimal(columns[12]);
@@ -71,9 +72,9 @@ public class TurtleMusterSimulationAnalysis {
 		Record tmp;
 		for(int i=0; i<records.size(); i++) {
 			tmp = records.get(i);
-			if(previous==null && tmp.getSellType()>=1) {
+			if(previous==null && tmp.getSellType()>=1) {  //selltype=1,卖出
 				results.add(tmp);
-			}else if(previous==null && tmp.getSellType()==0) {
+			}else if(previous==null && tmp.getSellType()==0) { //selltype=0,调仓
 				previous = tmp;
 			}else if(previous!=null) {
 				previous.setSellDate(tmp.getSellDate());
@@ -97,7 +98,7 @@ public class TurtleMusterSimulationAnalysis {
 			sb.append(r.getStr() +"\n");
 		}
 		
-		String file = reportPath + "/" + type + "_simulation_detail_plus"+openDuration+"_"+dropDuration+".csv"; 
+		String file = reportPath + "/" + type + "_simulation_detail_plus_"+openDuration+"_"+dropDuration+".csv"; 
 		FileTools.writeTextFile(file, sb.toString(), false);
 
 	}

@@ -43,6 +43,11 @@ public class TurtleMusterSimulationTest {
 	
 	@Test
 	public void generateRecords() {
+		turtleMusterSimulationAnalysis.generateRecords("hlb");
+		turtleMusterSimulationAnalysis.generateRecords("bdt");
+		turtleMusterSimulationAnalysis.generateRecords("avb");
+		turtleMusterSimulationAnalysis.generateRecords("bhl");
+		turtleMusterSimulationAnalysis.generateRecords("bav");
 		turtleMusterSimulationAnalysis.generateRecords("dtb");
 	}
 

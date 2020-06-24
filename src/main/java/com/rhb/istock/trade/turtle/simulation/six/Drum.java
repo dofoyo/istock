@@ -65,22 +65,22 @@ public class Drum {
 				
 				//涨幅超过21%，则跌破8日线
 				if(account.getUpRatio(itemID)>=21 && muster.isDropAve(8) && !muster.isDownLimited()) {
-					account.dropWithTax(itemID, "up "+account.getUpRatio(itemID).toString()+" and drop_ave8", muster.getLatestPrice());
+					account.dropWithTax(itemID, "1", muster.getLatestPrice());
 				}
 				
 				//跌破21日均线，同时成缩量
 				if(muster.isDropAve(21) 
 						&& muster.getAverageAmount5().compareTo(muster.getAverageAmount())==-1 
 						&& !muster.isDownLimited()) { 		
-					account.dropWithTax(itemID, "drop_ave21", muster.getLatestPrice());
+					account.dropWithTax(itemID, "2", muster.getLatestPrice());
 				}
 				
-				//走势弱于大盘，同时成缩量
+				//走势弱于大盘
 				ratio = Functions.growthRate(muster.getClose(),pre.getClose());
 				if(ratio < sseiRatio 
 						//&& muster.getAverageAmount5().compareTo(muster.getAverageAmount())==-1 
 						&& !muster.isDownLimited()) {
-					account.dropWithTax(itemID, sseiRatio.toString(), muster.getLatestPrice());
+					account.dropWithTax(itemID, "3", muster.getLatestPrice());
 				}
 			}
 		}
@@ -115,7 +115,7 @@ public class Drum {
 					muster = musters.get(itemID);
 					if(muster!=null) {
 						for(Integer holdOrderID : holdOrderIDs) {
-							account.dropByOrderID(holdOrderID, "-", muster.getLatestPrice());   //先卖
+							account.dropByOrderID(holdOrderID, "0", muster.getLatestPrice());   //先卖
 							dds.add(muster);						
 						}
 					}
