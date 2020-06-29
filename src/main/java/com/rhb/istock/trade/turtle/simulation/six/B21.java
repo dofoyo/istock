@@ -15,6 +15,7 @@ import java.util.TreeMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.rhb.istock.comm.util.Functions;
 import com.rhb.istock.fund.Account;
 import com.rhb.istock.kdata.Muster;
 /*
@@ -45,9 +46,10 @@ public class B21 {
 		this.type = type;
 	}
 	
-	public void doIt(Map<String,Muster> musters,Map<String,Muster> previous, LocalDate date, Integer sseiRatio) {
-		Muster muster;
+	public void doIt(Map<String,Muster> musters,Map<String,Muster> previous, LocalDate date, Integer sseiFlag, Integer sseiRatio) {
+		Muster muster, pre;
 		account.setLatestDate(date);
+		Integer ratio;
 		
 		Set<String> holdItemIDs = account.getItemIDsOfHolds();
 		for(String itemID : holdItemIDs) {
@@ -60,59 +62,67 @@ public class B21 {
 		//卖出跌破dropline的股票
 		for(String itemID: holdItemIDs) {
 			muster = musters.get(itemID);
-			if(muster!=null) {
+			pre = previous.get(itemID);
+			if(muster!=null && !muster.isDownLimited()) {
 				//跌破21日均线就卖
-				if(muster.isDropAve(21) && !muster.isDownLimited()) { 		
+				if(muster.isDropAve(21)) { 		
 					account.dropWithTax(itemID, "1", muster.getLatestPrice());
 				}
 				
-/*				//涨幅超过21%，则跌破8日线要卖出
-				if(account.getUpRatio(itemID)>=21 && muster.isDropAve(8) && !muster.isDownLimited()) {
-					account.dropWithTax(itemID, "2", muster.getLatestPrice());
+/*				//行情差,走势弱于大盘
+				if(sseiFlag==0 && pre!=null) {
+					ratio = Functions.growthRate(muster.getClose(),pre.getClose());
+					if(ratio < sseiRatio ) {
+						account.dropWithTax(itemID, "2", muster.getLatestPrice());
+					}
 				}*/
 				
 			}
 		}
-		
-		holdItemIDs = account.getItemIDsOfHolds();
-		
-		Set<Muster> dds = new HashSet<Muster>();  //用set，无重复，表示不可加仓
-		//List<Muster> dds = new ArrayList<Muster>();  //用list，有重复，表示可以加仓
-		
-		//确定突破走势的股票
-		List<Muster> breakers = this.getBreakers(musters, previous, sseiRatio);
-		
-		breakers_sb.append(date.toString() + ",");
-		StringBuffer sb = new StringBuffer();
-		for(Muster breaker : breakers) {
-			if(!holdItemIDs.contains(breaker.getItemID())) {
-				dds.add(breaker);
-				sb.append(breaker.getItemName());
-				sb.append(",");
+
+		//行情好，才买入
+		//if(sseiFlag==1) {
+	
+			holdItemIDs = account.getItemIDsOfHolds();
+			
+			Set<Muster> dds = new HashSet<Muster>();  //用set，无重复，表示不可加仓
+			//List<Muster> dds = new ArrayList<Muster>();  //用list，有重复，表示可以加仓
+			
+			//确定突破走势的股票
+			List<Muster> breakers = this.getBreakers(musters, previous, sseiRatio);
+			
+			breakers_sb.append(date.toString() + ",");
+			StringBuffer sb = new StringBuffer();
+			for(Muster breaker : breakers) {
+				if(!holdItemIDs.contains(breaker.getItemID())) {
+					dds.add(breaker);
+					sb.append(breaker.getItemName());
+					sb.append(",");
+				}
+				breakers_sb.append(breaker.getItemID());
+				breakers_sb.append(",");
 			}
-			breakers_sb.append(breaker.getItemID());
-			breakers_sb.append(",");
-		}
-		breakers_sb.deleteCharAt(breakers_sb.length()-1);
-		breakers_sb.append("\n");
-		
-		//先卖后买，完成调仓和开仓
-		// 当cash不够买入新股时，要卖出市值高与平均值的股票。
-		//此举可避免高位加仓的现象出现
-		if(!dds.isEmpty()) {
-			Set<Integer> holdOrderIDs;
-			for(String itemID: holdItemIDs) {
-				holdOrderIDs = 	account.getHoldOrderIDs(itemID);
-				muster = musters.get(itemID);
-				if(muster!=null) {
-					for(Integer holdOrderID : holdOrderIDs) {
-						account.dropByOrderID(holdOrderID, "0", muster.getLatestPrice());   //先卖
-						dds.add(muster);						
+			breakers_sb.deleteCharAt(breakers_sb.length()-1);
+			breakers_sb.append("\n");
+			
+			//先卖后买，完成调仓和开仓
+			// 当cash不够买入新股时，要卖出市值高与平均值的股票。
+			//此举可避免高位加仓的现象出现
+			if(!dds.isEmpty()) {
+				Set<Integer> holdOrderIDs;
+				for(String itemID: holdItemIDs) {
+					holdOrderIDs = 	account.getHoldOrderIDs(itemID);
+					muster = musters.get(itemID);
+					if(muster!=null) {
+						for(Integer holdOrderID : holdOrderIDs) {
+							account.dropByOrderID(holdOrderID, "0", muster.getLatestPrice());   //先卖
+							dds.add(muster);						
+						}
 					}
 				}
+				account.openAll(dds);			//后买
 			}
-			account.openAll(dds);			//后买
-		}
+		//}
 
 		dailyAmount_sb.append(account.getDailyAmount() + "\n");
 	}
@@ -158,7 +168,7 @@ public class B21 {
 		
 		
 		Muster m,p;
-		Integer goals, ratio;
+		Integer goals;
 		Selector selector = new Selector();
 		for(int i=0; i<musters.size() && i<this.pool; i++) {
 			m = musters.get(i);
@@ -179,11 +189,6 @@ public class B21 {
 				if(m.getAverageAmount().compareTo(p.getAverageAmount())==1) { // 放量
 					goals++;
 				}
-				
-				/*ratio = Functions.growthRate(m.getClose(),p.getClose());
-				if(ratio >= sseiRatio) {  //强于大盘
-					goals++;
-				}*/
 				
 				if(goals>0) {
 					selector.add(goals, m.getItemID());

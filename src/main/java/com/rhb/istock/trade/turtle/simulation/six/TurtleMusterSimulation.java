@@ -89,11 +89,11 @@ public class TurtleMusterSimulation {
 				sseiFlag = kdataService.getSseiFlag(date);
 				sseiRatio = kdataService.getSseiRatio(date, previous_period);
 
-				hlb.doIt(musters, date, sseiFlag);
-				bdt.doIt(musters, date, sseiFlag);
+				hlb.doIt(musters, previous.get(0), date, sseiFlag, sseiRatio);
+				bdt.doIt(musters, previous.get(0), date, sseiFlag, sseiRatio);
 
-				avb.doIt(musters, previous.get(0), date, sseiRatio);
-				bhl.doIt(musters, previous.get(0), date, sseiRatio);
+				avb.doIt(musters, previous.get(0), date, sseiFlag, sseiRatio);
+				bhl.doIt(musters, previous.get(0), date, sseiFlag, sseiRatio);
 
 				//bav.doIt(musters, previous.get(0), date, sseiFlag);
 				bav.doIt(musters, previous.get(0), date, sseiFlag, sseiRatio);

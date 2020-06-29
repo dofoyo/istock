@@ -14,6 +14,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.rhb.istock.comm.util.Functions;
 import com.rhb.istock.fund.Account;
 import com.rhb.istock.kdata.Muster;
 /*
@@ -33,7 +34,7 @@ public class NEWB {
 	
 	private StringBuffer dailyAmount_sb = new StringBuffer("date,cash,value,total\n");
 	private StringBuffer breakers_sb = new StringBuffer();
-	private Integer pool = 21;
+	private Integer pool = 55;
 	private Integer top = 1;
 	private Integer type = 1;// 1 - 高价， 0 - 低价
 	
@@ -43,9 +44,10 @@ public class NEWB {
 		this.type = type;
 	}
 	
-	public void doIt(Map<String,Muster> musters, LocalDate date, Integer sseiFlag) {
-		Muster muster;
+	public void doIt(Map<String,Muster> musters,Map<String,Muster> previous, LocalDate date, Integer sseiFlag, Integer sseiRatio) {
+		Muster muster, pre;
 		account.setLatestDate(date);
+		Integer ratio;
 		
 		Set<String> holdItemIDs = account.getItemIDsOfHolds();
 		for(String itemID : holdItemIDs) {
@@ -58,20 +60,26 @@ public class NEWB {
 		//卖出跌破dropline的股票
 		for(String itemID: holdItemIDs) {
 			muster = musters.get(itemID);
-			if(muster!=null) {
+			pre = previous.get(itemID);
+			if(muster!=null && !muster.isDownLimited()) {
 				//跌破21日均线就卖
-				if(muster.isDropAve(21) && !muster.isDownLimited()) { 		
+				if(muster.isDropAve(21)) { 		
 					account.dropWithTax(itemID, "1", muster.getLatestPrice());
 				}
 				
-/*				//涨幅超过21%，则跌破8日线
-				if(account.getUpRatio(itemID)>=21 && muster.isDropAve(8) && !muster.isDownLimited()) {
-					account.dropWithTax(itemID, "up "+account.getUpRatio(itemID).toString()+" and drop_ave8", muster.getLatestPrice());
+/*				//行情差,走势弱于大盘
+				if(sseiFlag==0 && pre!=null) {
+					ratio = Functions.growthRate(muster.getClose(),pre.getClose());
+					if(ratio < sseiRatio) {
+						account.dropWithTax(itemID, "2", muster.getLatestPrice());
+					}
 				}*/
 				
 			}
 		}
 		
+		//行情好，才买入
+		//if(sseiFlag==1) {
 			holdItemIDs = account.getItemIDsOfHolds();
 			
 			Set<Muster> dds = new HashSet<Muster>();  //用set，无重复，表示不可加仓
@@ -115,7 +123,8 @@ public class NEWB {
 					}
 				//}
 				account.openAll(dds);			//后买
-		}
+			}
+		//}
 
 		dailyAmount_sb.append(account.getDailyAmount() + "\n");
 	}

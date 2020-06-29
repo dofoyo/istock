@@ -42,7 +42,7 @@ public class Drum {
 	private StringBuffer breakers_sb = new StringBuffer();
 	
 	private BigDecimal valueRatio = new BigDecimal(3);  //每只股票不能超过市值的1/3
-	private Integer pool = 55;
+	//private Integer pool = 55;
 	private Integer top = 1;
 	private Integer type = 1;// 1 - 高价， 0 - 低价
 
@@ -62,33 +62,28 @@ public class Drum {
 		for(String itemID: holdIDs) {
 			muster = musters.get(itemID);
 			pre = previous.get(itemID);
-			if(muster!=null && pre!=null) {
+			if(muster!=null && !muster.isDownLimited()) {
 				account.refreshHoldsPrice(itemID, muster.getLatestPrice());
-				
-				//涨幅超过21%，则跌破8日线
-				if(account.getUpRatio(itemID)>=21 && muster.isDropAve(8) && !muster.isDownLimited()) {
+
+				//跌破21日均线
+				if(muster.isDropAve(21) 
+						//&& muster.getAverageAmount5().compareTo(muster.getAverageAmount())==-1
+						) { 		
 					account.dropWithTax(itemID, "1", muster.getLatestPrice());
 				}
-				
-				//跌破21日均线，同时成缩量
-				if(muster.isDropAve(21) 
-						&& muster.getAverageAmount5().compareTo(muster.getAverageAmount())==-1 
-						&& !muster.isDownLimited()) { 		
-					account.dropWithTax(itemID, "2", muster.getLatestPrice());
-				}
-				
-				//走势弱于大盘
-				ratio = Functions.growthRate(muster.getClose(),pre.getClose());
-				if(ratio < sseiRatio 
-						//&& muster.getAverageAmount5().compareTo(muster.getAverageAmount())==-1 
-						&& !muster.isDownLimited()) {
-					account.dropWithTax(itemID, "3", muster.getLatestPrice());
-				}
+
+/*				//行情差,走势弱于大盘
+				if(sseiFlag==0 && pre!=null) {
+					ratio = Functions.growthRate(muster.getClose(),pre.getClose());
+					if(ratio < sseiRatio) {
+						account.dropWithTax(itemID, "2", muster.getLatestPrice());
+					}
+				}*/
 			}
 		}
 		
 		//行情好，才买入
-		if(sseiFlag==1) {
+		//if(sseiFlag==1) {
 			//确定突破走势的股票
 			Set<String> holdItemIDs = account.getItemIDsOfHolds();
 			Set<Muster> dds = new HashSet<Muster>();  //用set，无重复，表示不可加仓
@@ -126,7 +121,7 @@ public class Drum {
 				//System.out.println(dds.size());
 				account.openAll(dds);			//后买
 			}
-		}
+		//}
 		
 		dailyAmount_sb.append(account.getDailyAmount() + "\n");
 
