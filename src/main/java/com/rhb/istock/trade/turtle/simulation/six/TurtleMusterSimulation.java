@@ -54,13 +54,16 @@ public class TurtleMusterSimulation {
 		//System.out.println("Functions.ratio(this.averagePrice21, this.averagePrice)<=13");
 		System.out.println("simulate from " + beginDate + " to " + endDate +" ......");
 
-		BAV3 bav = new BAV3(initCash);
-		AVBPlus bhl = new AVBPlus(initCash);
-		LPB2 bdt = new LPB2(initCash);  
+		NEWB hlb = new NEWB(initCash,1); //高价创新高
+		NEWB bdt = new NEWB(initCash,0); //低价创新高
 
-		LPB dtb = new LPB(initCash);  
-		Drum avb = new Drum(initCash);
-		HLB hlb = new HLB(initCash);
+		B21 avb = new B21(initCash,1);  //强平衡市策略：高价破21日线
+		B21 bhl = new B21(initCash,0);  //弱平衡市策略：低价破21日线
+
+		
+		//LPB2 bav = new LPB2(initCash);  //牛市策略：低价均线纠缠+突破21
+		Drum bav = new Drum(initCash,1);  //高价+上升趋势+强于大盘
+		Drum dtb = new Drum(initCash,0);  //低价+上升趋势+强于大盘
 
 		Map<String,Muster> musters;
 		
@@ -74,7 +77,6 @@ public class TurtleMusterSimulation {
 		for(LocalDate date = beginDate; (date.isBefore(endDate) || date.equals(endDate)); date = date.plusDays(1)) {
 
 			musters = kdataService.getMusters(date);
-			//musters = kdataService.getk
 
 			Progress.show((int)days, i++, "  simulate: " + date.toString() + ", musters.size()=" + musters.size() + " ");
 			
@@ -86,13 +88,16 @@ public class TurtleMusterSimulation {
 				
 				sseiFlag = kdataService.getSseiFlag(date);
 				sseiRatio = kdataService.getSseiRatio(date, previous_period);
-				
-				bav.doIt(musters, previous.get(0), date, sseiFlag);
-				bhl.doIt(musters, date, sseiFlag);
-				bdt.doIt(musters, previous.get(0), date, sseiFlag);
-				dtb.doIt(musters, previous.get(0), date, sseiFlag);
+
 				hlb.doIt(musters, date, sseiFlag);
-				avb.doIt(musters, previous.get(0), date, sseiFlag, sseiRatio);
+				bdt.doIt(musters, date, sseiFlag);
+
+				avb.doIt(musters, previous.get(0), date, sseiRatio);
+				bhl.doIt(musters, previous.get(0), date, sseiRatio);
+
+				//bav.doIt(musters, previous.get(0), date, sseiFlag);
+				bav.doIt(musters, previous.get(0), date, sseiFlag, sseiRatio);
+				dtb.doIt(musters, previous.get(0), date, sseiFlag, sseiRatio);
 			}
 		}
 		

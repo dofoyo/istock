@@ -19,17 +19,17 @@ import com.rhb.istock.comm.util.Functions;
 import com.rhb.istock.fund.Account;
 import com.rhb.istock.kdata.Muster;
 /*
- * 低价新高
+ * 高价价新高
  * 
  * 操作策略
  * 买入：突破89日高点
  * 卖出：跌破21日均线
- * 筛选范围：全部股票,按价格从小到大排序。
- * 筛选依据：选出价格最低的55个
+ * 筛选范围：全部股票,按价格从大到小排序。
+ * 筛选依据：选出价格最高的55个
  * 仓位控制：满仓，每只股票的均衡市值
  *
  */
-public class HLB {
+public class HLB3 {
 	protected static final Logger logger = LoggerFactory.getLogger(HLB_try.class);
 
 	private Account account = null;
@@ -49,7 +49,7 @@ public class HLB {
 	//private BigDecimal volumn_ratio = new BigDecimal(1.58);
 	//private BigDecimal total_mv = new BigDecimal("7000000000");
 	
-	public HLB(BigDecimal initCash) {
+	public HLB3(BigDecimal initCash) {
 		account = new Account(initCash);
 		this.initCash = initCash;
 	}
@@ -168,7 +168,7 @@ public class HLB {
 		Collections.sort(musters, new Comparator<Muster>() {
 			@Override
 			public int compare(Muster o1, Muster o2) {
-				return o1.getLatestPrice().compareTo(o2.getLatestPrice()); //a-z
+				return o2.getLatestPrice().compareTo(o1.getLatestPrice()); //a-z
 			
 				/*if(o1.getHLGap().compareTo(o2.getHLGap())==0){
 					return o1.getLatestPrice().compareTo(o2.getLatestPrice()); //a-z

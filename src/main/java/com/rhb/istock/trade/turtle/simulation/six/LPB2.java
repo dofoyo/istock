@@ -20,7 +20,8 @@ import com.rhb.istock.kdata.Muster;
 
 
 /*
- * LPB - Lowest Price Break
+ * 低价均线纠缠+突破21
+ * 
  * 操作策略
  *
  * 买入：全部股票中按各均线纠结从小到大排序筛选出最小的55个，再从中选出突破21日均线的.
@@ -63,6 +64,10 @@ public class LPB2 {
 			muster = musters.get(itemID);
 			if(muster!=null) {
 				account.refreshHoldsPrice(itemID, muster.getLatestPrice());
+/*				//涨幅超过21%，则跌破8日线
+				if(account.getUpRatio(itemID)>=21 && muster.isDropAve(8) && !muster.isDownLimited()) {
+					account.dropWithTax(itemID, "1", muster.getLatestPrice());
+				}*/
 /*				if(muster.isDropAve(21) && !muster.isDownLimited()) { 		//跌破21日均线就卖
 					account.dropWithTax(itemID, "2", muster.getLatestPrice());
 				}*/
@@ -159,6 +164,7 @@ public class LPB2 {
 			public int compare(Muster o1, Muster o2) {
 				if(o1.getAverageGap().equals(o2.getAverageGap())) {
 					return o1.getLatestPrice().compareTo(o2.getLatestPrice());
+					//return o2.getLatestPrice().compareTo(o1.getLatestPrice());
 				}else {
 					return o1.getAverageGap().compareTo(o2.getAverageGap()); //a-z
 				}
@@ -183,7 +189,7 @@ public class LPB2 {
 			if(m!=null && p!=null && r!=null
 					//&& m.getPe().compareTo(BigDecimal.ZERO)>0 && m.getPe().compareTo(new BigDecimal(233))<0
 					&& !m.isUpLimited() 
-					&& !m.isDownLimited() 
+					//&& !m.isDownLimited() 
 					//&& m.isUpBreaker()
 					&& m.isJustBreaker(ratio)   //刚刚突破21日线
 					//&& r >= sseiRatio   // 强于大盘

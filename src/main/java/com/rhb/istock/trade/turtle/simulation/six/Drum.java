@@ -44,10 +44,12 @@ public class Drum {
 	private BigDecimal valueRatio = new BigDecimal(3);  //每只股票不能超过市值的1/3
 	private Integer pool = 55;
 	private Integer top = 1;
+	private Integer type = 1;// 1 - 高价， 0 - 低价
 
-	public Drum(BigDecimal initCash) {
+	public Drum(BigDecimal initCash, Integer type) {
 		account = new Account(initCash);
 		this.initCash = initCash;
+		this.type = type;
 	}
 	
 	public void doIt(Map<String,Muster> musters,Map<String,Muster> previous, LocalDate date, Integer sseiFlag, Integer sseiRatio) {
@@ -158,12 +160,21 @@ public class Drum {
 	private List<Muster> getBreakers(Map<String,Muster> musters,Map<String,Muster> previous, LocalDate date, Integer sseiRatio){
 		List<Muster>  ms = new ArrayList<Muster>(musters.values());
 
-		Collections.sort(ms, new Comparator<Muster>() {
-			@Override
-			public int compare(Muster o1, Muster o2) {
-				return o1.getLatestPrice().compareTo(o2.getLatestPrice()); //a-z
-			}
-		});
+		if(this.type == 0) {
+			Collections.sort(ms, new Comparator<Muster>() {
+				@Override
+				public int compare(Muster o1, Muster o2) {
+					return o1.getLatestPrice().compareTo(o2.getLatestPrice()); //价格小到大排序
+				}
+			});
+		}else {
+			Collections.sort(ms, new Comparator<Muster>() {
+				@Override
+				public int compare(Muster o1, Muster o2) {
+					return o2.getLatestPrice().compareTo(o1.getLatestPrice()); //价格大到小排序
+				}
+			});
+		}
 		
 		List<Muster>  breakers = new ArrayList<Muster>();
 		Muster m,p;
@@ -176,6 +187,7 @@ public class Drum {
 				ratio = Functions.growthRate(m.getAveragePrice21(), m.getAveragePrice());
 				r = Functions.growthRate(m.getClose(),p.getClose());
 				if(!m.isUpLimited() && !m.isDownLimited()
+					&& r>0
 					&& r >= sseiRatio   // 强于大盘
 					//&& m.isBreaker(13)
 					//&& m.isBreaker()

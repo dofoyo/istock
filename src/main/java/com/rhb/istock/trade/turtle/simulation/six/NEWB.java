@@ -10,26 +10,22 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.rhb.istock.comm.util.Functions;
 import com.rhb.istock.fund.Account;
 import com.rhb.istock.kdata.Muster;
 /*
- * 低价新高
+ * 高价或低价创新高
  * 
  * 操作策略
- * 买入：突破89日高点
+ * 买入：全部股票,按价格排序，选出价格最高或最低的55个，突破89日高点
  * 卖出：跌破21日均线
- * 筛选范围：全部股票,按价格从小到大排序。
- * 筛选依据：选出价格最低的55个
  * 仓位控制：满仓，每只股票的均衡市值
  *
  */
-public class HLB {
+public class NEWB {
 	protected static final Logger logger = LoggerFactory.getLogger(HLB_try.class);
 
 	private Account account = null;
@@ -37,31 +33,19 @@ public class HLB {
 	
 	private StringBuffer dailyAmount_sb = new StringBuffer("date,cash,value,total\n");
 	private StringBuffer breakers_sb = new StringBuffer();
-	private Integer pool = 55;
+	private Integer pool = 21;
 	private Integer top = 1;
-	private Integer hlgap_min = 8;
-	private Integer hlgap_max = 25;
-/*	private BigDecimal turnover_rate_f_max = new BigDecimal(8.63);
-	private BigDecimal turnover_rate_f_min = new BigDecimal(0.18);
-	private BigDecimal volumn_ratio = new BigDecimal(3.22);
-*/	
-	//private BigDecimal turnover_rate_f = new BigDecimal(14.8);
-	//private BigDecimal volumn_ratio = new BigDecimal(1.58);
-	//private BigDecimal total_mv = new BigDecimal("7000000000");
+	private Integer type = 1;// 1 - 高价， 0 - 低价
 	
-	public HLB(BigDecimal initCash) {
+	public NEWB(BigDecimal initCash, Integer type) {
 		account = new Account(initCash);
 		this.initCash = initCash;
+		this.type = type;
 	}
 	
 	public void doIt(Map<String,Muster> musters, LocalDate date, Integer sseiFlag) {
 		Muster muster;
 		account.setLatestDate(date);
-/*		if(sseiFlag==1) {
-			this.top = 8;
-		}else {
-			this.top = 1;
-		}*/
 		
 		Set<String> holdItemIDs = account.getItemIDsOfHolds();
 		for(String itemID : holdItemIDs) {
@@ -71,28 +55,20 @@ public class HLB {
 			}
 		}
 		
-		//卖出跌破dropline或lowest的股票
+		//卖出跌破dropline的股票
 		for(String itemID: holdItemIDs) {
 			muster = musters.get(itemID);
 			if(muster!=null) {
-				if(muster.isDropAve(21) && !muster.isDownLimited()) { 		//跌破21日均线就卖
+				//跌破21日均线就卖
+				if(muster.isDropAve(21) && !muster.isDownLimited()) { 		
 					account.dropWithTax(itemID, "1", muster.getLatestPrice());
 				}
 				
-				/*//涨幅超过21%，则跌破8日线
+/*				//涨幅超过21%，则跌破8日线
 				if(account.getUpRatio(itemID)>=21 && muster.isDropAve(8) && !muster.isDownLimited()) {
 					account.dropWithTax(itemID, "up "+account.getUpRatio(itemID).toString()+" and drop_ave8", muster.getLatestPrice());
 				}*/
 				
-/*				if(muster.isDropLowest(13) && !muster.isDownLimited()) { 		//跌破21日低点就卖
-					account.dropWithTax(itemID, "1", muster.getLatestPrice());
-				}*/
-/*				if(sseiFlag==0 && muster.isDropAve(13) && !muster.isDownLimited()) { 		//跌破13日均线就卖
-					account.dropWithTax(itemID, "1", muster.getLatestPrice());
-				}				
-				if(sseiFlag==1 && muster.isDropLowest(34) && !muster.isDownLimited()) { 		//跌破21日低点就卖
-					account.dropWithTax(itemID, "2", muster.getLatestPrice());
-				}*/
 			}
 		}
 		
@@ -165,45 +141,28 @@ public class HLB {
 	private List<Muster> getBreakers(List<Muster> musters){
 		List<Muster> breakers = new ArrayList<Muster>();
 
-		Collections.sort(musters, new Comparator<Muster>() {
-			@Override
-			public int compare(Muster o1, Muster o2) {
-				return o1.getLatestPrice().compareTo(o2.getLatestPrice()); //a-z
-			
-				/*if(o1.getHLGap().compareTo(o2.getHLGap())==0){
-					return o1.getLatestPrice().compareTo(o2.getLatestPrice()); //a-z
-					//return o2.getLatestPrice().compareTo(o1.getLatestPrice()); //z-a
-				}else {
-					return o1.getHLGap().compareTo(o2.getHLGap());//A-Z
-				}*/
-			}
-		});
-		
-/*		Distribution distribution = new Distribution();
-		for(Muster m : musters) {
-			if(m!=null && !m.isUpLimited() && !m.isDownLimited() && m.isUpBreaker() && m.isUp()) {
-				distribution.add(m.getHLGap(), m.getItemID());
-			}
+		if(this.type == 0) {
+			Collections.sort(musters, new Comparator<Muster>() {
+				@Override
+				public int compare(Muster o1, Muster o2) {
+					return o1.getLatestPrice().compareTo(o2.getLatestPrice()); //价格小到大排序
+				}
+			});
+		}else {
+			Collections.sort(musters, new Comparator<Muster>() {
+				@Override
+				public int compare(Muster o1, Muster o2) {
+					return o2.getLatestPrice().compareTo(o1.getLatestPrice()); //价格大到小排序
+				}
+			});
 		}
-		distribution.show();
-*/		
+		
 		Muster m;
 		for(int i=0; i<musters.size() && breakers.size()<top && i<pool; i++) {
-		//for(int i=0; i<musters.size() && i<pool; i++) {
 			m = musters.get(i);
 			if(m!=null 
 					&& !m.isUpLimited() 
-					//&& !m.isDownLimited() 
 					&& m.isUpBreaker() 
-					//&& m.isGapBreaker() 
-					//&& m.isAboveAverageAmount()
-					//&& Functions.between(m.getHLGap(), hlgap_min, hlgap_max)
-					//&& m.isUp(21)
-					//&& m.getVolume_ratio().compareTo(new BigDecimal(2))==1
-					//&& m.getTurnover_rate_f().compareTo(turnover_rate_f_max)<0
-					//&& m.getTurnover_rate_f().compareTo(turnover_rate_f_min)>0
-					//&& m.getTurnover_rate_f().compareTo(turnover_rate_f)<0
-					//&& m.getTotal_mv().compareTo(total_mv)<0
 					) {
 				breakers.add(m);
 			}
@@ -212,26 +171,4 @@ public class HLB {
 		return breakers;
 	}
 	
-	class Distribution {
-		TreeMap<Integer, Set<String>> ids = new TreeMap<Integer, Set<String>>();
-		public void add(Integer i, String id) {
-			Set<String> ss = ids.get(i);
-			if(ss == null) {
-				ss = new HashSet<String>();
-				ids.put(i, ss);
-			}
-			ss.add(id);
-		}
-		
-		public void show() {
-			StringBuffer sb = new StringBuffer();
-			for(Map.Entry<Integer, Set<String>> entry : ids.entrySet()) {
-				sb.append(entry.getKey());
-				sb.append(":");
-				sb.append(entry.getValue().size());
-				sb.append("\n");
-			}
-			logger.info(sb.toString());
-		}
-	}
 }

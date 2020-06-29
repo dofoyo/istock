@@ -49,12 +49,13 @@ public class LPB {
 	public void doIt(Map<String,Muster> musters,Map<String,Muster> previous, LocalDate date, Integer sseiFlag) {
 		Muster muster;
 		account.setLatestDate(date);
+		//logger.info(date.toString());	
 		
-		if(sseiFlag==1) {
+		/*if(sseiFlag==1) {
 			this.top = 8;
 		}else {
 			this.top = 1;
-		}
+		}*/
 		
 		
 		//卖出
@@ -154,10 +155,19 @@ public class LPB {
 	private List<Muster> getBreakers(Map<String,Muster> musters,Map<String,Muster> previous, LocalDate date){
 		List<Muster>  ms = new ArrayList<Muster>(musters.values());
 
+		/*List<Muster>  ms = new ArrayList<Muster>();
+
+		for(Muster m : musters.values()) {
+			if(m.getPe().compareTo(BigDecimal.ZERO)>0) {
+				ms.add(m);
+			}
+		}*/
+		
 		Collections.sort(ms, new Comparator<Muster>() {
 			@Override
 			public int compare(Muster o1, Muster o2) {
 				return o1.getLatestPrice().compareTo(o2.getLatestPrice()); //a-z
+				//return o2.getLatestPrice().compareTo(o1.getLatestPrice()); //a-z
 			}
 		});
 		
@@ -177,14 +187,15 @@ public class LPB {
 			//r = Functions.ratio(m.getAveragePrice21(), m.getAveragePrice());
 			if(m!=null 
 					&& p!=null
-					&& m.getPe().compareTo(BigDecimal.ZERO)>0 && m.getPe().compareTo(new BigDecimal(233))<0
+					&& m.getPe().compareTo(BigDecimal.ZERO)>0 //&& m.getPe().compareTo(new BigDecimal(233))<0
 					&& !m.isUpLimited() 
-					&& !m.isDownLimited() 
+					//&& !m.isDownLimited() 
 					//&& m.isUpBreaker()
 					&& m.isJustBreaker(ratio)
 					//&& r<=ratio && r>0
 					//&& m.getPrviousAverageAmountRatio()>0
 					&& m.getAverageAmount().compareTo(previousAverageAmount)==1
+					//&& m.getAveragePrice21().compareTo(p.getAveragePrice21())==1  //上升趋势
 					//&& m.isAboveAverageAmount()
 					//&& m.getHLGap()<=55
 					//&& p.isDown(21)
@@ -195,6 +206,7 @@ public class LPB {
 					) {
 				breakers.add(m);
 				sb.append(m.getItemID() + "(" + i + ")" +",");
+				//logger.info(String.format("%s,averagePrice21=%.2f, privouseAP=%.2f",m.getItemID(), m.getAveragePrice21(),p.getAveragePrice21()));
 			}
 		}
 		
