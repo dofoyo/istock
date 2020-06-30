@@ -26,13 +26,16 @@ import com.rhb.istock.item.ItemService;
 import com.rhb.istock.kdata.Kbar;
 import com.rhb.istock.kdata.Kdata;
 import com.rhb.istock.kdata.KdataService;
+import com.rhb.istock.kdata.Muster;
 import com.rhb.istock.kdata.api.KdatasView;
 import com.rhb.istock.selector.SelectorService;
+import com.rhb.istock.selector.b21.B21Service;
 import com.rhb.istock.selector.hold.HoldEntity;
 import com.rhb.istock.selector.potential.Potential;
 import com.rhb.istock.trade.turtle.domain.Tfeature;
 import com.rhb.istock.trade.turtle.domain.Tbar;
 import com.rhb.istock.trade.turtle.domain.Turtle;
+import com.rhb.istock.trade.turtle.operation.api.ItemView;
 import com.rhb.istock.trade.turtle.operation.api.HoldView;
 import com.rhb.istock.trade.turtle.operation.api.IndustryView;
 import com.rhb.istock.trade.turtle.operation.api.PotentialView;
@@ -55,6 +58,10 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 	@Autowired
 	@Qualifier("fdataServiceTushare")
 	FdataServiceTushare fdataServiceTushare;
+
+	@Autowired
+	@Qualifier("b21Service")
+	B21Service b21Service;
 	
 	DecimalFormat df = new DecimalFormat("0.00"); 
 	DecimalFormat df_integer = new DecimalFormat("000"); 
@@ -67,6 +74,8 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 	
 	Integer bxxtops = 8;
 	Integer tops = 55;
+	
+	List<String> models = null;
 	
 	protected static final Logger logger = LoggerFactory.getLogger(TurtleOperationServiceImp.class);
 	
@@ -89,32 +98,35 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 	public List<HoldView> getHolds() {
 		List<HoldView> holds = new ArrayList<HoldView>();
 		
-		Tfeature feature;
-		BigDecimal stopPrice, reopenPrice;
+		Map<String,Muster> musters = kdataService.getLatestMusters();
+
 		Item item;
-		
 		HoldView hold;
+		Muster muster;
+		
 		List<HoldEntity> entities = selectorService.getHolds();
-		//System.out.println(entities);
 		for(HoldEntity entity : entities) {
 			this.setLatestKdata(entity.getItemID(),true);
 			
-			feature = turtle.getFeature(entity.getItemID());
-			stopPrice = entity.getPrice().subtract(feature.getAtr());
-			reopenPrice = entity.getPrice().add(feature.getAtr().divide(new BigDecimal(2),BigDecimal.ROUND_HALF_UP));
-			
 			item = itemService.getItem(entity.getItemID());
+			muster = musters.get(entity.getItemID());
 			
-			hold = new HoldView(entity.getItemID(),item.getCode(),item.getName(),feature.getAtr().toString());
-			hold.setNowPrice(feature.getNow());
-			hold.setHighPrice(feature.getOpenHigh());
-			hold.setLowPrice(feature.getOpenLow());
-			hold.setBuyPrice(entity.getPrice());
-			hold.setStopPrice(stopPrice);
-			hold.setDropPrice(feature.getDropLow());
-			hold.setReopenPrice(reopenPrice);
+			hold = new HoldView();
+			hold.setItemID(entity.getItemID());
+			hold.setCode(item.getCode());
+			hold.setName(item.getName());
+			
 			hold.setIndustry(item.getIndustry());
 			hold.setArea(item.getArea());
+			hold.setBuyPrice(entity.getPrice());
+			hold.setBuyDate(entity.getDate());;
+			hold.setNowPrice(muster.getLatestPrice().toString());
+			hold.setTopic(this.getTopic(item.getItemID()));
+			hold.setLabel(entity.getLabel());
+			
+			if(muster.isDropAve(21)) {
+				hold.setStatus("-2");
+			}
 			
 			holds.add(hold);
 			
@@ -179,13 +191,17 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 	}
 
 	@Override
-	public List<TurtleView> getFavors() {
+	public List<ItemView> getFavors() {
 		Map<String, String> favors = selectorService.getFavors();
 
-		List<TurtleView> views = getTurtleViews(new ArrayList<String>(favors.keySet()),"favors",true);
+		List<ItemView> views = getItemViews(new ArrayList<String>(favors.keySet()));
+
+		LocalDate endDate = kdataService.getLatestMarketDate("sh000001");
+		Map<String,String> b21s = b21Service.isB21(new ArrayList<String>(favors.keySet()), endDate);
 		
-		for(TurtleView view : views) {
-			view.setName(favors.get(view.getItemID()));
+		for(ItemView view : views) {
+			view.setLabel(favors.get(view.getItemID()));
+			view.setStatus(b21s.get(view.getItemID()));
 		}
 		
 		return views;
@@ -422,6 +438,58 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 		return views;
 	}
 	
+	private List<ItemView> getItemViews(List<String> itemIDs) {
+		long beginTime=System.currentTimeMillis(); 
+		logger.info("getting b21 views ......");
+		
+		List<ItemView> views = new ArrayList<ItemView>();
+		
+		Map<String,String> preyMap;
+
+		Item item;
+
+		List<String> holds = selectorService.getHoldIDs();
+		Map<String,Muster> musters = kdataService.getLatestMusters();
+		Muster muster;
+		
+		int i=1;
+		for(String id : itemIDs) {
+			Progress.show(itemIDs.size(),i++,id);
+			
+				item = itemService.getItem(id);
+				if(item == null) {
+					System.err.println("item of " + id + " is null!!!");
+				}else {
+					muster = musters.get(id);
+					preyMap = new HashMap<String,String>();
+					preyMap.put("itemID", id);
+					preyMap.put("code", (holds!=null && holds.contains(id)) ? "*" + item.getCode() : item.getCode());
+					preyMap.put("name", item.getName());
+					preyMap.put("industry", item.getIndustry());
+					preyMap.put("area", item.getArea());
+					preyMap.put("topic", this.getTopic(id));
+					preyMap.put("price", muster==null ? "0" : muster.getLatestPrice().toString());
+					views.add(new ItemView(preyMap));						
+				}
+		}
+		
+		Collections.sort(views, new Comparator<ItemView>() {
+			@Override
+			public int compare(ItemView o1, ItemView o2) {
+				BigDecimal now1 = new BigDecimal(o1.getPrice());
+				BigDecimal now2 = new BigDecimal(o2.getPrice());
+				
+				return now1.compareTo(now2);
+			}
+		});		
+		
+		long used = (System.currentTimeMillis() - beginTime)/1000; 
+		logger.info("getting b21 views done! 用时：" + used + "秒");     
+		
+		return views;
+	}
+
+	
 	private List<TurtleView> getTurtleViews(List<String> itemIDs, String name, boolean reSort) {
 		long beginTime=System.currentTimeMillis(); 
 		logger.info("getting " + name + " views ......");
@@ -652,21 +720,23 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 	}
 
 	@Override
-	public List<TurtleView> getPowers() {
+	public List<ItemView> getPowers() {
 		//List<String> ps = selectorService.getPowerIDs();
 		String b_date = "20161231";
 		String e_date = "20191231";
 		Integer n = 3;
-		List<GrowModel> models = fdataServiceTushare.getGrowModels(b_date, e_date, n);
-		
-		List<String> ps = new ArrayList<String>();
-		for(GrowModel model : models) {
-			ps.add(model.getItemID());
+
+		if(this.models == null) {
+			models = fdataServiceTushare.getGrowModels(b_date, e_date, n);
 		}
 		
-		List<TurtleView> views = getTurtleViews(ps,"powers",false);
+		LocalDate endDate = kdataService.getLatestMarketDate("sh000001");
+		Map<String,String> b21s = b21Service.isB21(models, endDate);
 
-		
+		List<ItemView> views = getItemViews(models);
+		for(ItemView view : views) {
+			view.setStatus(b21s.get(view.getItemID()));
+		}
 		
 		return views;
 	}
@@ -724,6 +794,13 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 			views.add(view);
 		}
 		
+		return views;
+	}
+
+	@Override
+	public List<ItemView> getB21s() {
+		Map<String,String> ids = selectorService.getB21();
+		List<ItemView> views = this.getItemViews(new ArrayList(ids.keySet())); 
 		return views;
 	}
 

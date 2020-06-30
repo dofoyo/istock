@@ -1,6 +1,5 @@
 package com.rhb.istock.selector.hold;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,7 +22,12 @@ public class HoldServiceImp implements HoldService {
 		for(String line : lines) {
 			columns = line.split(",");
 			if(columns.length >= 2) {
-				hold = new HoldEntity(columns[0], new BigDecimal(columns[1]));
+				hold = new HoldEntity();
+				hold.setDate(columns[0]);
+				hold.setItemID(columns[1]);
+				hold.setItemName(columns[2]);
+				hold.setPrice(columns[3]);
+				hold.setLabel(columns[4]);
 				holds.add(hold);				
 			}
 		}

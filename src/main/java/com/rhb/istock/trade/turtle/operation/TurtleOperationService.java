@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.rhb.istock.kdata.api.KdatasView;
+import com.rhb.istock.trade.turtle.operation.api.ItemView;
 import com.rhb.istock.trade.turtle.operation.api.HoldView;
 import com.rhb.istock.trade.turtle.operation.api.IndustryView;
 import com.rhb.istock.trade.turtle.operation.api.PotentialView;
@@ -23,7 +24,8 @@ public interface TurtleOperationService {
 	 * 对holds.txt中的股票进行提示：止损价(stopPrice)、平仓价(dropPrice)、加仓价(reopenPrice)
 	 */
 	public List<HoldView> getHolds();
-	public List<TurtleView> getFavors();
+	public List<ItemView> getFavors();
+	public List<ItemView> getB21s();
 	public List<TurtleView> getPotentials(String type);
 	public List<PotentialView> getPotentials(String type, LocalDate date);
 	public List<PotentialView> getPotentials_hlb(LocalDate date);
@@ -31,7 +33,7 @@ public interface TurtleOperationService {
 	public Map<String,IndustryView> getPotentialIndustrys(LocalDate date);
 	public void redoPotentials();
 	public String[] getTopics();
-	public List<TurtleView> getPowers();
+	public List<ItemView> getPowers();
 	
 	/*
 	 * 一般每周1-5，每天上午9:00初始化一次。主要是导入之前的历史记录

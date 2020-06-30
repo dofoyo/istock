@@ -50,9 +50,9 @@ public class FdataServiceTest {
 		String e_date = "20191231";
 		Integer n = 3;
 		
-		List<GrowModel> models = fdataServiceTushare.getGrowModels(b_date, e_date,n);
+		List<String> models = fdataServiceTushare.getGrowModels(b_date, e_date,n);
 		
-		for(GrowModel model : models) {
+		for(String model : models) {
 			System.out.println(model);
 		}
 		

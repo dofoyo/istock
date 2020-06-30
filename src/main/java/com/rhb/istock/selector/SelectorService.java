@@ -53,6 +53,7 @@ public interface SelectorService{
 	public Map<String,String> getLpbs();
 	public Map<String,String> getBavs();
 	public Map<String,String> getDrums();
+	public Map<String,String> getB21();
 
 
 }

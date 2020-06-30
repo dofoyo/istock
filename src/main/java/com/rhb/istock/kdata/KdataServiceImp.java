@@ -837,5 +837,15 @@ public class KdataServiceImp implements KdataService{
 		return highest;
 	}
 
+	@Override
+	public Map<String, Muster> getPreviousMusters(Integer previous_period, LocalDate endDate) {
+		List<LocalDate> previousDates = this.getMusterDates(previous_period, endDate);
+		if(previousDates!=null) {
+			return this.getMusters(previousDates.get(0));
+		}else {
+			return null;
+		}
+	}
+
 
 }

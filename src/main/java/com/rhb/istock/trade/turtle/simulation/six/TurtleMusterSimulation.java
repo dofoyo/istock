@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.rhb.istock.comm.util.Functions;
 import com.rhb.istock.comm.util.Progress;
 import com.rhb.istock.item.ItemService;
 import com.rhb.istock.kdata.KdataService;
@@ -48,6 +47,17 @@ public class TurtleMusterSimulation {
 	
 	/*
 	 * 根据输入起止日期，系统模拟买入和卖出
+	 * 
+	 * 2020年6月30日
+	 * 经过测算，总结如下：
+	 * 1、熊市空仓是最佳策略，目前近20年来，沪深Ａ股经历了四个阶段的熊市：
+	 * 2001/6/1	－	2005/6/6
+	 * 2007/10/16	－	2008/11/5
+	 * 2015/6/15　－		2016/1/28
+	 * 2018/1/26	－	2019/1/3
+	 * 
+	 * 2、牛市和平衡市的最佳策略是B21
+	 * 
 	 */
 	public void simulate(LocalDate beginDate, LocalDate endDate) {
 		long beginTime=System.currentTimeMillis(); 
@@ -57,11 +67,9 @@ public class TurtleMusterSimulation {
 		NEWB hlb = new NEWB(initCash,1); //高价创新高
 		NEWB bdt = new NEWB(initCash,0); //低价创新高
 
-		B21 avb = new B21(initCash,1);  //强平衡市策略：高价破21日线
-		B21 bhl = new B21(initCash,0);  //弱平衡市策略：低价破21日线
-
+		B21 avb = new B21(initCash,1);  //平衡市策略：高价破21日线
+		B21 bhl = new B21(initCash,0);  //牛市和平衡市策略：低价破21日线
 		
-		//LPB2 bav = new LPB2(initCash);  //牛市策略：低价均线纠缠+突破21
 		Drum bav = new Drum(initCash,1);  //高价+上升趋势+强于大盘
 		Drum dtb = new Drum(initCash,0);  //低价+上升趋势+强于大盘
 

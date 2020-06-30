@@ -29,8 +29,8 @@ public class KdataServiceTest {
 	public void generateMusters() {
 		LocalDate date = LocalDate.parse("2000-01-01");
 		kdataService.generateMusters(date);
-		//kdataService.generateLatestMusters();
-		//kdataService.updateLatestMusters();
+		kdataService.generateLatestMusters();
+		kdataService.updateLatestMusters();
 	}
 	
 	

@@ -24,8 +24,6 @@ public class TurtleApi{
 	@Qualifier("turtleOperationServiceImp")
 	TurtleOperationService ts;
 
-	private List<TurtleView> powers_views;
-	
 	@GetMapping("/turtle/topics")
 	public ResponseContent<String[]> getTopics() {
 		String[] topis = ts.getTopics();
@@ -33,11 +31,9 @@ public class TurtleApi{
 	}
 
 	@GetMapping("/turtle/powers")
-	public ResponseContent<List<TurtleView>> getPowers() {
-		if(powers_views==null) {
-			powers_views = ts.getPowers();
-		}
-		return new ResponseContent<List<TurtleView>>(ResponseEnum.SUCCESS, powers_views);
+	public ResponseContent<List<ItemView>> getPowers() {
+		List<ItemView> powers_views = ts.getPowers();
+		return new ResponseContent<List<ItemView>>(ResponseEnum.SUCCESS, powers_views);
 	}
 
 	@GetMapping("/turtle/potentials/{type}/{date}")
@@ -59,37 +55,6 @@ public class TurtleApi{
 		}else if("avb".equals(type)) {
 			potentialviews =  ts.getPotentials_avb(theDate);
 		}
-/*		
-		//System.out.println("the date is " + theDate);
-		Map<String,IndustryView> industryViews = ts.getPotentialIndustrys(theDate);
-		IndustryView industryView;
-		
-		List<PotentialView> potentialviews = ts.getPotentials(type, theDate);		
-		for(PotentialView potentialView : potentialviews) {
-			industryView = industryViews.get(potentialView.getIndustry());
-			if(industryView != null) {
-				potentialView.setIndustry(industryView.getIndustry());
-				potentialView.setCount(industryView.getCount());
-			}
-			//System.out.println(potentialView);
-		}
-*/			
-/*		Collections.sort(potentialviews, new Comparator<PotentialView>() {
-			@Override
-			public int compare(PotentialView o1, PotentialView o2) {
-				if(o1.getHnGap().compareTo(o2.getHnGap())==0) {
-					return
-				}
-				return o1.getHnGap().compareTo(o2.getHnGap());
-				if(o2.getIndustryHot().compareTo(o1.getIndustryHot())==0) {
-					return o1.getHlGap().compareTo(o2.getHlGap());
-				}else {
-					return o2.getIndustryHot().compareTo(o1.getIndustryHot());
-				}
-			}
-			
-		});*/
-	
 		return new ResponseContent<List<PotentialView>>(ResponseEnum.SUCCESS, potentialviews);
 	}
 	
@@ -135,6 +100,12 @@ public class TurtleApi{
 		return new ResponseContent<List<TurtleView>>(ResponseEnum.SUCCESS, views);
 	}
 	
+	@GetMapping("/turtle/b21")
+	public ResponseContent<List<ItemView>> getPotentialsOfB21() {
+		List<ItemView> views = ts.getB21s();
+		return new ResponseContent<List<ItemView>>(ResponseEnum.SUCCESS, views);
+	}
+	
 	/*	
 	@GetMapping("/turtle/potentials/redo")
 	public ResponseContent<String> redoPotentials() {
@@ -143,28 +114,15 @@ public class TurtleApi{
 	}*/
 	
 	@GetMapping("/turtle/favors")
-	public ResponseContent<List<TurtleView>> getFavors() {
-		List<TurtleView> favors = ts.getFavors();
-		return new ResponseContent<List<TurtleView>>(ResponseEnum.SUCCESS, favors);
+	public ResponseContent<List<ItemView>> getFavors() {
+		List<ItemView> favors = ts.getFavors();
+		return new ResponseContent<List<ItemView>>(ResponseEnum.SUCCESS, favors);
 	}
 	
 	@GetMapping("/turtle/holds")
 	public ResponseContent<List<HoldView>> getHolds() {
 		List<HoldView> holds = ts.getHolds();
-		Collections.sort(holds, new Comparator<HoldView>() {
-			@Override
-			public int compare(HoldView o1, HoldView o2) {
-				return (o2.getStatus()).compareTo(o1.getStatus());
-			}
-		});	
 		return new ResponseContent<List<HoldView>>(ResponseEnum.SUCCESS, holds);
 	}
 	
-	class TopicView{
-		private String text;
-		private String value;
-		
-		
-	}
-
 }

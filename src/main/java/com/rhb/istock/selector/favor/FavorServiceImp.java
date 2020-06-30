@@ -24,7 +24,7 @@ public class FavorServiceImp implements FavorService {
 			//System.out.println(str);
 			String[] ss = str.split(",");
 			if(ss.length>1) {
-				articles.put(ss[0].toLowerCase(), ss[1]);
+				articles.put(ss[0].toLowerCase(), ss[2]);
 			}
 		}
 		return articles;

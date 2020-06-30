@@ -25,6 +25,7 @@ lpb2File: d:/dev/istock-data/lpb2.txt
 hlb2File: d:/dev/istock-data/hlb2.txt
 txtFile: d:/dev/istock-data/ids.txt
 drumFile: d:/dev/istock-data/drum.txt
+b21File: d:/dev/istock-data/b21.txt
 openDuration: 89
 dropDuration: 21
 

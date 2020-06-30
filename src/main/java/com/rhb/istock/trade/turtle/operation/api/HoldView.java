@@ -12,49 +12,27 @@ public class HoldView {
 	private String name;
 	private String industry;
 	private String area;
-	private String atr;
-	private BigDecimal nowPrice;
-	private BigDecimal buyPrice;
-	private Map<String, BigDecimal> prices;
+	private String nowPrice;
+	private String buyPrice;
+	private String label;
+	private String buyDate;
+	private String topic;
+	private String status;
 	
-	public HoldView(String itemID, String code, String name, String atr) {
-		this.itemID = itemID;
-		this.code = code;
-		this.name = name;
-		this.atr = atr;
-		prices = new HashMap<String, BigDecimal>();
-	}
-	
-	public void setNowPrice(BigDecimal price) {
-		this.nowPrice = price;
-		prices.put("now", price);
-	}
-	public void setHighPrice(BigDecimal price) {
-		prices.put("high", price);
-	}
-	public void setLowPrice(BigDecimal price) {
-		prices.put("low", price);
-	}
-	public void setBuyPrice(BigDecimal price) {
-		this.buyPrice = price;
-		prices.put("buy", price);
-	}
-	public void setStopPrice(BigDecimal price) {
-		prices.put("stop", price);
-	}
-	public void setDropPrice(BigDecimal price) {
-		prices.put("drop", price);
-	}
-	public void setReopenPrice(BigDecimal price) {
-		prices.put("reopen", price);
+	public String getStatus() {
+		return status;
 	}
 
-	public String getAtr() {
-		return atr;
+	public void setStatus(String status) {
+		this.status = status;
 	}
 
-	public void setAtr(String atr) {
-		this.atr = atr;
+	public String getTopic() {
+		return topic;
+	}
+
+	public void setTopic(String topic) {
+		this.topic = topic;
 	}
 
 	public String getItemID() {
@@ -81,15 +59,6 @@ public class HoldView {
 		this.name = name;
 	}
 
-	public String getLine() {
-		return Line.draw(prices);
-	}
-	
-	public String getStatus() {
-		return nowPrice.compareTo(buyPrice)==1 ? "2" : "-2";
-	}
-	
-
 	public String getIndustry() {
 		return industry;
 	}
@@ -105,11 +74,37 @@ public class HoldView {
 	public void setArea(String area) {
 		this.area = area;
 	}
-	
-	@Override
-	public String toString() {
-		return "HoldView [itemID=" + itemID + ", code=" + code + ", name=" + name + ", atr=" + atr + ", prices="
-				+ prices + "]";
+
+	public String getNowPrice() {
+		return nowPrice;
 	}
 
+	public void setNowPrice(String nowPrice) {
+		this.nowPrice = nowPrice;
+	}
+
+	public String getBuyPrice() {
+		return buyPrice;
+	}
+
+	public void setBuyPrice(String buyPrice) {
+		this.buyPrice = buyPrice;
+	}
+
+	public String getLabel() {
+		return label;
+	}
+
+	public void setLabel(String label) {
+		this.label = label;
+	}
+
+	public String getBuyDate() {
+		return buyDate;
+	}
+
+	public void setBuyDate(String buyDate) {
+		this.buyDate = buyDate;
+	}
+	
 }

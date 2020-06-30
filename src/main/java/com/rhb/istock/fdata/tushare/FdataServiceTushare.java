@@ -27,10 +27,10 @@ public class FdataServiceTushare {
 
 	protected static final Logger logger = LoggerFactory.getLogger(FdataServiceTushare.class);
 	
-	public List<GrowModel> getGrowModels(String b_date, String e_date,Integer n) {
+	public List<String> getGrowModels(String b_date, String e_date,Integer n) {
 		long beginTime=System.currentTimeMillis(); 
 
-		List<GrowModel> models = new ArrayList<GrowModel>(); 
+		List<String> models = new ArrayList<String>(); 
 
 		GrowModel model;
 		
@@ -40,15 +40,9 @@ public class FdataServiceTushare {
 			Progress.show(items.size(),i++, " getGrowModels: " + item.getItemID());//进度条
 			model = this.getGrowModel(item.getItemID(),item.getName(), b_date, e_date,n);
 			if(model!=null && model.isOK()) {
-				models.add(model);
+				models.add(item.getItemID());
 			}
 		}
-		
-		Collections.sort(models, new Comparator<GrowModel>() {
-			@Override
-			public int compare(GrowModel o1, GrowModel o2) {
-				return o2.getE_fina().getIncome().getRevenue().compareTo(o1.getE_fina().getIncome().getRevenue());
-			}});
 		
 		long used = (System.currentTimeMillis() - beginTime)/1000; 
 		logger.info("用时：" + used + "秒");          
