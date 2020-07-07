@@ -194,7 +194,7 @@ public class BAV3 {
 					&& m.getPe().compareTo(BigDecimal.ZERO)>0 && m.getPe().compareTo(new BigDecimal(233))<0
 					&& !m.isUpLimited() 
 					&& !m.isDownLimited() 
-					&& m.isJustBreaker(ratio)
+					&& m.isJustBreaker()
 					&& m.getAverageAmount().compareTo(previousAverageAmount)==1
 					) {
 				breakers.add(m);

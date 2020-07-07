@@ -76,7 +76,7 @@ public class TurtleMusterSimulation {
 		Map<String,Muster> musters;
 		
 		List<Map<String,Muster>> previous = new ArrayList<Map<String,Muster>>();
-		Integer previous_period  = 8; //历史纪录区间，主要用于后面判断
+		Integer previous_period  = 13; //历史纪录区间，主要用于后面判断
 
 		Integer sseiFlag, sseiRatio;
 		

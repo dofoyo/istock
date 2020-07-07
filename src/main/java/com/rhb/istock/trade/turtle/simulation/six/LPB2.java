@@ -191,7 +191,7 @@ public class LPB2 {
 					&& !m.isUpLimited() 
 					//&& !m.isDownLimited() 
 					//&& m.isUpBreaker()
-					&& m.isJustBreaker(ratio)   //刚刚突破21日线
+					&& m.isJustBreaker()   //刚刚突破21日线
 					//&& r >= sseiRatio   // 强于大盘
 					&& r2<5                     //当天涨幅不超过5%
 					//&& m.isBreaker()

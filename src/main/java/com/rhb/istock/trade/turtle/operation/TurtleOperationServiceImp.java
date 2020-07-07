@@ -438,8 +438,8 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 		return views;
 	}
 	
-	private List<ItemView> getItemViews(List<String> itemIDs) {
 		long beginTime=System.currentTimeMillis(); 
+		private List<ItemView> getItemViews(List<String> itemIDs) {
 		logger.info("getting b21 views ......");
 		
 		List<ItemView> views = new ArrayList<ItemView>();
@@ -799,8 +799,13 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 
 	@Override
 	public List<ItemView> getB21s() {
+		Map<String, String> favors = selectorService.getFavors();
 		Map<String,String> ids = selectorService.getB21();
 		List<ItemView> views = this.getItemViews(new ArrayList(ids.keySet())); 
+		for(ItemView view : views) {
+			view.setLabel(favors.get(view.getItemID()));
+		}
+		
 		return views;
 	}
 

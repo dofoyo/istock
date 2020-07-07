@@ -8,8 +8,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -157,13 +159,15 @@ public class MusterRepositoryImp implements MusterRepository{
 
 	@Override
 	public List<LocalDate> getMusterDates() {
-		List<LocalDate> dates = new ArrayList<LocalDate>();
+		Set<LocalDate> ds = new HashSet<LocalDate>();
 		LocalDate date;
 		List<File> files = FileTools.getFiles(musterPath, null, true);
 		for(File file : files) {
 			date = LocalDate.parse(file.getName().substring(0, 8), DateTimeFormatter.ofPattern("yyyyMMdd"));
-			dates.add(date);
+			ds.add(date);
 		}
+		
+		List<LocalDate> dates = new ArrayList<LocalDate>(ds);
 		
 		Collections.sort(dates, new Comparator<LocalDate>() {
 			@Override

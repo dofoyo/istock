@@ -192,7 +192,7 @@ public class BAV2 {
 					&& !m.isUpLimited() 
 					&& !m.isDownLimited() 
 					//&& m.isUpBreaker()
-					&& m.isJustBreaker(ratio)
+					&& m.isJustBreaker()
 					//&& r<=ratio && r>0
 					//&& m.isAboveAveragePrice(21) && !p.isAboveAveragePrice(21)
 					&& m.getAverageAmount().compareTo(previousAverageAmount)==1

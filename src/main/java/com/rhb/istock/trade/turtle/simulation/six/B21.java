@@ -89,7 +89,7 @@ public class B21 {
 			//List<Muster> dds = new ArrayList<Muster>();  //用list，有重复，表示可以加仓
 			
 			//确定突破走势的股票
-			List<Muster> breakers = this.getBreakers(musters, previous, sseiRatio);
+			List<Muster> breakers = this.getBreakers(musters, previous, sseiRatio,holdItemIDs);
 			
 			breakers_sb.append(date.toString() + ",");
 			StringBuffer sb = new StringBuffer();
@@ -145,7 +145,7 @@ public class B21 {
 		return result;
 	}
 	
-	private List<Muster> getBreakers(Map<String,Muster> ms,Map<String,Muster> previous, Integer sseiRatio){
+	private List<Muster> getBreakers(Map<String,Muster> ms,Map<String,Muster> previous, Integer sseiRatio, Set<String> holds){
 		List<Muster> breakers = new ArrayList<Muster>();
 		
 		List<Muster> musters = new ArrayList<Muster>(ms.values());
@@ -168,62 +168,23 @@ public class B21 {
 		
 		
 		Muster m,p;
-		Integer goals;
-		Selector selector = new Selector();
-		for(int i=0; i<musters.size() && i<this.pool; i++) {
+		for(int i=0; i<musters.size() && breakers.size()<this.top && i<this.pool; i++) {
 			m = musters.get(i);
 			p = previous.get(m.getItemID());
-			goals = 0;
 			if(m!=null && p!=null && !m.isUpLimited() 
-					&& m.isJustBreaker(8)  //刚刚突破21日线，同时21日线在89日线上放不超过8%
+					&& m.isJustBreaker() 
+					&& m.getHLGap()<=55 //股价还没飞涨
+					&& !holds.contains(m.getItemID())
+					&& (m.getAverageGap()<8  //均线在8%范围内纠缠
+							|| m.getAveragePrice21().compareTo(p.getAveragePrice21())==1  //上升趋势
+							|| m.getAverageAmount().compareTo(p.getAverageAmount())==1)  // 放量
 					) {
 				
-				if(m.getAverageGap()<8) {    //均线在8%范围内纠缠
-					goals++;
-				}
-				
-				if(m.getAveragePrice21().compareTo(p.getAveragePrice21())==1) { //上升趋势
-					goals++;
-				}
-				
-				if(m.getAverageAmount().compareTo(p.getAverageAmount())==1) { // 放量
-					goals++;
-				}
-				
-				if(goals>0) {
-					selector.add(goals, m.getItemID());
-				}
-			}
-		}
-		
-		List<String> results = selector.getResults();
-		if(results!=null) {
-			for(int i=0; i<this.top && i<results.size(); i++) {
-				breakers.add(ms.get(results.get(i)));
+					breakers.add(m);
 			}
 		}
 		
 		return breakers;
 	}
 	
-	class Selector {
-		TreeMap<Integer, List<String>> ids = new TreeMap<Integer, List<String>>();
-		public void add(Integer i, String id) {
-			List<String> ss = ids.get(i);
-			if(ss == null) {
-				ss = new ArrayList<String>();
-				ids.put(i, ss);
-			}
-			ss.add(id);
-		}
-		
-		public List<String> getResults() {
-			if(ids.lastEntry()!=null) {
-				return ids.lastEntry().getValue();
-			}else {
-				return null;
-			}
-		}
-		
-	}
 }

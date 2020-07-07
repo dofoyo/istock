@@ -16,6 +16,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.rhb.istock.kdata.Muster;
+import com.rhb.istock.kdata.spider.KdataFromDZHByClipboard;
 import com.rhb.istock.kdata.KdataService;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -25,7 +26,7 @@ public class KdataServiceTest {
 	@Qualifier("kdataServiceImp")
 	KdataService kdataService;
 	
-	@Test
+	//@Test
 	public void generateMusters() {
 		LocalDate date = LocalDate.parse("2000-01-01");
 		kdataService.generateMusters(date);
@@ -66,16 +67,21 @@ public class KdataServiceTest {
 		}
 	}
 	
-	//@Test
+	@Test
 	public void getSseiRatio() {
-		LocalDate date = LocalDate.parse("2020-03-20");
+		List<LocalDate> dates = kdataService.getMusterDates();
+		for(LocalDate date : dates) {
+			System.out.format("%tF, %d\n",date,kdataService.getSseiFlag(date));
+
+		}
+/*		LocalDate date = LocalDate.parse("2020-03-20");
 		try {
 			System.out.println(kdataService.getSseiFlag(date));
-			System.out.println(kdataService.getSseiRatio(date, 8));
+			//System.out.println(kdataService.getSseiRatio(date, 8));
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		}*/
 	}
 	
 	//@Test

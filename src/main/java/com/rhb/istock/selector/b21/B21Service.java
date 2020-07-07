@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.rhb.istock.comm.util.FileTools;
+import com.rhb.istock.comm.util.Functions;
 import com.rhb.istock.item.ItemService;
 import com.rhb.istock.kdata.KdataService;
 import com.rhb.istock.kdata.Muster;
@@ -47,9 +48,10 @@ public class B21Service {
 	public Map<String,String> isB21(List<String> itemIDs, LocalDate endDate) {
 		Map<String,String> results = new HashMap<String,String>();
 
-		Integer previous_period = 8;
+		Integer previous_period = 13;
 		Map<String,Muster> musters = kdataService.getMusters(endDate);
 		Map<String,Muster> previous = kdataService.getPreviousMusters(previous_period, endDate);
+		Integer sseiRatio = kdataService.getSseiRatio(endDate, previous_period);
 		if(musters!=null && previous!=null) {
 			Muster m, p;
 			String v;
@@ -57,17 +59,20 @@ public class B21Service {
 				m = musters.get(id);
 				p = previous.get(id);
 				v = "0";
-				if(m!=null && p!=null
-						&& m.isJustBreaker(8)  //刚刚突破21日线，同时21日线在89日线上放不超过8%
-						) {
-					
-					if(m.getAverageGap()<8 //均线在8%范围内纠缠
-						|| m.getAveragePrice21().compareTo(p.getAveragePrice21())==1 //上升趋势
-						|| m.getAverageAmount().compareTo(p.getAverageAmount())==1 // 放量
-						) {
-						
-							v = "2";
+				if(m!=null && p!=null) {
+					if(m.isJustBreaker() 
+							&& m.getHLGap()<=55 //股价还没飞涨
+							&& (m.getAverageGap()<8  //均线在8%范围内纠缠
+									|| m.getAveragePrice21().compareTo(p.getAveragePrice21())==1  //上升趋势
+									|| m.getAverageAmount().compareTo(p.getAverageAmount())==1)  // 放量
+							) {
+						v = "2";
+					}else if(Functions.growthRate(m.getClose(),p.getClose()) >= sseiRatio   // 强于大盘
+							&& m.getHLGap()<=55
+							&& m.getAveragePrice21().compareTo(p.getAveragePrice21())==1 ) { //上升趋势
+						v = "2";
 					}
+						
 				}else if(m!=null && m.isDropAve(21)) {
 					v = "-2";
 				}
@@ -90,13 +95,14 @@ public class B21Service {
 	
 	private String generateB21(LocalDate endDate) {
 		Map<String,Muster> musters = kdataService.getMusters(endDate);
-		Integer previous_period = 8;
+		Integer previous_period = 13;
 		StringBuffer sb = new StringBuffer(endDate.toString() + ":");
 		if(musters!=null) {
 			List<LocalDate> previousDates = kdataService.getMusterDates(previous_period, endDate);
 			if(previousDates!=null) {
 				Map<String,Muster> previous = kdataService.getMusters(previousDates.get(0));
-				
+				Integer sseiRatio = kdataService.getSseiRatio(endDate, previous_period);
+			
 				List<Muster>  ms = new ArrayList<Muster>(musters.values()); 
 				
 				Collections.sort(ms, new Comparator<Muster>() {
@@ -110,16 +116,19 @@ public class B21Service {
 				for(int i=0; i<ms.size(); i++) {
 					m = ms.get(i);
 					p = previous.get(m.getItemID());
-					if(m!=null && p!=null
-							&& m.isJustBreaker(8)  //刚刚突破21日线，同时21日线在89日线上放不超过8%
-							) {
-						
-						if(m.getAverageGap()<8 //均线在8%范围内纠缠
-							|| m.getAveragePrice21().compareTo(p.getAveragePrice21())==1 //上升趋势
-							|| m.getAverageAmount().compareTo(p.getAverageAmount())==1 // 放量
-							) {
-								sb.append(m.getItemID() + "(" + String.format("%04d",i) + ")" +",");
-							}
+					if(m!=null && p!=null) {
+						if(m.isJustBreaker() 
+								&& m.getHLGap()<=55 //股价还没飞涨
+								&& (m.getAverageGap()<8  //均线在8%范围内纠缠
+										|| m.getAveragePrice21().compareTo(p.getAveragePrice21())==1  //上升趋势
+										|| m.getAverageAmount().compareTo(p.getAverageAmount())==1)  // 放量
+								) {
+							sb.append(m.getItemID() + "(" + String.format("%04d",i) + ")" +",");
+						}else if(Functions.growthRate(m.getClose(),p.getClose()) >= sseiRatio   // 强于大盘
+								&& m.getHLGap()<=55
+								&& m.getAveragePrice21().compareTo(p.getAveragePrice21())==1 ) { //上升趋势
+							sb.append(m.getItemID() + "(" + String.format("%04d",i) + ")" +",");
+						}
 					}
 					
 					//logger.info(String.format("%d %s %.0f",i,m.getItemID(),m.getAmount()));

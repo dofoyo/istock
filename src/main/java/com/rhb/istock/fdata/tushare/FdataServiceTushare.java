@@ -55,6 +55,11 @@ public class FdataServiceTushare {
 		Fina b_fina = fdataRepositoryTushare.getFina(itemID, b_date);
 		Fina e_fina = fdataRepositoryTushare.getFina(itemID, e_date);
 		fdataRepositoryTushare.init();
-		return new GrowModel(itemID, itemName,b_fina, e_fina,n);
+		
+		if(b_fina!=null && e_fina!=null) {
+			return new GrowModel(itemID, itemName,b_fina, e_fina,n);
+		}else {
+			return null;
+		}
 	}
 }

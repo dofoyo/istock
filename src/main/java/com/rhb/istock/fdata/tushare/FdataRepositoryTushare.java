@@ -61,11 +61,14 @@ public class FdataRepositoryTushare {
 			this.indicators = this.getIndicators(itemID);
 		}
 		
-		FinaCashflow cashflow = this.cashflows.get(end_date);
-		FinaIncome income = this.incomes.get(end_date);
-		FinaIndicator indicator = this.indicators.get(end_date);
-		
-		Fina fina = new Fina(end_date,cashflow,income,indicator);
+		Fina fina = null;
+		if(this.cashflows!=null && this.incomes!=null && this.indicators!=null) {
+			FinaCashflow cashflow = this.cashflows.get(end_date);
+			FinaIncome income = this.incomes.get(end_date);
+			FinaIndicator indicator = this.indicators.get(end_date);
+			
+			fina = new Fina(end_date,cashflow,income,indicator);
+		}
 		
 		return fina;
 	}

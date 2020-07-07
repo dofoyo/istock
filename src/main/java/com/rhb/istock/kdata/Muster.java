@@ -346,12 +346,13 @@ public class Muster {
 		//return latestPrice.subtract(close).divide(close,BigDecimal.ROUND_HALF_UP).compareTo(new BigDecimal(-0.095))<=0;
 	}
 	
-	public boolean isJustBreaker(Integer ratio) {
-		Integer r = Functions.growthRate(this.averagePrice21, this.averagePrice);
+	public boolean isJustBreaker() {
+		//Integer r = Functions.growthRate(this.averagePrice21, this.averagePrice);
 		return //this.latestPrice.compareTo(this.close)==1 &&
-				this.close.compareTo(this.averagePrice21)<=0 &&
-				this.latestPrice.compareTo(this.averagePrice21)==1 &&
-				r<=ratio && r>0;
+				this.close.compareTo(this.averagePrice21)<=0 
+				&& this.latestPrice.compareTo(this.averagePrice21)>=0 
+				//&& r<=ratio && r>0
+				;
 	}
 	
 	public boolean isBreaker(Integer ratio) {
@@ -396,15 +397,29 @@ public class Muster {
 	
 	public boolean isDropAve(Integer period) {
 		if(period == 8) {
-			return latestPrice.compareTo(averagePrice8)==-1 && Functions.growthRate(latestPrice, averagePrice8)<=-1;
+			return Functions.growthRate(latestPrice, averagePrice8)<=-1;
 		}else if(period == 13) {
-			return latestPrice.compareTo(averagePrice13)==-1 && Functions.growthRate(latestPrice, averagePrice13)<=-1;
+			return Functions.growthRate(latestPrice, averagePrice13)<=-1;
 		}else if(period == 21) {
-			return latestPrice.compareTo(averagePrice21)==-1 && Functions.growthRate(latestPrice, averagePrice21)<=-1;
+			return Functions.growthRate(latestPrice, averagePrice21)<=-1;
 		}else if(period == 34) {
-			return latestPrice.compareTo(averagePrice34)==-1 && Functions.growthRate(latestPrice, averagePrice34)<=-1;
+			return Functions.growthRate(latestPrice, averagePrice34)<=-1;
 		}else {
-			return latestPrice.compareTo(averagePrice)==-1 && Functions.growthRate(latestPrice, averagePrice)<=-1;
+			return Functions.growthRate(latestPrice, averagePrice)<=-1;
+		}
+	}
+	
+	public boolean isUpAve(Integer period) {
+		if(period == 8) {
+			return Functions.growthRate(latestPrice, averagePrice8)>=1;
+		}else if(period == 13) {
+			return Functions.growthRate(latestPrice, averagePrice13)>=1;
+		}else if(period == 21) {
+			return Functions.growthRate(latestPrice, averagePrice21)>=1;
+		}else if(period == 34) {
+			return Functions.growthRate(latestPrice, averagePrice34)>=1;
+		}else {
+			return Functions.growthRate(latestPrice, averagePrice)>=1;
 		}
 	}
 	
@@ -488,7 +503,8 @@ public class Muster {
 	}
 
 	public Integer getHLGap() {
-		return highest.subtract(lowest).divide(lowest,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)).intValue();
+		return Functions.growthRate(highest, lowest);
+		//return highest.subtract(lowest).divide(lowest,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)).intValue();
 	}
 	
 	public String getItemID() {

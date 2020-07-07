@@ -73,7 +73,7 @@ public class LpbService {
 							&& m.getPe().compareTo(BigDecimal.ZERO)>0 && m.getPe().compareTo(new BigDecimal(233))<0
 							&& !m.isUpLimited() 
 							&& !m.isDownLimited() 
-							&& m.isJustBreaker(8)
+							&& m.isJustBreaker()
 							//&& m.getHLGap()<=55
 							&& m.getAverageAmount().compareTo(p.getAverageAmount())==1
 							) {

@@ -86,7 +86,7 @@ public class NEWB {
 			//List<Muster> dds = new ArrayList<Muster>();  //用list，有重复，表示可以加仓
 			
 			//确定突破走势的股票
-			List<Muster> breakers = this.getBreakers(new ArrayList<Muster>(musters.values()));
+			List<Muster> breakers = this.getBreakers(new ArrayList<Muster>(musters.values()),holdItemIDs);
 			//breakers.addAll(keeps.getUps(musters));
 			
 			breakers_sb.append(date.toString() + ",");
@@ -147,7 +147,7 @@ public class NEWB {
 		return result;
 	}
 	
-	private List<Muster> getBreakers(List<Muster> musters){
+	private List<Muster> getBreakers(List<Muster> musters, Set<String> holds){
 		List<Muster> breakers = new ArrayList<Muster>();
 
 		if(this.type == 0) {
@@ -167,11 +167,13 @@ public class NEWB {
 		}
 		
 		Muster m;
-		for(int i=0; i<musters.size() && breakers.size()<top && i<pool; i++) {
+		for(int i=0; i<musters.size() && breakers.size()<top && i<this.pool; i++) {
 			m = musters.get(i);
 			if(m!=null 
 					&& !m.isUpLimited() 
 					&& m.isUpBreaker() 
+					//&& m.getHLGap()<=55
+					&& !holds.contains(m.getItemID())
 					) {
 				breakers.add(m);
 			}

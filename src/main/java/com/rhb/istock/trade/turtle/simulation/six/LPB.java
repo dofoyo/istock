@@ -191,7 +191,7 @@ public class LPB {
 					&& !m.isUpLimited() 
 					//&& !m.isDownLimited() 
 					//&& m.isUpBreaker()
-					&& m.isJustBreaker(ratio)
+					&& m.isJustBreaker()
 					//&& r<=ratio && r>0
 					//&& m.getPrviousAverageAmountRatio()>0
 					&& m.getAverageAmount().compareTo(previousAverageAmount)==1
