@@ -121,12 +121,12 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 			hold.setArea(item.getArea());
 			hold.setBuyPrice(entity.getPrice());
 			hold.setBuyDate(entity.getDate());;
-			hold.setNowPrice(muster.getLatestPrice().toString());
+			hold.setNowPrice(muster==null ? "" : muster.getLatestPrice().toString());
 			hold.setTopic(this.getTopic(item.getItemID()));
 			hold.setLabel(entity.getLabel());
 			hold.setFavor(favors.get(item.getItemID()));
 			
-			if(muster.isDropAve(21)) {
+			if(muster!=null && muster.isDropAve(21)) {
 				hold.setStatus("-2");
 			}
 			
