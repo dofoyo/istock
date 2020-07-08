@@ -563,13 +563,13 @@ public class SelectorServiceImp implements SelectorService{
 		Map<String,String> ids = new HashMap<String,String>();
 		String str = b21Service.getB21();
 		if(str!=null && str.length()>11) {
-			String id,order;
+			String id,status;
 			String[] ss = str.substring(11).split(",");
 			for(String s : ss) {
 				if(s.length()>8) {
 					id = s.substring(0, 8);
-					order = s.substring(9,s.indexOf(")"));
-					ids.put(id,order);
+					status = s.substring(9,s.indexOf(")"));
+					ids.put(id,status);
 				}
 			}
 		}

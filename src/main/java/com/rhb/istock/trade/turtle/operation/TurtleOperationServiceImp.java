@@ -104,6 +104,7 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 		HoldView hold;
 		Muster muster;
 		
+		Map<String, String> favors = selectorService.getFavors();
 		List<HoldEntity> entities = selectorService.getHolds();
 		for(HoldEntity entity : entities) {
 			this.setLatestKdata(entity.getItemID(),true);
@@ -123,6 +124,7 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 			hold.setNowPrice(muster.getLatestPrice().toString());
 			hold.setTopic(this.getTopic(item.getItemID()));
 			hold.setLabel(entity.getLabel());
+			hold.setFavor(favors.get(item.getItemID()));
 			
 			if(muster.isDropAve(21)) {
 				hold.setStatus("-2");
@@ -804,6 +806,7 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 		List<ItemView> views = this.getItemViews(new ArrayList(ids.keySet())); 
 		for(ItemView view : views) {
 			view.setLabel(favors.get(view.getItemID()));
+			view.setStatus(ids.get(view.getItemID()));
 		}
 		
 		return views;

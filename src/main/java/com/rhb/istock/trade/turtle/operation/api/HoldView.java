@@ -18,7 +18,16 @@ public class HoldView {
 	private String buyDate;
 	private String topic;
 	private String status;
+	private String favor;
 	
+	public String getFavor() {
+		return favor;
+	}
+
+	public void setFavor(String favor) {
+		this.favor = favor==null ? "" : favor;
+	}
+
 	public String getStatus() {
 		return status;
 	}

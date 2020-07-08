@@ -66,7 +66,7 @@ public class B21Service {
 									|| m.getAveragePrice21().compareTo(p.getAveragePrice21())==1  //上升趋势
 									|| m.getAverageAmount().compareTo(p.getAverageAmount())==1)  // 放量
 							) {
-						v = "2";
+						v = "1";
 					}else if(Functions.growthRate(m.getClose(),p.getClose()) >= sseiRatio   // 强于大盘
 							&& m.getHLGap()<=55
 							&& m.getAveragePrice21().compareTo(p.getAveragePrice21())==1 ) { //上升趋势
@@ -123,11 +123,11 @@ public class B21Service {
 										|| m.getAveragePrice21().compareTo(p.getAveragePrice21())==1  //上升趋势
 										|| m.getAverageAmount().compareTo(p.getAverageAmount())==1)  // 放量
 								) {
-							sb.append(m.getItemID() + "(" + String.format("%04d",i) + ")" +",");
+							sb.append(m.getItemID() + "(1),");
 						}else if(Functions.growthRate(m.getClose(),p.getClose()) >= sseiRatio   // 强于大盘
 								&& m.getHLGap()<=55
 								&& m.getAveragePrice21().compareTo(p.getAveragePrice21())==1 ) { //上升趋势
-							sb.append(m.getItemID() + "(" + String.format("%04d",i) + ")" +",");
+							sb.append(m.getItemID() + "(2),");
 						}
 					}
 					
