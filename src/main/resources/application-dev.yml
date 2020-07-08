@@ -10,6 +10,7 @@ tmpMusterPath: d:/dev/istock-data/kdata/muster_tmp
 tushareItemsFile: D:/dev/istock-data/tushare_items.json
 holdsFile: D:/dev/istock-data/holds.txt
 favorsFile: D:/dev/istock-data/favors.txt
+favorsPath: D:/dev/istock-data/favors
 bluechipsFile: D:/dev/istock-data/bluechips.json
 topicsFile: D:/dev/istock-data/topics.txt
 fvaluesOfHLFile: D:/dev/istock-data/fvaluesOfHL.txt

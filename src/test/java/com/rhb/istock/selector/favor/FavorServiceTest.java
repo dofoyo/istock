@@ -1,6 +1,5 @@
-package com.rhb.istock.selector.txt;
+package com.rhb.istock.selector.favor;
 
-import java.util.List;
 import java.util.Map;
 
 import org.junit.Test;
@@ -12,19 +11,15 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest
-public class BavServiceTest {
+public class FavorServiceTest {
 	@Autowired
-	@Qualifier("txtService")
-	TxtService txtService;
-	
-	//@Test
-	public void getIds() {
-		Map<String,String> ids = txtService.getIds();
-		System.out.println(ids);
-	}
+	@Qualifier("favorServiceImp")
+	FavorService favorServiceImp;
 	
 	@Test
-	public void getRatio() {
-		txtService.getRatio();
+	public void getIds() {
+		Map<String,String> ids = favorServiceImp.getFavors();
+		System.out.println(ids);
 	}
+
 }
