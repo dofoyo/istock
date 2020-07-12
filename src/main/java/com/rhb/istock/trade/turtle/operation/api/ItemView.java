@@ -41,6 +41,16 @@ public class ItemView {
 		return label;
 	}
 
+	public void addLabel(String label) {
+		if(label==null || label.isEmpty()) return;
+				
+		if(this.label==null || this.label.isEmpty()) {
+			this.label = label;
+		}else {
+			this.label = this.label + "，" + label;
+		}
+	}
+	
 	public void setLabel(String label) {
 		this.label = label;
 	}

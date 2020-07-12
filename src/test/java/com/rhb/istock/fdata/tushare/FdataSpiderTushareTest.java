@@ -25,7 +25,7 @@ public class FdataSpiderTushareTest {
 	@Qualifier("itemRepositoryTushare")
 	ItemRepository itemRepository;
 	
-	@Test
+	//@Test
 	public void downIndicators() throws Exception {
 		long beginTime=System.currentTimeMillis(); 
 
@@ -56,10 +56,10 @@ public class FdataSpiderTushareTest {
 
 	}
 	
-	//@Test
-	public void downIndicator() throws Exception {
-		String itemID = "sz000410";
-		fdataSpiderTushare.downIndicator(itemID);
+	@Test
+	public void down() throws Exception {
+		String itemID = "sz002077";
+		fdataSpiderTushare.downForecast(itemID);
 	}
 
 }

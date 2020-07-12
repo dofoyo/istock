@@ -35,7 +35,7 @@ public class TurtleApi{
 		List<ItemView> powers_views = ts.getPowers();
 		return new ResponseContent<List<ItemView>>(ResponseEnum.SUCCESS, powers_views);
 	}
-
+	
 	@GetMapping("/turtle/potentials/{type}/{date}")
 	public ResponseContent<List<PotentialView>> getPotentials(
 			@PathVariable(value="type") String type,
@@ -99,19 +99,12 @@ public class TurtleApi{
 		List<TurtleView> views = ts.getPotentials("bav");
 		return new ResponseContent<List<TurtleView>>(ResponseEnum.SUCCESS, views);
 	}
-	
+
 	@GetMapping("/turtle/b21")
 	public ResponseContent<List<ItemView>> getPotentialsOfB21() {
 		List<ItemView> views = ts.getB21s();
 		return new ResponseContent<List<ItemView>>(ResponseEnum.SUCCESS, views);
 	}
-	
-	/*	
-	@GetMapping("/turtle/potentials/redo")
-	public ResponseContent<String> redoPotentials() {
-		ts.redoPotentials();
-		return new ResponseContent<String>(ResponseEnum.SUCCESS, "");
-	}*/
 	
 	@GetMapping("/turtle/favors")
 	public ResponseContent<List<ItemView>> getFavors() {
@@ -125,4 +118,9 @@ public class TurtleApi{
 		return new ResponseContent<List<HoldView>>(ResponseEnum.SUCCESS, holds);
 	}
 	
+	@GetMapping("/turtle/forecasts")
+	public ResponseContent<List<ForecastView>> getForecasts() {
+		List<ForecastView> views = ts.getForecastViews();
+		return new ResponseContent<List<ForecastView>>(ResponseEnum.SUCCESS, views);
+	}
 }

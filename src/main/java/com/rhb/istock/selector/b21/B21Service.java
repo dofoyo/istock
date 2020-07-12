@@ -67,13 +67,17 @@ public class B21Service {
 									|| m.getAverageAmount().compareTo(p.getAverageAmount())==1)  // 放量
 							) {
 						v = "1";
+					}else if(m.isUpBreaker()) {  //创新高
+						v = "3";
 					}else if(Functions.growthRate(m.getClose(),p.getClose()) >= sseiRatio   // 强于大盘
 							&& m.getHLGap()<=55
 							&& m.getAveragePrice21().compareTo(p.getAveragePrice21())==1 ) { //上升趋势
 						v = "2";
 					}
 						
-				}else if(m!=null && m.isDropAve(21)) {
+				}
+				
+				if(m!=null && m.isDropAve(21)) {
 					v = "-2";
 				}
 				

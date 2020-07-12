@@ -44,6 +44,10 @@ public class Muster {
 	private BigDecimal prviousAverageAmount=null;
 	private Integer prviousAverageGap=null;
 	
+	public Integer getMaxRate() {
+		return Functions.growthRate(this.getLatestHighest(), this.close);
+	}
+	
 	public Integer getPrviousAverageGap() {
 		return prviousAverageGap;
 	}

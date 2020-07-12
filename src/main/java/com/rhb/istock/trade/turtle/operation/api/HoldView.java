@@ -1,11 +1,5 @@
 package com.rhb.istock.trade.turtle.operation.api;
 
-import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.Map;
-
-import com.rhb.istock.comm.util.Line;
-
 public class HoldView {
 	private String itemID;
 	private String code;
@@ -25,9 +19,19 @@ public class HoldView {
 	}
 
 	public void setFavor(String favor) {
-		this.favor = favor==null ? "" : favor;
+		this.favor = favor;
 	}
 
+	public void addFavor(String favor) {
+		if(favor==null || favor.isEmpty()) return;
+		
+		if(this.favor == null || this.favor.isEmpty()) {
+			this.favor = favor;
+		}else {
+			this.favor =  this.favor + "，" + favor;
+		}
+	}
+	
 	public String getStatus() {
 		return status;
 	}

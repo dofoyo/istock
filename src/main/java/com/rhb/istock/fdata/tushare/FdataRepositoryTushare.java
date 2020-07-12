@@ -143,4 +143,27 @@ public class FdataRepositoryTushare {
 		
 		return indicators;
 	}
+	
+	public	Map<String,FinaForecast> getForecasts(String itemID){
+		Map<String,FinaForecast> indicators = new HashMap<String,FinaForecast>();
+		
+		String fdataFile = fdataPath + "/" + itemID + "_forecast.json";
+		if(FileTools.isExists(fdataFile)) {
+			JSONObject basicObject = new JSONObject(FileTools.readTextFile(fdataFile));
+			JSONArray items = basicObject.getJSONArray("items");
+			if(items.length()>0) {
+				JSONArray item;
+				String ann_date,end_date;
+				FinaForecast forecast;
+				for(int i=0; i<items.length()-1; i++) {
+					item = items.getJSONArray(i);
+					end_date = item.getString(2);
+					forecast = new FinaForecast(item);
+					indicators.put(end_date, forecast);
+				}
+			}
+		}
+		
+		return indicators;
+	}
 }

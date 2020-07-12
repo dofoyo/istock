@@ -30,6 +30,8 @@ import com.rhb.istock.kdata.Muster;
 import com.rhb.istock.kdata.api.KdatasView;
 import com.rhb.istock.selector.SelectorService;
 import com.rhb.istock.selector.b21.B21Service;
+import com.rhb.istock.selector.fina.FinaService;
+import com.rhb.istock.selector.fina.QuarterCompare;
 import com.rhb.istock.selector.hold.HoldEntity;
 import com.rhb.istock.selector.potential.Potential;
 import com.rhb.istock.trade.turtle.domain.Tfeature;
@@ -39,6 +41,7 @@ import com.rhb.istock.trade.turtle.operation.api.ItemView;
 import com.rhb.istock.trade.turtle.operation.api.HoldView;
 import com.rhb.istock.trade.turtle.operation.api.IndustryView;
 import com.rhb.istock.trade.turtle.operation.api.PotentialView;
+import com.rhb.istock.trade.turtle.operation.api.ForecastView;
 import com.rhb.istock.trade.turtle.operation.api.TurtleView;
 
 @Service("turtleOperationServiceImp")
@@ -60,6 +63,10 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 	FdataServiceTushare fdataServiceTushare;
 
 	@Autowired
+	@Qualifier("finaService")
+	FinaService finaService;
+	
+	@Autowired
 	@Qualifier("b21Service")
 	B21Service b21Service;
 	
@@ -74,8 +81,6 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 	
 	Integer bxxtops = 8;
 	Integer tops = 55;
-	
-	List<String> models = null;
 	
 	protected static final Logger logger = LoggerFactory.getLogger(TurtleOperationServiceImp.class);
 	
@@ -106,6 +111,15 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 		
 		Map<String, String> favors = selectorService.getFavors();
 		List<HoldEntity> entities = selectorService.getHolds();
+		Map<String,QuarterCompare> qcs = finaService.getQuarterCompares();
+		
+		List<String> holdIDs = new ArrayList<String>();
+		for(HoldEntity entity : entities) {
+			holdIDs.add(entity.getItemID());
+		}
+		LocalDate endDate = kdataService.getLatestMarketDate("sh000001");
+		Map<String,String> b21s = b21Service.isB21(holdIDs, endDate);
+		
 		for(HoldEntity entity : entities) {
 			this.setLatestKdata(entity.getItemID(),true);
 			
@@ -125,10 +139,10 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 			hold.setTopic(this.getTopic(item.getItemID()));
 			hold.setLabel(entity.getLabel());
 			hold.setFavor(favors.get(item.getItemID()));
-			
-			if(muster!=null && muster.isDropAve(21)) {
-				hold.setStatus("-2");
+			if(qcs.get(item.getItemID())!=null) {
+				hold.addFavor(qcs.get(item.getItemID()).getInfo());
 			}
+			hold.setStatus(b21s.get(item.getItemID()));
 			
 			holds.add(hold);
 			
@@ -195,14 +209,18 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 	@Override
 	public List<ItemView> getFavors() {
 		Map<String, String> favors = selectorService.getFavors();
+		Map<String,QuarterCompare> qcs = finaService.getQuarterCompares();
 
-		List<ItemView> views = getItemViews(new ArrayList<String>(favors.keySet()));
+		List<ItemView> views = buildItemViews(new ArrayList<String>(favors.keySet()));
 
 		LocalDate endDate = kdataService.getLatestMarketDate("sh000001");
 		Map<String,String> b21s = b21Service.isB21(new ArrayList<String>(favors.keySet()), endDate);
 		
 		for(ItemView view : views) {
 			view.setLabel(favors.get(view.getItemID()));
+			if(qcs.get(view.getItemID())!=null) {
+				view.addLabel(qcs.get(view.getItemID()).getInfo());
+			}
 			view.setStatus(b21s.get(view.getItemID()));
 		}
 		
@@ -440,9 +458,50 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 		return views;
 	}
 	
+	private List<ForecastView> buildQuarterCompareViews(List<String> itemIDs) {
 		long beginTime=System.currentTimeMillis(); 
-		private List<ItemView> getItemViews(List<String> itemIDs) {
-		logger.info("getting b21 views ......");
+		logger.info("building QuarterCompareViews ......");
+		
+		List<ForecastView> views = new ArrayList<ForecastView>();
+		
+		Map<String,String> preyMap;
+
+		Item item;
+
+		List<String> holds = selectorService.getHoldIDs();
+		Map<String,Muster> musters = kdataService.getLatestMusters();
+		Muster muster;
+		
+		int i=1;
+		for(String id : itemIDs) {
+			Progress.show(itemIDs.size(),i++,id);
+			
+				item = itemService.getItem(id);
+				if(item == null) {
+					System.err.println("item of " + id + " is null!!!");
+				}else {
+					muster = musters.get(id);
+					preyMap = new HashMap<String,String>();
+					preyMap.put("itemID", id);
+					preyMap.put("code", (holds!=null && holds.contains(id)) ? "*" + item.getCode() : item.getCode());
+					preyMap.put("name", item.getName());
+					preyMap.put("industry", item.getIndustry());
+					preyMap.put("area", item.getArea());
+					preyMap.put("topic", this.getTopic(id));
+					preyMap.put("price", muster==null ? "0" : muster.getLatestPrice().toString());
+					views.add(new ForecastView(preyMap));						
+				}
+		}
+		long used = (System.currentTimeMillis() - beginTime)/1000; 
+		logger.info("getting b21 views done! 用时：" + used + "秒");     
+		
+		return views;
+	}
+
+	
+	private List<ItemView> buildItemViews(List<String> itemIDs) {
+		long beginTime=System.currentTimeMillis(); 
+		logger.info("building itemViews ......");
 		
 		List<ItemView> views = new ArrayList<ItemView>();
 		
@@ -728,14 +787,12 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 		String e_date = "20191231";
 		Integer n = 3;
 
-		if(this.models == null) {
-			models = fdataServiceTushare.getGrowModels(b_date, e_date, n);
-		}
+		List<String> models = fdataServiceTushare.getGrowModels(b_date, e_date, n);
 		
 		LocalDate endDate = kdataService.getLatestMarketDate("sh000001");
 		Map<String,String> b21s = b21Service.isB21(models, endDate);
 
-		List<ItemView> views = getItemViews(models);
+		List<ItemView> views = buildItemViews(models);
 		for(ItemView view : views) {
 			view.setStatus(b21s.get(view.getItemID()));
 		}
@@ -802,12 +859,44 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 	@Override
 	public List<ItemView> getB21s() {
 		Map<String, String> favors = selectorService.getFavors();
+		Map<String,QuarterCompare> qcs = finaService.getQuarterCompares();
 		Map<String,String> ids = selectorService.getB21();
-		List<ItemView> views = this.getItemViews(new ArrayList(ids.keySet())); 
+		List<ItemView> views = this.buildItemViews(new ArrayList(ids.keySet())); 
 		for(ItemView view : views) {
 			view.setLabel(favors.get(view.getItemID()));
+			if(qcs.get(view.getItemID())!=null) {
+				view.addLabel(qcs.get(view.getItemID()).getInfo());
+			}
 			view.setStatus(ids.get(view.getItemID()));
 		}
+		
+		return views;
+	}
+
+	@Override
+	public List<ForecastView> getForecastViews() {
+		Map<String,QuarterCompare> qcs = finaService.getForecasts();
+		
+		List<String> ids = new ArrayList<String>(qcs.keySet());
+		
+		LocalDate endDate = kdataService.getLatestMarketDate("sh000001");
+		Map<String,String> b21s = b21Service.isB21(ids, endDate);
+		Map<String, String> favors = selectorService.getFavors();
+
+		List<ForecastView> views = buildQuarterCompareViews(ids);
+		for(ForecastView view : views) {
+			view.setStatus(b21s.get(view.getItemID()));
+			view.setAll(qcs.get(view.getItemID()));
+			view.setLabel(favors.get(view.getItemID()));
+		}
+		
+		Collections.sort(views, new Comparator<ForecastView>() {
+			@Override
+			public int compare(ForecastView o1, ForecastView o2) {
+				return new Integer(o2.getPrevious_netprofit_yoy()).compareTo(new Integer(o1.getPrevious_netprofit_yoy()));
+			}
+			
+		});
 		
 		return views;
 	}

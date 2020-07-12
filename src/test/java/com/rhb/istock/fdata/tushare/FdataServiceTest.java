@@ -24,7 +24,7 @@ public class FdataServiceTest {
 	
 	
 	//@Test
-	public void test() {
+	public void testGetFina() {
 		String end_date1 = "20161231";
 		String end_date2 = "20191231";
 		Integer n = 3;
@@ -44,11 +44,11 @@ public class FdataServiceTest {
 		System.out.println(String.format("ratio2=profit/revenue=%d", fina2.getOperationMarginRatio()));
 	}
 	
-	@Test
+	//@Test
 	public void getGrowModels() {
-		String b_date = "20161231";
-		String e_date = "20191231";
-		Integer n = 3;
+		String b_date = "20190331";
+		String e_date = "20200331";
+		Integer n = 1;
 		
 		List<String> models = fdataServiceTushare.getGrowModels(b_date, e_date,n);
 		
@@ -58,4 +58,17 @@ public class FdataServiceTest {
 		
 		System.out.println(models.size());
 	}
+	
+	@Test
+	public void getGrowModel() {
+		String itemID = "sz300022";
+		String b_date = "20190331";
+		String e_date = "20200331";
+		Integer n = 1;
+		
+		GrowModel model = fdataServiceTushare.getGrowModel(itemID, "",b_date, e_date,n);
+		
+		System.out.println(model);
+	}
+	
 }

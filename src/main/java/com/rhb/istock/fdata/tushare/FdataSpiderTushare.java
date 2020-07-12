@@ -1,6 +1,8 @@
 package com.rhb.istock.fdata.tushare;
 
 import java.io.File;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import org.json.JSONObject;
@@ -67,5 +69,29 @@ public class FdataSpiderTushare {
 	
 	public void downIndicator(String itemID) throws Exception {
 		this.down(itemID, "fina_indicator");
+	}
+	
+	public void downForecast(String itemID) throws Exception {
+		this.down(itemID, "forecast");
+	}
+	
+	public void downForecast(LocalDate date) {
+		DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyyMMdd");
+
+		String url = "http://api.tushare.pro";
+		JSONObject args = new JSONObject();
+		args.put("api_name", "forecast");
+		args.put("token", "175936caa4637bc9ac8e5e75ac92eff6887739ca6be771b81653f278");
+		
+		JSONObject params = new JSONObject();
+		params.put("ann_date", date.format(df));
+		
+		args.put("params", params);
+		
+		String str = HttpClient.doPostJson(url, args.toString());
+		JSONObject data = (new JSONObject(str)).getJSONObject("data");
+		
+		String kdataFile = fdataPath + "/" + date.format(df) + "_forecast.json";
+		FileTools.writeTextFile(kdataFile, data.toString(), false);		
 	}
 }

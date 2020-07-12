@@ -41,6 +41,7 @@ public class FdataServiceTushare {
 			model = this.getGrowModel(item.getItemID(),item.getName(), b_date, e_date,n);
 			if(model!=null && model.isOK()) {
 				models.add(item.getItemID());
+				System.out.println(model);
 			}
 		}
 		
@@ -51,7 +52,7 @@ public class FdataServiceTushare {
 		
 	}
 	
-	private GrowModel getGrowModel(String itemID, String itemName, String b_date, String e_date,Integer n) {
+	public GrowModel getGrowModel(String itemID, String itemName, String b_date, String e_date,Integer n) {
 		Fina b_fina = fdataRepositoryTushare.getFina(itemID, b_date);
 		Fina e_fina = fdataRepositoryTushare.getFina(itemID, e_date);
 		fdataRepositoryTushare.init();

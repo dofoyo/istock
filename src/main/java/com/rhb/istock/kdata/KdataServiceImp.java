@@ -435,71 +435,88 @@ public class KdataServiceImp implements KdataService{
 		logger.info("用时：" + used + "秒");          
 		
 	}
+	
+	private Muster getMuster(MusterEntity entity) {
+		Muster muster = new Muster();
+		muster.setItemID(entity.getItemID());
+		muster.setClose(entity.getClose());
+		muster.setLatestAmount(entity.getLatestAmount());
+		muster.setLatestPrice(entity.getLatestPrice());
+		muster.setLimited(entity.getLimited());
+		muster.setHighest(entity.getHighest());
+		muster.setLowest(entity.getLowest());
+		muster.setLowest21(entity.getLowest21());
+		muster.setLowest34(entity.getLowest34());
+		muster.setAverageAmount(entity.getAverageAmount());
+		muster.setAveragePrice(entity.getAveragePrice());
+		muster.setAveragePrice8(entity.getAveragePrice8());
+		muster.setAveragePrice13(entity.getAveragePrice13());
+		muster.setAveragePrice21(entity.getAveragePrice21());
+		muster.setAveragePrice34(entity.getAveragePrice34());
+		muster.setTurnover_rate_f(entity.getTurnover_rate_f());
+		muster.setAverage_turnover_rate_f(entity.getAverage_turnover_rate_f());
+		muster.setVolume_ratio(entity.getVolume_ratio());
+		muster.setAverage_volume_ratio(entity.getAverage_volume_ratio());
+		muster.setTotal_mv(entity.getTotal_mv());
+		muster.setCirc_mv(entity.getCirc_mv());
+		muster.setTotal_share(entity.getTotal_share());
+		muster.setFloat_share(entity.getFloat_share());
+		muster.setFree_share(entity.getFree_share());
+		muster.setLowest13(entity.getLowest13());
+		muster.setLowest8(entity.getLowest8());
+		muster.setLowest5(entity.getLowest5());
+		muster.setAmount5(entity.getAmount5());
+		muster.setPe(entity.getPe());
+		muster.setLatestHighest(entity.getLatestHighest());
+		muster.setLatestLowest(entity.getLatestLowest());
+		muster.setAveragePrice5(entity.getAveragePrice5());
+//		muster.setPrviousAverageAmount(previousEntity==null ? muster.getAverageAmount() : previousEntity.getAverageAmount());
+		return muster;
+	}
 
+	@Override
+	public Map<String,Muster> getMustersOfTheDayAfter(LocalDate date) {
+		Map<String,Muster> musters = new HashMap<String,Muster>();
+		if(date==null) return musters;
+		
+		List<LocalDate> dates = musterRepositoryImp.getMusterDates(date, LocalDate.now());
+		if(dates.size()>0) {
+			LocalDate theDate = dates.get(0);
+			Map<String, MusterEntity> entities = musterRepositoryImp.getMusters(theDate);
+			
+			Muster muster=null;
+			Item item;
+			for(MusterEntity entity : entities.values()) {
+				item = itemService.getItem(entity.getItemID());
+				if(item!=null) {
+					muster = this.getMuster(entity);
+					muster.setItemName(item.getName());
+					muster.setIndustry(item.getIndustry());
+					musters.put(muster.getItemID(),muster);
+				}else {
+					//logger.info(String.format("item of %s is null", entity.getItemID()));
+				}
+			}
+		}
+		
+		return musters;
+	}
+	
 	@Override
 	public Map<String,Muster> getMusters(LocalDate date) {
 		Map<String,Muster> musters = new HashMap<String,Muster>();
 		if(date==null) return musters;
 		
-/*		Integer period = 8;
-		List<LocalDate> dates = musterRepositoryImp.getMusterDates();
-		Integer index = dates.indexOf(date);
-		Integer previousIndex = index>(period-1) ? index-(period-1) : 0;
-		LocalDate previousDate = dates.get(previousIndex);
-*/		
 		Map<String, MusterEntity> entities = musterRepositoryImp.getMusters(date);
-//		Map<String, MusterEntity> previousEntities = musterRepositoryImp.getMusters(previousDate);
 		
-		MusterEntity previousEntity;
-		Muster muster;
+		Muster muster=null;
 		Item item;
 		for(MusterEntity entity : entities.values()) {
 			item = itemService.getItem(entity.getItemID());
 			if(item!=null) {
-			//if(item!=null && item.getItemID().startsWith("sz300")) {
-//				previousEntity = previousEntities.get(entity.getItemID());
-				
-/*				if(previousEntity==null) {
-					System.out.println("************ index=" + previousIndex + ",date=" + previousDate  + ", itemID=" + entity.getItemID()+ " has NO kdata***************");
-				}*/
-				
-				muster = new Muster();
-				muster.setItemID(entity.getItemID());
+				muster = this.getMuster(entity);
 				muster.setItemName(item.getName());
 				muster.setIndustry(item.getIndustry());
-				muster.setClose(entity.getClose());
-				muster.setLatestAmount(entity.getLatestAmount());
-				muster.setLatestPrice(entity.getLatestPrice());
-				muster.setLimited(entity.getLimited());
-				muster.setHighest(entity.getHighest());
-				muster.setLowest(entity.getLowest());
-				muster.setLowest21(entity.getLowest21());
-				muster.setLowest34(entity.getLowest34());
-				muster.setAverageAmount(entity.getAverageAmount());
-				muster.setAveragePrice(entity.getAveragePrice());
-				muster.setAveragePrice8(entity.getAveragePrice8());
-				muster.setAveragePrice13(entity.getAveragePrice13());
-				muster.setAveragePrice21(entity.getAveragePrice21());
-				muster.setAveragePrice34(entity.getAveragePrice34());
-				muster.setTurnover_rate_f(entity.getTurnover_rate_f());
-				muster.setAverage_turnover_rate_f(entity.getAverage_turnover_rate_f());
-				muster.setVolume_ratio(entity.getVolume_ratio());
-				muster.setAverage_volume_ratio(entity.getAverage_volume_ratio());
-				muster.setTotal_mv(entity.getTotal_mv());
-				muster.setCirc_mv(entity.getCirc_mv());
-				muster.setTotal_share(entity.getTotal_share());
-				muster.setFloat_share(entity.getFloat_share());
-				muster.setFree_share(entity.getFree_share());
-				muster.setLowest13(entity.getLowest13());
-				muster.setLowest8(entity.getLowest8());
-				muster.setLowest5(entity.getLowest5());
-				muster.setAmount5(entity.getAmount5());
-				muster.setPe(entity.getPe());
-				muster.setLatestHighest(entity.getLatestHighest());
-				muster.setLatestLowest(entity.getLatestLowest());
-				muster.setAveragePrice5(entity.getAveragePrice5());
-//				muster.setPrviousAverageAmount(previousEntity==null ? muster.getAverageAmount() : previousEntity.getAverageAmount());
-				
 				musters.put(muster.getItemID(),muster);
 			}else {
 				//logger.info(String.format("item of %s is null", entity.getItemID()));
@@ -523,42 +540,9 @@ public class KdataServiceImp implements KdataService{
 			industry = itemService.getItem(entity.getItemID()).getIndustry();
 			if(includeIndustrys==null || includeIndustrys.contains(entity.getItemID())) {
 				//System.out.println(entity.getItemID());
-				muster = new Muster();
-				muster.setItemID(entity.getItemID());
+				muster = this.getMuster(entity);
 				muster.setItemName(itemName);
 				muster.setIndustry(industry);
-				muster.setClose(entity.getClose());
-				muster.setLatestAmount(entity.getLatestAmount());
-				muster.setLatestPrice(entity.getLatestPrice());
-				muster.setLimited(entity.getLimited());
-				muster.setHighest(entity.getHighest());
-				muster.setLowest(entity.getLowest());
-				muster.setLowest21(entity.getLowest21());
-				muster.setLowest34(entity.getLowest34());
-				muster.setAverageAmount(entity.getAverageAmount());
-				muster.setAveragePrice(entity.getAveragePrice());
-				muster.setAveragePrice8(entity.getAveragePrice8());
-				muster.setAveragePrice13(entity.getAveragePrice13());
-				muster.setAveragePrice21(entity.getAveragePrice21());
-				muster.setAveragePrice34(entity.getAveragePrice34());
-				muster.setTurnover_rate_f(entity.getTurnover_rate_f());
-				muster.setAverage_turnover_rate_f(entity.getAverage_turnover_rate_f());
-				muster.setVolume_ratio(entity.getVolume_ratio());
-				muster.setAverage_volume_ratio(entity.getAverage_volume_ratio());
-				muster.setTotal_mv(entity.getTotal_mv());
-				muster.setCirc_mv(entity.getCirc_mv());
-				muster.setTotal_share(entity.getTotal_share());
-				muster.setFloat_share(entity.getFloat_share());
-				muster.setFree_share(entity.getFree_share());
-				muster.setLowest13(entity.getLowest13());
-				muster.setLowest8(entity.getLowest8());
-				muster.setLowest5(entity.getLowest5());
-				muster.setAmount5(entity.getAmount5());
-				muster.setPe(entity.getPe());
-				muster.setLatestHighest(entity.getLatestHighest());
-				muster.setLatestLowest(entity.getLatestLowest());
-				muster.setAveragePrice5(entity.getAveragePrice5());
-
 				musters.put(muster.getItemID(),muster);
 			}
 		}
@@ -653,43 +637,9 @@ public class KdataServiceImp implements KdataService{
 		
 		for(MusterEntity entity : entities.values()) {
 			if(itemService.getItem(entity.getItemID()).getIndustry().equals(industry)) {
-				//System.out.println(entity.getItemID());
-				muster = new Muster();
-				muster.setItemID(entity.getItemID());
+				muster = this.getMuster(entity);
 				muster.setItemName(itemService.getItem(entity.getItemID()).getName());
 				muster.setIndustry(itemService.getItem(entity.getItemID()).getIndustry());
-				muster.setClose(entity.getClose());
-				muster.setLatestAmount(entity.getLatestAmount());
-				muster.setLatestPrice(entity.getLatestPrice());
-				muster.setLimited(entity.getLimited());
-				muster.setHighest(entity.getHighest());
-				muster.setLowest(entity.getLowest());
-				muster.setLowest21(entity.getLowest21());
-				muster.setLowest34(entity.getLowest34());
-				muster.setAverageAmount(entity.getAverageAmount());
-				muster.setAveragePrice(entity.getAveragePrice());
-				muster.setAveragePrice8(entity.getAveragePrice8());
-				muster.setAveragePrice13(entity.getAveragePrice13());
-				muster.setAveragePrice21(entity.getAveragePrice21());
-				muster.setAveragePrice34(entity.getAveragePrice34());
-				muster.setTurnover_rate_f(entity.getTurnover_rate_f());
-				muster.setAverage_turnover_rate_f(entity.getAverage_turnover_rate_f());
-				muster.setVolume_ratio(entity.getVolume_ratio());
-				muster.setAverage_volume_ratio(entity.getAverage_volume_ratio());
-				muster.setTotal_mv(entity.getTotal_mv());
-				muster.setCirc_mv(entity.getCirc_mv());
-				muster.setTotal_share(entity.getTotal_share());
-				muster.setFloat_share(entity.getFloat_share());
-				muster.setFree_share(entity.getFree_share());
-				muster.setLowest13(entity.getLowest13());
-				muster.setLowest8(entity.getLowest8());
-				muster.setLowest5(entity.getLowest5());
-				muster.setAmount5(entity.getAmount5());
-				muster.setPe(entity.getPe());
-				muster.setLatestHighest(entity.getLatestHighest());
-				muster.setLatestLowest(entity.getLatestLowest());
-				muster.setAveragePrice5(entity.getAveragePrice5());
-
 				musters.put(muster.getItemID(),muster);				
 			}
 		}

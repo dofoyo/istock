@@ -41,7 +41,8 @@ public interface KdataService {
 	public Map<String,Muster> getMusters(LocalDate date); //用于simulation
 	public Map<String,Muster> getMusters(LocalDate date, Set<String> excludeIndustrys); //用于simulation
 	public Map<String,Muster> getMusters(LocalDate date, String industry); //用于simulation
-	
+	public Map<String,Muster> getMustersOfTheDayAfter(LocalDate date);
+
 	public void generateLatestMusters();  //用于operation，每天开盘前，根据上一交易日的收盘价和最新的除权因子计算
 	public Map<String,Muster> getLatestMusters();//用于operation，提供给前端显示。和updateLatestMusters配合，可以提升操作体验
 	public Map<String,Muster> getPreviousMusters(Integer previous_period, LocalDate endDate);//给定日期前的muster

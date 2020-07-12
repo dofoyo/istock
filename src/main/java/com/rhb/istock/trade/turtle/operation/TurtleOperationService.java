@@ -9,6 +9,7 @@ import com.rhb.istock.trade.turtle.operation.api.ItemView;
 import com.rhb.istock.trade.turtle.operation.api.HoldView;
 import com.rhb.istock.trade.turtle.operation.api.IndustryView;
 import com.rhb.istock.trade.turtle.operation.api.PotentialView;
+import com.rhb.istock.trade.turtle.operation.api.ForecastView;
 import com.rhb.istock.trade.turtle.operation.api.TurtleView;
 
 /*
@@ -34,6 +35,7 @@ public interface TurtleOperationService {
 	public void redoPotentials();
 	public String[] getTopics();
 	public List<ItemView> getPowers();
+	public List<ForecastView> getForecastViews();
 	
 	/*
 	 * 一般每周1-5，每天上午9:00初始化一次。主要是导入之前的历史记录

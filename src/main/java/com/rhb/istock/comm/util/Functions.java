@@ -8,6 +8,8 @@ import java.util.List;
 public class Functions {
 	//CAGR是Compound Annual Growth Rate的缩写，意思是复合年均增长率
 	public static Integer cagr(BigDecimal a, BigDecimal b, double n) {
+		if(b.equals(BigDecimal.ZERO)) return 0;
+		
 		Double r = a.divide(b,BigDecimal.ROUND_HALF_UP).doubleValue();
 		Double pow = Math.pow(r, 1/n);
 		Double gr = (pow-1+0.005)*100;

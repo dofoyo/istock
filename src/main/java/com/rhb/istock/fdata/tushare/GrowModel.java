@@ -1,7 +1,5 @@
 package com.rhb.istock.fdata.tushare;
 
-import java.math.BigDecimal;
-
 import com.rhb.istock.comm.util.Functions;
 
 public class GrowModel {

@@ -63,11 +63,12 @@ public class Fina {
 	public void setIndicator(FinaIndicator indicator) {
 		this.indicator = indicator;
 	}
+
 	@Override
 	public String toString() {
 		return "Fina [end_date=" + end_date + ", cashflow=" + cashflow + ", income=" + income + ", indicator="
-				+ indicator + ", isValid()=" + isValid() + ", isOK()=" + isOK() + ", getOperationMarginRatio()="
-				+ getOperationMarginRatio() + "]";
+				+ indicator + "]";
 	}
+
 	
 }

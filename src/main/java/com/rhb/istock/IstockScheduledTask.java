@@ -15,6 +15,7 @@ import com.rhb.istock.kdata.KdataService;
 import com.rhb.istock.kdata.spider.KdataRealtimeSpider;
 import com.rhb.istock.selector.SelectorService;
 import com.rhb.istock.selector.bav.BavService;
+import com.rhb.istock.selector.fina.FinaService;
 import com.rhb.istock.selector.hua.HuaService;
 import com.rhb.istock.selector.lpb.LpbService;
 import com.rhb.istock.trade.turtle.operation.TurtleOperationService;
@@ -30,13 +31,17 @@ public class IstockScheduledTask {
 	ItemService itemService;
 
 	@Autowired
+	@Qualifier("finaService")
+	FinaService finaService;
+	
+/*	@Autowired
 	@Qualifier("financialStatementServiceImp")
-	FinancialStatementService financialStatementService;
-
+	FinancialStatementService financialStatementService;*/
+/*
 	@Autowired
 	@Qualifier("selectorServiceImp")
 	SelectorService selectorService;
-	
+	*/
 	@Autowired
 	@Qualifier("turtleOperationServiceImp")
 	TurtleOperationService turtleOperationService;
@@ -45,7 +50,7 @@ public class IstockScheduledTask {
 	@Qualifier("kdataRealtimeSpiderImp")
 	KdataRealtimeSpider kdataRealtimeSpider;
 	
-	@Autowired
+/*	@Autowired
 	@Qualifier("huaService")
 	HuaService huaService;
 
@@ -55,7 +60,7 @@ public class IstockScheduledTask {
 	
 	@Autowired
 	@Qualifier("lpbService")
-	LpbService lpbService;
+	LpbService lpbService;*/
 	
 	protected static final Logger logger = LoggerFactory.getLogger(IstockScheduledTask.class);
 	
@@ -129,10 +134,11 @@ public class IstockScheduledTask {
 		if(this.isTradeDate()) {
 			kdataService.downClosedDatas(LocalDate.now());
 			kdataService.generateMusters(LocalDate.parse("2000-01-01"));   //生成muster，需要192分钟，即3个多小时
-			huaService.generateHuaPotentials(LocalDate.now());
-			huaService.generateLatestHuaFirst();
-			bavService.generateBAV(LocalDate.now(),13);
-			lpbService.generateLPB(LocalDate.now(), 13);
+			finaService.generateQuarterCompares();
+			//huaService.generateHuaPotentials(LocalDate.now());
+			//huaService.generateLatestHuaFirst();
+			//bavService.generateBAV(LocalDate.now(),13);
+			//lpbService.generateLPB(LocalDate.now(), 13);
 			
 		}
 

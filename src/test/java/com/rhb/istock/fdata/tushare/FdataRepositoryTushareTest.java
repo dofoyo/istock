@@ -37,21 +37,30 @@ public class FdataRepositoryTushareTest {
 		}
 	}
 	
-	//@Test
+	@Test
 	public void getIndicators() {
 		String itemID = "sz300022";
 		Map<String,FinaIndicator> indicators = fdataRepositoryTushare.getIndicators(itemID);
-		for(FinaIndicator indicator : indicators.values()) {
-			System.out.println(indicator);
+		for(Map.Entry<String, FinaIndicator> entry : indicators.entrySet()) {
+			System.out.println(entry.getKey() +": "+ entry.getValue());
 		}
 	}
 	
-	@Test
+	//@Test
 	public void getFina() {
 		String itemID = "sz300022";
 		String end_date = "20191231";
 		Fina fina = fdataRepositoryTushare.getFina(itemID,end_date);
 		System.out.println(fina);
 		
+	}
+	
+	//@Test
+	public void getForecasts() {
+		String itemID = "sz002077";
+		Map<String,FinaForecast> forecasts = fdataRepositoryTushare.getForecasts(itemID);
+		for(FinaForecast forecast : forecasts.values()) {
+			System.out.println(forecast);
+		}
 	}
 }

@@ -67,7 +67,7 @@ public class FavorServiceImp implements FavorService {
 				if(value == null) {
 					value = file.getName().substring(0, file.getName().length()-4);
 				}else {
-					value = value + "," + file.getName().substring(0, file.getName().length()-4);
+					value = value + "，" + file.getName().substring(0, file.getName().length()-4);
 				}
 				articles.put(id, value);
 			}

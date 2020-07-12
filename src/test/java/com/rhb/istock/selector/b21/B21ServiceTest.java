@@ -11,7 +11,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest
-public class BavServiceTest {
+public class B21ServiceTest {
 	@Autowired
 	@Qualifier("b21Service")
 	B21Service b21Service;
