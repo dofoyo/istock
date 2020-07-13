@@ -124,27 +124,31 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 			this.setLatestKdata(entity.getItemID(),true);
 			
 			item = itemService.getItem(entity.getItemID());
-			muster = musters.get(entity.getItemID());
-			
-			hold = new HoldView();
-			hold.setItemID(entity.getItemID());
-			hold.setCode(item.getCode());
-			hold.setName(item.getName());
-			
-			hold.setIndustry(item.getIndustry());
-			hold.setArea(item.getArea());
-			hold.setBuyPrice(entity.getPrice());
-			hold.setBuyDate(entity.getDate());;
-			hold.setNowPrice(muster==null ? "" : muster.getLatestPrice().toString());
-			hold.setTopic(this.getTopic(item.getItemID()));
-			hold.setLabel(entity.getLabel());
-			hold.setFavor(favors.get(item.getItemID()));
-			if(qcs.get(item.getItemID())!=null) {
-				hold.addFavor(qcs.get(item.getItemID()).getInfo());
+			if(item==null) {
+				logger.info(entity.getItemID() + " do NOT exist!!!!");
+			}else {
+				muster = musters.get(entity.getItemID());
+				
+				hold = new HoldView();
+				hold.setItemID(entity.getItemID());
+				hold.setCode(item.getCode());
+				hold.setName(item.getName());
+				
+				hold.setIndustry(item.getIndustry());
+				hold.setArea(item.getArea());
+				hold.setBuyPrice(entity.getPrice());
+				hold.setBuyDate(entity.getDate());;
+				hold.setNowPrice(muster==null ? "" : muster.getLatestPrice().toString());
+				hold.setTopic(this.getTopic(item.getItemID()));
+				hold.setLabel(entity.getLabel());
+				hold.setFavor(favors.get(item.getItemID()));
+				if(qcs.get(item.getItemID())!=null) {
+					hold.addFavor(qcs.get(item.getItemID()).getInfo());
+				}
+				hold.setStatus(b21s.get(item.getItemID()));
+				
+				holds.add(hold);
 			}
-			hold.setStatus(b21s.get(item.getItemID()));
-			
-			holds.add(hold);
 			
 		}
 		return holds;
