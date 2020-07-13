@@ -45,7 +45,7 @@ public interface KdataService {
 
 	public void generateLatestMusters();  //用于operation，每天开盘前，根据上一交易日的收盘价和最新的除权因子计算
 	public Map<String,Muster> getLatestMusters();//用于operation，提供给前端显示。和updateLatestMusters配合，可以提升操作体验
-	public Map<String,Muster> getPreviousMusters(Integer previous_period, LocalDate endDate);//给定日期前的muster
+	public List<Map<String,Muster>> getPreviousMusters(Integer previous_period, LocalDate endDate);//给定日期前的muster
 	public void updateLatestMusters();//用于operation, 在交易时间无限循环对其中的potential刷新latestPrice，
 	public List<LocalDate> getMusterDates(LocalDate beginDate, LocalDate endDate);
 	public List<LocalDate> getMusterDates(Integer count, LocalDate endDate);

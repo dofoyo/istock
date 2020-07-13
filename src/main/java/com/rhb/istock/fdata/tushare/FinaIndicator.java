@@ -12,6 +12,7 @@ public class FinaIndicator {
 	private BigDecimal ebt_yoy;  			//利润总额同比增长率(%)
 	private BigDecimal netprofit_yoy; 		//归属母公司股东的净利润同比增长率(%)  -- 业绩预告
 	private BigDecimal dt_netprofit_yoy; 	//归属母公司股东的净利润-扣除非经常损益同比增长率(%)
+	private BigDecimal or_yoy; 				//营业收入同比增长率(%)
 	
 	public boolean isValid() {
 		return this.profit_dedt!=null && !this.profit_dedt.equals(BigDecimal.ZERO);
@@ -24,8 +25,15 @@ public class FinaIndicator {
 		this.ebt_yoy  = item.get(95).toString().equals("null") ? BigDecimal.ZERO : item.getBigDecimal(95);
 		this.netprofit_yoy  = item.get(96).toString().equals("null") ? BigDecimal.ZERO : item.getBigDecimal(96);
 		this.dt_netprofit_yoy  = item.get(97).toString().equals("null") ? BigDecimal.ZERO : item.getBigDecimal(97);
+		this.or_yoy  = item.get(104).toString().equals("null") ? BigDecimal.ZERO : item.getBigDecimal(104);
 	}
 	
+	public BigDecimal getOr_yoy() {
+		return or_yoy;
+	}
+	public void setOr_yoy(BigDecimal or_yoy) {
+		this.or_yoy = or_yoy;
+	}
 	public BigDecimal getNetprofit_yoy() {
 		return netprofit_yoy;
 	}
@@ -71,7 +79,8 @@ public class FinaIndicator {
 	@Override
 	public String toString() {
 		return "FinaIndicator [ann_date=" + ann_date + ", profit_dedt=" + profit_dedt + ", grossprofit_margin="
-				+ grossprofit_margin + ", op_yoy=" + op_yoy + ", ebt_yoy=" + ebt_yoy + "]";
+				+ grossprofit_margin + ", op_yoy=" + op_yoy + ", ebt_yoy=" + ebt_yoy + ", netprofit_yoy="
+				+ netprofit_yoy + ", dt_netprofit_yoy=" + dt_netprofit_yoy + ", or_yoy=" + or_yoy + "]";
 	}
 
 }

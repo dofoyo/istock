@@ -9,6 +9,7 @@ public class QuarterCompare {
 	private String itemID;
 	private Integer previous_netprofit_yoy;			//上一季度归属母公司股东的净利润同比增长率(%)  -- 与业绩预告对应
 	private Integer previous_dt_netprofit_yoy; 		//上一季度归属母公司股东的净利润-扣除非经常损益同比增长率(%)
+	private Integer previous_or_yoy; 				//上一季度营业收入同比增长率(%)
 	private String forecast_date;					//新季度业绩预告发布日期，没有的话，表示还没有发布，适时买入
 	private Integer forecast_netprofit_yoy_max;		//新季度业绩预告结果：业绩变动百分比， 没有的话，表示还没有发布，适时买入
 	private Integer forecast_price_up_max;			//新季度业绩预告当天：股价变动百分比
@@ -25,6 +26,18 @@ public class QuarterCompare {
 		
 	}
 	
+	public Integer getPrevious_or_yoy() {
+		return previous_or_yoy;
+	}
+	
+	public String getPrevious_or_yoy_s() {
+		return previous_or_yoy==0 ? "" : previous_or_yoy.toString();
+	}
+
+	public void setPrevious_or_yoy(Integer previous_or_yoy) {
+		this.previous_or_yoy = previous_or_yoy;
+	}
+
 	public Integer getIndicator_netprofit_yoy() {
 		return indicator_netprofit_yoy;
 	}
@@ -125,6 +138,8 @@ public class QuarterCompare {
 		sb.append(",");
 		sb.append(this.getPrevious_dt_netprofit_yoy());		
 		sb.append(",");
+		sb.append(this.getPrevious_or_yoy());		
+		sb.append(",");
 		sb.append(this.forecast_date==null ? "" : this.forecast_date);
 		sb.append(",");
 		sb.append(this.forecast_netprofit_yoy_max==null ? "" : this.forecast_netprofit_yoy_max);
@@ -148,12 +163,13 @@ public class QuarterCompare {
 		this.itemID = ss[0];
 		this.previous_netprofit_yoy = ss[1].isEmpty()? 0 :Integer.parseInt(ss[1]);
 		this.previous_dt_netprofit_yoy = ss[2].isEmpty()? 0 :Integer.parseInt(ss[2]);
-		this.forecast_date = ss[3];
-		this.forecast_netprofit_yoy_max = ss[4].isEmpty()? 0 :Integer.parseInt(ss[4]);
-		this.forecast_price_up_max = ss[5].isEmpty()? 0 :Integer.parseInt(ss[5]);
-		this.indicator_date = ss[6];
-		this.indicator_netprofit_yoy = ss[7].isEmpty()? 0 :Integer.parseInt(ss[7]);
-		this.indicator_dt_netprofit_yoy = ss[8].isEmpty()? 0 :Integer.parseInt(ss[8]);
-		this.indicator_price_up_max = ss[9].isEmpty()? 0 :Integer.parseInt(ss[9]);
+		this.previous_or_yoy = ss[3].isEmpty()? 0 :Integer.parseInt(ss[3]);
+		this.forecast_date = ss[4];
+		this.forecast_netprofit_yoy_max = ss[5].isEmpty()? 0 :Integer.parseInt(ss[5]);
+		this.forecast_price_up_max = ss[6].isEmpty()? 0 :Integer.parseInt(ss[6]);
+		this.indicator_date = ss[7];
+		this.indicator_netprofit_yoy = ss[8].isEmpty()? 0 :Integer.parseInt(ss[8]);
+		this.indicator_dt_netprofit_yoy = ss[9].isEmpty()? 0 :Integer.parseInt(ss[9]);
+		this.indicator_price_up_max = ss[10].isEmpty()? 0 :Integer.parseInt(ss[10]);
 	}
 }

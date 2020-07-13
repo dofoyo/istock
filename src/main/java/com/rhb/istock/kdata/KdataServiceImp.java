@@ -789,13 +789,13 @@ public class KdataServiceImp implements KdataService{
 	}
 
 	@Override
-	public Map<String, Muster> getPreviousMusters(Integer previous_period, LocalDate endDate) {
+	public List<Map<String, Muster>> getPreviousMusters(Integer previous_period, LocalDate endDate) {
+		List<Map<String, Muster>> musters = new ArrayList<Map<String,Muster>>();
 		List<LocalDate> previousDates = this.getMusterDates(previous_period, endDate);
-		if(previousDates!=null) {
-			return this.getMusters(previousDates.get(0));
-		}else {
-			return null;
+		for(LocalDate date : previousDates) {
+			musters.add(this.getMusters(date));
 		}
+		return musters;
 	}
 
 

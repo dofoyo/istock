@@ -16,7 +16,7 @@ public class FinaServiceTest {
 	@Qualifier("finaService")
 	FinaService finaService;
 	
-	//@Test
+	@Test
 	public void generateQuarterCompare() {
 		//String itemID = "sz300022";
 		//String begin = "20190331";
@@ -27,7 +27,7 @@ public class FinaServiceTest {
 
 	}
 	
-	@Test
+	//@Test
 	public void getQuarterCompares() {
 		Map<String,QuarterCompare> qcs = finaService.getForecasts();
 		for(Map.Entry<String, QuarterCompare> entry : qcs.entrySet()) {

@@ -8,14 +8,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.rhb.istock.comm.util.Functions;
+import com.rhb.istock.selector.b21.B21Service;
 
 public class Kdata {
 	private String itemID;
 	private TreeMap<LocalDate,Kbar> bars;
+	private BigDecimal highest;
+	private BigDecimal lowest;
 
 	Map<String,BigDecimal> features = null;
 	Map<String,BigDecimal> averagePrices = null;
+	
+	protected static final Logger logger = LoggerFactory.getLogger(Kdata.class);
 	
 	public Kdata(String itemID) {
 		this.itemID = itemID;
@@ -24,10 +32,16 @@ public class Kdata {
 	
 	public Integer getRatio() {
 		BigDecimal p1 = bars.lastEntry().getValue().getClose();
-		BigDecimal p2 = bars.firstEntry().getValue().getClose();
+		//BigDecimal p2 = bars.firstEntry().getValue().getClose();
 		//System.out.format("last date: %tF, %.2f\n",bars.lastEntry().getValue().getDate(),bars.lastEntry().getValue().getClose());
 		//System.out.format("first date: %tF, %.2f\n",bars.firstEntry().getValue().getDate(),bars.firstEntry().getValue().getClose());
-		return Functions.growthRate(p1, p2);
+		if(highest==null || lowest ==null) {
+			return 0;
+		}else {
+			//logger.info(String.format("ssei, lowest=%.2f, highest=%.2f, ratio=%d", lowest, highest,Functions.growthRate(highest, lowest)));
+
+			return Functions.growthRate(p1, lowest);
+		}
 	}
 	
 	public Integer getSize() {
@@ -219,6 +233,9 @@ public class Kdata {
 			) {
 		this.bars.put(date, new Kbar(open, high, low, close, amount, quantity,date, 
 				turnover_rate_f, volume_ratio,total_mv,circ_mv,total_share,float_share,free_share,pe));
+		this.highest = (this.highest==null || this.highest.compareTo(high)==-1) ? high : this.highest;
+		this.lowest = (this.lowest==null || this.lowest.compareTo(low)==1) ? low : this.lowest;
+		
 	}
 	
 	public Kbar getBar(LocalDate date){

@@ -56,10 +56,22 @@ public class FdataSpiderTushareTest {
 
 	}
 	
-	@Test
-	public void down() throws Exception {
+	//@Test
+	public void downForecast() throws Exception {
 		String itemID = "sz002077";
 		fdataSpiderTushare.downForecast(itemID);
 	}
+	
+	//@Test
+	public void downFloatholders() {
+		String itemID = "sh603399";
+		String period = "20200331";
+		fdataSpiderTushare.downFloatholders(itemID, period);
+	}
 
+	@Test
+	public void downFloatholders1() {
+		String period = "20200331";
+		fdataSpiderTushare.downFloatholders(period);
+	}
 }

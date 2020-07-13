@@ -1,5 +1,6 @@
 package com.rhb.istock.fdata.tushare;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -166,4 +167,26 @@ public class FdataRepositoryTushare {
 		
 		return indicators;
 	}
+	
+	public	List<Floatholder> getFloatholders(String itemID){
+		List<Floatholder> holders = new ArrayList<Floatholder>();
+		
+		String fdataFile = fdataPath + "/" + itemID + "_floatholders.json";
+		if(FileTools.isExists(fdataFile)) {
+			JSONObject basicObject = new JSONObject(FileTools.readTextFile(fdataFile));
+			JSONArray items = basicObject.getJSONArray("items");
+			if(items.length()>0) {
+				JSONArray item;
+				Floatholder holder;
+				for(int i=0; i<items.length()-1; i++) {
+					item = items.getJSONArray(i);
+					holder = new Floatholder(item);
+					holders.add(holder);
+				}
+			}
+		}
+		
+		return holders;
+	}
+	
 }

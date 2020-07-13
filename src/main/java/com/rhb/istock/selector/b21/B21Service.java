@@ -39,27 +39,27 @@ public class B21Service {
 	
 	protected static final Logger logger = LoggerFactory.getLogger(B21Service.class);
 
-	public String getB21() {
-		List<LocalDate> dates = kdataService.getLastMusterDates();
-		LocalDate date = dates.get(dates.size()-1);
-		return this.generateB21(date);
-	}
-	
 	public Map<String,String> isB21(List<String> itemIDs, LocalDate endDate) {
 		Map<String,String> results = new HashMap<String,String>();
 
 		Integer previous_period = 13;
 		Map<String,Muster> musters = kdataService.getMusters(endDate);
-		Map<String,Muster> previous = kdataService.getPreviousMusters(previous_period, endDate);
+		List<Map<String,Muster>> previous = kdataService.getPreviousMusters(previous_period, endDate);
 		Integer sseiRatio = kdataService.getSseiRatio(endDate, previous_period);
+		Integer ratio;
 		if(musters!=null && previous!=null) {
 			Muster m, p;
 			String v;
 			for(String id : itemIDs) {
 				m = musters.get(id);
-				p = previous.get(id);
+				p = previous.get(0).get(id);
 				v = "0";
 				if(m!=null && p!=null) {
+					ratio = this.getRatio(previous, m.getItemID(), m.getLatestPrice()); 
+					if(m.isDropAve(21) || ratio < sseiRatio) {  // 弱于大盘
+ 						v = "-2";
+					}
+
 					if(m.isJustBreaker() 
 							&& m.getHLGap()<=55 //股价还没飞涨
 							&& (m.getAverageGap()<8  //均线在8%范围内纠缠
@@ -69,86 +69,37 @@ public class B21Service {
 						v = "1";
 					}else if(m.isUpBreaker()) {  //创新高
 						v = "3";
-					}else if(Functions.growthRate(m.getClose(),p.getClose()) >= sseiRatio   // 强于大盘
-							&& m.getHLGap()<=55
+					}else if(ratio >= sseiRatio   // 强于大盘
+							&& m.isUpAve(21)
+							//&& m.getHLGap()<=55
 							&& m.getAveragePrice21().compareTo(p.getAveragePrice21())==1 ) { //上升趋势
 						v = "2";
 					}
 						
+					
+					results.put(id, v);
 				}
-				
-				if(m!=null && m.isDropAve(21)) {
-					v = "-2";
-				}
-				
-				results.put(id, v);
 			}
 		}
 		
 		return results;
 	}
 	
-	public void generateB21(LocalDate endDate, Integer days) {
-		List<LocalDate> dates = kdataService.getMusterDates(days, endDate);
-		StringBuffer sb = new StringBuffer();
-		for(LocalDate date : dates) {
-			sb.append(this.generateB21(date));
-		}
-		FileTools.writeTextFile(b21File, sb.toString(), false);
-	}
-	
-	private String generateB21(LocalDate endDate) {
-		Map<String,Muster> musters = kdataService.getMusters(endDate);
-		Integer previous_period = 13;
-		StringBuffer sb = new StringBuffer(endDate.toString() + ":");
-		if(musters!=null) {
-			List<LocalDate> previousDates = kdataService.getMusterDates(previous_period, endDate);
-			if(previousDates!=null) {
-				Map<String,Muster> previous = kdataService.getMusters(previousDates.get(0));
-				Integer sseiRatio = kdataService.getSseiRatio(endDate, previous_period);
-			
-				List<Muster>  ms = new ArrayList<Muster>(musters.values()); 
-				
-				Collections.sort(ms, new Comparator<Muster>() {
-					@Override
-					public int compare(Muster o1, Muster o2) {
-						return o1.getLatestPrice().compareTo(o2.getLatestPrice()); //价格小到大排序
-					}
-				});
-				
-				Muster m,p;
-				for(int i=0; i<ms.size(); i++) {
-					m = ms.get(i);
-					p = previous.get(m.getItemID());
-					if(m!=null && p!=null) {
-						if(m.isJustBreaker() 
-								&& m.getHLGap()<=55 //股价还没飞涨
-								&& (m.getAverageGap()<8  //均线在8%范围内纠缠
-										|| m.getAveragePrice21().compareTo(p.getAveragePrice21())==1  //上升趋势
-										|| m.getAverageAmount().compareTo(p.getAverageAmount())==1)  // 放量
-								) {
-							sb.append(m.getItemID() + "(1),");
-						}else if(Functions.growthRate(m.getClose(),p.getClose()) >= sseiRatio   // 强于大盘
-								&& m.getHLGap()<=55
-								&& m.getAveragePrice21().compareTo(p.getAveragePrice21())==1 ) { //上升趋势
-							sb.append(m.getItemID() + "(2),");
-						}
-					}
-					
-					//logger.info(String.format("%d %s %.0f",i,m.getItemID(),m.getAmount()));
-				}
-				
-				sb.append("\n");
-				
-			}else {
-				sb.append(" No previous!");
+	private Integer getRatio(List<Map<String,Muster>> musters, String itemID, BigDecimal price) {
+		Integer ratio = 0;
+		BigDecimal lowest=null;
+		Muster m;
+		for(Map<String,Muster> ms : musters) {
+			m = ms.get(itemID);
+			if(m!=null) {
+				lowest = (lowest==null || lowest.compareTo(m.getLatestLowest())==1) ? m.getLatestLowest() : lowest;
 			}
-		}else {
-			sb.append(" No muster!");
 		}
 		
-		//logger.info(sb.toString());
-		
-		return sb.toString();
+		if(lowest!=null) {
+			ratio = Functions.growthRate(price, lowest);
+		}
+		//logger.info(String.format("%s, lowest=%.2f, highest=%.2f, ratio=%d", itemID, lowest, price,ratio));
+		return ratio;
 	}
 }

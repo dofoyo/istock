@@ -857,23 +857,6 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 	}
 
 	@Override
-	public List<ItemView> getB21s() {
-		Map<String, String> favors = selectorService.getFavors();
-		Map<String,QuarterCompare> qcs = finaService.getQuarterCompares();
-		Map<String,String> ids = selectorService.getB21();
-		List<ItemView> views = this.buildItemViews(new ArrayList(ids.keySet())); 
-		for(ItemView view : views) {
-			view.setLabel(favors.get(view.getItemID()));
-			if(qcs.get(view.getItemID())!=null) {
-				view.addLabel(qcs.get(view.getItemID()).getInfo());
-			}
-			view.setStatus(ids.get(view.getItemID()));
-		}
-		
-		return views;
-	}
-
-	@Override
 	public List<ForecastView> getForecastViews() {
 		Map<String,QuarterCompare> qcs = finaService.getForecasts();
 		
@@ -893,7 +876,7 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 		Collections.sort(views, new Comparator<ForecastView>() {
 			@Override
 			public int compare(ForecastView o1, ForecastView o2) {
-				return new Integer(o2.getPrevious_netprofit_yoy()).compareTo(new Integer(o1.getPrevious_netprofit_yoy()));
+				return new BigDecimal(o1.getPrice()).compareTo(new BigDecimal(o2.getPrice()));
 			}
 			
 		});

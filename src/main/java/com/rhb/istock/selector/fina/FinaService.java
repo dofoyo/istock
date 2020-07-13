@@ -92,6 +92,7 @@ public class FinaService {
 			qc.setItemID(itemID);
 			qc.setPrevious_netprofit_yoy(indicator.getNetprofit_yoy().intValue());
 			qc.setPrevious_dt_netprofit_yoy(indicator.getDt_netprofit_yoy().intValue());
+			qc.setPrevious_or_yoy(indicator.getOr_yoy().intValue());
 			
 			//System.out.format("%s %s, ratio is %d\n", itemID,date,qc.getRatio());
 		}
@@ -161,14 +162,21 @@ public class FinaService {
 		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyyMMdd");
 		Map<String,Muster> musters = null;
 
-		StringBuffer sb = new StringBuffer("代码,上季净利润同比,上季非经净利润同比,预告日期,预告净利润同比,预告日涨跌,报告日期,上季净利润同比,上季非经净利润同比,报告日涨跌\n");
+		StringBuffer sb = new StringBuffer("代码,上季净利润同比,上季非经净利润同比,上季主营同比,预告日期,预告净利润同比,预告日涨跌,报告日期,上季净利润同比,上季非经净利润同比,报告日涨跌\n");
 		int i=1;
 		Muster muster;
 		FinaIndicator indicator;
 		FinaForecast forecast;
 		for(QuarterCompare qc : qcs) {
 			Progress.show(qcs.size(),i++, qc.getItemID());//进度条
-			if(qc!=null && qc.getPrevious_netprofit_yoy()!=null && qc.getPrevious_netprofit_yoy()>=ratio) {
+			if(qc!=null 
+					&& qc.getPrevious_netprofit_yoy()!=null 
+					&& qc.getPrevious_netprofit_yoy()>=ratio
+					//&& qc.getPrevious_netprofit_yoy()!=null
+					//&& qc.getPrevious_dt_netprofit_yoy()>0
+					//&& qc.getPrevious_or_yoy()!=null
+					//&& qc.getPrevious_or_yoy()>0
+					) {
 				forecast = getForecast(qc.getItemID(),forecast_date);
 				if(forecast!=null) {
 					qc.setForecast_date(forecast.getAnn_date());

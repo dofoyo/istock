@@ -16,9 +16,4 @@ public class B21ServiceTest {
 	@Qualifier("b21Service")
 	B21Service b21Service;
 	
-	@Test
-	public void generateBAV() {
-		LocalDate endDate = LocalDate.parse("2020-06-16");
-		b21Service.generateB21(endDate,13);
-	}
 }

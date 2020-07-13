@@ -1,5 +1,8 @@
 package com.rhb.istock.fdata.tushare;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.Test;
@@ -9,6 +12,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import com.rhb.istock.item.ItemService;
+
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest
 public class FdataRepositoryTushareTest {
@@ -16,6 +21,10 @@ public class FdataRepositoryTushareTest {
 	@Autowired
 	@Qualifier("fdataRepositoryTushare")
 	FdataRepositoryTushare fdataRepositoryTushare;
+	
+	@Autowired
+	@Qualifier("itemServiceImp")
+	ItemService itemService;
 	
 	//@Test
 	public void getCashflows() {
@@ -37,7 +46,7 @@ public class FdataRepositoryTushareTest {
 		}
 	}
 	
-	@Test
+	//@Test
 	public void getIndicators() {
 		String itemID = "sz300022";
 		Map<String,FinaIndicator> indicators = fdataRepositoryTushare.getIndicators(itemID);
@@ -63,4 +72,42 @@ public class FdataRepositoryTushareTest {
 			System.out.println(forecast);
 		}
 	}
+	
+	//@Test
+	public void getFloatholders() {
+		String itemID = "sh603399";
+		List<Floatholder> holders = fdataRepositoryTushare.getFloatholders(itemID);
+		for(Floatholder holder : holders) {
+			System.out.println(holder);
+		}
+	}
+	
+	@Test
+	public void getHolders() {
+		Map<String,Integer> holderIds = new HashMap<String,Integer>();
+		String str = "陕国投";
+		List<Floatholder> holders;
+		List<String> ids = itemService.getItemIDs();
+		Integer count;
+		for(String id : ids) {
+			holders = fdataRepositoryTushare.getFloatholders(id);
+			for(Floatholder holder : holders) {
+				if(holder.getHolder_name().contains(str)) {
+					count = holderIds.get(holder.getTs_code());
+					if(count == null) {
+						count = 1;
+					}else {
+						count ++;
+					}
+					holderIds.put(holder.getTs_code(), count);
+				}
+			}			
+		}
+		
+		for(Map.Entry<String, Integer> entry : holderIds.entrySet()) {
+			System.out.println(entry.getKey() + ", " + entry.getValue());
+		}
+		
+	}
+	
 }

@@ -26,7 +26,7 @@ public class KdataServiceTest {
 	@Qualifier("kdataServiceImp")
 	KdataService kdataService;
 	
-	//@Test
+	@Test
 	public void generateMusters() {
 		LocalDate date = LocalDate.parse("2000-01-01");
 		kdataService.generateMusters(date);
@@ -67,7 +67,7 @@ public class KdataServiceTest {
 		}
 	}
 	
-	@Test
+	//@Test
 	public void getSseiRatio() {
 		List<LocalDate> dates = kdataService.getMusterDates();
 		for(LocalDate date : dates) {

@@ -99,12 +99,6 @@ public class TurtleApi{
 		List<TurtleView> views = ts.getPotentials("bav");
 		return new ResponseContent<List<TurtleView>>(ResponseEnum.SUCCESS, views);
 	}
-
-	@GetMapping("/turtle/b21")
-	public ResponseContent<List<ItemView>> getPotentialsOfB21() {
-		List<ItemView> views = ts.getB21s();
-		return new ResponseContent<List<ItemView>>(ResponseEnum.SUCCESS, views);
-	}
 	
 	@GetMapping("/turtle/favors")
 	public ResponseContent<List<ItemView>> getFavors() {

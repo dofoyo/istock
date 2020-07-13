@@ -46,7 +46,7 @@ public class B21 {
 		this.type = type;
 	}
 	
-	public void doIt(Map<String,Muster> musters,Map<String,Muster> previous, LocalDate date, Integer sseiFlag, Integer sseiRatio) {
+	public void doIt(Map<String,Muster> musters,List<Map<String,Muster>> previous, LocalDate date, Integer sseiFlag, Integer sseiRatio) {
 		Muster muster, pre;
 		account.setLatestDate(date);
 		Integer ratio;
@@ -60,22 +60,23 @@ public class B21 {
 		}
 		
 		//卖出跌破dropline的股票
+		boolean droped = false;
 		for(String itemID: holdItemIDs) {
 			muster = musters.get(itemID);
-			pre = previous.get(itemID);
+			pre = previous.get(0).get(itemID);
 			if(muster!=null && !muster.isDownLimited()) {
 				//跌破21日均线就卖
 				if(muster.isDropAve(21)) { 		
 					account.dropWithTax(itemID, "1", muster.getLatestPrice());
+					droped = true;
 				}
 				
-/*				//行情差,走势弱于大盘
-				if(sseiFlag==0 && pre!=null) {
-					ratio = Functions.growthRate(muster.getClose(),pre.getClose());
-					if(ratio < sseiRatio ) {
-						account.dropWithTax(itemID, "2", muster.getLatestPrice());
-					}
-				}*/
+				//走势弱于大盘
+				ratio = this.getRatio(previous, itemID, muster.getLatestHighest());
+				if(ratio < sseiRatio) {
+					account.dropWithTax(itemID, "2", muster.getLatestPrice());
+					droped = true;
+				}
 				
 			}
 		}
@@ -108,7 +109,7 @@ public class B21 {
 			//先卖后买，完成调仓和开仓
 			// 当cash不够买入新股时，要卖出市值高与平均值的股票。
 			//此举可避免高位加仓的现象出现
-			if(!dds.isEmpty()) {
+			if(!dds.isEmpty() || droped) {
 				Set<Integer> holdOrderIDs;
 				for(String itemID: holdItemIDs) {
 					holdOrderIDs = 	account.getHoldOrderIDs(itemID);
@@ -145,7 +146,7 @@ public class B21 {
 		return result;
 	}
 	
-	private List<Muster> getBreakers(Map<String,Muster> ms,Map<String,Muster> previous, Integer sseiRatio, Set<String> holds){
+	private List<Muster> getBreakers(Map<String,Muster> ms,List<Map<String,Muster>> previous, Integer sseiRatio, Set<String> holds){
 		List<Muster> breakers = new ArrayList<Muster>();
 		
 		List<Muster> musters = new ArrayList<Muster>(ms.values());
@@ -170,7 +171,7 @@ public class B21 {
 		Muster m,p;
 		for(int i=0; i<musters.size() && breakers.size()<this.top && i<this.pool; i++) {
 			m = musters.get(i);
-			p = previous.get(m.getItemID());
+			p = previous.get(0).get(m.getItemID());
 			if(m!=null && p!=null && !m.isUpLimited() 
 					&& m.isJustBreaker() 
 					&& m.getHLGap()<=55 //股价还没飞涨
@@ -187,4 +188,23 @@ public class B21 {
 		return breakers;
 	}
 	
+	private Integer getRatio(List<Map<String,Muster>> musters, String itemID, BigDecimal price) {
+		Integer ratio = 0;
+		BigDecimal lowest=null;
+		Muster m;
+		for(Map<String,Muster> ms : musters) {
+			m = ms.get(itemID);
+			if(m!=null) {
+				lowest = (lowest==null || lowest.compareTo(m.getLatestLowest())==1) ? m.getLatestLowest() : lowest;
+			}
+		}
+		
+		if(lowest!=null && lowest.compareTo(BigDecimal.ZERO)>0) {
+			ratio = Functions.growthRate(price, lowest);
+		}
+		
+		//logger.info(String.format("%s, lowest=%.2f, price=%.2f, ratio=%d", itemID, lowest, price,ratio));
+
+		return ratio;
+	}
 }
