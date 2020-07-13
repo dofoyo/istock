@@ -25,6 +25,7 @@ import com.rhb.istock.kdata.repository.KdataEntity;
 import com.rhb.istock.kdata.repository.KdataRepository;
 import com.rhb.istock.kdata.spider.KdataRealtimeSpider;
 import com.rhb.istock.kdata.spider.KdataSpider;
+import com.rhb.istock.selector.favor.FavorService;
 
 @Service("kdataServiceImp")
 public class KdataServiceImp implements KdataService{
@@ -55,7 +56,11 @@ public class KdataServiceImp implements KdataService{
 	@Autowired
 	@Qualifier("musterRepositoryImp")
 	MusterRepository musterRepositoryImp;
-	
+
+	@Autowired
+	@Qualifier("favorServiceImp")
+	FavorService favorServiceImp;
+
 	@Value("${openDuration}")
 	private Integer openDuration;
 	
@@ -550,14 +555,33 @@ public class KdataServiceImp implements KdataService{
 		return musters;
 	}
 
+
+	@Override
+	public void updateLatestMustersOfFavors() {
+		Set<String> ids = favorServiceImp.getFavors().keySet();
+		LocalDate date = this.getLatestMarketDate("sh000001");
+		Map<String,Muster> musters = this.getMusters(date);
+		Map<String,Muster> favors = new HashMap<String,Muster>();
+		for(Map.Entry<String, Muster> entry : musters.entrySet()) {
+			if(ids.contains(entry.getKey())) {
+				favors.put(entry.getKey(), entry.getValue());
+			}
+		}
+		this.updateMusters(date, favors);
+	}
+	
 	@Override
 	public void updateLatestMusters() {
+		LocalDate date = this.getLatestMarketDate("sh000001");
+		Map<String,Muster> musters = this.getMusters(date);
+		this.updateMusters(date, musters);
+	}
+
+	private void updateMusters(LocalDate date, Map<String,Muster> musters) {
 		long beginTime=System.currentTimeMillis(); 
 		logger.info("updateLatestMusters ......");
 
 		Kbar kbar;
-		LocalDate date = this.getLatestMarketDate("sh000001");
-		Map<String,Muster> musters = this.getMusters(date);
 		List<MusterEntity> entities = new ArrayList<MusterEntity>();
 		int i=1;
 		for(Muster muster : musters.values()) {
@@ -610,9 +634,8 @@ public class KdataServiceImp implements KdataService{
 		logger.info("\nupdateLatestMusters done!");
 		long used = (System.currentTimeMillis() - beginTime)/1000; 
 		logger.info("用时：" + used + "秒");     
-
 	}
-
+	
 	@Override
 	public List<LocalDate> getMusterDates(LocalDate beginDate, LocalDate endDate) {
 		return musterRepositoryImp.getMusterDates(beginDate, endDate);
@@ -797,6 +820,7 @@ public class KdataServiceImp implements KdataService{
 		}
 		return musters;
 	}
+
 
 
 }
