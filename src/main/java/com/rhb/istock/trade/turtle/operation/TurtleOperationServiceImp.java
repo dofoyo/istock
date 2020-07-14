@@ -213,7 +213,7 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 	@Override
 	public List<ItemView> getFavors() {
 		Map<String, String> favors = selectorService.getFavors();
-		Map<String,QuarterCompare> qcs = finaService.getQuarterCompares();
+		Map<String,String> finas = fdataServiceTushare.getFinaGrowthRatioInfo(favors.keySet());
 
 		List<ItemView> views = buildItemViews(new ArrayList<String>(favors.keySet()));
 
@@ -222,8 +222,8 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 		
 		for(ItemView view : views) {
 			view.setLabel(favors.get(view.getItemID()));
-			if(qcs.get(view.getItemID())!=null) {
-				view.addLabel(qcs.get(view.getItemID()).getInfo());
+			if(finas.get(view.getItemID())!=null) {
+				view.setFina(finas.get(view.getItemID()));
 			}
 			view.setStatus(b21s.get(view.getItemID()));
 		}

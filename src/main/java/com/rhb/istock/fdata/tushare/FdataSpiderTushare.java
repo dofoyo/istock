@@ -81,6 +81,10 @@ public class FdataSpiderTushare {
 	public void downForecast(String itemID) throws Exception {
 		this.down(itemID, "forecast");
 	}
+
+	public void downFloatholder(String itemID) throws Exception {
+		this.down(itemID, "top10_floatholders");
+	}
 	
 	public void downForecast(LocalDate date) {
 		DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyyMMdd");
@@ -100,6 +104,24 @@ public class FdataSpiderTushare {
 		
 		String kdataFile = fdataPath + "/" + date.format(df) + "_forecast.json";
 		FileTools.writeTextFile(kdataFile, data.toString(), false);		
+	}
+
+	public void downAll() {
+		List<String> ids = itemService.getItemIDs();
+		int i=1;
+		for(String itemID : ids) {
+			Progress.show(ids.size(),i++, " down all: " + itemID);//进度条
+			this.down(itemID, "income");
+			this.down(itemID, "cashflow");
+			this.down(itemID, "fina_indicator");
+			this.down(itemID, "forecast");
+			this.down(itemID, "top10_floatholders");
+			try {
+				Thread.sleep(1000);  //一分钟200个	
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			} 
+		}
 	}
 	
 	public void downFloatholders(String period) {

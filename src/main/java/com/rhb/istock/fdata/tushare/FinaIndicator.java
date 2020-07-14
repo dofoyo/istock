@@ -6,6 +6,7 @@ import org.json.JSONArray;
 
 public class FinaIndicator {
 	private String ann_date;		//str	公告日期
+	private String end_date;		//str	报告期
 	private BigDecimal profit_dedt;
 	private BigDecimal grossprofit_margin;
 	private BigDecimal op_yoy;  			//营业利润同比增长率(%)
@@ -19,6 +20,7 @@ public class FinaIndicator {
 	}
 	public FinaIndicator(JSONArray item) {
 		this.ann_date = item.get(1).toString();
+		this.end_date  = item.getString(2);
 		this.profit_dedt  = item.get(11).toString().equals("null") ? BigDecimal.ZERO : item.getBigDecimal(11);
 		this.grossprofit_margin  = item.get(49).toString().equals("null") ? BigDecimal.ZERO : item.getBigDecimal(49);
 		this.op_yoy  = item.get(94).toString().equals("null") ? BigDecimal.ZERO : item.getBigDecimal(94);
@@ -28,6 +30,16 @@ public class FinaIndicator {
 		this.or_yoy  = item.get(104).toString().equals("null") ? BigDecimal.ZERO : item.getBigDecimal(104);
 	}
 	
+	public String getInfo() {
+		return end_date+"净利:" +  netprofit_yoy.intValue() + "、非经:" +  dt_netprofit_yoy.intValue() + "、营收:" + or_yoy.intValue() + ")";
+	}
+	
+	public String getEnd_date() {
+		return end_date;
+	}
+	public void setEnd_date(String end_date) {
+		this.end_date = end_date;
+	}
 	public BigDecimal getOr_yoy() {
 		return or_yoy;
 	}

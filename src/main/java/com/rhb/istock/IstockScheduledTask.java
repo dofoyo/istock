@@ -10,6 +10,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import com.rhb.istock.fdata.sina.FinancialStatementService;
+import com.rhb.istock.fdata.tushare.FdataSpiderTushare;
 import com.rhb.istock.item.ItemService;
 import com.rhb.istock.kdata.KdataService;
 import com.rhb.istock.kdata.spider.KdataRealtimeSpider;
@@ -33,6 +34,10 @@ public class IstockScheduledTask {
 	@Autowired
 	@Qualifier("finaService")
 	FinaService finaService;
+	
+	@Autowired
+	@Qualifier("fdataSpiderTushare")
+	FdataSpiderTushare fdataSpiderTushare;
 	
 /*	@Autowired
 	@Qualifier("financialStatementServiceImp")
@@ -101,7 +106,7 @@ public class IstockScheduledTask {
 			itemService.init();  // 2. 
 			kdataService.downFactors(); // 3. 上一交易日的收盘数据要等开盘前才能下载到, 大约需要15分钟
 			kdataService.downSSEI();
-			kdataService.generateLatestMusters();
+			kdataService.generateLatestMusters(null);
 			kdataService.updateLatestMusters();
 			turtleOperationService.init();  // 4.
 		}
@@ -134,7 +139,7 @@ public class IstockScheduledTask {
 		}
 	}*/
 	
-	@Scheduled(cron="0 40 21 ? * 1-5") //周一至周五，每日18点 执行收盘
+	@Scheduled(cron="0 0 23 ? * 1-5") //周一至周五，每日23点 执行收盘
 	public void downloadKdatas()  throws Exception{
 		System.out.println("run scheduled of '0 0 18 ? * 1-5'");
 		long beginTime=System.currentTimeMillis(); 
@@ -142,7 +147,8 @@ public class IstockScheduledTask {
 		if(this.isTradeDate()) {
 			kdataService.downClosedDatas(LocalDate.now());
 			kdataService.generateMusters(LocalDate.parse("2000-01-01"));   //生成muster，需要192分钟，即3个多小时
-			finaService.generateQuarterCompares();
+			fdataSpiderTushare.downAll();  //财务报告、预告、股东信息等下载
+			//finaService.generateQuarterCompares();
 			//huaService.generateHuaPotentials(LocalDate.now());
 			//huaService.generateLatestHuaFirst();
 			//bavService.generateBAV(LocalDate.now(),13);
@@ -151,7 +157,7 @@ public class IstockScheduledTask {
 		}
 
 		long used = (System.currentTimeMillis() - beginTime)/1000; 
-		System.out.println("用时：" + used + "秒");          
+		System.out.println("执行收盘完成，用时：" + used + "秒");          
 	}
 
 }

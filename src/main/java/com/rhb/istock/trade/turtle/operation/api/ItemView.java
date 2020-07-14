@@ -12,7 +12,7 @@ public class ItemView {
 	private String industry;
 	private String topic;
 	private String label;
-	private String note;
+	private String fina;
 	private String price;
 
 	public ItemView(Map<String, String> map) {
@@ -23,7 +23,7 @@ public class ItemView {
 		this.status = map.get("status");
 		this.industry = map.get("industry");
 		this.area = map.get("area");	
-		this.note = map.get("note");
+		this.fina = map.get("fina");
 		this.topic = map.get("topic");
 		this.label = map.get("label");
 		this.price = map.get("price");
@@ -118,14 +118,14 @@ public class ItemView {
 		this.industry = industry;
 	}
 
-	public String getNote() {
-		return note;
+	public String getFina() {
+		return fina;
 	}
 
-	public void setNote(String note) {
-		this.note = note;
+	public void setFina(String fina) {
+		this.fina = fina;
 	}
-	
+
 	public String getTopic() {
 		return topic;
 	}

@@ -1,9 +1,11 @@
 package com.rhb.istock.fdata.tushare;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +28,60 @@ public class FdataServiceTushare {
 	FdataRepositoryTushare fdataRepositoryTushare;
 
 	protected static final Logger logger = LoggerFactory.getLogger(FdataServiceTushare.class);
+	
+	public Map<String,String> getFinaGrowthRatioInfo(Set<String> ids){
+		Map<String, String> info =  new HashMap<String,String>();
+		
+		String[] endDate = this.getEndDate();
+		Map<String,FinaIndicator> indicators;
+		Map<String,FinaForecast> forecasts;
+		FinaIndicator indicator;
+		FinaForecast forecast;
+		
+		for(String id : ids) {
+			indicators = fdataRepositoryTushare.getIndicators(id);
+			indicator = indicators.get(endDate[0]);
+			if(indicator!=null) {
+				info.put(id, indicator.getInfo());
+			}else {
+				forecasts = fdataRepositoryTushare.getForecasts(id);
+				forecast = forecasts.get(endDate[0]);
+				if(forecast != null) {
+					info.put(id, forecast.getInfo());
+				}else {
+					indicator = indicators.get(endDate[1]);
+					if(indicator!=null) {
+						info.put(id, indicator.getInfo());
+					}
+				}
+			}
+		}
+		
+		return info;
+	}
+	
+	private String[] getEndDate() {
+		String[] endDate = new String[2];
+		LocalDate today = LocalDate.now();
+		int y = today.getYear();
+		int m = today.getMonthValue();
+		int d = today.getDayOfMonth();
+		if(m>=1 && m<5){
+			endDate[0] = Integer.toString(y-1) + "1231";
+			endDate[1] = Integer.toString(y-1) + "0930";
+		}else if(m>=5 && m<7){
+			endDate[0] = Integer.toString(y) + "0331";
+			endDate[1] = Integer.toString(y-1) + "1231";
+		}else if(m>=7 && m<10){
+			endDate[0] = Integer.toString(y) + "0630";
+			endDate[1] = Integer.toString(y-1) + "0331";
+		}else if(m>=10){
+			endDate[0] = Integer.toString(y) + "0930";
+			endDate[1] = Integer.toString(y-1) + "0630";
+		}
+		
+		return endDate;
+	}
 	
 	public List<String> getGrowModels(String b_date, String e_date,Integer n) {
 		long beginTime=System.currentTimeMillis(); 

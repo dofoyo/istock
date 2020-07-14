@@ -70,8 +70,8 @@ public class FdataSpiderTushareTest {
 	}
 
 	@Test
-	public void downFloatholders1() {
-		String period = "20200331";
-		fdataSpiderTushare.downFloatholders(period);
+	public void downAll() {
+		//String period = "20200331";
+		fdataSpiderTushare.downAll();
 	}
 }

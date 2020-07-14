@@ -198,7 +198,7 @@ public class KdataServiceImp implements KdataService{
 			kdataSpider163.downKdatas(sseiID);
 			evictKDataCache();
 			
-			this.generateLatestMusters(); //此方法每天开盘时执行一次
+			this.generateLatestMusters(null); //此方法每天开盘时执行一次
 		}
 	}
 
@@ -405,11 +405,13 @@ public class KdataServiceImp implements KdataService{
 
 
 	@Override
-	public void generateLatestMusters() {
+	public void generateLatestMusters(LocalDate date) {
 		long beginTime=System.currentTimeMillis(); 
 		logger.info("generateLatestMusters ......");
 		
-		LocalDate date = kdataRealtimeSpider.getLatestMarketDate("sh000001");
+		if(date == null) {
+			date = kdataRealtimeSpider.getLatestMarketDate("sh000001");
+		}
 
 		//LocalDate date = kdataRepository.getLastDate();
 		Integer count = 0, nullCount=0;
@@ -555,29 +557,23 @@ public class KdataServiceImp implements KdataService{
 		return musters;
 	}
 
-
 	@Override
 	public void updateLatestMustersOfFavors() {
 		Set<String> ids = favorServiceImp.getFavors().keySet();
 		LocalDate date = this.getLatestMarketDate("sh000001");
 		Map<String,Muster> musters = this.getMusters(date);
-		Map<String,Muster> favors = new HashMap<String,Muster>();
-		for(Map.Entry<String, Muster> entry : musters.entrySet()) {
-			if(ids.contains(entry.getKey())) {
-				favors.put(entry.getKey(), entry.getValue());
-			}
-		}
-		this.updateMusters(date, favors);
+
+		this.updateMusters(date, musters, ids);
 	}
 	
 	@Override
 	public void updateLatestMusters() {
 		LocalDate date = this.getLatestMarketDate("sh000001");
 		Map<String,Muster> musters = this.getMusters(date);
-		this.updateMusters(date, musters);
+		this.updateMusters(date, musters, musters.keySet());
 	}
 
-	private void updateMusters(LocalDate date, Map<String,Muster> musters) {
+	private void updateMusters(LocalDate date, Map<String,Muster> musters, Set<String> ids) {
 		long beginTime=System.currentTimeMillis(); 
 		logger.info("updateLatestMusters ......");
 
@@ -589,7 +585,7 @@ public class KdataServiceImp implements KdataService{
 
 			kbar = this.getLatestMarketData(muster.getItemID());
 			if(kbar==null) {
-				this.generateLatestMusters();
+				this.generateLatestMusters(null);
 				kbar = this.getLatestMarketData(muster.getItemID());
 			}
 			if(kbar!=null) {

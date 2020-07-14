@@ -34,6 +34,10 @@ public class FinaForecast {
 		
 	}
 	
+	public String getInfo() {
+		return end_date+"净利润预计" +  p_change_min.intValue() + "～" +  p_change_max.intValue();
+	}
+	
 	public String getTs_code() {
 		return ts_code;
 	}
