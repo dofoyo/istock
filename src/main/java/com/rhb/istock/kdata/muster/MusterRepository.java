@@ -10,6 +10,7 @@ public interface MusterRepository {
 	public void saveMusters(LocalDate date,List<MusterEntity> musterEntities);
 	
 	public void saveMuster(LocalDate date, MusterEntity entity);
+	public void saveMuster(LocalDate date, String txt);
 	public void saveTmpMuster(LocalDate date, MusterEntity entity);
 	
 	public boolean isMustersExist(LocalDate date);

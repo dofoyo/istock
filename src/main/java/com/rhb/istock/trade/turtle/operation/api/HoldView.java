@@ -13,6 +13,7 @@ public class HoldView {
 	private String topic;
 	private String status;
 	private String favor;
+	private String fina;
 	
 	public String getFavor() {
 		return favor;
@@ -32,6 +33,14 @@ public class HoldView {
 		}
 	}
 	
+	public String getFina() {
+		return fina;
+	}
+
+	public void setFina(String fina) {
+		this.fina = fina;
+	}
+
 	public String getStatus() {
 		return status;
 	}

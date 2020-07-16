@@ -41,7 +41,6 @@ public class B21Service {
 
 	public Map<String,String> isB21(List<String> itemIDs, LocalDate endDate) {
 		Map<String,String> results = new HashMap<String,String>();
-
 		Integer previous_period = 13;
 		Map<String,Muster> musters = kdataService.getMusters(endDate);
 		List<Map<String,Muster>> previous = kdataService.getPreviousMusters(previous_period, endDate);
@@ -96,9 +95,10 @@ public class B21Service {
 			}
 		}
 		
-		if(lowest!=null) {
-			ratio = Functions.growthRate(price, lowest);
+		if(lowest==null || lowest.compareTo(BigDecimal.ZERO)==0) {
+			lowest = price;
 		}
+		ratio = Functions.growthRate(price, lowest);
 		//logger.info(String.format("%s, lowest=%.2f, highest=%.2f, ratio=%d", itemID, lowest, price,ratio));
 		return ratio;
 	}

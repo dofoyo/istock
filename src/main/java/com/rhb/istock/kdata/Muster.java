@@ -2,6 +2,7 @@ package com.rhb.istock.kdata;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
+import java.time.LocalDate;
 
 import com.rhb.istock.comm.util.Functions;
 
@@ -9,6 +10,7 @@ public class Muster {
 	private String itemID;
 	private String itemName;
 	private String industry;
+	private LocalDate date;
 	private BigDecimal close; 		//上一交易日收盘价
 	private Integer limited;        //当日是否一字板
 	private BigDecimal latestPrice;  //当日收盘价
@@ -44,6 +46,14 @@ public class Muster {
 	private BigDecimal prviousAverageAmount=null;
 	private Integer prviousAverageGap=null;
 	
+	public LocalDate getDate() {
+		return date;
+	}
+
+	public void setDate(LocalDate date) {
+		this.date = date;
+	}
+
 	public Integer getMaxRate() {
 		return Functions.growthRate(this.getLatestHighest(), this.close);
 	}

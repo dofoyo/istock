@@ -111,7 +111,7 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 		
 		Map<String, String> favors = selectorService.getFavors();
 		List<HoldEntity> entities = selectorService.getHolds();
-		Map<String,QuarterCompare> qcs = finaService.getQuarterCompares();
+		Map<String,String> finas = fdataServiceTushare.getFinaGrowthRatioInfo(favors.keySet());
 		
 		List<String> holdIDs = new ArrayList<String>();
 		for(HoldEntity entity : entities) {
@@ -142,8 +142,8 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 				hold.setTopic(this.getTopic(item.getItemID()));
 				hold.setLabel(entity.getLabel());
 				hold.setFavor(favors.get(item.getItemID()));
-				if(qcs.get(item.getItemID())!=null) {
-					hold.addFavor(qcs.get(item.getItemID()).getInfo());
+				if(finas.get(item.getItemID())!=null) {
+					hold.setFina(finas.get(item.getItemID()));
 				}
 				hold.setStatus(b21s.get(item.getItemID()));
 				

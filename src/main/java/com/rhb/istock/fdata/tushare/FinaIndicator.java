@@ -31,7 +31,7 @@ public class FinaIndicator {
 	}
 	
 	public String getInfo() {
-		return end_date+"净利:" +  netprofit_yoy.intValue() + "、非经:" +  dt_netprofit_yoy.intValue() + "、营收:" + or_yoy.intValue() + ")";
+		return end_date+"净利:" +  netprofit_yoy.intValue() + "、非经:" +  dt_netprofit_yoy.intValue() + "、营收:" + or_yoy.intValue() + "";
 	}
 	
 	public String getEnd_date() {

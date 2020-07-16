@@ -133,4 +133,12 @@ public class ItemView {
 	public void setTopic(String topic) {
 		this.topic = topic;
 	}
+
+	@Override
+	public String toString() {
+		return "ItemView [itemID=" + itemID + ", code=" + code + ", name=" + name + ", status=" + status + ", area="
+				+ area + ", industry=" + industry + ", topic=" + topic + ", label=" + label + ", fina=" + fina
+				+ ", price=" + price + "]";
+	}
+	
 }

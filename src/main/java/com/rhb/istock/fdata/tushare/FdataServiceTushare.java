@@ -74,10 +74,10 @@ public class FdataServiceTushare {
 			endDate[1] = Integer.toString(y-1) + "1231";
 		}else if(m>=7 && m<10){
 			endDate[0] = Integer.toString(y) + "0630";
-			endDate[1] = Integer.toString(y-1) + "0331";
+			endDate[1] = Integer.toString(y) + "0331";
 		}else if(m>=10){
 			endDate[0] = Integer.toString(y) + "0930";
-			endDate[1] = Integer.toString(y-1) + "0630";
+			endDate[1] = Integer.toString(y) + "0630";
 		}
 		
 		return endDate;

@@ -1,6 +1,9 @@
 package com.rhb.istock.fdata.tushare;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -59,7 +62,7 @@ public class FdataServiceTest {
 		System.out.println(models.size());
 	}
 	
-	@Test
+	//@Test
 	public void getGrowModel() {
 		String itemID = "sz300022";
 		String b_date = "20190331";
@@ -69,6 +72,16 @@ public class FdataServiceTest {
 		GrowModel model = fdataServiceTushare.getGrowModel(itemID, "",b_date, e_date,n);
 		
 		System.out.println(model);
+	}
+	
+	@Test
+	public void getFinaGrowthRatioInfo() {
+		Set<String> ids = new HashSet<String>();
+		ids.add("sz002426");
+		
+		Map<String,String> result = fdataServiceTushare.getFinaGrowthRatioInfo(ids);
+		
+		System.out.println(result);
 	}
 	
 }

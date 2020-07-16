@@ -12,6 +12,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import com.rhb.istock.kdata.api.KdatasView;
 import com.rhb.istock.trade.turtle.operation.TurtleOperationService;
 import com.rhb.istock.trade.turtle.operation.api.HoldView;
+import com.rhb.istock.trade.turtle.operation.api.ItemView;
 import com.rhb.istock.trade.turtle.operation.api.TurtleView;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -22,25 +23,11 @@ public class TurtleOperationServiceTest {
 	TurtleOperationService turtleService;
 
 	@Test
-	public void getPotentials() {
-		List<TurtleView> views = turtleService.getPotentials("hlb");
-		for(TurtleView view : views) {
-			System.out.print(view.getItemID() + ",");
+	public void getFavors() {
+		List<ItemView> views = turtleService.getFavors();
+		for(ItemView view : views) {
+			System.out.print(view);
 		}	
-/*		
-		try {
-			Thread.sleep(10000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		System.out.println("---**************************--------------");
-		
-		views = turtleService.getPotentials();
-		for(TurtleView view : views) {
-			System.out.println(view);
-		}	*/
 	}
 	
 	//@Test

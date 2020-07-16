@@ -64,6 +64,12 @@ public class MusterRepositoryImp implements MusterRepository{
 		String pathAndFile = musterPath + "/" + date.format(DateTimeFormatter.ofPattern("yyyyMMdd")) +  "_" + openDuration+"_" + dropDuration + "_musters.txt";
 		FileTools.writeTextFile(pathAndFile, entity.toText(), true);
 	}
+	
+	@Override
+	public void saveMuster(LocalDate date, String txt) {
+		String pathAndFile = musterPath + "/" + date.format(DateTimeFormatter.ofPattern("yyyyMMdd")) +  "_" + openDuration+"_" + dropDuration + "_musters.txt";
+		FileTools.writeTextFile(pathAndFile, txt, true);
+	}
 
 
 	@Override

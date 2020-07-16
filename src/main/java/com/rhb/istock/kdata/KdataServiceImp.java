@@ -522,6 +522,7 @@ public class KdataServiceImp implements KdataService{
 			item = itemService.getItem(entity.getItemID());
 			if(item!=null) {
 				muster = this.getMuster(entity);
+				muster.setDate(date);
 				muster.setItemName(item.getName());
 				muster.setIndustry(item.getIndustry());
 				musters.put(muster.getItemID(),muster);

@@ -17,6 +17,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.rhb.istock.kdata.Muster;
 import com.rhb.istock.kdata.spider.KdataFromDZHByClipboard;
+import com.rhb.istock.kdata.Kbar;
 import com.rhb.istock.kdata.KdataService;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -32,6 +33,14 @@ public class KdataServiceTest {
 		//kdataService.generateMusters(date);
 		kdataService.generateLatestMusters(null);
 		kdataService.updateLatestMusters();
+	}
+	
+	//@Test
+	public void test() {
+		String itemID = "sh600673";
+		Kbar bar =  kdataService.getLatestMarketData(itemID);
+		System.out.println(bar);
+
 	}
 	
 	

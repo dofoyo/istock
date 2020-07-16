@@ -112,6 +112,16 @@ public class ForecastView extends ItemView {
 	public void setIndicator_price_up_max(String indicator_price_up_max) {
 		this.indicator_price_up_max = indicator_price_up_max;
 	}
+
+	@Override
+	public String toString() {
+		return "ForecastView [previous_netprofit_yoy=" + previous_netprofit_yoy + ", previous_dt_netprofit_yoy="
+				+ previous_dt_netprofit_yoy + ", previous_or_yoy=" + previous_or_yoy + ", forecast_date="
+				+ forecast_date + ", forecast_netprofit_yoy_max=" + forecast_netprofit_yoy_max
+				+ ", forecast_price_up_max=" + forecast_price_up_max + ", indicator_date=" + indicator_date
+				+ ", indicator_netprofit_yoy=" + indicator_netprofit_yoy + ", indicator_dt_netprofit_yoy="
+				+ indicator_dt_netprofit_yoy + ", indicator_price_up_max=" + indicator_price_up_max + "]";
+	}
 	
 	
 
