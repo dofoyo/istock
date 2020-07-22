@@ -91,7 +91,7 @@ public class B21Service {
 		for(Map<String,Muster> ms : musters) {
 			m = ms.get(itemID);
 			if(m!=null) {
-				lowest = (lowest==null || lowest.compareTo(m.getLatestLowest())==1) ? m.getLatestLowest() : lowest;
+				lowest = (lowest==null || lowest.compareTo(m.getLatestPrice())==1) ? m.getLatestPrice() : lowest;
 			}
 		}
 		

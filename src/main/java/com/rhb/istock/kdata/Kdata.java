@@ -41,10 +41,11 @@ public class Kdata {
 		if(highest==null || lowest ==null) {
 			return 0;
 		}else {
+			Integer ratio = Functions.growthRate(p1, lowest);
 			//logger.info("ssei ratio's begin date:" + bars.firstKey() + ", end date: " + bars.lastKey());
-			//logger.info(String.format("ssei, lowest=%.2f, highest=%.2f, ratio=%d", lowest, highest,Functions.growthRate(highest, lowest)));
+			//logger.info(String.format("ssei, lowest=%.2f, price=%.2f, ratio=%d", lowest, p1,ratio));
 
-			return Functions.growthRate(p1, lowest);
+			return ratio;
 		}
 	}
 	
@@ -237,8 +238,8 @@ public class Kdata {
 			) {
 		this.bars.put(date, new Kbar(open, high, low, close, amount, quantity,date, 
 				turnover_rate_f, volume_ratio,total_mv,circ_mv,total_share,float_share,free_share,pe));
-		this.highest = (this.highest==null || this.highest.compareTo(high)==-1) ? high : this.highest;
-		this.lowest = (this.lowest==null || this.lowest.compareTo(low)==1) ? low : this.lowest;
+		this.highest = (this.highest==null || this.highest.compareTo(close)==-1) ? close : this.highest;
+		this.lowest = (this.lowest==null || this.lowest.compareTo(close)==1) ? close : this.lowest;
 		
 	}
 	

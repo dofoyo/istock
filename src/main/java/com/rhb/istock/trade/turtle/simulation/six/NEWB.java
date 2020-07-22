@@ -70,7 +70,7 @@ public class NEWB {
 				}
 				
 				//走势弱于大盘
-				ratio = this.getRatio(previous, itemID, muster.getLatestHighest());
+				ratio = this.getRatio(previous, itemID, muster.getLatestPrice());
 				if(ratio < sseiRatio) {
 					account.dropWithTax(itemID, "2", muster.getLatestPrice());
 					droped = true;
@@ -190,7 +190,7 @@ public class NEWB {
 		for(Map<String,Muster> ms : musters) {
 			m = ms.get(itemID);
 			if(m!=null) {
-				lowest = (lowest==null || lowest.compareTo(m.getLatestLowest())==1) ? m.getLatestLowest() : lowest;
+				lowest = (lowest==null || lowest.compareTo(m.getLatestPrice())==1) ? m.getLatestPrice() : lowest;
 			}
 		}
 		

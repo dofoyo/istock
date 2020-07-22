@@ -75,7 +75,7 @@ public class Drum {
 				}
 
 				//走势弱于大盘
-				ratio = this.getRatio(previous, itemID, muster.getLatestHighest());
+				ratio = this.getRatio(previous, itemID, muster.getLatestPrice());
 				if(ratio < sseiRatio) {
 					account.dropWithTax(itemID, "2", muster.getLatestPrice());
 					droped = true;
@@ -181,7 +181,7 @@ public class Drum {
 			p = previous.get(0).get(m.getItemID());
 			if(m!=null && p!=null) {
 				ratio = Functions.growthRate(m.getAveragePrice21(), m.getAveragePrice());
-				r = getRatio(previous,m.getItemID(),m.getLatestPrice());
+				r = this.getRatio(previous,m.getItemID(),m.getLatestPrice());
 				if(!m.isUpLimited() && !m.isDownLimited()
 					&& r>0
 					&& r >= sseiRatio   // 强于大盘
@@ -208,8 +208,10 @@ public class Drum {
 		for(Map<String,Muster> ms : musters) {
 			m = ms.get(itemID);
 			if(m!=null) {
-				lowest = (lowest==null || lowest.compareTo(m.getLatestLowest())==1) ? m.getLatestLowest() : lowest;
+				lowest = (lowest==null || lowest.compareTo(m.getLatestPrice())==1) ? m.getLatestPrice() : lowest;
+				//logger.info(String.format("%s, date=%s, price=%.2f", itemID, m.getDate().toString(), m.getLatestPrice()));
 			}
+			
 		}
 		
 		if(lowest!=null && lowest.compareTo(BigDecimal.ZERO)>0) {

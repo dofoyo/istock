@@ -90,7 +90,7 @@ public class TurtleMusterSimulation {
 			
 			if(musters!=null && musters.size()>0) {
 				previous.add(musters);
-				if(previous.size()>=previous_period) {
+				if(previous.size()>previous_period) {
 					previous.remove(0);
 				}
 				
