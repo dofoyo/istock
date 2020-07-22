@@ -42,7 +42,7 @@ public class KdataSpiderTest {
 		kdataSpiderTushare.downFactors(itemID);
 	}
 	
-	//@Test
+	@Test
 	public void testDownKdataByIDs() {
 		long beginTime=System.currentTimeMillis(); 
 

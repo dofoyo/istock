@@ -112,7 +112,7 @@ public class KdataServiceImp implements KdataService{
 		
 		KdataEntity entity = this.getEntity(itemID, byCache);
 		
-		for(int i=0,j=0; i<count && j<entity.getBarSize(); j++) {
+		for(int i=1,j=0; i<count && j<entity.getBarSize(); j++) {
 			bar = entity.getBar(date);
 			if(bar!=null) {
 				//System.out.println(date.toString() + ":" + bar.toString());
@@ -695,6 +695,10 @@ public class KdataServiceImp implements KdataService{
 	@Override
 	public Integer getSseiRatio(LocalDate date, Integer period) {
 		Kdata ssei = this.getKdata(sseiID, date.plusDays(1), period, true);
+		if(!ssei.getLastBar().getDate().equals(date)) {
+			ssei.addBar(date, this.getLatestMarketData(sseiID));
+			//ssei.removeFirstBar();
+		}
 		return ssei.getRatio();
 	}
 
@@ -795,7 +799,7 @@ public class KdataServiceImp implements KdataService{
 			}
 			i++;
 		}
-		ds = dates.subList(i>=count ? i-count+1 : 0, i);
+		ds = dates.subList(i>=count ? i-count : 0, i);
 		
 		return ds;
 	}
@@ -822,9 +826,12 @@ public class KdataServiceImp implements KdataService{
 	public List<Map<String, Muster>> getPreviousMusters(Integer previous_period, LocalDate endDate) {
 		List<Map<String, Muster>> musters = new ArrayList<Map<String,Muster>>();
 		List<LocalDate> previousDates = this.getMusterDates(previous_period, endDate);
+		//StringBuffer sb = new StringBuffer("previous musters dates:");
 		for(LocalDate date : previousDates) {
 			musters.add(this.getMusters(date));
+			//sb.append(date.toString() + ",");
 		}
+		//logger.info(sb.toString());
 		return musters;
 	}
 

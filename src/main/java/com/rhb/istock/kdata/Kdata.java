@@ -25,6 +25,9 @@ public class Kdata {
 	
 	protected static final Logger logger = LoggerFactory.getLogger(Kdata.class);
 	
+	public void removeFirstBar() {
+		this.bars.remove(this.bars.firstKey());
+	}
 	public Kdata(String itemID) {
 		this.itemID = itemID;
 		this.bars = new TreeMap<LocalDate,Kbar>();
@@ -38,6 +41,7 @@ public class Kdata {
 		if(highest==null || lowest ==null) {
 			return 0;
 		}else {
+			//logger.info("ssei ratio's begin date:" + bars.firstKey() + ", end date: " + bars.lastKey());
 			//logger.info(String.format("ssei, lowest=%.2f, highest=%.2f, ratio=%d", lowest, highest,Functions.growthRate(highest, lowest)));
 
 			return Functions.growthRate(p1, lowest);

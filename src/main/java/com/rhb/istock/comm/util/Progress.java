@@ -4,7 +4,7 @@ public class Progress{
         System.out.print("\r");
 		//double rate = 1.0 * now / total;
 		//System.out.print(String.format(" %.2f%%", rate * 100));
-		System.out.format(" %.2f%%  %s", 1.0 * now / total * 100, note);
+		System.out.format(" %.2f%% %d/%d %s", 1.0 * now / total * 100, now, total, note);
 		if(now==total) {
 			System.out.println("\n");
 		}
