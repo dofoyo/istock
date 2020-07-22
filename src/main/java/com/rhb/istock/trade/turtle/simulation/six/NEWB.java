@@ -34,7 +34,7 @@ public class NEWB {
 	
 	private StringBuffer dailyAmount_sb = new StringBuffer("date,cash,value,total\n");
 	private StringBuffer breakers_sb = new StringBuffer();
-	private Integer pool = 55;
+	private Integer pool = 89;
 	private Integer top = 1;
 	private Integer type = 1;// 1 - 高价， 0 - 低价
 	
@@ -167,9 +167,18 @@ public class NEWB {
 			});
 		}
 		
+		List<Muster> ms = musters.subList(0, musters.size()>=pool ? pool : musters.size());
+		
+		Collections.sort(ms, new Comparator<Muster>() {
+			@Override
+			public int compare(Muster o1, Muster o2) {
+				return o1.getHLGap().compareTo(o2.getHLGap()); //横盘
+			}
+		});
+		
 		Muster m;
-		for(int i=0; i<musters.size() && breakers.size()<top && i<this.pool; i++) {
-			m = musters.get(i);
+		for(int i=0; i<ms.size() && breakers.size()<top; i++) {
+			m = ms.get(i);
 			if(m!=null 
 					&& !m.isUpLimited() 
 					&& m.isUpBreaker() 

@@ -177,7 +177,8 @@ public class B21 {
 					&& m.getHLGap()<=55 //股价还没飞涨
 					&& !holds.contains(m.getItemID())
 					&& (m.getAverageGap()<8  //均线在8%范围内纠缠
-							|| m.getAveragePrice21().compareTo(p.getAveragePrice21())==1  //上升趋势
+							|| (m.getAveragePrice21().compareTo(p.getAveragePrice21())==1  //上升趋势
+								&& m.getAveragePrice().compareTo(p.getAveragePrice())==1)
 							|| m.getAverageAmount().compareTo(p.getAverageAmount())==1)  // 放量
 					) {
 				
