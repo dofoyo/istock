@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import com.rhb.istock.comm.util.Progress;
 import com.rhb.istock.item.ItemService;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -76,7 +78,9 @@ public class FdataRepositoryTushareTest {
 	//@Test
 	public void getFloatholders() {
 		String itemID = "sh603399";
-		List<Floatholder> holders = fdataRepositoryTushare.getFloatholders(itemID);
+		String[] end_dates = {"20200331","20191231"};
+
+		Set<Floatholder> holders = fdataRepositoryTushare.getFloatholders(itemID, end_dates);
 		for(Floatholder holder : holders) {
 			System.out.println(holder);
 		}
@@ -85,14 +89,20 @@ public class FdataRepositoryTushareTest {
 	@Test
 	public void getHolders() {
 		Map<String,Integer> holderIds = new HashMap<String,Integer>();
-		String str = "陕国投";
-		List<Floatholder> holders;
-		List<String> ids = itemService.getItemIDs();
-		Integer count;
+		String str = "潘宇红";
+		Set<Floatholder> holders;
+		//List<String> ids = itemService.getItemIDs();
+		List<String> ids = new ArrayList<String>();
+		ids.add("sz002428");
+		String[] end_dates = {"20200331","20191231"};
+		Integer count, i=1;
 		for(String id : ids) {
-			holders = fdataRepositoryTushare.getFloatholders(id);
+			Progress.show(ids.size(),i++, " getFloatholders: " + id);//进度条
+			holders = fdataRepositoryTushare.getFloatholders(id, end_dates);
 			for(Floatholder holder : holders) {
+				//System.out.print(holder.getHolder_name());
 				if(holder.getHolder_name().contains(str)) {
+					//System.out.println(",yes");
 					count = holderIds.get(holder.getTs_code());
 					if(count == null) {
 						count = 1;
@@ -100,6 +110,8 @@ public class FdataRepositoryTushareTest {
 						count ++;
 					}
 					holderIds.put(holder.getTs_code(), count);
+				}else {
+					//System.out.println(",no");
 				}
 			}			
 		}

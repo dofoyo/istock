@@ -2,6 +2,7 @@ package com.rhb.istock.fdata.tushare;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -154,7 +155,7 @@ public class FdataRepositoryTushare {
 			JSONArray items = basicObject.getJSONArray("items");
 			if(items.length()>0) {
 				JSONArray item;
-				String ann_date,end_date;
+				String end_date;
 				FinaForecast forecast;
 				for(int i=0; i<items.length()-1; i++) {
 					item = items.getJSONArray(i);
@@ -168,20 +169,36 @@ public class FdataRepositoryTushare {
 		return indicators;
 	}
 	
-	public	List<Floatholder> getFloatholders(String itemID){
-		List<Floatholder> holders = new ArrayList<Floatholder>();
+	public	Set<Floatholder> getFloatholders(String itemID, String[] periods){
+		Set<Floatholder> holders = new HashSet<Floatholder>();
 		
-		String fdataFile = fdataPath + "/" + itemID + "_floatholders.json";
+		String fdataFile = fdataPath + "/" + itemID + "_top10_floatholders.json";
 		if(FileTools.isExists(fdataFile)) {
 			JSONObject basicObject = new JSONObject(FileTools.readTextFile(fdataFile));
 			JSONArray items = basicObject.getJSONArray("items");
 			if(items.length()>0) {
 				JSONArray item;
 				Floatholder holder;
+				String end_date;
 				for(int i=0; i<items.length()-1; i++) {
 					item = items.getJSONArray(i);
-					holder = new Floatholder(item);
-					holders.add(holder);
+					end_date = item.getString(2);
+					if(end_date.equals(periods[0])) {
+						holder = new Floatholder(item);
+						holders.add(holder);
+					}
+				}
+				
+				if(holders.size()==0) {
+					for(int i=0; i<items.length()-1; i++) {
+						item = items.getJSONArray(i);
+						end_date = item.getString(2);
+						if(end_date.equals(periods[1])) {
+							holder = new Floatholder(item);
+							holders.add(holder);
+						}
+					}
+					
 				}
 			}
 		}

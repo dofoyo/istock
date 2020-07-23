@@ -74,7 +74,7 @@ public class FdataServiceTest {
 		System.out.println(model);
 	}
 	
-	@Test
+	//@Test
 	public void getFinaGrowthRatioInfo() {
 		Set<String> ids = new HashSet<String>();
 		ids.add("sz002426");
@@ -82,6 +82,17 @@ public class FdataServiceTest {
 		Map<String,String> result = fdataServiceTushare.getFinaGrowthRatioInfo(ids);
 		
 		System.out.println(result);
+	}
+	
+	@Test
+	public void getFloatholders() {
+		Set<String> names = new HashSet<String>();
+		names.add("潘宇红");
+		names.add("章建平");
+		names.add("葛卫东");
+		names.add("陕国投");
+		Map<String,Map<String,Integer>> hs = fdataServiceTushare.getFloatholders(names);
+		System.out.println(hs);
 	}
 	
 }

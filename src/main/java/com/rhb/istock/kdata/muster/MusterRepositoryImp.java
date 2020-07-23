@@ -51,8 +51,10 @@ public class MusterRepositoryImp implements MusterRepository{
 			String[] columns;
 			String[] lines = source.split("\n");
 			for(int i=1; i<lines.length; i++) {
-				columns = lines[i].split(",");
-				entities.put(columns[0], new MusterEntity(lines[i]));
+				if(!lines[i].isEmpty()) {
+					columns = lines[i].split(",");
+					entities.put(columns[0], new MusterEntity(lines[i]));
+				}
 			}			
 		}
 		
@@ -68,7 +70,7 @@ public class MusterRepositoryImp implements MusterRepository{
 	@Override
 	public void saveMuster(LocalDate date, String txt) {
 		String pathAndFile = musterPath + "/" + date.format(DateTimeFormatter.ofPattern("yyyyMMdd")) +  "_" + openDuration+"_" + dropDuration + "_musters.txt";
-		FileTools.writeTextFile(pathAndFile, txt, true);
+		FileTools.writeTextFile(pathAndFile, txt, false);
 	}
 
 

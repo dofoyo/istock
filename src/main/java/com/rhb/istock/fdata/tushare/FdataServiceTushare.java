@@ -29,10 +29,59 @@ public class FdataServiceTushare {
 
 	protected static final Logger logger = LoggerFactory.getLogger(FdataServiceTushare.class);
 	
+	/*
+	 * 返回一只股票,包含了几个机构,每个机构有几个理财项目
+	 * 
+	 * 
+	 */
+	public Map<String,Map<String, Integer>> getFloatholders(Set<String> names){
+		Map<String,Map<String, Integer>> holders = new HashMap<String,Map<String, Integer>>();
+		Set<Floatholder> hs;
+		String holderName;
+		Integer count;
+		Map<String,Integer> holder_count; 
+		String[] end_dates = this.getEndDates();
+		List<String> ids = itemService.getItemIDs();
+/*		List<String> ids = new ArrayList<String>();
+		ids.add("sz002428");
+		ids.add("sh603718");
+		ids.add("sh603399");
+*/		int i=1;
+		for(String id : ids) {
+			Progress.show(ids.size(),i++, " getFloatholders: " + id);//进度条
+			hs = fdataRepositoryTushare.getFloatholders(id,end_dates);
+			for(Floatholder h : hs) {
+				holderName = h.getHolder_name();
+				//System.out.println(holderName);
+				for(String name : names) {
+					if(holderName.contains(name)) {
+						//System.out.println(id + "'s holder " + name);
+						holder_count = holders.get(id);
+						if(holder_count==null) {
+							holder_count = new HashMap<String,Integer>();
+							holder_count.put(name, 1);
+							//System.out.println(holder_count);
+						}else {
+							//System.out.println(holder_count);
+							count = holder_count.get(name);
+							//System.out.println("count = " + count);
+							count = count==null? 1 : ++count;
+							holder_count.put(name, count);
+						}
+
+						holders.put(id, holder_count);
+					}
+				}
+			}
+		}
+		
+		return holders;
+	}
+	
 	public Map<String,String> getFinaGrowthRatioInfo(Set<String> ids){
 		Map<String, String> info =  new HashMap<String,String>();
 		
-		String[] endDate = this.getEndDate();
+		String[] endDate = this.getEndDates();
 		Map<String,FinaIndicator> indicators;
 		Map<String,FinaForecast> forecasts;
 		FinaIndicator indicator;
@@ -60,7 +109,7 @@ public class FdataServiceTushare {
 		return info;
 	}
 	
-	private String[] getEndDate() {
+	private String[] getEndDates() {
 		String[] endDate = new String[2];
 		LocalDate today = LocalDate.now();
 		int y = today.getYear();

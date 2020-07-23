@@ -211,6 +211,9 @@ public class Kdata {
 	}
 	
 	public Kbar getLastBar() {
+		if(this.bars.size()==0 || this.bars.lastEntry()==null) {
+			return null;
+		}
 		return this.bars.lastEntry().getValue();
 	}
 

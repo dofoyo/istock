@@ -112,7 +112,7 @@ public class KdataServiceImp implements KdataService{
 		
 		KdataEntity entity = this.getEntity(itemID, byCache);
 		
-		for(int i=1,j=0; i<count && j<entity.getBarSize(); j++) {
+		for(int i=0,j=0; i<count && j<entity.getBarSize(); j++) {
 			bar = entity.getBar(date);
 			if(bar!=null) {
 				//System.out.println(date.toString() + ":" + bar.toString());
@@ -338,9 +338,22 @@ public class KdataServiceImp implements KdataService{
 	private MusterEntity getMusterEntity(String itemID, LocalDate endDate, boolean cache) {
 		Kdata kdata = this.getKdata(itemID,endDate,openDuration,cache); //不包含endDate
 		
-		if(kdata==null || kdata.getSize()<openDuration) return null;  //此行很重要，涉及averageAmount和dropPrice的准确性
-		
+/*		if(kdata==null) {
+			System.out.println("kdata is null!!!");
+			return null;  //此行很重要，涉及averageAmount和dropPrice的准确性
+		}
+		if(kdata.getSize()<openDuration) {
+			System.out.println("kdata.getSize()=" + kdata.getSize() + " is small " + openDuration);
+			return null;  //此行很重要，涉及averageAmount和dropPrice的准确性
+		}
+		*/
+		//System.out.println("kdata.getSize()=" + kdata.getSize() + " is small " + openDuration);
+
 		Kbar lastBar = kdata.getLastBar(); //是endDate的前一个交易日
+		if(lastBar == null) return null;
+		
+		//System.out.println(lastBar);
+		
 		BigDecimal close = lastBar.getClose();
 		//BigDecimal amount = lastBar.getAmount();
 		BigDecimal trunover_rate_f = lastBar.getTurnover_rate_f();
@@ -407,7 +420,6 @@ public class KdataServiceImp implements KdataService{
 	@Override
 	public void generateLatestMusters(LocalDate date) {
 		long beginTime=System.currentTimeMillis(); 
-		logger.info("generateLatestMusters ......");
 		
 		if(date == null) {
 			date = kdataRealtimeSpider.getLatestMarketDate("sh000001");
@@ -416,12 +428,12 @@ public class KdataServiceImp implements KdataService{
 		//LocalDate date = kdataRepository.getLastDate();
 		Integer count = 0, nullCount=0;
 		if(musterRepositoryImp.isMustersExist(date)) {
-			System.out.println("The last musters of " + date + " has already exists! pass!");
+			System.out.println("The latest muster of " + date + " has already exists! pass!");
 		}else {
+			logger.info("generate Latest muster  of " + date + "......");
 			MusterEntity entity;
-			List<MusterEntity> entities = new ArrayList<MusterEntity>();
+			StringBuffer sb = new StringBuffer();
 			
-			itemService.cacheEvict();
 			List<Item> items = itemService.getItems();
 			count = items.size();
 			int i=1;
@@ -430,19 +442,19 @@ public class KdataServiceImp implements KdataService{
 				
 				entity = this.getMusterEntity(item.getItemID(), date, false);
 				if(entity!=null) {
-					entities.add(entity);
-					//musterRepositoryImp.saveMuster(date, entity);
+					sb.append(entity.toText());
+					sb.append("\n");
+					//System.out.println(entity);
 				}else {
 					nullCount ++;
+					System.out.println(item.getItemID() + "'s entity is null!");
 				}
 
 			}
-			
-			musterRepositoryImp.saveMusters(date,entities);
-
+			musterRepositoryImp.saveMuster(date, sb.toString());
 		}
 		
-		logger.info("generateLatestMusters done! There are " + count.toString() + " items. There are "+ nullCount +" + No Data");
+		logger.info("generate Latest Muster done! There are " + count.toString() + " items. There are "+ nullCount +" + No Data");
 		long used = (System.currentTimeMillis() - beginTime)/1000; 
 		logger.info("用时：" + used + "秒");          
 		
