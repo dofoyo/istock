@@ -110,10 +110,11 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 		Muster muster;
 		
 		Map<String, String> favors = selectorService.getFavors();
-		List<HoldEntity> entities = selectorService.getHolds();
 		Map<String,String> finas = fdataServiceTushare.getFinaGrowthRatioInfo(favors.keySet());
 		
 		List<String> holdIDs = new ArrayList<String>();
+
+		List<HoldEntity> entities = selectorService.getHolds();
 		for(HoldEntity entity : entities) {
 			holdIDs.add(entity.getItemID());
 		}

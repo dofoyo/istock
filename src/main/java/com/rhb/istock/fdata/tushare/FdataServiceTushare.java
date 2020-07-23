@@ -3,6 +3,7 @@ package com.rhb.istock.fdata.tushare;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -11,8 +12,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import com.rhb.istock.comm.util.FileTools;
 import com.rhb.istock.comm.util.Progress;
 import com.rhb.istock.item.Item;
 import com.rhb.istock.item.ItemService;
@@ -26,8 +29,35 @@ public class FdataServiceTushare {
 	@Autowired
 	@Qualifier("fdataRepositoryTushare")
 	FdataRepositoryTushare fdataRepositoryTushare;
-
+	
+	@Value("${makersFile}")
+	private String makersFile;
+	
+	private Map<String,Map<String, Integer>> makers;
+	private Set<String> makerNames;
+	
 	protected static final Logger logger = LoggerFactory.getLogger(FdataServiceTushare.class);
+	
+	public Set<String> getMakerNames() {
+		Set<String> names = new HashSet<String> ();
+		String source = FileTools.readTextFile(makersFile);
+		String[] lines = source.split("\n");
+		for(String line : lines) {
+			names.add(line);
+		}
+		return names;
+	}
+	
+	public Map<String,Map<String, Integer>> getFloatholders(){
+		Set<String> mns = this.getMakerNames();
+		if(this.makers==null || mns.size()!=makerNames.size()) {
+			this.makerNames = mns;
+			this.makers = this.getFloatholders(this.makerNames);
+		}
+		
+		return this.makers;
+		
+	}
 	
 	/*
 	 * 返回一只股票,包含了几个机构,每个机构有几个理财项目

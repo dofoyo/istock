@@ -84,14 +84,16 @@ public class FdataServiceTest {
 		System.out.println(result);
 	}
 	
+	//@Test
+	public void getMakerNames() {
+		Set<String> names = fdataServiceTushare.getMakerNames();
+		System.out.println(names);
+	}
+	
+	
 	@Test
 	public void getFloatholders() {
-		Set<String> names = new HashSet<String>();
-		names.add("潘宇红");
-		names.add("章建平");
-		names.add("葛卫东");
-		names.add("陕国投");
-		Map<String,Map<String,Integer>> hs = fdataServiceTushare.getFloatholders(names);
+		Map<String,Map<String,Integer>> hs = fdataServiceTushare.getFloatholders();
 		System.out.println(hs);
 	}
 	

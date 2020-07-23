@@ -5,10 +5,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.rhb.istock.comm.util.FileTools;
+import com.rhb.istock.fdata.tushare.FdataServiceTushare;
 
 @Service("favorServiceImp")
 public class FavorServiceImp implements FavorService {
@@ -17,6 +20,10 @@ public class FavorServiceImp implements FavorService {
 	
 	@Value("${favorsPath}")
 	private String favorsPath;	
+	
+	@Autowired
+	@Qualifier("fdataServiceTushare")
+	FdataServiceTushare fdataServiceTushare;
 	
 	@Override
 	public Map<String, String> getFavors() {
@@ -43,7 +50,32 @@ public class FavorServiceImp implements FavorService {
 			}
 		}
 		
+		Map<String,Map<String,Integer>> holdres = fdataServiceTushare.getFloatholders();
+		for(Map.Entry<String, Map<String,Integer>> entry : holdres.entrySet()) {
+			value = articles.get(entry.getKey());
+			if(value == null) {
+				articles.put(entry.getKey(), this.getMakers(entry.getValue()));
+			}else {
+				articles.put(entry.getKey(), value + "," + this.getMakers(entry.getValue()));
+			}
+			
+		}
+		
 		return articles;
+	}
+	
+	private String getMakers(Map<String,Integer> ms) {
+		StringBuffer sb = new StringBuffer();
+		for(Map.Entry<String, Integer> entry : ms.entrySet()) {
+			if(sb.length()>0) {
+				sb.append(",");
+			}
+			sb.append(entry.getKey());
+			sb.append("(");
+			sb.append(entry.getValue());
+			sb.append(")");
+		}
+		return sb.toString();
 	}
 	
 	private Map<String,String> getAllFavors(){
