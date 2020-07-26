@@ -51,7 +51,7 @@ public class B21Service {
 			String v;
 			for(String id : itemIDs) {
 				m = musters.get(id);
-				p = previous.get(0).get(id);
+				p = this.getPreviousMuster(previous, id);
 				v = "0";
 				if(m!=null && p!=null) {
 					ratio = this.getRatio(previous, m.getItemID(), m.getLatestPrice()); 
@@ -82,6 +82,17 @@ public class B21Service {
 		}
 		
 		return results;
+	}
+	
+	private Muster getPreviousMuster(List<Map<String,Muster>> previous, String id) {
+		Muster m=null;
+		for(Map<String,Muster> ms : previous) {
+			m = ms.get(id);
+			if(m!=null) {
+				break;
+			}
+		}
+		return m;
 	}
 	
 	private Integer getRatio(List<Map<String,Muster>> musters, String itemID, BigDecimal price) {

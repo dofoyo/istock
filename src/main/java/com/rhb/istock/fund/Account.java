@@ -437,7 +437,7 @@ public class Account {
 		if(this.beginDate==null) this.beginDate = date;
 		this.endDate = date;
 	}
-
+	
 	public void refreshHoldsPrice(String itemID, BigDecimal price) {
 		if(states.containsKey(itemID)) states.get(itemID).setLatestPrice(price);
 		
@@ -450,12 +450,28 @@ public class Account {
 		}
 	}
 	
+	public void dropFallOrder(String itemID,Integer rate, String note) {
+		HoldState hs = states.get(itemID);
+		if(hs!=null && hs.getFallRate()<=rate){
+			this.dropWithTax(itemID, note, hs.getLatestPrice());
+		}
+	}
+	
 	public Integer getUpRatio(String itemID) {
 		HoldState hs = states.get(itemID);
 		if(hs!=null && hs.isHold) {
 			return Functions.growthRate(hs.getLatestPrice(), hs.getBuyPrice());
 		}else {
 			return 0;
+		}
+	}
+	
+	public boolean isGain(Integer orderID, Integer ratio) {
+		Order openOrder = holds.get(orderID);
+		if(openOrder.getRatio().compareTo(ratio)==1) {
+			return true;
+		}else {
+			return false;
 		}
 	}
 	
@@ -769,13 +785,21 @@ public class Account {
 		private BigDecimal latestPrice;
 		private Integer holdsDays;
 		private boolean isHold;
+		private BigDecimal highest;
 		
 		public HoldState(String itemID, BigDecimal buyPrice) {
 			this.itemID = itemID;
 			this.buyPrice = buyPrice;
 			this.latestPrice = buyPrice;
+			this.highest = buyPrice;
 			this.holdsDays = 1;
 			this.isHold = true;
+			
+		}
+		
+		
+		public Integer getFallRate() {
+			return Functions.growthRate(this.latestPrice,this.highest);
 		}
 		
 		public boolean isHold() {
@@ -810,6 +834,7 @@ public class Account {
 			if(isHold) {
 				this.latestPrice = latestPrice;
 				this.holdsDays = this.holdsDays + 1;
+				highest = highest.compareTo(latestPrice)==-1 ? latestPrice : highest;
 				//logger.info("itemID=" + this.itemID + ",holdsDays=" + this.holdsDays);
 			}
 		}

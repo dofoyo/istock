@@ -76,6 +76,8 @@ public class NEWB {
 					droped = true;
 				}
 				
+				//高位快速回落超过13%
+				//account.dropFallOrder(itemID, -13,"3");
 			}
 		}
 		

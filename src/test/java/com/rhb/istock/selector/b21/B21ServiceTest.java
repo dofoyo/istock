@@ -1,6 +1,9 @@
 package com.rhb.istock.selector.b21;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -16,4 +19,12 @@ public class B21ServiceTest {
 	@Qualifier("b21Service")
 	B21Service b21Service;
 	
+	@Test
+	public void test() {
+		List<String> ids = new ArrayList<String>();
+		ids.add("sh603488");
+		LocalDate date = LocalDate.now();
+		Map<String,String> ms = b21Service.isB21(ids, date);
+		System.out.println(ms);
+	}
 }

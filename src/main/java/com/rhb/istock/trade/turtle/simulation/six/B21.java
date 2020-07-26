@@ -10,7 +10,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,6 +76,25 @@ public class B21 {
 					account.dropWithTax(itemID, "2", muster.getLatestPrice());
 					droped = true;
 				}
+				
+				//高位快速回落超过13%
+				//account.dropFallOrder(itemID, -13,"3");
+
+				
+/*				//大盘不好,有赚就卖
+				if(sseiFlag==0) {
+					holdItemIDs = account.getItemIDsOfHolds();
+					Set<Integer> orderIDs;
+					for(String id : holdItemIDs) {
+						orderIDs = account.getHoldOrderIDs(id);
+						for(Integer orderID : orderIDs) {
+							if(account.isGain(orderID, 3)) {
+								account.dropWithTax(itemID, "3", muster.getLatestPrice());
+								droped = true;
+							}
+						}
+					}
+				}*/
 				
 			}
 		}
@@ -171,14 +189,14 @@ public class B21 {
 		Muster m,p;
 		for(int i=0; i<musters.size() && breakers.size()<this.top && i<this.pool; i++) {
 			m = musters.get(i);
-			p = previous.get(0).get(m.getItemID());
+			p = getPreviousMuster(previous, m.getItemID());
 			if(m!=null && p!=null && !m.isUpLimited() 
 					&& m.isJustBreaker() 
 					&& m.getHLGap()<=55 //股价还没飞涨
 					&& !holds.contains(m.getItemID())
 					&& (m.getAverageGap()<8  //均线在8%范围内纠缠
 							|| (m.getAveragePrice21().compareTo(p.getAveragePrice21())==1  //上升趋势
-								&& m.getAveragePrice().compareTo(p.getAveragePrice())==1)
+								)
 							|| m.getAverageAmount().compareTo(p.getAverageAmount())==1)  // 放量
 					) {
 				
@@ -187,6 +205,17 @@ public class B21 {
 		}
 		
 		return breakers;
+	}
+	
+	private Muster getPreviousMuster(List<Map<String,Muster>> previous, String id) {
+		Muster m=null;
+		for(Map<String,Muster> ms : previous) {
+			m = ms.get(id);
+			if(m!=null) {
+				break;
+			}
+		}
+		return m;
 	}
 	
 	private Integer getRatio(List<Map<String,Muster>> musters, String itemID, BigDecimal price) {

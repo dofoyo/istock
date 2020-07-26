@@ -42,4 +42,14 @@ public class FileToolsTest {
 				f.renameTo(new File(newName));
 		}
 	}
+	
+	@Test
+	public void testFunctions() {
+		BigDecimal a = new BigDecimal(2.06);
+		BigDecimal b = new BigDecimal(1.8);
+		Integer rate = Functions.growthRate(b, a);
+		System.out.println(rate);
+		
+		
+	}
 }
