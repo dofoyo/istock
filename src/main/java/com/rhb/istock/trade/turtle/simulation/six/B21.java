@@ -54,7 +54,7 @@ public class B21 {
 		for(String itemID : holdItemIDs) {
 			muster = musters.get(itemID);
 			if(muster != null) {
-				account.refreshHoldsPrice(itemID, muster.getLatestPrice());
+				account.refreshHoldsPrice(itemID, muster.getLatestPrice(), muster.getLatestHighest());
 			}
 		}
 		
@@ -192,6 +192,7 @@ public class B21 {
 			p = getPreviousMuster(previous, m.getItemID());
 			if(m!=null && p!=null && !m.isUpLimited() 
 					&& m.isJustBreaker() 
+					//&& isAbsolutlyDownAve(previous, m.getItemID())
 					&& m.getHLGap()<=55 //股价还没飞涨
 					&& !holds.contains(m.getItemID())
 					&& (m.getAverageGap()<8  //均线在8%范围内纠缠
@@ -205,6 +206,20 @@ public class B21 {
 		}
 		
 		return breakers;
+	}
+	
+	private boolean isAbsolutlyDownAve(List<Map<String,Muster>> previous, String id) {
+		boolean flag = false;
+		Muster m = null;
+		for(int i=previous.size()-1; i>=0; i--) {
+			m = previous.get(i).get(id);
+			if(m!=null && m.isAbsolutlyDownAve(21)) {
+				flag = true;
+				break;
+			}
+		}
+		
+		return flag;
 	}
 	
 	private Muster getPreviousMuster(List<Map<String,Muster>> previous, String id) {

@@ -57,7 +57,7 @@ public class Muster {
 	public Integer getMaxRate() {
 		return Functions.growthRate(this.getLatestHighest(), this.close);
 	}
-	
+
 	public Integer getPrviousAverageGap() {
 		return prviousAverageGap;
 	}
@@ -448,6 +448,20 @@ public class Muster {
 			return latestPrice.compareTo(averagePrice34)==-1;
 		}else {
 			return latestPrice.compareTo(averagePrice)==-1;
+		}
+	}
+	
+	public boolean isAbsolutlyDownAve(Integer period) {
+		if(period == 8) {
+			return latestHighest.compareTo(averagePrice8)==-1 && Functions.growthRate(latestPrice, averagePrice8)<-5;
+		}else if(period == 13) {
+			return latestHighest.compareTo(averagePrice13)==-1 && Functions.growthRate(latestPrice, averagePrice13)<-5;
+		}else if(period == 21) {
+			return latestHighest.compareTo(averagePrice21)==-1 && Functions.growthRate(latestPrice, averagePrice21)<-5;
+		}else if(period == 34) {
+			return latestHighest.compareTo(averagePrice34)==-1 && Functions.growthRate(latestPrice, averagePrice34)<-5;
+		}else {
+			return latestHighest.compareTo(averagePrice)==-1 && Functions.growthRate(latestPrice, averagePrice)<-5;
 		}
 	}
 	

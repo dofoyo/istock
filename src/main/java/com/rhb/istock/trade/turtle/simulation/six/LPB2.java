@@ -63,7 +63,7 @@ public class LPB2 {
 		for(String itemID: holdIDs) {
 			muster = musters.get(itemID);
 			if(muster!=null) {
-				account.refreshHoldsPrice(itemID, muster.getLatestPrice());
+				account.refreshHoldsPrice(itemID, muster.getLatestPrice(), muster.getLatestHighest());
 /*				//涨幅超过21%，则跌破8日线
 				if(account.getUpRatio(itemID)>=21 && muster.isDropAve(8) && !muster.isDownLimited()) {
 					account.dropWithTax(itemID, "1", muster.getLatestPrice());

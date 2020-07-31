@@ -78,7 +78,7 @@ public class FdataServiceTushare {
 		ids.add("sh603399");
 */		int i=1;
 		for(String id : ids) {
-			Progress.show(ids.size(),i++, " getFloatholders: " + id);//进度条
+			//Progress.show(ids.size(),i++, " getFloatholders: " + id);//进度条
 			hs = fdataRepositoryTushare.getFloatholders(id,end_dates);
 			for(Floatholder h : hs) {
 				holderName = h.getHolder_name();

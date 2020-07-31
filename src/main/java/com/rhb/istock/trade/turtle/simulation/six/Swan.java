@@ -54,7 +54,7 @@ public class Swan {
 		for(String itemID : holdItemIDs) {
 			muster = musters.get(itemID);
 			if(muster != null) {
-				account.refreshHoldsPrice(itemID, muster.getLatestPrice());
+				account.refreshHoldsPrice(itemID, muster.getLatestPrice(), muster.getLatestHighest());
 				
 				if(holds.containsKey(itemID)) {
 					if(holds.get(itemID).compareTo(muster.getLatestPrice())==1) {

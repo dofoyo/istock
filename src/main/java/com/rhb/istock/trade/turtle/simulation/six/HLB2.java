@@ -81,7 +81,7 @@ public class HLB2 {
 		for(String itemID : holdItemIDs) {
 			muster = musters.get(itemID);
 			if(muster != null) {
-				account.refreshHoldsPrice(itemID, muster.getLatestPrice());
+				account.refreshHoldsPrice(itemID, muster.getLatestPrice(), muster.getLatestHighest());
 			}
 		}
 		

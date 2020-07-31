@@ -129,7 +129,7 @@ public class Turtle {
 			return false;
 		}
 		tdata.setLatestBar(date,open,high,low,close);
-		account.refreshHoldsPrice(itemID, close);
+		account.refreshHoldsPrice(itemID, close, high);
 		account.setLatestDate(date);
 		return true;
 	}

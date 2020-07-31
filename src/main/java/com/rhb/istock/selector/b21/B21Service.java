@@ -39,7 +39,41 @@ public class B21Service {
 	
 	protected static final Logger logger = LoggerFactory.getLogger(B21Service.class);
 
-	public Map<String,String> isB21(List<String> itemIDs, LocalDate endDate) {
+	public List<String> getB21s(LocalDate endDate){
+		//logger.info("******** get b21 of " + endDate.toString());
+		List<Muster> ms = new ArrayList<Muster>();
+		Map<String,Muster> musters = kdataService.getMusters(endDate);
+		for(Muster m : musters.values()) {
+			if(m.isJustBreaker()
+					&& m.isUpThan(5)        //大幅
+					&& !m.isUpLimited()
+					//&& m.isAboveAverageAmount()  //放量
+					) {
+				//logger.info(m.getItemID() + ", "+ m.getMaxRate());
+				ms.add(m);
+			}
+		}
+		
+		Collections.sort(ms, new Comparator<Muster>() {
+			@Override
+			public int compare(Muster o1, Muster o2) {
+				if(o2.getMaxRate().equals(o1.getMaxRate())) {
+					return o1.getHLGap().compareTo(o2.getHLGap()); //价格波动幅度小到大排序
+				}else {
+					return o2.getMaxRate().compareTo(o1.getMaxRate());
+				}			
+			}
+			
+		});
+		
+		List<String> ids = new ArrayList<String>();
+		for(Muster m : ms) {
+			ids.add(m.getItemID());
+		}
+		return ids;
+	}
+	
+	public Map<String,String> getStates(List<String> itemIDs, LocalDate endDate) {
 		Map<String,String> results = new HashMap<String,String>();
 		Integer previous_period = 13;
 		Map<String,Muster> musters = kdataService.getMusters(endDate);
@@ -60,10 +94,12 @@ public class B21Service {
 					}
 
 					if(m.isJustBreaker() 
+							&& m.isUpThan(5)        //大幅
 							&& m.getHLGap()<=55 //股价还没飞涨
 							&& (m.getAverageGap()<8  //均线在8%范围内纠缠
 									|| m.getAveragePrice21().compareTo(p.getAveragePrice21())==1  //上升趋势
-									|| m.getAverageAmount().compareTo(p.getAverageAmount())==1)  // 放量
+									//|| m.getAverageAmount().compareTo(p.getAverageAmount())==1
+									)  // 放量
 							) {
 						v = "1";
 					}else if(m.isUpBreaker()) {  //创新高

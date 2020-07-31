@@ -54,7 +54,7 @@ public class Hunt {
 		for(String itemID: holdItemIDs) {
 			muster = musters.get(itemID);
 			if(muster!=null) {
-				account.refreshHoldsPrice(itemID, muster.getLatestPrice());
+				account.refreshHoldsPrice(itemID, muster.getLatestPrice(), muster.getLatestHighest());
 				if(muster.isDropAve(21) && !muster.isDownLimited()){
 					account.drop(itemID, "跌破deadline", muster.getLatestPrice()); 
 					account.dropHoldState(itemID);

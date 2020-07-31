@@ -24,7 +24,7 @@ public class B21ServiceTest {
 		List<String> ids = new ArrayList<String>();
 		ids.add("sh603488");
 		LocalDate date = LocalDate.now();
-		Map<String,String> ms = b21Service.isB21(ids, date);
+		Map<String,String> ms = b21Service.getStates(ids, date);
 		System.out.println(ms);
 	}
 }

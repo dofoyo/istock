@@ -64,7 +64,7 @@ public class TurtleMusterSimulation {
 		//System.out.println("Functions.ratio(this.averagePrice21, this.averagePrice)<=13");
 		System.out.println("simulate from " + beginDate + " to " + endDate +" ......");
 
-		NEWB hlb = new NEWB(initCash,1); //高价创新高
+		B21plus hlb = new B21plus(initCash,1); //高价创新高
 		NEWB bdt = new NEWB(initCash,0); //低价创新高
 
 		B21 avb = new B21(initCash,1);  //平衡市策略：高价破21日线

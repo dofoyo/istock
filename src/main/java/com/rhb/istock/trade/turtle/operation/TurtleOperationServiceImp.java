@@ -119,7 +119,7 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 			holdIDs.add(entity.getItemID());
 		}
 		LocalDate endDate = kdataService.getLatestMarketDate("sh000001");
-		Map<String,String> b21s = b21Service.isB21(holdIDs, endDate);
+		Map<String,String> b21s = b21Service.getStates(holdIDs, endDate);
 		
 		for(HoldEntity entity : entities) {
 			this.setLatestKdata(entity.getItemID(),true);
@@ -216,10 +216,10 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 		Map<String, String> favors = selectorService.getFavors();
 		Map<String,String> finas = fdataServiceTushare.getFinaGrowthRatioInfo(favors.keySet());
 
-		List<ItemView> views = buildItemViews(new ArrayList<String>(favors.keySet()));
+		List<ItemView> views = buildItemViews(new ArrayList<String>(favors.keySet()), true);
 
 		LocalDate endDate = kdataService.getLatestMarketDate("sh000001");
-		Map<String,String> b21s = b21Service.isB21(new ArrayList<String>(favors.keySet()), endDate);
+		Map<String,String> b21s = b21Service.getStates(new ArrayList<String>(favors.keySet()), endDate);
 		
 		for(ItemView view : views) {
 			view.setLabel(favors.get(view.getItemID()));
@@ -504,7 +504,7 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 	}
 
 	
-	private List<ItemView> buildItemViews(List<String> itemIDs) {
+	private List<ItemView> buildItemViews(List<String> itemIDs, boolean resort) {
 		long beginTime=System.currentTimeMillis(); 
 		logger.info("building itemViews ......");
 		
@@ -539,15 +539,17 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 				}
 		}
 		
-		Collections.sort(views, new Comparator<ItemView>() {
-			@Override
-			public int compare(ItemView o1, ItemView o2) {
-				BigDecimal now1 = new BigDecimal(o1.getPrice());
-				BigDecimal now2 = new BigDecimal(o2.getPrice());
-				
-				return now1.compareTo(now2);
-			}
-		});		
+		if(resort) {
+			Collections.sort(views, new Comparator<ItemView>() {
+				@Override
+				public int compare(ItemView o1, ItemView o2) {
+					BigDecimal now1 = new BigDecimal(o1.getPrice());
+					BigDecimal now2 = new BigDecimal(o2.getPrice());
+					
+					return now1.compareTo(now2);
+				}
+			});		
+		}
 		
 		long used = (System.currentTimeMillis() - beginTime)/1000; 
 		logger.info("getting b21 views done! 用时：" + used + "秒");     
@@ -795,9 +797,9 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 		List<String> models = fdataServiceTushare.getGrowModels(b_date, e_date, n);
 		
 		LocalDate endDate = kdataService.getLatestMarketDate("sh000001");
-		Map<String,String> b21s = b21Service.isB21(models, endDate);
+		Map<String,String> b21s = b21Service.getStates(models, endDate);
 
-		List<ItemView> views = buildItemViews(models);
+		List<ItemView> views = buildItemViews(models, true);
 		for(ItemView view : views) {
 			view.setStatus(b21s.get(view.getItemID()));
 		}
@@ -868,7 +870,7 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 		List<String> ids = new ArrayList<String>(qcs.keySet());
 		
 		LocalDate endDate = kdataService.getLatestMarketDate("sh000001");
-		Map<String,String> b21s = b21Service.isB21(ids, endDate);
+		Map<String,String> b21s = b21Service.getStates(ids, endDate);
 		Map<String, String> favors = selectorService.getFavors();
 
 		List<ForecastView> views = buildQuarterCompareViews(ids);
@@ -885,6 +887,24 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 			}
 			
 		});
+		
+		return views;
+	}
+
+	@Override
+	public List<ItemView> getB21Views() {
+		LocalDate endDate = kdataService.getLatestMarketDate("sh000001");
+		List<String> b21s = b21Service.getB21s(endDate);
+		Map<String,String> finas = fdataServiceTushare.getFinaGrowthRatioInfo(new HashSet<String>(b21s));
+		Map<String, String> favors = selectorService.getFavors();
+		List<ItemView> views = buildItemViews(b21s, false);
+		
+		for(ItemView view : views) {
+			view.setLabel(favors.get(view.getItemID()));
+			if(finas.get(view.getItemID())!=null) {
+				view.setFina(finas.get(view.getItemID()));
+			}
+		}
 		
 		return views;
 	}

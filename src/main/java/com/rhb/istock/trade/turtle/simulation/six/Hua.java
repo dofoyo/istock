@@ -50,7 +50,7 @@ public class Hua {
 		for(String itemID: holdItemIDs) {
 			muster = musters.get(itemID);
 			if(muster!=null) {
-				account.refreshHoldsPrice(itemID, muster.getLatestPrice());
+				account.refreshHoldsPrice(itemID, muster.getLatestPrice(), muster.getLatestHighest());
 				if(muster.isDropLowest(8) && !muster.isDownLimited()){
 					account.drop(itemID, "1", muster.getLatestPrice()); 
 					account.dropHoldState(itemID);

@@ -63,7 +63,7 @@ public class BAV3 {
 		for(String itemID: holdIDs) {
 			muster = musters.get(itemID);
 			if(muster!=null) {
-				account.refreshHoldsPrice(itemID, muster.getLatestPrice());
+				account.refreshHoldsPrice(itemID, muster.getLatestPrice(), muster.getLatestHighest());
 				
 				//跌破21日均线
 				if(muster.isDropAve(21) && !muster.isDownLimited()) { 		

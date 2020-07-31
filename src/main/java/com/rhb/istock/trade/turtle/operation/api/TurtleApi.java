@@ -112,9 +112,9 @@ public class TurtleApi{
 		return new ResponseContent<List<HoldView>>(ResponseEnum.SUCCESS, holds);
 	}
 	
-	@GetMapping("/turtle/forecasts")
-	public ResponseContent<List<ForecastView>> getForecasts() {
-		List<ForecastView> views = ts.getForecastViews();
-		return new ResponseContent<List<ForecastView>>(ResponseEnum.SUCCESS, views);
+	@GetMapping("/turtle/b21")
+	public ResponseContent<List<ItemView>> getB21Views() {
+		List<ItemView> views = ts.getB21Views();
+		return new ResponseContent<List<ItemView>>(ResponseEnum.SUCCESS, views);
 	}
 }

@@ -91,7 +91,7 @@ public class Balloon {
 		}
 		bdata.addBar(date, open, high, low, close);
 		
-		account.refreshHoldsPrice(itemID, close);
+		account.refreshHoldsPrice(itemID, close, high);
 		account.setLatestDate(date);		
 	}
 	

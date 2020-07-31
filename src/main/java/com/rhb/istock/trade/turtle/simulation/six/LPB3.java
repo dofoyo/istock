@@ -62,7 +62,7 @@ public class LPB3 {
 		for(String itemID: holdIDs) {
 			muster = musters.get(itemID);
 			if(muster!=null) {
-				account.refreshHoldsPrice(itemID, muster.getLatestPrice());
+				account.refreshHoldsPrice(itemID, muster.getLatestPrice(), muster.getLatestHighest());
 				if(muster.isDropAve(21) && !muster.isDownLimited()) { 		//跌破21日均线就卖
 					account.dropWithTax(itemID, "2", muster.getLatestPrice());
 				}

@@ -438,8 +438,11 @@ public class Account {
 		this.endDate = date;
 	}
 	
-	public void refreshHoldsPrice(String itemID, BigDecimal price) {
-		if(states.containsKey(itemID)) states.get(itemID).setLatestPrice(price);
+	public void refreshHoldsPrice(String itemID, BigDecimal price, BigDecimal highest) {
+		if(states.containsKey(itemID)) {
+			states.get(itemID).setLatestPrice(price);
+			states.get(itemID).setLatestHighest(highest);
+		}
 		
 		prices.put(itemID, price);
 		
@@ -457,13 +460,23 @@ public class Account {
 		}
 	}
 	
-	public Integer getUpRatio(String itemID) {
+	public Integer getFallRate(String itemID) {
 		HoldState hs = states.get(itemID);
 		if(hs!=null && hs.isHold) {
-			return Functions.growthRate(hs.getLatestPrice(), hs.getBuyPrice());
+			return hs.getFallRate();
 		}else {
 			return 0;
 		}
+	}
+	
+	public boolean isLost(String itemID) {
+		HoldState hs = states.get(itemID);
+		if(hs!=null && hs.isHold) {
+			return hs.isLost();
+		}else {
+			return false;
+		}
+		
 	}
 	
 	public boolean isGain(Integer orderID, Integer ratio) {
@@ -604,14 +617,9 @@ public class Account {
 	
 	public BigDecimal getHighestPriceOfHold(String itemID) {
 		BigDecimal highest = new BigDecimal(0);
-		for(Order order : holds.values()) {
-			if(order.getItemID().equals(itemID)) {
-				if(highest.compareTo(order.getHighest())==-1) {
-					highest = order.getHighest();
-				}
-			}
-		}		
-		
+		if(this.states.get(itemID)!=null) {
+			highest = this.states.get(itemID).getHighest();
+		}
 		return highest;
 	}
 	
@@ -794,10 +802,12 @@ public class Account {
 			this.highest = buyPrice;
 			this.holdsDays = 1;
 			this.isHold = true;
-			
 		}
 		
-		
+		public BigDecimal getHighest() {
+			return highest;
+		}
+
 		public Integer getFallRate() {
 			return Functions.growthRate(this.latestPrice,this.highest);
 		}
@@ -810,7 +820,10 @@ public class Account {
 			this.isHold = isHold;
 		}
 
-
+		public boolean isLost() {
+			return latestPrice.compareTo(buyPrice)==-1;
+		}
+		
 		public boolean isLost(Integer days) {
 			return holdsDays>=days && latestPrice.compareTo(buyPrice)==-1;
 		}
@@ -834,10 +847,15 @@ public class Account {
 			if(isHold) {
 				this.latestPrice = latestPrice;
 				this.holdsDays = this.holdsDays + 1;
-				highest = highest.compareTo(latestPrice)==-1 ? latestPrice : highest;
-				//logger.info("itemID=" + this.itemID + ",holdsDays=" + this.holdsDays);
 			}
 		}
+		
+		public void setLatestHighest(BigDecimal high) {
+			if(isHold) {
+				this.highest = this.highest.compareTo(high)==-1 ? high : this.highest;
+			}
+		}
+		
 		public Integer getHoldsDays() {
 			return holdsDays;
 		}

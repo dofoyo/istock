@@ -64,7 +64,7 @@ public class Drum {
 			muster = musters.get(itemID);
 			//pre = previous.get(0).get(itemID);
 			if(muster!=null && !muster.isDownLimited()) {
-				account.refreshHoldsPrice(itemID, muster.getLatestPrice());
+				account.refreshHoldsPrice(itemID, muster.getLatestPrice(), muster.getLatestHighest());
 
 				//跌破21日均线
 				if(muster.isDropAve(21) 

@@ -50,7 +50,7 @@ public class BHL {
 		for(String itemID: holdIDs) {
 			muster = musters.get(itemID);
 			if(muster!=null) {
-				account.refreshHoldsPrice(itemID, muster.getLatestPrice());
+				account.refreshHoldsPrice(itemID, muster.getLatestPrice(), muster.getLatestHighest());
 /*				
 				if(muster.isDrop(21) && !muster.isDownLimited()) { 		//跌破21日均线就卖
 					account.drop(itemID, "跌破dropline", muster.getLatestPrice());
@@ -68,7 +68,7 @@ public class BHL {
 		holdIDs = account.getItemIDsOfHolds();
 		for(Muster breaker : tops) {
 			if(!holdIDs.contains(breaker.getItemID())) {
-				account.refreshHoldsPrice(breaker.getItemID(), breaker.getLatestPrice());
+				account.refreshHoldsPrice(breaker.getItemID(), breaker.getLatestPrice(), breaker.getLatestHighest());
 				account.open(breaker.getItemID(),breaker.getItemName(), breaker.getIndustry(), this.getQuantity(account.getCash(),account.getTotal(),breaker.getLatestPrice()), "", breaker.getLatestPrice());
 			}
 			breakers_sb.append(breaker.getItemID());
