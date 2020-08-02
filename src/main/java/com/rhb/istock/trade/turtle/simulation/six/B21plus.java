@@ -36,7 +36,7 @@ public class B21plus {
 	private StringBuffer dailyAmount_sb = new StringBuffer("date,cash,value,total\n");
 	private StringBuffer breakers_sb = new StringBuffer();
 	//private Integer pool = 21;
-	private Integer top = 2;
+	private Integer top = 1;
 	//private Integer type = 1;  // 1 - 高价， 0 - 低价
 
 	public B21plus(BigDecimal initCash, Integer type) {
@@ -98,7 +98,7 @@ public class B21plus {
 					account.dropWithTax(itemID, "2", muster.getLatestPrice());
 				}*/
 				
-				//最高点跌5%就卖
+				//最高点跌3%就卖
 				if(account.getFallRate(itemID)<-5
 						//&& !account.isLost(itemID)
 						) {
@@ -122,7 +122,7 @@ public class B21plus {
 					}
 				}
 			}*/
-			account.openAll(dds);			//后买
+			account.openAllWithFixAmount(dds);			//后买
 		}
 
 		dailyAmount_sb.append(account.getDailyAmount() + "\n");
@@ -154,10 +154,10 @@ public class B21plus {
 		Collections.sort(musters, new Comparator<Muster>() {
 			@Override
 			public int compare(Muster o1, Muster o2) {
-				if(o2.getMaxRate().equals(o1.getMaxRate())) {
-					return o1.getHLGap().compareTo(o2.getHLGap()); //价格波动幅度小到大排序
+				if(o1.getLNGap().equals(o2.getLNGap())) {
+					return o2.getMaxRate().compareTo(o1.getMaxRate()); //价格波动幅度小到大排序
 				}else {
-					return o2.getMaxRate().compareTo(o1.getMaxRate());
+					return o1.getLNGap().compareTo(o2.getLNGap());
 				}
 			}
 		});

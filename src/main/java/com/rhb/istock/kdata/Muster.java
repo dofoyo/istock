@@ -363,8 +363,12 @@ public class Muster {
 	public boolean isJustBreaker() {
 		//Integer r = Functions.growthRate(this.averagePrice21, this.averagePrice);
 		return //this.latestPrice.compareTo(this.close)==1 &&
-				this.close.compareTo(this.averagePrice21)<=0 
-				&& this.latestPrice.compareTo(this.averagePrice21)>=0 
+				(this.close.compareTo(this.averagePrice21)<=0 
+				&& this.latestPrice.compareTo(this.averagePrice21)>=0)
+				||
+				(this.close.compareTo(this.averagePrice34)<=0 
+				&& this.latestPrice.compareTo(this.averagePrice34)>=0)
+				
 				//&& r<=ratio && r>0
 				;
 	}

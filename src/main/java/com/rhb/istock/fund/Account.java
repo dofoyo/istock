@@ -39,12 +39,14 @@ public class Account {
 	private LocalDate endDate = null;
 	private Integer orderID=0;
 	DecimalFormat orderIDFormat = new DecimalFormat("0000"); 
+	private BigDecimal fix_amount;
 	
 	public Account(BigDecimal cash) {
 		this.initCash = cash;
 		
 		this.cash = cash;
 		this.value = new BigDecimal(0);
+		this.fix_amount = cash.divide(new BigDecimal(5), BigDecimal.ROUND_HALF_DOWN);
 		
 		states = new HashMap<String, HoldState>();
 		holds = new TreeMap<Integer,Order>();
@@ -308,6 +310,24 @@ public class Account {
 		int position = items.size();
 		
 		BigDecimal quota = c.divide(new BigDecimal(position),BigDecimal.ROUND_DOWN);
+		for(Muster item : items) {
+			this.prices.put(item.getItemID(), item.getLatestPrice());
+			this.open(item.getItemID(), item.getItemName(), item.getIndustry(), this.getQuantity(quota, item.getLatestPrice()), item.getNote() , item.getLatestPrice());
+		}
+	}
+
+	public void openAllWithFixAmount(Set<Muster> items) {
+		if(items.isEmpty()) return;
+		
+		//BigDecimal c = this.cash;
+/*		if(holds.size()==0 && items.size()==1) {
+			c = this.cash.divide(new BigDecimal(2),BigDecimal.ROUND_DOWN);
+		}
+*/		//int position = items.size()<3 ? 3 : items.size();
+		//int position = items.size();
+		
+		//BigDecimal quota = c.divide(new BigDecimal(position),BigDecimal.ROUND_DOWN);
+		BigDecimal quota = this.fix_amount;
 		for(Muster item : items) {
 			this.prices.put(item.getItemID(), item.getLatestPrice());
 			this.open(item.getItemID(), item.getItemName(), item.getIndustry(), this.getQuantity(quota, item.getLatestPrice()), item.getNote() , item.getLatestPrice());

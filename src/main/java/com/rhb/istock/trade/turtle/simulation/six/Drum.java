@@ -73,13 +73,13 @@ public class Drum {
 					account.dropWithTax(itemID, "1", muster.getLatestPrice());
 					droped = true;
 				}
-
+/*
 				//走势弱于大盘
 				ratio = this.getRatio(previous, itemID, muster.getLatestPrice());
 				if(ratio < sseiRatio) {
 					account.dropWithTax(itemID, "2", muster.getLatestPrice());
 					droped = true;
-				}
+				}*/
 				
 				//高位快速回落超过13%
 				//account.dropFallOrder(itemID, -13,"3");

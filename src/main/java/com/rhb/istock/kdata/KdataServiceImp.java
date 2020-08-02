@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.rhb.istock.comm.util.Progress;
+import com.rhb.istock.index.tushare.IndexSpiderTushare;
 import com.rhb.istock.item.Item;
 import com.rhb.istock.item.ItemService;
 import com.rhb.istock.kdata.muster.MusterEntity;
@@ -60,7 +61,7 @@ public class KdataServiceImp implements KdataService{
 	@Autowired
 	@Qualifier("favorServiceImp")
 	FavorService favorServiceImp;
-
+	
 	@Value("${openDuration}")
 	private Integer openDuration;
 	
