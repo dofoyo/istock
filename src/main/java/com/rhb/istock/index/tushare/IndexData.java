@@ -3,32 +3,51 @@ package com.rhb.istock.index.tushare;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.rhb.istock.comm.util.Functions;
-import com.rhb.istock.kdata.Kdata;
 
 public class IndexData {
-	private String itemID;
+	protected static final Logger logger = LoggerFactory.getLogger(IndexData.class);
+	
+	private String ts_code;
 	private TreeMap<LocalDate,IndexBar> bars;
 
-	public IndexData(String itemID) {
-		this.itemID = itemID;
+	public String getItemID() {
+		String code = this.ts_code.substring(0,6);
+		if(this.ts_code.contains(".SH")) {
+			return "sh" + code;
+		}else {
+			return "sz" + code;
+		}
+	}
+	
+	public boolean isExist(LocalDate date) {
+		return this.bars.containsKey(date);
+	}
+	
+	public IndexData(String ts_code) {
+		this.ts_code = ts_code;
 		this.bars = new TreeMap<LocalDate,IndexBar>();
 	}
 	
+	public void addBar(IndexBar bar) {
+		this.bars.put(bar.getDate(), bar);
+	}
+	
 	public void addBar(LocalDate trade_date, BigDecimal close, BigDecimal open, BigDecimal high, BigDecimal low,
-			BigDecimal pre_close, BigDecimal change, BigDecimal pct_chg, BigDecimal vol, BigDecimal amount
+			BigDecimal pre_close, BigDecimal vol, BigDecimal amount
 					) {
-		this.bars.put(trade_date, new IndexBar(close, open, high, low, pre_close, change, pct_chg, vol, amount));
+		this.bars.put(trade_date, new IndexBar(trade_date,close, open, high, low, pre_close, vol, amount));
 	}
 	
 	public void addBar(String trade_date, String close, String open, String high, String low,
-			String pre_close, String change, String pct_chg, String vol, String amount
+			String pre_close, String vol, String amount
 				) {
 		if(!"null".equals(trade_date) 
 				&& !"null".equals(close)
@@ -36,13 +55,11 @@ public class IndexData {
 				&& !"null".equals(high)
 				&& !"null".equals(low)
 				&& !"null".equals(pre_close)
-				&& !"null".equals(change)
-				&& !"null".equals(pct_chg)
 				&& !"null".equals(vol)
 				&& !"null".equals(amount)
 				) {
 			this.bars.put(LocalDate.parse(trade_date,DateTimeFormatter.ofPattern("yyyyMMdd")), 
-					new IndexBar(close, open, high, low, pre_close, change, pct_chg, vol, amount));
+					new IndexBar(LocalDate.parse(trade_date,DateTimeFormatter.ofPattern("yyyyMMdd")),close, open, high, low, pre_close, vol, amount));
 		}
 	}
 	
@@ -66,12 +83,12 @@ public class IndexData {
 		return this.bars.size();
 	}
 	
-	public String getItemID() {
-		return itemID;
+	public String getTs_code() {
+		return ts_code;
 	}
 
-	public void setItemID(String itemID) {
-		this.itemID = itemID;
+	public void setTs_code(String ts_code) {
+		this.ts_code = ts_code;
 	}
 	
 	public Map<LocalDate,IndexBar> getBars(){
@@ -99,6 +116,10 @@ public class IndexData {
 		}else {
 			BigDecimal close = bars.lastEntry().getValue().getClose();
 			Integer ratio = Functions.growthRate(close, lowest);
+			//System.out.println(close);
+			//System.out.println(lowest);
+			//System.out.println(ratio);
+
 			return ratio;
 		}
 	}
@@ -106,7 +127,7 @@ public class IndexData {
 
 	@Override
 	public String toString() {
-		return "KdataEntity [itemID=" + itemID + ", bars=" + bars + "]";
+		return "KdataEntity [ts_code=" + ts_code + ", bars=" + bars + "]";
 	}
 
 }

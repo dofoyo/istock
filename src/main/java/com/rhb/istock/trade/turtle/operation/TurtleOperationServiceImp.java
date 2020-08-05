@@ -901,6 +901,7 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 		
 		for(ItemView view : views) {
 			view.setLabel(favors.get(view.getItemID()));
+			
 			if(finas.get(view.getItemID())!=null) {
 				view.setFina(finas.get(view.getItemID()));
 			}

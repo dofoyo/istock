@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -18,8 +17,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.rhb.istock.comm.util.FileTools;
 import com.rhb.istock.comm.util.Functions;
+import com.rhb.istock.comm.util.Progress;
+import com.rhb.istock.index.tushare.IndexServiceTushare;
 import com.rhb.istock.item.ItemService;
 import com.rhb.istock.kdata.KdataService;
 import com.rhb.istock.kdata.Muster;
@@ -34,6 +34,10 @@ public class B21Service {
 	@Qualifier("itemServiceImp")
 	ItemService itemService;
 	
+	@Autowired
+	@Qualifier("indexServiceTushare")
+	IndexServiceTushare indexServiceTushare;
+	
 	@Value("${b21File}")
 	private String b21File;	
 	
@@ -43,10 +47,16 @@ public class B21Service {
 		//logger.info("******** get b21 of " + endDate.toString());
 		List<Muster> ms = new ArrayList<Muster>();
 		Map<String,Muster> musters = kdataService.getMusters(endDate);
+		Set<String> oks = indexServiceTushare.getItemIDsFromTopGrowthRateIndex(endDate, 13, 5);
+		
+		int i=1;
 		for(Muster m : musters.values()) {
+			Progress.show(musters.values().size(), i++, "  getB21s, " + m.getItemID());
+
 			if(m.isJustBreaker()
-					&& m.isUpThan(5)        //大幅
-					&& !m.isUpLimited()
+					//&& m.isUpThan(5)        //大幅
+					//&& !m.isUpLimited()
+					&& oks.contains(m.getItemID())  //强势板块
 					//&& m.isAboveAverageAmount()  //放量
 					) {
 				//logger.info(m.getItemID() + ", "+ m.getMaxRate());
@@ -78,7 +88,7 @@ public class B21Service {
 		Integer previous_period = 13;
 		Map<String,Muster> musters = kdataService.getMusters(endDate);
 		List<Map<String,Muster>> previous = kdataService.getPreviousMusters(previous_period, endDate);
-		Integer sseiRatio = kdataService.getSseiRatio(endDate, previous_period);
+		Integer sseiRatio = indexServiceTushare.getSseiGrowthRate(endDate, previous_period);
 		Integer ratio;
 		if(musters!=null && previous!=null) {
 			Muster m, p;

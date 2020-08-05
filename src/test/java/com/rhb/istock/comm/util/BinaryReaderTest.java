@@ -35,9 +35,17 @@ public class BinaryReaderTest {
 		System.out.println(rate2);
 	}
 	
-	@Test
+	//@Test
 	public void test2() {
 		String itemID = "300022";
 		System.out.println(itemID.startsWith("300"));
 	}
+	
+	@Test
+	public void test3() {
+		StringBuffer sb = new StringBuffer("dfafajdlfdlsf,");
+		sb.deleteCharAt(sb.length()-1);
+		System.out.println(sb.toString());
+	}
+	
 }

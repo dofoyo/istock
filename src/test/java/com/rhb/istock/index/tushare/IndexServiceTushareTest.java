@@ -2,7 +2,9 @@ package com.rhb.istock.index.tushare;
 
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Map;
+import java.util.NavigableSet;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -33,43 +35,65 @@ public class IndexServiceTushareTest {
 	}
 	
 	
-	@Test
+	//@Test
 	public void downIndex_classify() throws Exception {
 		long beginTime=System.currentTimeMillis(); 
+
+		LocalDate endDate = LocalDate.now();
+		Integer period = 13;
+		Integer top = 5;
+		Set<String> ids = indexServiceTushare.getItemIDsFromTopGrowthRateIndex(endDate, period, top);
+		
+		System.out.println(ids);
+		System.out.println(ids.size());
+		
+		long used = (System.currentTimeMillis() - beginTime)/1000; 
+		System.out.println("用时：" + used + "秒");          
+	}
+	
+	//@Test
+	public void generateIndex() {
+		indexServiceTushare.generateIndex();
+	}
+	
+	@Test
+	public void getGrowthRateOfAll() {
+		long beginTime=System.currentTimeMillis(); 
+		
+		LocalDate endDate = LocalDate.parse("2020/08/05",DateTimeFormatter.ofPattern("yyyy/MM/dd"));
+		Integer period = 13;
 		
 		Map<String,Set<IndexWeight>> members = indexServiceTushare.getIndexWeights();
 		Set<IndexWeight> ms;
 		
-		LocalDate endDate = LocalDate.now();
-		Integer period = 13;
-		TreeMap<Integer,Set<IndexBasic>> indexs = indexServiceTushare.getGrowthRate(endDate, period);
-/*		Integer i = indexs.lastKey();
-		Set<IndexBasic> basics = indexs.get(i);
-		for(IndexBasic ib : basics) {
-			ms = members.get(ib.getTs_code());
-			if(ms!=null) {
-				System.out.println("indexID="+ ib.getTs_code()+", indexName=" + ib.getName() + ", rate=" + i + ", and members are " + ms.size());
-				for(IndexWeight iw : ms) {
-					System.out.print(iw.getCon_code() + ",");
+		TreeMap<Integer,Set<String>> indexs = indexServiceTushare.getGrowthRate(endDate, period);
+		NavigableSet<Integer> keys = indexs.descendingKeySet();
+		Set<String> codes;
+		IndexBasic basic;
+		int i = 0 ;
+		StringBuffer sb = new StringBuffer(endDate.toString() + ", period=" + period + "\n");
+		for(Integer key : keys) {
+			codes = indexs.get(key);
+			for(String code : codes) {
+				basic = indexServiceTushare.getIndexBasic(code);
+				if(basic!=null) {
+					sb.append("rate=" + key.toString() + " - " + code + " - " + basic.getName() + ": ");
 				}
-			}		
-		}	*/	
-		
-		for(Map.Entry<Integer, Set<IndexBasic>> entry : indexs.entrySet()) {
-			for(IndexBasic ib : entry.getValue()) {
-				System.out.print(entry.getKey() + ", " + ib.getName());
-				ms = members.get(ib.getTs_code());
+/*				ms = members.get(code);
 				if(ms!=null) {
 					for(IndexWeight iw : ms) {
-						System.out.print(iw.getCon_code() + ",");
+						sb.append(iw.getItemID() + ",");
 					}
-				}
-				System.out.println("");
+				}*/
+				sb.append("\n");
 			}
 		}
 		
+		System.out.println(sb.toString());
+		
 		long used = (System.currentTimeMillis() - beginTime)/1000; 
 		System.out.println("用时：" + used + "秒");          
+		
 	}
 	
 	

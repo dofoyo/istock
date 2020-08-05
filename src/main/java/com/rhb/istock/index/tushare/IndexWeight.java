@@ -5,6 +5,7 @@ public class IndexWeight {
 	private String con_code; //	str	Y	成分股票代码
 	private String trade_date; //	str	Y	交易日期
 	private String weight; //	str	Y	权重
+	
 	public IndexWeight(String index_code, String con_code, String trade_date, String weight) {
 		super();
 		this.index_code = index_code;
@@ -12,6 +13,16 @@ public class IndexWeight {
 		this.trade_date = trade_date;
 		this.weight = weight;
 	}
+	
+	public String getItemID() {
+		String code = this.con_code.substring(0,6);
+		if(this.con_code.contains(".SH")) {
+			return "sh" + code;
+		}else {
+			return "sz" + code;
+		}
+	}
+	
 	public String getIndex_code() {
 		return index_code;
 	}

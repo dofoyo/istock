@@ -22,7 +22,7 @@ public class IndexRepositoryTushareTest {
 	
 	//@Test
 	public void getIndexBasic() {
-		Set<IndexBasic> ics = indexRepositoryTushare.getIndexBasic();
+		Set<IndexBasic> ics = indexRepositoryTushare.getIndexBasics();
 		//Map<String,Set<IndexMember>> members = indexRepositoryTushare.getIndexMembers();
 		for(IndexBasic ic : ics) {
 			System.out.println(ic);

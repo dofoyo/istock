@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.rhb.istock.comm.util.Progress;
+import com.rhb.istock.index.tushare.IndexServiceTushare;
 import com.rhb.istock.item.ItemService;
 import com.rhb.istock.kdata.KdataService;
 import com.rhb.istock.kdata.Muster;
@@ -43,6 +45,10 @@ public class TurtleMusterSimulation {
 	@Qualifier("itemServiceImp")
 	ItemService itemService;
 	
+	@Autowired
+	@Qualifier("indexServiceTushare")
+	IndexServiceTushare indexServiceTushare;
+	
 	BigDecimal initCash = new BigDecimal(1000000);
 	
 	/*
@@ -64,7 +70,7 @@ public class TurtleMusterSimulation {
 		//System.out.println("Functions.ratio(this.averagePrice21, this.averagePrice)<=13");
 		System.out.println("simulate from " + beginDate + " to " + endDate +" ......");
 
-		B21plus hlb = new B21plus(initCash,1); //高价创新高
+		NEWB hlb = new NEWB(initCash,1); //高价创新高
 		NEWB bdt = new NEWB(initCash,0); //低价创新高
 
 		B21 avb = new B21(initCash,1);  //平衡市策略：高价破21日线
@@ -79,6 +85,7 @@ public class TurtleMusterSimulation {
 		Integer previous_period  = 13; //历史纪录区间，主要用于后面判断
 
 		Integer sseiFlag, sseiRatio;
+		Set<String> oks = null;
 		
 		long days = endDate.toEpochDay()- beginDate.toEpochDay();
 		int i=1;
@@ -95,7 +102,8 @@ public class TurtleMusterSimulation {
 				}
 				
 				sseiFlag = kdataService.getSseiFlag(date);
-				sseiRatio = kdataService.getSseiRatio(date, previous_period);
+				sseiRatio = indexServiceTushare.getSseiGrowthRate(date, previous_period);
+				//oks = indexServiceTushare.getItemIDsFromTopGrowthRateIndex(date, previous_period, 3);
 
 				hlb.doIt(musters, previous, date, sseiFlag, sseiRatio);
 				bdt.doIt(musters, previous, date, sseiFlag, sseiRatio);

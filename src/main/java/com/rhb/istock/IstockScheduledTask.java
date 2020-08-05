@@ -10,6 +10,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import com.rhb.istock.fdata.tushare.FdataSpiderTushare;
+import com.rhb.istock.index.tushare.IndexServiceTushare;
+import com.rhb.istock.index.tushare.IndexSpiderTushare;
 import com.rhb.istock.item.ItemService;
 import com.rhb.istock.kdata.KdataService;
 import com.rhb.istock.kdata.spider.KdataRealtimeSpider;
@@ -34,6 +36,13 @@ public class IstockScheduledTask {
 	@Qualifier("fdataSpiderTushare")
 	FdataSpiderTushare fdataSpiderTushare;
 	
+	@Autowired
+	@Qualifier("indexSpiderTushare")
+	IndexSpiderTushare indexSpiderTushare;
+	
+	@Autowired
+	@Qualifier("indexServiceTushare")
+	IndexServiceTushare indexServiceTushare;
 /*	@Autowired
 	@Qualifier("financialStatementServiceImp")
 	FinancialStatementService financialStatementService;*/
@@ -134,15 +143,19 @@ public class IstockScheduledTask {
 		}
 	}*/
 	
-	@Scheduled(cron="0 0 20 ? * 1-5") //周一至周五，每日20点 执行收盘
+	@Scheduled(cron="0 35 20 ? * 1-5") //周一至周五，每日20点 执行收盘
 	public void downloadKdatas()  throws Exception{
 		System.out.println("run scheduled of '0 0 18 ? * 1-5'");
 		long beginTime=System.currentTimeMillis(); 
 
 		if(this.isTradeDate()) {
 			kdataService.downClosedDatas(LocalDate.now());
-			fdataSpiderTushare.downAll();  //财务报告、预告、股东信息等下载
 			kdataService.generateMusters(LocalDate.parse("2000-01-01"));   //生成muster，需要192分钟，即3个多小时
+			fdataSpiderTushare.downAll();  //财务报告、预告、股东信息等下载
+			indexSpiderTushare.downIndex_Daily();
+			indexSpiderTushare.downIndex_weight();
+			indexSpiderTushare.downIndex_basic();
+			indexServiceTushare.generateIndex();
 			//finaService.generateQuarterCompares();
 			//huaService.generateHuaPotentials(LocalDate.now());
 			//huaService.generateLatestHuaFirst();
