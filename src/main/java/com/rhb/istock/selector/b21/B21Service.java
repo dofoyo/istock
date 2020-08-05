@@ -47,7 +47,7 @@ public class B21Service {
 		//logger.info("******** get b21 of " + endDate.toString());
 		List<Muster> ms = new ArrayList<Muster>();
 		Map<String,Muster> musters = kdataService.getMusters(endDate);
-		Set<String> oks = indexServiceTushare.getItemIDsFromTopGrowthRateIndex(endDate, 13, 5);
+		//Set<String> oks = indexServiceTushare.getItemIDsFromTopGrowthRateIndex(endDate, 13, 5);
 		
 		int i=1;
 		for(Muster m : musters.values()) {
@@ -56,7 +56,7 @@ public class B21Service {
 			if(m.isJustBreaker()
 					//&& m.isUpThan(5)        //大幅
 					//&& !m.isUpLimited()
-					&& oks.contains(m.getItemID())  //强势板块
+					//&& oks.contains(m.getItemID())  //强势板块
 					//&& m.isAboveAverageAmount()  //放量
 					) {
 				//logger.info(m.getItemID() + ", "+ m.getMaxRate());
