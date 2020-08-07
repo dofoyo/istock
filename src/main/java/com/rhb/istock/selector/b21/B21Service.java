@@ -67,10 +67,10 @@ public class B21Service {
 		Collections.sort(ms, new Comparator<Muster>() {
 			@Override
 			public int compare(Muster o1, Muster o2) {
-				if(o2.getMaxRate().equals(o1.getMaxRate())) {
-					return o1.getHLGap().compareTo(o2.getHLGap()); //价格波动幅度小到大排序
+				if(o1.getHLGap().equals(o2.getHLGap())) {
+					return o2.getMaxRate().compareTo(o1.getMaxRate()); //价格波动幅度小到大排序
 				}else {
-					return o2.getMaxRate().compareTo(o1.getMaxRate());
+					return o1.getHLGap().compareTo(o2.getHLGap());
 				}			
 			}
 			
@@ -120,7 +120,6 @@ public class B21Service {
 							&& m.getAveragePrice21().compareTo(p.getAveragePrice21())==1 ) { //上升趋势
 						v = "2";
 					}
-						
 					
 					results.put(id, v);
 				}

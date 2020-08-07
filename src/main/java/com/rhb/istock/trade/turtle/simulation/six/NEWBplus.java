@@ -18,16 +18,15 @@ import com.rhb.istock.comm.util.Functions;
 import com.rhb.istock.fund.Account;
 import com.rhb.istock.kdata.Muster;
 /*
- * 突破21日线
+ * 高价或低价创新高
  * 
  * 操作策略
- * 筛选：全部股票,按价格排序,选出最高或最低的55个。
- * 买入：突破21日均线，同时横盘、放量、升势、强于大盘这四个条件中，同时满足越多越好
+ * 买入：全部股票,按价格排序，选出价格最高或最低的55个，突破89日高点
  * 卖出：跌破21日均线
- * 仓位：满仓，每只股票的均衡市值
+ * 仓位控制：满仓，每只股票的均衡市值
  *
  */
-public class B21plus {
+public class NEWBplus {
 	protected static final Logger logger = LoggerFactory.getLogger(HLB_try.class);
 
 	private Account account = null;
@@ -37,9 +36,9 @@ public class B21plus {
 	private StringBuffer breakers_sb = new StringBuffer();
 	private Integer pool = 21;
 	private Integer top = 1;
-	private Integer type = 1;  // 1 - 高价， 0 - 低价
-
-	public B21plus(BigDecimal initCash, Integer type) {
+	private Integer type = 1;// 1 - 高价， 0 - 低价
+	
+	public NEWBplus(BigDecimal initCash, Integer type) {
 		account = new Account(initCash);
 		this.initCash = initCash;
 		this.type = type;
@@ -67,7 +66,7 @@ public class B21plus {
 				//跌破21日均线就卖
 				if(muster.isDropAve(21)) { 		
 					account.dropWithTax(itemID, "1", muster.getLatestPrice());
-					droped = true;
+					droped=true;
 				}
 				
 /*				//走势弱于大盘
@@ -79,36 +78,19 @@ public class B21plus {
 				
 				//高位快速回落超过13%
 				//account.dropFallOrder(itemID, -13,"3");
-
-				
-/*				//大盘不好,有赚就卖
-				if(sseiFlag==0) {
-					holdItemIDs = account.getItemIDsOfHolds();
-					Set<Integer> orderIDs;
-					for(String id : holdItemIDs) {
-						orderIDs = account.getHoldOrderIDs(id);
-						for(Integer orderID : orderIDs) {
-							if(account.isGain(orderID, 3)) {
-								account.dropWithTax(itemID, "3", muster.getLatestPrice());
-								droped = true;
-							}
-						}
-					}
-				}*/
-				
 			}
 		}
-
+		
 		//行情好，才买入
 		//if(sseiFlag==1) {
-	
 			holdItemIDs = account.getItemIDsOfHolds();
 			
 			Set<Muster> dds = new HashSet<Muster>();  //用set，无重复，表示不可加仓
 			//List<Muster> dds = new ArrayList<Muster>();  //用list，有重复，表示可以加仓
 			
 			//确定突破走势的股票
-			List<Muster> breakers = this.getBreakers(new ArrayList<Muster>(musters.values()), previous, sseiRatio,holdItemIDs);
+			List<Muster> breakers = this.getBreakers(new ArrayList<Muster>(musters.values()),holdItemIDs);
+			//breakers.addAll(keeps.getUps(musters));
 			
 			breakers_sb.append(date.toString() + ",");
 			StringBuffer sb = new StringBuffer();
@@ -137,6 +119,7 @@ public class B21plus {
 				}
 			}					
 			account.openAll(dds);			//后买
+			//}
 		//}
 
 		dailyAmount_sb.append(account.getDailyAmount() + "\n");
@@ -160,11 +143,9 @@ public class B21plus {
 		return result;
 	}
 	
-	private List<Muster> getBreakers(List<Muster> musters,List<Map<String,Muster>> previous, Integer sseiRatio, Set<String> holds){
+	private List<Muster> getBreakers(List<Muster> musters, Set<String> holds){
 		List<Muster> breakers = new ArrayList<Muster>();
-		
-		//List<Muster> musters = new ArrayList<Muster>(ms.values());
-		
+
 		if(this.type == 0) {
 			Collections.sort(musters, new Comparator<Muster>() {
 				@Override
@@ -186,55 +167,28 @@ public class B21plus {
 		Collections.sort(ms, new Comparator<Muster>() {
 			@Override
 			public int compare(Muster o1, Muster o2) {
-				return o1.getLNGap().compareTo(o2.getLNGap()); //
+				if(o1.getHLGap().compareTo(o2.getHLGap())==0){
+					return o1.getLNGap().compareTo(o2.getLNGap());
+				}else {
+					return o1.getHLGap().compareTo(o2.getHLGap());
+				}
 			}
 		});
 		
-		Muster m,p;
-		for(int i=0; i<ms.size() && breakers.size()<this.top; i++) {
+		Muster m;
+		for(int i=0; i<ms.size() && breakers.size()<top; i++) {
 			m = ms.get(i);
-			p = getPreviousMuster(previous, m.getItemID());
-			if(m!=null && p!=null && !m.isUpLimited() 
-					&& m.isJustBreaker() 
-					//&& isAbsolutlyDownAve(previous, m.getItemID())
-					&& m.getHLGap()<=55 //股价还没飞涨
+			if(m!=null 
+					&& !m.isUpLimited() 
+					&& m.isUpBreaker() 
+					&& m.getHLGap()<=55
 					&& !holds.contains(m.getItemID())
-					&& (m.getAverageGap()<8  //均线在8%范围内纠缠
-							|| (m.getAveragePrice21().compareTo(p.getAveragePrice21())==1  //上升趋势
-								)
-							|| m.getAverageAmount().compareTo(p.getAverageAmount())==1)  // 放量
 					) {
-				
-					breakers.add(m);
+				breakers.add(m);
 			}
 		}
 		
 		return breakers;
-	}
-	
-	private boolean isAbsolutlyDownAve(List<Map<String,Muster>> previous, String id) {
-		boolean flag = false;
-		Muster m = null;
-		for(int i=previous.size()-1; i>=0; i--) {
-			m = previous.get(i).get(id);
-			if(m!=null && m.isAbsolutlyDownAve(21)) {
-				flag = true;
-				break;
-			}
-		}
-		
-		return flag;
-	}
-	
-	private Muster getPreviousMuster(List<Map<String,Muster>> previous, String id) {
-		Muster m=null;
-		for(Map<String,Muster> ms : previous) {
-			m = ms.get(id);
-			if(m!=null) {
-				break;
-			}
-		}
-		return m;
 	}
 	
 	private Integer getRatio(List<Map<String,Muster>> musters, String itemID, BigDecimal price) {
@@ -256,4 +210,5 @@ public class B21plus {
 
 		return ratio;
 	}
+	
 }

@@ -70,14 +70,14 @@ public class TurtleMusterSimulation {
 		//System.out.println("Functions.ratio(this.averagePrice21, this.averagePrice)<=13");
 		System.out.println("simulate from " + beginDate + " to " + endDate +" ......");
 
-		NEWB hlb = new NEWB(initCash,1); //高价创新高
-		NEWB bdt = new NEWB(initCash,0); //低价创新高
+		NEWBplus hlb = new NEWBplus(initCash,1); //高价创新高
+		NEWBplus bdt = new NEWBplus(initCash,0); //低价创新高
 
-		B21 avb = new B21(initCash,1);  //平衡市策略：高价破21日线
-		B21 bhl = new B21(initCash,0);  //牛市和平衡市策略：低价破21日线
+		B21plus avb = new B21plus(initCash,1);  //平衡市策略：高价破21日线
+		B21plus bhl = new B21plus(initCash,0);  //牛市和平衡市策略：低价破21日线
 		
-		Drum bav = new Drum(initCash,1);  //高价+上升趋势+强于大盘
-		Drum dtb = new Drum(initCash,0);  //低价+上升趋势+强于大盘
+		DrumPlus bav = new DrumPlus(initCash,1);  //高价+上升趋势+强于大盘
+		DrumPlus dtb = new DrumPlus(initCash,0);  //低价+上升趋势+强于大盘
 
 		Map<String,Muster> musters;
 		
