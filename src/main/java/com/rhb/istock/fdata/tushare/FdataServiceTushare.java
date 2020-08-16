@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,8 +36,64 @@ public class FdataServiceTushare {
 	
 	private Map<String,Map<String, Integer>> makers;
 	private Set<String> makerNames;
+	private Map<Integer,Set<String>> oks = null;
 	
 	protected static final Logger logger = LoggerFactory.getLogger(FdataServiceTushare.class);
+
+	public Map<Integer,Set<String>> getOks() {
+		if(oks!=null) {
+			return oks;
+		}
+		oks = new HashMap<Integer,Set<String>>();
+		List<String> ids = itemService.getItemIDs();
+		int i=1;
+		Set<Integer> years;
+		Set<String> okIDs;
+		for(String id : ids) {
+			Progress.show(ids.size(), i++, id);
+			years = this.getOKs(id);
+			for(Integer year : years) {
+				okIDs = oks.get(year);
+				if(okIDs == null) {
+					okIDs = new HashSet<String>();
+				}
+				okIDs.add(id);
+				oks.put(year, okIDs);
+			}
+		}
+		
+		return oks;
+	}
+
+	private Set<Integer> getOKs(String itemID){
+		Set<Integer> years = new HashSet<Integer>();
+		Map<String,FinaIndicator> indicators = fdataRepositoryTushare.getIndicators(itemID);
+		FinaIndicator i1,i2,i3;
+		for(int year=2020; year>=2009; year--) {
+			String date1 = Integer.toString(year-3) + "1231";
+			String date2 = Integer.toString(year-2) + "1231";
+			String date3 = Integer.toString(year-1) + "1231";
+			
+			i1 = indicators.get(date1);
+			i2 = indicators.get(date2);
+			i3 = indicators.get(date3);
+			
+			if(i1!=null && i2!=null && i3!=null
+					&& i1.isOK() && i2.isOK() && i3.isOK()
+					) {
+				years.add(year);
+			}			
+		}
+		return years;
+	}
+	
+	public Map<String,Integer[]> getFinaGrowthRate(String itemID){
+		Map<String,Integer[]> growthRates = new TreeMap<String,Integer[]>();
+		Map<String,Fina> finas = fdataRepositoryTushare.getFinas(itemID);
+		
+		
+		return growthRates;
+	}
 	
 	public Set<String> getMakerNames() {
 		Set<String> names = new HashSet<String> ();

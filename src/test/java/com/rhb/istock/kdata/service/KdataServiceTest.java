@@ -31,8 +31,8 @@ public class KdataServiceTest {
 	public void generateMusters() {
 		LocalDate date = LocalDate.parse("2010-01-01");
 		kdataService.generateMusters(date);
-		kdataService.generateLatestMusters(null);
-		kdataService.updateLatestMusters();
+		//kdataService.generateLatestMusters(null);
+		//kdataService.updateLatestMusters();
 	}
 	
 	//@Test
@@ -44,24 +44,26 @@ public class KdataServiceTest {
 	}
 	
 	
-	//@Test
+	@Test
 	public void getLastMusters() {
-		LocalDate date = LocalDate.parse("2020-01-09");
+		LocalDate date = LocalDate.parse("2020-08-14");
 		Map<String,Muster> musters = kdataService.getMusters(date);
 		List<Muster> mm = new ArrayList<Muster>(musters.values());
 		Collections.sort(mm, new Comparator<Muster>() {
 			@Override
 			public int compare(Muster o1, Muster o2) {
-				return o1.getTotal_mv().compareTo(o2.getTotal_mv());
+				if(o2.getAbove2121().compareTo(o1.getAbove2121())==0) {
+					return o1.getCloseRateOf21().compareTo(o2.getCloseRateOf21());
+				}
+				return o2.getAbove2121().compareTo(o1.getAbove2121());
 			}});
 		String str = null;
-		BigDecimal b = new BigDecimal(500000000).multiply(new BigDecimal(100));
+		//BigDecimal b = new BigDecimal(500000000).multiply(new BigDecimal(100)); //伍佰亿
 		for(Muster muster : mm) {
-			if(muster.getTotal_mv().compareTo(b)==-1) {
-				str = String.format("%s: %.2f\n", muster.getItemName(), muster.getTotal_mv());
+			//if(muster.getTotal_mv().compareTo(b)==-1) {
+				str = String.format("%s, %s: %d %d %.2f\n", muster.getItemID(), muster.getItemName(), muster.getAbove2121(), muster.getAbove2189(), muster.getCloseRateOf21());
 				System.out.println(str);
-			}
-
+			//}
 		}
 	}
 	

@@ -20,6 +20,8 @@ public interface SelectorService{
 	 * 用于operation
 	 */
 	public Map<String,String> getFavors();
+	public Map<String,String> getFavorsOfB21();
+	public Map<String,String> getFavorsOfB21up();
 
 	
 	public Map<String,Integer> getHighLowTops(Integer top);

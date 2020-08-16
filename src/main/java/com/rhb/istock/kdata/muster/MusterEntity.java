@@ -35,6 +35,10 @@ public class MusterEntity {
 	private BigDecimal latestHighest; //当日最高价
 	private BigDecimal latestLowest; //当日最低价
 	private BigDecimal latestAmount; ////当日交易金额
+	private Integer above2121=0;//前21个交易日,价格高于21日均线的次数
+	private Integer above2134=0;//前34个交易日,价格高于21日均线的次数
+	private Integer above2155=0;//前55个交易日,价格高于21日均线的次数
+	private Integer above2189=0;//前89个交易日,价格高于21日均线的次数
 	
 	public MusterEntity(String itemID, 
 			BigDecimal close, 
@@ -138,6 +142,49 @@ public class MusterEntity {
 		this.latestHighest = new BigDecimal(ss[29]);
 		this.latestLowest = new BigDecimal(ss[30]);
 		this.averagePrice5 = new BigDecimal(ss[31]);
+		this.above2121 = Integer.parseInt(ss[32]);
+		this.above2134 = Integer.parseInt(ss[33]);
+		this.above2155 = Integer.parseInt(ss[34]);
+		this.above2189 = Integer.parseInt(ss[35]);
+	}
+	public Integer getAbove2121() {
+		return above2121;
+	}
+
+	public void setAbove2121(Integer above2121) {
+		this.above2121 = above2121;
+	}
+
+	public Integer getAbove2134() {
+		return above2134;
+	}
+
+	public void setAbove2134(Integer above2134) {
+		this.above2134 = above2134;
+	}
+
+	public Integer getAbove2155() {
+		return above2155;
+	}
+
+	public void setAbove2155(Integer above2155) {
+		this.above2155 = above2155;
+	}
+
+	public Integer getAbove2189() {
+		return above2189;
+	}
+
+	public void setAbove2189(Integer above2189) {
+		this.above2189 = above2189;
+	}
+
+	public Integer isAbove21() {
+		if(this.latestPrice.compareTo(this.averagePrice21)==1) {
+			return 1;
+		}else {
+			return 0;
+		}
 	}
 	
 	public BigDecimal getAveragePrice5() {
@@ -301,7 +348,11 @@ public class MusterEntity {
 				this.pe + "," +
 				this.latestHighest + "," + 
 				this.latestLowest + "," +
-				this.averagePrice5 + "\n"; 
+				this.averagePrice5 + "," + 
+				this.above2121 + "," + 
+				this.above2134 + "," +
+				this.above2155 + "," + 
+				this.above2189 + "\n"; 
 	}
 
 	public BigDecimal getLowest21() {

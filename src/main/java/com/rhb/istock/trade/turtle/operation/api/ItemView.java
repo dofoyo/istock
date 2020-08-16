@@ -14,6 +14,7 @@ public class ItemView {
 	private String label;
 	private String fina;
 	private String price;
+	private Integer hlgap;
 
 	public ItemView(Map<String, String> map) {
 		//System.out.println(map);
@@ -27,6 +28,11 @@ public class ItemView {
 		this.topic = map.get("topic");
 		this.label = map.get("label");
 		this.price = map.get("price");
+		this.hlgap = Integer.parseInt(map.get("hlgap"));
+	}
+
+	public Integer getHlgap() {
+		return hlgap;
 	}
 
 	public String getPrice() {

@@ -29,7 +29,7 @@ public class Account {
 	private BigDecimal cash = null;
 	private BigDecimal value = null;
 
-	private Map<String,HoldState> states = null;
+	private Map<String,HoldState> states = null;   //itemID
 	private TreeMap<Integer,Order> holds = null;
 	private TreeMap<Integer,Order> opens = null;
 	private TreeMap<Integer,Order> drops = null;
@@ -472,6 +472,28 @@ public class Account {
 			}
 		}
 	}
+
+	public void dropTheMostOfFallOrder(String note) {
+		HoldState hs;
+		String itemID = null;
+		Integer rate = null;
+		BigDecimal price = null;
+		for(String id : states.keySet()) {
+			hs = states.get(id);
+			if(hs.isHold) {
+				if(rate == null || rate > hs.getWinRate()) {
+					itemID = id;
+					rate = states.get(id).getWinRate();
+					price = states.get(id).getLatestPrice();
+				}				
+			}
+		}
+		if(itemID!=null && rate<0) {
+			this.dropWithTax(itemID, note, price);
+		}
+		
+		//logger.info(String.format("%s %d\n", itemID, rate));
+	}
 	
 	public void dropFallOrder(String itemID,Integer rate, String note) {
 		HoldState hs = states.get(itemID);
@@ -480,12 +502,10 @@ public class Account {
 		}
 	}
 	
-	public Integer getFallRate(String itemID) {
+	public void dropWinOrder(String itemID,Integer rate, String note) {
 		HoldState hs = states.get(itemID);
-		if(hs!=null && hs.isHold) {
-			return hs.getFallRate();
-		}else {
-			return 0;
+		if(hs!=null && hs.getWinRate()>=rate){
+			this.dropWithTax(itemID, note, hs.getLatestPrice());
 		}
 	}
 	
@@ -830,6 +850,10 @@ public class Account {
 
 		public Integer getFallRate() {
 			return Functions.growthRate(this.latestPrice,this.highest);
+		}
+		
+		public Integer getWinRate() {
+			return Functions.growthRate(this.latestPrice,this.buyPrice);
 		}
 		
 		public boolean isHold() {

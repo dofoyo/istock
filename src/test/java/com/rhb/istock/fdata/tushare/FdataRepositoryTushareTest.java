@@ -1,7 +1,12 @@
 package com.rhb.istock.fdata.tushare;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -13,6 +18,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import com.rhb.istock.comm.util.FileTools;
 import com.rhb.istock.comm.util.Progress;
 import com.rhb.istock.item.ItemService;
 
@@ -58,6 +64,144 @@ public class FdataRepositoryTushareTest {
 	}
 	
 	//@Test
+	public void getIndicators1() {
+		List<String> ids = itemService.getItemIDs();
+		Map<String,FinaIndicator> indicators;
+		FinaIndicator indicator;
+		String date = "20181231";
+		List<FinaIndicator> fis = new ArrayList<FinaIndicator>();
+		int i=1;
+		for(String id : ids) {
+			Progress.show(ids.size(), i++, id);
+			indicators = fdataRepositoryTushare.getIndicators(id);
+			indicator = indicators.get(date);
+			if(indicator!=null) {
+				indicator.setItemID(id);
+				fis.add(indicator);
+			}
+		}
+		
+		Collections.sort(fis, new Comparator<FinaIndicator>() {
+			@Override
+			public int compare(FinaIndicator o1, FinaIndicator o2) {
+				return o2.getGrossprofit_margin().compareTo(o1.getGrossprofit_margin());
+			}
+			
+		});
+		
+		System.out.println(fis.size());
+		
+		System.out.format("id,date,Grossprofit_margin,profit_dedt,dt_netprofit_yoy,or_yoy,ocfps\n");
+		for(FinaIndicator fi : fis) {
+			//if(fi.getGrossprofit_margin().compareTo(BigDecimal.ZERO)==1) {
+				System.out.format("%s, %s, %.2f, %.2f, %.2f, %.2f, %.3f\n", fi.getItemID(), fi.getEnd_date(), fi.getGrossprofit_margin(),fi.getProfit_dedt(),fi.getDt_netprofit_yoy(), fi.getOr_yoy(),fi.getOcfps());
+			//}
+		}
+	}
+	
+	//@Test
+	public void getIndicators2() {
+		List<String> ids = itemService.getItemIDs();
+		Map<String,FinaIndicator> indicators;
+		FinaIndicator i1,i2,i3;
+		String date1 = "20171231";
+		String date2 = "20181231";
+		String date3 = "20191231";
+		List<FinaIndicator> fis = new ArrayList<FinaIndicator>();
+		int i=1;
+		for(String id : ids) {
+			Progress.show(ids.size(), i++, id);
+			indicators = fdataRepositoryTushare.getIndicators(id);
+			i1 = indicators.get(date1);
+			i2 = indicators.get(date2);
+			i3 = indicators.get(date3);
+			
+			if(i1!=null && i2!=null && i3!=null
+					&& i1.isOK() && i2.isOK() && i3.isOK()
+					) {
+				i3.setItemID(id);
+				fis.add(i3);
+			}
+		}
+		
+		Collections.sort(fis, new Comparator<FinaIndicator>() {
+			@Override
+			public int compare(FinaIndicator o1, FinaIndicator o2) {
+				return o2.getGrossprofit_margin().compareTo(o1.getGrossprofit_margin());
+			}
+			
+		});
+		
+		System.out.println(fis.size());
+		
+		System.out.format("id,date,Grossprofit_margin,profit_dedt,dt_netprofit_yoy,or_yoy,ocfps\n");
+		for(FinaIndicator fi : fis) {
+			//if(fi.getGrossprofit_margin().compareTo(BigDecimal.ZERO)==1) {
+				System.out.format("%s, %s, %.2f, %.2f, %.2f, %.2f, %.3f\n", fi.getItemID(), fi.getEnd_date(), fi.getGrossprofit_margin(),fi.getProfit_dedt(),fi.getDt_netprofit_yoy(), fi.getOr_yoy(),fi.getOcfps());
+			//}
+		}
+	}
+	
+	@Test
+	public void getIndicators3() {
+		Map<Integer,Set<String>> results = new HashMap<Integer,Set<String>>();
+		List<String> ids = itemService.getItemIDs();
+		int i=1;
+		Set<Integer> years;
+		Set<String> okIDs;
+		for(String id : ids) {
+			Progress.show(ids.size(), i++, id);
+			years = this.getOKs(id);
+			for(Integer year : years) {
+				okIDs = results.get(year);
+				if(okIDs == null) {
+					okIDs = new HashSet<String>();
+				}
+				okIDs.add(id);
+				results.put(year, okIDs);
+			}
+		}
+		
+		StringBuffer sb = new StringBuffer();
+		for(Map.Entry<Integer, Set<String>> entry : results.entrySet()) {
+			sb.append(entry.getKey());
+			sb.append(",");
+			for(String str : entry.getValue()) {
+				sb.append(str);
+				sb.append(",");
+			}
+			sb.replace(sb.length()-1, sb.length(), "\n");
+		}
+
+		String path = "D:\\dev\\istock-data\\fdata\\oks.txt";
+		
+		FileTools.writeTextFile(path, sb.toString(), false);
+		
+	}
+	
+	private Set<Integer> getOKs(String itemID){
+		Set<Integer> years = new HashSet<Integer>();
+		Map<String,FinaIndicator> indicators = fdataRepositoryTushare.getIndicators(itemID);
+		FinaIndicator i1,i2,i3;
+		for(int year=2020; year>=2009; year--) {
+			String date1 = Integer.toString(year-3) + "1231";
+			String date2 = Integer.toString(year-2) + "1231";
+			String date3 = Integer.toString(year-1) + "1231";
+			
+			i1 = indicators.get(date1);
+			i2 = indicators.get(date2);
+			i3 = indicators.get(date3);
+			
+			if(i1!=null && i2!=null && i3!=null
+					&& i1.isOK() && i2.isOK() && i3.isOK()
+					) {
+				years.add(year);
+			}			
+		}
+		return years;
+	}
+	
+	//@Test
 	public void getFina() {
 		String itemID = "sz300022";
 		String end_date = "20191231";
@@ -86,7 +230,7 @@ public class FdataRepositoryTushareTest {
 		}
 	}
 	
-	@Test
+	//@Test
 	public void getHolders() {
 		Map<String,Integer> holderIds = new HashMap<String,Integer>();
 		String str = "潘宇红";

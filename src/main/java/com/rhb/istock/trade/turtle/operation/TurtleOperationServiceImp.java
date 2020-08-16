@@ -535,6 +535,7 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 					preyMap.put("area", item.getArea());
 					preyMap.put("topic", this.getTopic(id));
 					preyMap.put("price", muster==null ? "0" : muster.getLatestPrice().toString());
+					preyMap.put("hlgap", muster==null ? "0" : muster.getHLGap().toString());
 					views.add(new ItemView(preyMap));						
 				}
 		}
@@ -543,10 +544,12 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 			Collections.sort(views, new Comparator<ItemView>() {
 				@Override
 				public int compare(ItemView o1, ItemView o2) {
-					BigDecimal now1 = new BigDecimal(o1.getPrice());
-					BigDecimal now2 = new BigDecimal(o2.getPrice());
-					
-					return now1.compareTo(now2);
+					if(o1.getHlgap().compareTo(o2.getHlgap())==0) {
+						BigDecimal now1 = new BigDecimal(o1.getPrice());
+						BigDecimal now2 = new BigDecimal(o2.getPrice());
+						return now1.compareTo(now2);
+					}
+					return o1.getHlgap().compareTo(o2.getHlgap());
 				}
 			});		
 		}
@@ -893,11 +896,36 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 
 	@Override
 	public List<ItemView> getB21Views() {
-		LocalDate endDate = kdataService.getLatestMarketDate("sh000001");
-		List<String> b21s = b21Service.getB21s(endDate);
-		Map<String,String> finas = fdataServiceTushare.getFinaGrowthRatioInfo(new HashSet<String>(b21s));
-		Map<String, String> favors = selectorService.getFavors();
-		List<ItemView> views = buildItemViews(b21s, false);
+		//LocalDate endDate = kdataService.getLatestMarketDate("sh000001");
+		//List<String> b21s = b21Service.getB21s(endDate);
+		
+		Map<String, String> favors = selectorService.getFavorsOfB21();
+		Map<String,String> finas = fdataServiceTushare.getFinaGrowthRatioInfo(new HashSet<String>(favors.keySet()));
+		
+		
+		List<ItemView> views = buildItemViews(new ArrayList<String>(favors.keySet()), true);
+		
+		for(ItemView view : views) {
+			view.setLabel(favors.get(view.getItemID()));
+			
+			if(finas.get(view.getItemID())!=null) {
+				view.setFina(finas.get(view.getItemID()));
+			}
+		}
+		
+		return views;
+	}
+	
+	@Override
+	public List<ItemView> getB21upViews() {
+		//LocalDate endDate = kdataService.getLatestMarketDate("sh000001");
+		//List<String> b21s = b21Service.getB21s(endDate);
+		
+		Map<String, String> favors = selectorService.getFavorsOfB21up();
+		Map<String,String> finas = fdataServiceTushare.getFinaGrowthRatioInfo(new HashSet<String>(favors.keySet()));
+		
+		
+		List<ItemView> views = buildItemViews(new ArrayList<String>(favors.keySet()), true);
 		
 		for(ItemView view : views) {
 			view.setLabel(favors.get(view.getItemID()));

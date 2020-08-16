@@ -36,6 +36,7 @@ public interface TurtleOperationService {
 	public List<ItemView> getPowers();
 	public List<ForecastView> getForecastViews();
 	public List<ItemView> getB21Views();
+	public List<ItemView> getB21upViews();
 	
 	/*
 	 * 一般每周1-5，每天上午9:00初始化一次。主要是导入之前的历史记录

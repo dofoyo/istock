@@ -5,15 +5,17 @@ import java.math.BigDecimal;
 import org.json.JSONArray;
 
 public class FinaIndicator {
+	private String itemID;
 	private String ann_date;		//str	公告日期
 	private String end_date;		//str	报告期
-	private BigDecimal profit_dedt;
-	private BigDecimal grossprofit_margin;
+	private BigDecimal profit_dedt;			//扣除非经常性损益后的净利润
+	private BigDecimal grossprofit_margin;  //销售毛利率
 	private BigDecimal op_yoy;  			//营业利润同比增长率(%)
 	private BigDecimal ebt_yoy;  			//利润总额同比增长率(%)
 	private BigDecimal netprofit_yoy; 		//归属母公司股东的净利润同比增长率(%)  -- 业绩预告
 	private BigDecimal dt_netprofit_yoy; 	//归属母公司股东的净利润-扣除非经常损益同比增长率(%)
 	private BigDecimal or_yoy; 				//营业收入同比增长率(%)
+	private BigDecimal ocfps;				//每股经营活动产生的现金流量净额
 	
 	public boolean isValid() {
 		return this.profit_dedt!=null && !this.profit_dedt.equals(BigDecimal.ZERO);
@@ -22,7 +24,8 @@ public class FinaIndicator {
 		this.ann_date = item.get(1).toString();
 		this.end_date  = item.getString(2);
 		this.profit_dedt  = item.get(11).toString().equals("null") ? BigDecimal.ZERO : item.getBigDecimal(11);
-		this.grossprofit_margin  = item.get(49).toString().equals("null") ? BigDecimal.ZERO : item.getBigDecimal(49);
+		this.ocfps  = item.get(36).toString().equals("null") ? BigDecimal.ZERO : item.getBigDecimal(36);
+		this.grossprofit_margin  = item.get(43).toString().equals("null") ? BigDecimal.ZERO : item.getBigDecimal(43);
 		this.op_yoy  = item.get(94).toString().equals("null") ? BigDecimal.ZERO : item.getBigDecimal(94);
 		this.ebt_yoy  = item.get(95).toString().equals("null") ? BigDecimal.ZERO : item.getBigDecimal(95);
 		this.netprofit_yoy  = item.get(96).toString().equals("null") ? BigDecimal.ZERO : item.getBigDecimal(96);
@@ -30,6 +33,27 @@ public class FinaIndicator {
 		this.or_yoy  = item.get(104).toString().equals("null") ? BigDecimal.ZERO : item.getBigDecimal(104);
 	}
 	
+	public boolean isOK() {
+		return this.profit_dedt.compareTo(BigDecimal.ZERO)==1
+				&& this.grossprofit_margin.compareTo(BigDecimal.ZERO)==1
+				&& this.or_yoy.compareTo(BigDecimal.ZERO)==1
+				&& this.dt_netprofit_yoy.compareTo(BigDecimal.ZERO)==1
+				&& this.ocfps.compareTo(BigDecimal.ZERO)==1
+				;
+	}
+	
+	public BigDecimal getOcfps() {
+		return ocfps;
+	}
+	public void setOcfps(BigDecimal ocfps) {
+		this.ocfps = ocfps;
+	}
+	public String getItemID() {
+		return itemID;
+	}
+	public void setItemID(String itemID) {
+		this.itemID = itemID;
+	}
 	public String getInfo() {
 		return end_date+"净利:" +  netprofit_yoy.intValue() + "、非经:" +  dt_netprofit_yoy.intValue() + "、营收:" + or_yoy.intValue() + "";
 	}

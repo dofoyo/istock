@@ -117,4 +117,10 @@ public class TurtleApi{
 		List<ItemView> views = ts.getB21Views();
 		return new ResponseContent<List<ItemView>>(ResponseEnum.SUCCESS, views);
 	}
+	
+	@GetMapping("/turtle/b21up")
+	public ResponseContent<List<ItemView>> getB21upViews() {
+		List<ItemView> views = ts.getB21upViews();
+		return new ResponseContent<List<ItemView>>(ResponseEnum.SUCCESS, views);
+	}
 }

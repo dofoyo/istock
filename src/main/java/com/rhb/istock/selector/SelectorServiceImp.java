@@ -558,4 +558,14 @@ public class SelectorServiceImp implements SelectorService{
 		return ids;
 	}
 
+	@Override
+	public Map<String, String> getFavorsOfB21() {
+		return favorService.getFavorsOfB21();
+	}
+	
+	@Override
+	public Map<String, String> getFavorsOfB21up() {
+		return favorService.getFavorsOfB21up();
+	}
+
 }

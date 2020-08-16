@@ -1,6 +1,7 @@
 package com.rhb.istock.selector.favor;
 
 import java.io.File;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,7 +12,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.rhb.istock.comm.util.FileTools;
+import com.rhb.istock.comm.util.Functions;
 import com.rhb.istock.fdata.tushare.FdataServiceTushare;
+import com.rhb.istock.kdata.KdataService;
+import com.rhb.istock.kdata.Muster;
 
 @Service("favorServiceImp")
 public class FavorServiceImp implements FavorService {
@@ -24,6 +28,10 @@ public class FavorServiceImp implements FavorService {
 	@Autowired
 	@Qualifier("fdataServiceTushare")
 	FdataServiceTushare fdataServiceTushare;
+	
+	@Autowired
+	@Qualifier("kdataServiceImp")
+	KdataService kdataService;
 	
 	@Override
 	public Map<String, String> getFavors() {
@@ -108,6 +116,48 @@ public class FavorServiceImp implements FavorService {
 		//System.out.println(articles);
 		
 		return articles;
+	}
+
+	@Override
+	public Map<String, String> getFavorsOfB21() {
+		Map<String,String> results = new HashMap<String,String>();
+		LocalDate date = kdataService.getLastKdataDate("sh000001");
+		Map<String,Muster> musters = kdataService.getMusters(date);
+		Muster muster;
+		Integer rate;
+		Map<String,String> favors = this.getFavors();
+		for(String itemID : favors.keySet()) {
+			muster = musters.get(itemID);
+			if(muster!=null ) {
+				rate = Functions.growthRate(muster.getLatestPrice(), muster.getAveragePrice21());
+				if(rate<0 && rate>-8) {
+					results.put(itemID, favors.get(itemID));
+				}
+			}
+		}
+		
+		return results;
+	}
+	
+	@Override
+	public Map<String, String> getFavorsOfB21up() {
+		Map<String,String> results = new HashMap<String,String>();
+		LocalDate date = kdataService.getLastKdataDate("sh000001");
+		Map<String,Muster> musters = kdataService.getMusters(date);
+		Muster muster;
+		Integer rate;
+		Map<String,String> favors = this.getFavors();
+		for(String itemID : favors.keySet()) {
+			muster = musters.get(itemID);
+			if(muster!=null ) {
+				rate = Functions.growthRate(muster.getLatestPrice(), muster.getAveragePrice21());
+				if(rate<5 && rate>=0) {
+					results.put(itemID, favors.get(itemID));
+				}
+			}
+		}
+		
+		return results;
 	}
 	
 

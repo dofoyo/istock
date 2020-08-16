@@ -104,12 +104,12 @@ public class B21Service {
 					}
 
 					if(m.isJustBreaker() 
-							&& m.isUpThan(5)        //大幅
-							&& m.getHLGap()<=55 //股价还没飞涨
-							&& (m.getAverageGap()<8  //均线在8%范围内纠缠
-									|| m.getAveragePrice21().compareTo(p.getAveragePrice21())==1  //上升趋势
+							//&& m.isUpThan(5)        //大幅
+							//&& m.getHLGap()<=55 //股价还没飞涨
+							//&& (m.getAverageGap()<8  //均线在8%范围内纠缠
+								//	|| m.getAveragePrice21().compareTo(p.getAveragePrice21())==1  //上升趋势
 									//|| m.getAverageAmount().compareTo(p.getAverageAmount())==1
-									)  // 放量
+									//)  // 放量
 							) {
 						v = "1";
 					}else if(m.isUpBreaker()) {  //创新高

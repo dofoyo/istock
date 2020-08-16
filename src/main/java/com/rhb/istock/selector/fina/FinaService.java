@@ -1,8 +1,11 @@
 package com.rhb.istock.selector.fina;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -229,11 +232,11 @@ public class FinaService {
 	 * 业绩报告
 	 */
 	public FinaIndicator getIndicator(String itemID, String date) {
-		try {
+		/*try {
 			fdataSpiderTushare.downIndicator(itemID);
 		} catch (Exception e) {
 			e.printStackTrace();
-		}
+		}*/
 		Map<String,FinaIndicator> indicators = fdataRepositoryTushare.getIndicators(itemID);
 		if(indicators.containsKey(date)) {
 			return indicators.get(date);
@@ -242,6 +245,35 @@ public class FinaService {
 		}
 	}
 	
-	
-	
+	public List<NewPE> generateNewPE(String date) {
+		List<NewPE> results = new ArrayList<NewPE>();
+		Map<String, Muster> musters = kdataService.getLatestMusters();
+		List<String> ids = itemService.getItemIDs();
+		FinaIndicator fina;
+		Muster muster;
+		BigDecimal profit_dedt,total_mv,rate;
+		int i=1;
+		for(String id : ids) {
+			Progress.show(ids.size(), i++, id);
+			fina = this.getIndicator(id, date);
+			muster = musters.get(id);
+			if(fina!=null && muster!=null && fina.getProfit_dedt().compareTo(BigDecimal.ZERO)==1) {
+				profit_dedt = fina.getProfit_dedt();
+				total_mv = muster.getTotal_mv();
+				rate = total_mv.divide(profit_dedt,BigDecimal.ROUND_HALF_UP);
+				results.add(new NewPE(id, rate));
+			}
+		}
+		
+		Collections.sort(results, new Comparator<NewPE>() {
+
+			@Override
+			public int compare(NewPE o1, NewPE o2) {
+				return o1.getRate().compareTo(o2.getRate());
+			}
+			
+		});
+		
+		return results;
+	}
 }

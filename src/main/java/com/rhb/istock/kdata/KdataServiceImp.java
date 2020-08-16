@@ -309,7 +309,11 @@ public class KdataServiceImp implements KdataService{
 		Kdata kdata;
 		List<LocalDate> dates;
 		MusterEntity entity;
-
+		Above21 above2121;
+		Above21 above2134;
+		Above21 above2155;
+		Above21 above2189;
+		
 		List<Item> items = itemService.getItems();
 		int i=1;
 		for(Item item : items) {
@@ -317,16 +321,32 @@ public class KdataServiceImp implements KdataService{
 			
 			kdata = this.getKdata(item.getItemID(), true);
 			dates = kdata.getDates();
-			
+			above2121 = new Above21(21);
+			above2134 = new Above21(34);
+			above2155 = new Above21(55);
+			above2189 = new Above21(89);
 			for(LocalDate date : dates) {
 				if(date.isAfter(beginDate)) {
 					entity = this.getMusterEntity(item.getItemID(), date, true);
-					if(entity!=null) musterRepositoryImp.saveTmpMuster(date, entity);
+					if(entity!=null) {
+						above2121.add(entity.isAbove21());
+						above2134.add(entity.isAbove21());
+						above2155.add(entity.isAbove21());
+						above2189.add(entity.isAbove21());
+						entity.setAbove2121(above2121.result());
+						entity.setAbove2134(above2134.result());
+						entity.setAbove2155(above2155.result());
+						entity.setAbove2189(above2189.result());
+						
+						musterRepositoryImp.saveTmpMuster(date, entity);
+					}
 				}
 			}
 			
 			this.evictKDataCache();
 		}
+		
+		logger.info("\n copying......");
 		
 		musterRepositoryImp.copyTmpMusters();
 		
@@ -335,6 +355,29 @@ public class KdataServiceImp implements KdataService{
 		logger.info("用时：" + used + "秒");          
 	}
 
+	class Above21{
+		private Integer period;
+		private List<Integer> count;
+		private Integer total;
+		
+		public Above21(Integer period) {
+			this.period = period;
+			this.total = 0;
+			count = new ArrayList<Integer>();
+		}
+		
+		public void add(Integer i) {
+			count.add(i);
+			total = total + i;
+			if(count.size()>this.period) {
+				total = total - count.remove(0);
+			}
+		}
+		
+		public Integer result() {
+			return total;
+		}
+	}
 	
 	private MusterEntity getMusterEntity(String itemID, LocalDate endDate, boolean cache) {
 		Kdata kdata = this.getKdata(itemID,endDate,openDuration,cache); //不包含endDate
@@ -496,6 +539,10 @@ public class KdataServiceImp implements KdataService{
 		muster.setLatestLowest(entity.getLatestLowest());
 		muster.setAveragePrice5(entity.getAveragePrice5());
 //		muster.setPrviousAverageAmount(previousEntity==null ? muster.getAverageAmount() : previousEntity.getAverageAmount());
+		muster.setAbove2121(entity.getAbove2121());
+		muster.setAbove2134(entity.getAbove2134());
+		muster.setAbove2155(entity.getAbove2155());
+		muster.setAbove2189(entity.getAbove2189());
 		return muster;
 	}
 

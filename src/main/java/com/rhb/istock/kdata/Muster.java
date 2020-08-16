@@ -45,7 +45,47 @@ public class Muster {
 	private DecimalFormat df = new DecimalFormat("#.00");
 	private BigDecimal prviousAverageAmount=null;
 	private Integer prviousAverageGap=null;
+	private Integer above2121=0;
+	private Integer above2134=0;
+	private Integer above2155=0;
+	private Integer above2189=0;
 	
+	public BigDecimal getCloseRateOf21() {
+		return this.latestPrice.divide(this.averagePrice21,BigDecimal.ROUND_HALF_UP);
+	}
+	
+	public Integer getAbove2121() {
+		return above2121;
+	}
+
+	public void setAbove2121(Integer above2121) {
+		this.above2121 = above2121;
+	}
+
+	public Integer getAbove2134() {
+		return above2134;
+	}
+
+	public void setAbove2134(Integer above2134) {
+		this.above2134 = above2134;
+	}
+
+	public Integer getAbove2155() {
+		return above2155;
+	}
+
+	public void setAbove2155(Integer above2155) {
+		this.above2155 = above2155;
+	}
+
+	public Integer getAbove2189() {
+		return above2189;
+	}
+
+	public void setAbove2189(Integer above2189) {
+		this.above2189 = above2189;
+	}
+
 	public LocalDate getDate() {
 		return date;
 	}
@@ -598,10 +638,10 @@ public class Muster {
 
 	@Override
 	public String toString() {
-		return "Muster [itemID=" + itemID + ", itemName=" + itemName + ", industry=" + industry + ", close=" + close
-				+ ", limited=" + limited + ", latestPrice=" + latestPrice + ", latestHighest=" + latestHighest
-				+ ", latestLowest=" + latestLowest + ", latestAmount=" + latestAmount + ", highest=" + highest
-				+ ", lowest=" + lowest + ", averageAmount=" + averageAmount + ", averagePrice=" + averagePrice
+		return "Muster [itemID=" + itemID + ", itemName=" + itemName + ", industry=" + industry + ", date=" + date
+				+ ", close=" + close + ", limited=" + limited + ", latestPrice=" + latestPrice + ", latestHighest="
+				+ latestHighest + ", latestLowest=" + latestLowest + ", latestAmount=" + latestAmount + ", highest="
+				+ highest + ", lowest=" + lowest + ", averageAmount=" + averageAmount + ", averagePrice=" + averagePrice
 				+ ", averagePrice5=" + averagePrice5 + ", averagePrice8=" + averagePrice8 + ", averagePrice13="
 				+ averagePrice13 + ", averagePrice21=" + averagePrice21 + ", averagePrice34=" + averagePrice34
 				+ ", lowest34=" + lowest34 + ", lowest21=" + lowest21 + ", lowest13=" + lowest13 + ", lowest8="
@@ -610,7 +650,8 @@ public class Muster {
 				+ ", average_volume_ratio=" + average_volume_ratio + ", total_mv=" + total_mv + ", circ_mv=" + circ_mv
 				+ ", total_share=" + total_share + ", float_share=" + float_share + ", free_share=" + free_share
 				+ ", amount5=" + amount5 + ", pe=" + pe + ", df=" + df + ", prviousAverageAmount="
-				+ prviousAverageAmount + "]";
+				+ prviousAverageAmount + ", prviousAverageGap=" + prviousAverageGap + ", above2121=" + above2121
+				+ ", above2134=" + above2134 + ", above2155=" + above2155 + ", above2189=" + above2189 + "]";
 	}	
 	
 }

@@ -76,6 +76,13 @@ public class TurtleMusterSimulation {
 		B21plus avb = new B21plus(initCash,1);  //平衡市策略：高价破21日线
 		B21plus bhl = new B21plus(initCash,0);  //牛市和平衡市策略：低价破21日线
 		
+
+/*		Above hlb = new Above(initCash,21); //连续21天在21日线上
+		Above bdt = new Above(initCash,34); //连续34天在21日线上
+
+		Above avb = new Above(initCash,55);  //连续55天在21日线上
+		Above bhl = new Above(initCash,89);  //连续89天在21日线上
+*/		
 		DrumPlus bav = new DrumPlus(initCash,1);  //高价+上升趋势+强于大盘
 		DrumPlus dtb = new DrumPlus(initCash,0);  //低价+上升趋势+强于大盘
 

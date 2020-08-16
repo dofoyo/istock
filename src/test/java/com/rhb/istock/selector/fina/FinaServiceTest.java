@@ -1,5 +1,6 @@
 package com.rhb.istock.selector.fina;
 
+import java.util.List;
 import java.util.Map;
 
 import org.junit.Test;
@@ -16,7 +17,7 @@ public class FinaServiceTest {
 	@Qualifier("finaService")
 	FinaService finaService;
 	
-	@Test
+	//@Test
 	public void generateQuarterCompare() {
 		//String itemID = "sz300022";
 		//String begin = "20190331";
@@ -32,6 +33,19 @@ public class FinaServiceTest {
 		Map<String,QuarterCompare> qcs = finaService.getForecasts();
 		for(Map.Entry<String, QuarterCompare> entry : qcs.entrySet()) {
 			System.out.println(entry.getValue().getTxt());
+		}
+	}
+	
+	@Test
+	public void generateNewPE() {
+		String date = "20191231";
+		List<NewPE> pes = finaService.generateNewPE(date);
+		int i=0;
+		for(NewPE pe : pes) {
+			System.out.println(pe);
+			if(i++ > 100) {
+				break;
+			}
 		}
 	}
 }
