@@ -1,4 +1,4 @@
-package com.rhb.istock.fund;
+package com.rhb.istock.account;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

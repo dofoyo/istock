@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.rhb.istock.comm.util.Progress;
+import com.rhb.istock.fdata.tushare.FdataServiceTushare;
 import com.rhb.istock.index.tushare.IndexServiceTushare;
 import com.rhb.istock.item.ItemService;
 import com.rhb.istock.kdata.KdataService;
@@ -48,6 +49,10 @@ public class TurtleMusterSimulation {
 	@Autowired
 	@Qualifier("indexServiceTushare")
 	IndexServiceTushare indexServiceTushare;
+
+	@Autowired
+	@Qualifier("fdataServiceTushare")
+	FdataServiceTushare fdataServiceTushare;
 	
 	BigDecimal initCash = new BigDecimal(1000000);
 	
@@ -92,6 +97,9 @@ public class TurtleMusterSimulation {
 		Integer previous_period  = 13; //历史纪录区间，主要用于后面判断
 
 		Integer sseiFlag, sseiRatio;
+		
+		//Map<Integer,Set<String>> year_oks = fdataServiceTushare.getOks();
+		
 		Set<String> oks = null;
 		
 		long days = endDate.toEpochDay()- beginDate.toEpochDay();
@@ -110,7 +118,7 @@ public class TurtleMusterSimulation {
 				
 				sseiFlag = kdataService.getSseiFlag(date);
 				sseiRatio = indexServiceTushare.getSseiGrowthRate(date, previous_period);
-				//oks = indexServiceTushare.getItemIDsFromTopGrowthRateIndex(date, previous_period, 3);
+				//oks = year_oks.get(date.getYear());
 
 				hlb.doIt(musters, previous, date, sseiFlag, sseiRatio);
 				bdt.doIt(musters, previous, date, sseiFlag, sseiRatio);
@@ -118,7 +126,6 @@ public class TurtleMusterSimulation {
 				avb.doIt(musters, previous, date, sseiFlag, sseiRatio);
 				bhl.doIt(musters, previous, date, sseiFlag, sseiRatio);
 
-				//bav.doIt(musters, previous.get(0), date, sseiFlag);
 				bav.doIt(musters, previous, date, sseiFlag, sseiRatio);
 				dtb.doIt(musters, previous, date, sseiFlag, sseiRatio);
 			}

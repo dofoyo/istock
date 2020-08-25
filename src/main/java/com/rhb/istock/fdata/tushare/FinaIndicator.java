@@ -34,11 +34,11 @@ public class FinaIndicator {
 	}
 	
 	public boolean isOK() {
-		return this.profit_dedt.compareTo(BigDecimal.ZERO)==1
-				&& this.grossprofit_margin.compareTo(BigDecimal.ZERO)==1
-				&& this.or_yoy.compareTo(BigDecimal.ZERO)==1
-				&& this.dt_netprofit_yoy.compareTo(BigDecimal.ZERO)==1
-				&& this.ocfps.compareTo(BigDecimal.ZERO)==1
+		return this.profit_dedt.compareTo(BigDecimal.ZERO)==1   //扣除非经常性损益后的净利润
+				&& this.grossprofit_margin.compareTo(BigDecimal.ZERO)==1   //销售毛利率
+				&& this.or_yoy.compareTo(BigDecimal.ZERO)==1    //营业收入同比增长率(%)
+				&& this.dt_netprofit_yoy.compareTo(BigDecimal.ZERO)==1  //归属母公司股东的净利润-扣除非经常损益同比增长率(%)
+				//&& this.ocfps.compareTo(BigDecimal.ZERO)==1  //每股经营活动产生的现金流量净额
 				;
 	}
 	

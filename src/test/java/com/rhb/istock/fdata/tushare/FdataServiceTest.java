@@ -91,10 +91,40 @@ public class FdataServiceTest {
 	}
 	
 	
-	@Test
+	//@Test
 	public void getFloatholders() {
 		Map<String,Map<String,Integer>> hs = fdataServiceTushare.getFloatholders();
 		System.out.println(hs);
+	}
+	
+	@Test
+	public void getOKs() {
+		Set<String> result = new HashSet<String>();
+		Map<Integer,Set<String>> oks = fdataServiceTushare.getOks();
+		
+		Set<String> s2019 = oks.get(2019);
+		Set<String> s2018 = oks.get(2018);
+		Set<String> s2017 = oks.get(2017);
+		//Set<String> s2016 = oks.get(2016);
+		//Set<String> s2015 = oks.get(2015);
+		
+		for(String str : s2019) {
+			if(s2018.contains(str) && s2017.contains(str) 
+					//&& s2016.contains(str) && s2015.contains(str)
+					) {
+				result.add(str);
+			}
+		}
+		
+		System.out.println(result.size());
+		
+		for(String str: result) {
+			System.out.print(str + ",");
+		}
+		
+		System.out.println();
+		
+		
 	}
 	
 }

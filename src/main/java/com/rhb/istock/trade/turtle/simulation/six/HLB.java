@@ -15,8 +15,8 @@ import java.util.TreeMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.rhb.istock.account.Account;
 import com.rhb.istock.comm.util.Functions;
-import com.rhb.istock.fund.Account;
 import com.rhb.istock.kdata.Muster;
 /*
  * 低价新高

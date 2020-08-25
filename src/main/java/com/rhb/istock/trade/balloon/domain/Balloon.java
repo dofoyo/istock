@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.rhb.istock.fund.Account;
+import com.rhb.istock.account.Account;
 
 /*
  * 气球模型（均线上堆积成交越多，股价上涨的概率越大）

@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.rhb.istock.fund.Account;
+import com.rhb.istock.account.Account;
 
 /*
  * 按照海龟的标准版本，突破上轨买入，跌破下轨卖出

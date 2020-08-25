@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.rhb.istock.fund.Account;
+import com.rhb.istock.account.Account;
 
 /*
  * 
