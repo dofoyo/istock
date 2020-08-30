@@ -43,6 +43,7 @@ public class IstockScheduledTask {
 	@Autowired
 	@Qualifier("indexServiceTushare")
 	IndexServiceTushare indexServiceTushare;
+	
 /*	@Autowired
 	@Qualifier("financialStatementServiceImp")
 	FinancialStatementService financialStatementService;*/
@@ -113,6 +114,7 @@ public class IstockScheduledTask {
 			kdataService.generateLatestMusters(null);
 			kdataService.updateLatestMusters();
 			turtleOperationService.init();  // 4.
+			indexServiceTushare.init();
 		}
 	}
 

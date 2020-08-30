@@ -32,6 +32,10 @@ public class IndexServiceTushare {
 	
 	protected static final Logger logger = LoggerFactory.getLogger(IndexServiceTushare.class);
 	
+	public void init() {
+		indexRepositoryTushare.evictIndexDatasCache();
+	}
+	
 	public Set<LocalDate> getSseiDates(LocalDate endDate, Integer period){
 		String ts_code = "000001.SH";
 		IndexData data = this.getIndexDatas(ts_code, endDate, period);

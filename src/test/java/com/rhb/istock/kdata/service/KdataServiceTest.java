@@ -44,7 +44,7 @@ public class KdataServiceTest {
 	}
 	
 	
-	@Test
+	//@Test
 	public void getLastMusters() {
 		LocalDate date = LocalDate.parse("2020-08-14");
 		Map<String,Muster> musters = kdataService.getMusters(date);
@@ -67,9 +67,9 @@ public class KdataServiceTest {
 		}
 	}
 	
-	//@Test
+	@Test
 	public void downClosedDatas() {
-		LocalDate date = LocalDate.parse("2020-07-21");
+		LocalDate date = LocalDate.parse("2020-08-25");
 		try {
 			kdataService.downClosedDatas(date);
 		} catch (Exception e) {

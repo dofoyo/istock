@@ -30,6 +30,8 @@ b21File: d:/dev/istock-data/b21.txt
 quarterCompareFile: d:/dev/istock-data/quarterCompare.txt
 makersFile: d:/dev/istock-data/makers.txt
 indexFile: d:/dev/istock-data/kdata/tushare/index/index.txt
+fundsFile: d:/dev/istock-data/funds.txt
+fundsPath: D:/dev/istock-data/funds
 openDuration: 89
 dropDuration: 21
 

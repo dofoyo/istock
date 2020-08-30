@@ -186,7 +186,11 @@ public class B21plus {
 		Collections.sort(ms, new Comparator<Muster>() {
 			@Override
 			public int compare(Muster o1, Muster o2) {
-				return o1.getLNGap().compareTo(o2.getLNGap()); //
+				if(o1.getHLGap().compareTo(o2.getHLGap())==0){
+					return o1.getLNGap().compareTo(o2.getLNGap());
+				}else {
+					return o1.getHLGap().compareTo(o2.getHLGap());
+				}
 			}
 		});
 		
