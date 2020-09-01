@@ -27,7 +27,7 @@ import com.rhb.istock.item.ItemService;
 import com.rhb.istock.kdata.Kbar;
 import com.rhb.istock.kdata.KdataService;
 import com.rhb.istock.kdata.api.KdatasView;
-import com.rhb.istock.selector.b21.B21Service;
+import com.rhb.istock.selector.newb.NewbService;
 import com.rhb.istock.trade.turtle.simulation.six.TurtleMusterSimulation;
 import com.rhb.istock.trade.turtle.simulation.six.TurtleMusterSimulation_avb_plus;
 import com.rhb.istock.trade.turtle.simulation.six.TurtleMusterSimulation_hua;
@@ -61,10 +61,12 @@ public class ManualApi {
 	KdataService kdataService;
 
 	@Autowired
-	@Qualifier("b21Service")
-	B21Service b21Service;
-	
-	Map<LocalDate, String> selects = new TreeMap<LocalDate, String>();
+	@Qualifier("newbService")
+	NewbService newbService;
+
+	@Autowired
+	@Qualifier("manualService")
+	ManualService manualService;
 	
 	@GetMapping("/turtle/manual/kdatas/{itemID}")
 	public ResponseContent<KdatasView> getKdatas(@PathVariable(value="itemID") String itemID,
@@ -198,7 +200,7 @@ public class ManualApi {
 			new ResponseContent<List<ItemView>>(ResponseEnum.ERROR, views);
 		}
 		
-		List<String> ids = b21Service.getB21s(theDate);
+		List<String> ids = newbService.getNewbs(theDate);
 		if(ids!=null && !ids.isEmpty()) {
 			for(String id : ids) {
 				views.add(new ItemView(id,itemService.getItem(id).getName()));
@@ -224,7 +226,7 @@ public class ManualApi {
 			new ResponseContent<List<ItemView>>(ResponseEnum.ERROR, views);
 		}
 		
-		selects.put(theDate, itemID);		
+		manualService.addSelects(theDate, itemID);		
 		
 		return new ResponseContent<List<ItemView>>(ResponseEnum.SUCCESS, views);
 	}
@@ -244,7 +246,7 @@ public class ManualApi {
 			new ResponseContent<List<ItemView>>(ResponseEnum.ERROR, views);
 		}
 		
-		selects.remove(theDate);
+		manualService.deleteSelects(theDate);
 
 		return new ResponseContent<List<ItemView>>(ResponseEnum.SUCCESS, views);
 	}
@@ -252,6 +254,8 @@ public class ManualApi {
 	@GetMapping("/turtle/manual/selects")
 	public ResponseContent<List<SelectView>> getSelects() {
 		List<SelectView> views = new ArrayList<SelectView>();
+		
+		Map<LocalDate, String> selects = manualService.getSelects();
 		
 		for(Map.Entry<LocalDate, String> entry : selects.entrySet()) {
 			views.add(new SelectView(entry.getValue(),itemService.getItem(entry.getValue()).getName(),entry.getKey()));

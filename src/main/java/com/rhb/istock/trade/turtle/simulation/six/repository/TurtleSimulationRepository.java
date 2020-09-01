@@ -90,13 +90,15 @@ public class TurtleSimulationRepository {
 		List<String> ids;
 		for(String line : lines) {
 			//System.out.println(line);
-			columns = line.split(",");
-			date = LocalDate.parse(columns[0],DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-			ids = new ArrayList<String>();
-			for(int i=1; i<columns.length; i++) {
-				ids.add(columns[i]);
+			if(line.length()>0 && line.contains(",")) {
+				columns = line.split(",");
+				date = LocalDate.parse(columns[0],DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+				ids = new ArrayList<String>();
+				for(int i=1; i<columns.length; i++) {
+					ids.add(columns[i]);
+				}
+				breakers.put(date, ids);
 			}
-			breakers.put(date, ids);
 		}		
 		
 		return breakers;
