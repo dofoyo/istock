@@ -541,6 +541,9 @@ public class Muster {
 	}
 	
 	public boolean isUpBreaker() {
+/*		if(this.itemID.equals("sh601633")) {
+			System.out.println(" highest=" + this.highest.toString() + ", latestPrice=" + this.latestPrice.toString());
+		}*/
 		return latestPrice.compareTo(highest)==1; 
 	}
 	

@@ -25,7 +25,7 @@ public class ItemSpiderTushare implements ItemSpider {
 	protected static final Logger logger = LoggerFactory.getLogger(ItemSpiderTushare.class);
 	
 	@Override
-	public void download() throws Exception {
+	public void downItems() throws Exception {
 		logger.info("download items...");
 		
 		String url = "http://api.tushare.pro";
@@ -60,19 +60,22 @@ public class ItemSpiderTushare implements ItemSpider {
 
 	@Override
 	public String getTopic(String itemID) {
-		System.out.print(" getting topic... ");
+		//System.out.print(" getting topic... ");
 
 		String code = itemID.substring(2);
 		String strUrl = "http://stockpage.10jqka.com.cn/"+code+"/";
 		String result = HttpClient.doGet(strUrl);
 		String topic = ParseString.subString(result, "<dd title=\"|\">");
+		if(topic==null) {
+			return "other";
+		}
 		topic = topic.replaceAll("概念",	 "");
 		
 		//Set<String> topics = new HashSet<String>();
 		
 		
 		//System.out.println(strUrl);
-		System.out.println(topic);
+		//System.out.println(topic);
 		
 		return topic;
 	}

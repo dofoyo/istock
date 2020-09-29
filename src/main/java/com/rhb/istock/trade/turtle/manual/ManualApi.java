@@ -27,6 +27,7 @@ import com.rhb.istock.item.ItemService;
 import com.rhb.istock.kdata.Kbar;
 import com.rhb.istock.kdata.KdataService;
 import com.rhb.istock.kdata.api.KdatasView;
+import com.rhb.istock.selector.drum.DrumService;
 import com.rhb.istock.selector.newb.NewbService;
 import com.rhb.istock.trade.turtle.simulation.six.TurtleMusterSimulation;
 import com.rhb.istock.trade.turtle.simulation.six.TurtleMusterSimulation_avb_plus;
@@ -65,13 +66,16 @@ public class ManualApi {
 	NewbService newbService;
 
 	@Autowired
+	@Qualifier("drumService")
+	DrumService drumService;
+	
+	@Autowired
 	@Qualifier("manualService")
 	ManualService manualService;
 	
 	@GetMapping("/turtle/manual/kdatas/{itemID}")
 	public ResponseContent<KdatasView> getKdatas(@PathVariable(value="itemID") String itemID,
-			@RequestParam(value="endDate") String endDate,
-			@RequestParam(value="theType") String type
+			@RequestParam(value="endDate") String endDate
 			) {
 
 		//System.out.println(endDate);
@@ -92,24 +96,25 @@ public class ManualApi {
 			kdatas.setCode(item.getCode());
 			kdatas.setName(item.getName());
 			
-			LocalDate latestDate = kdataService.getLatestMarketDate("sh000001");
 			List<LocalDate> dates = kdataService.getKdata(itemID, theEndDate, true).getDates();
+			
 			Kbar bar=null;
 			for(LocalDate date : dates) {
 				bar = kdataService.getKbar(itemID, date, true);
 				kdatas.addKdata(date, bar.getOpen(), bar.getHigh(), bar.getLow(), bar.getClose());
 			}
 			
-			Kbar latestBar;
-			if(theEndDate.equals(latestDate)) {
-				latestBar = kdataService.getLatestMarketData(itemID);
-				if(bar==null || !bar.getDate().equals(latestBar.getDate())) {
+			//System.out.println(bar);
+			
+			if(bar==null || !bar.getDate().equals(theEndDate)) {
+				Kbar latestBar = kdataService.getLatestMarketData(itemID);
+				if(latestBar!=null) {
 					kdatas.addKdata(theEndDate, latestBar.getOpen(), latestBar.getHigh(), latestBar.getLow(), latestBar.getClose());
 				}
-			}			
+			}
 			
-			kdatas.addBuys(turtleSimulationRepository.getBuys(itemID,type));
-			kdatas.addSells(turtleSimulationRepository.getSells(itemID,type));
+			kdatas.addBuys(turtleSimulationRepository.getBuys(itemID,"manual"));
+			kdatas.addSells(turtleSimulationRepository.getSells(itemID,"manual"));
 		}
 		
 		return new ResponseContent<KdatasView>(ResponseEnum.SUCCESS, kdatas);
@@ -117,30 +122,18 @@ public class ManualApi {
 	
 	
 	
-	@GetMapping("/turtle/manual/run/{bdate}/{edate}")
-	public ResponseContent<String> simulate(
-			@PathVariable(value="bdate") String bdate,
-			@PathVariable(value="edate") String edate){
+	@GetMapping("/turtle/manual/run/{simulateType}")
+	public ResponseContent<String> simulate(@PathVariable(value="simulateType") String simulateType){
 		
-		LocalDate theBeginDate = null;
-		LocalDate theEndDate = null;
-		try{
-			theBeginDate = LocalDate.parse(bdate, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-			theEndDate = LocalDate.parse(edate, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-		}catch(Exception e){
-			return new ResponseContent<String>(ResponseEnum.ERROR, " NO date!");
-		}
-
 		turtleSimulationRepository.evictAmountsCache();
 		turtleSimulationRepository.evictBreakersCache();
 		turtleSimulationRepository.evictBuysCache();
 		turtleSimulationRepository.evictSellsCache();
 
 		
-		turtleMusterSimulation.simulate(theBeginDate, theEndDate); 
-		//turtleMusterSimulation_hua.simulate(theBeginDate, theEndDate);
-		//turtleMusterSimulation_avb_plus.simulate(theBeginDate, theEndDate);
+		manualService.simulate(simulateType); 
 		
+		kdataService.evictKDataCache();
 		turtleSimulationRepository.evictAmountsCache();
 		turtleSimulationRepository.evictBreakersCache();
 		turtleSimulationRepository.evictBuysCache();
@@ -163,22 +156,17 @@ public class ManualApi {
 			return new ResponseContent<AllAmountView>(ResponseEnum.ERROR, view);
 		}
 
-		Map<LocalDate, AmountEntity> bhl = turtleSimulationRepository.getAmounts("bhl");
-		Map<LocalDate, AmountEntity> bav = turtleSimulationRepository.getAmounts("bav");
-		Map<LocalDate, AmountEntity> bdt = turtleSimulationRepository.getAmounts("bdt");
-		Map<LocalDate, AmountEntity> hlb = turtleSimulationRepository.getAmounts("hlb");
-		Map<LocalDate, AmountEntity> avb = turtleSimulationRepository.getAmounts("avb");
-		Map<LocalDate, AmountEntity> dtb = turtleSimulationRepository.getAmounts("dtb");
+		Map<LocalDate, AmountEntity> manual = turtleSimulationRepository.getAmounts("manual");
 
-		for(LocalDate theDate : hlb.keySet()) {
+		for(LocalDate theDate : manual.keySet()) {
 			if(theDate.isBefore(theEndDate) || theDate.equals(theEndDate)) {
 				view.add(theDate, 
-						bhl.get(theDate).getTotal(),
-						bav.get(theDate).getTotal(),
-						bdt.get(theDate).getTotal(),
-						hlb.get(theDate).getTotal(), 
-						avb.get(theDate).getTotal(), 
-						dtb.get(theDate).getTotal());
+						manual.get(theDate).getTotal(),
+						manual.get(theDate).getTotal(),
+						manual.get(theDate).getTotal(),
+						manual.get(theDate).getTotal(), 
+						manual.get(theDate).getTotal(), 
+						manual.get(theDate).getTotal());
 			}
 		}
 	
@@ -200,7 +188,13 @@ public class ManualApi {
 			new ResponseContent<List<ItemView>>(ResponseEnum.ERROR, views);
 		}
 		
-		List<String> ids = newbService.getNewbs(theDate);
+		List<String> ids = null;
+		if("newb".equals(type)) {
+			ids = newbService.getNewbs(theDate);
+		}else if("drum".equals(type)) {
+			ids = drumService.getDrumsOfTopDimensions(theDate);
+		}
+		
 		if(ids!=null && !ids.isEmpty()) {
 			for(String id : ids) {
 				views.add(new ItemView(id,itemService.getItem(id).getName()));
@@ -256,6 +250,20 @@ public class ManualApi {
 		List<SelectView> views = new ArrayList<SelectView>();
 		
 		Map<LocalDate, String> selects = manualService.getSelects();
+		//System.out.println(selects);
+		
+		for(Map.Entry<LocalDate, String> entry : selects.entrySet()) {
+			views.add(new SelectView(entry.getValue(),itemService.getItem(entry.getValue()).getName(),entry.getKey()));
+		}
+		
+		return new ResponseContent<List<SelectView>>(ResponseEnum.SUCCESS, views);
+	}
+	
+	@GetMapping("/turtle/manual/reselect")
+	public ResponseContent<List<SelectView>> getReselect() {
+		List<SelectView> views = new ArrayList<SelectView>();
+		
+		Map<LocalDate, String> selects = manualService.getReselect();
 		
 		for(Map.Entry<LocalDate, String> entry : selects.entrySet()) {
 			views.add(new SelectView(entry.getValue(),itemService.getItem(entry.getValue()).getName(),entry.getKey()));
@@ -271,6 +279,8 @@ public class ManualApi {
 			@PathVariable(value="date") String date
 			) {
 
+		//System.out.println("breakers: " + type + " - " + date.toString());
+		
 		List<ItemView> views = new ArrayList<ItemView>();
 		
 		LocalDate theDate = null;
@@ -282,6 +292,8 @@ public class ManualApi {
 		
 		
 		Map<LocalDate,List<String>> breakers = turtleSimulationRepository.getBreakers(type);
+		
+		
 		List<String> ids = breakers.get(theDate);
 		if(ids!=null && !ids.isEmpty()) {
 			for(String id : ids) {
@@ -334,7 +346,7 @@ public class ManualApi {
 			@PathVariable(value="date") String date
 			) {
 		
-		AmountView view = new AmountView(0,0);
+		AmountView view = new AmountView(BigDecimal.ZERO,BigDecimal.ZERO,new BigDecimal(150000));
 
 		LocalDate theDate = null;
 		try{
@@ -347,7 +359,7 @@ public class ManualApi {
 		Map<LocalDate, AmountEntity> amounts = turtleSimulationRepository.getAmounts(type);
 		AmountEntity entity = amounts.get(theDate);
 		if(entity!=null) {
-			view = new AmountView(entity.getCash(), entity.getValue());
+			view = new AmountView(entity.getCash(), entity.getValue(),new BigDecimal(150000));
 		}
 		
 		return new ResponseContent<AmountView>(ResponseEnum.SUCCESS, view);

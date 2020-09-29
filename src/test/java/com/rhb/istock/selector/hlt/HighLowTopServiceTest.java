@@ -19,11 +19,11 @@ public class HighLowTopServiceTest {
 	
 	@Test
 	public void getLatestHighLowTops() {
-		List<String> ids = highLowTopService.getTops(100);
+		List<String> ids = highLowTopService.getTops(144);
 		for(String id: ids) {
-			if(id.startsWith("sh")){
+			//if(id.startsWith("sh")){
 				System.out.println(id);
-			}
+			//}
 		}
 	}
 

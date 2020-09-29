@@ -17,7 +17,7 @@ public class ItemSpiderTest {
 	//@Test
 	public void test() {
 		try {
-			itemSpider.download();
+			itemSpider.downItems();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

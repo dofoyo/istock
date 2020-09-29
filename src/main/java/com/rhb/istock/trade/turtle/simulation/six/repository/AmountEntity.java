@@ -3,35 +3,33 @@ package com.rhb.istock.trade.turtle.simulation.six.repository;
 import java.math.BigDecimal;
 
 public class AmountEntity {
-	private String cash;
-	private String value;
+	private BigDecimal cash;
+	private BigDecimal value;
 
 	public AmountEntity(String cash, String value) {
 		super();
-		this.cash = cash;
-		this.value = value;
+		this.cash = new BigDecimal(cash);
+		this.value = new BigDecimal(value);
 	}
 	
 	public BigDecimal getTotal() {
-		return (new BigDecimal(cash)).add(new BigDecimal(value));
-	}
-	
-	public String getCash() {
-		return cash;
-	}
-	public void setCash(String cash) {
-		this.cash = cash;
-	}
-	public String getValue() {
-		return value;
-	}
-	public void setValue(String value) {
-		this.value = value;
+		return cash.add(value);
 	}
 
-	@Override
-	public String toString() {
-		return "AmountEntity [cash=" + cash + ", value=" + value + "]";
+	public BigDecimal getCash() {
+		return cash;
+	}
+
+	public void setCash(BigDecimal cash) {
+		this.cash = cash;
+	}
+
+	public BigDecimal getValue() {
+		return value;
+	}
+
+	public void setValue(BigDecimal value) {
+		this.value = value;
 	}
 	
 	

@@ -330,7 +330,9 @@ public class Account {
 		BigDecimal quota = this.fix_amount;
 		for(Muster item : items) {
 			this.prices.put(item.getItemID(), item.getLatestPrice());
-			this.open(item.getItemID(), item.getItemName(), item.getIndustry(), this.getQuantity(quota, item.getLatestPrice()), item.getNote() , item.getLatestPrice());
+			if(this.cash.compareTo(BigDecimal.ZERO)==1) {
+				this.open(item.getItemID(), item.getItemName(), item.getIndustry(), this.getQuantity(quota, item.getLatestPrice()), item.getNote() , item.getLatestPrice());
+			}
 		}
 	}
 	
@@ -515,17 +517,16 @@ public class Account {
 			return hs.isLost();
 		}else {
 			return false;
-		}
-		
+		}		
 	}
 	
-	public boolean isGain(Integer orderID, Integer ratio) {
-		Order openOrder = holds.get(orderID);
-		if(openOrder.getRatio().compareTo(ratio)==1) {
-			return true;
+	public boolean isGain(String itemID, Integer ratio) {
+		HoldState hs = states.get(itemID);
+		if(hs!=null && hs.isHold) {
+			return hs.getWinRate().compareTo(ratio)==1;
 		}else {
 			return false;
-		}
+		}		
 	}
 	
 	public Set<String> getItemIDsOfLost(Integer days) {

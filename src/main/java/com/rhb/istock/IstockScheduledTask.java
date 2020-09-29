@@ -107,7 +107,7 @@ public class IstockScheduledTask {
 	public void dailyInit() throws Exception {
 		System.out.println("run scheduled of '0 35 9 ? * 1-5'");
 		if(this.isTradeDate()) {   //次序很重要
-			itemService.download();		// 1. 下载最新股票代码
+			itemService.downItems();		// 1. 下载最新股票代码
 			itemService.init();  // 2. 
 			kdataService.downFactors(); // 3. 上一交易日的收盘数据要等开盘前才能下载到, 大约需要15分钟
 			kdataService.downSSEI();
@@ -134,6 +134,13 @@ public class IstockScheduledTask {
 		}
 	}
 
+	@Scheduled(cron="0 0 15 ? * 1-5")  //周一至周五，每日15点 
+	public void updateLatestMusters2() throws Exception {
+		System.out.println("run scheduled of '0 0 15 ? * 1-5'");
+		if(this.isTradeDate()) {
+			kdataService.updateLatestMusters();
+		}
+	}
 	
 /*	@Scheduled(cron="0 50 9 ? * 1-5") //周一至周五，每日9:50点
 	public void downloadReports() {
@@ -158,6 +165,7 @@ public class IstockScheduledTask {
 			indexSpiderTushare.downIndex_weight();
 			indexSpiderTushare.downIndex_basic();
 			indexServiceTushare.generateIndex();
+			itemService.downTopics();
 			//finaService.generateQuarterCompares();
 			//huaService.generateHuaPotentials(LocalDate.now());
 			//huaService.generateLatestHuaFirst();

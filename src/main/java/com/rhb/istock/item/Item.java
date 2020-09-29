@@ -38,6 +38,22 @@ public class Item {
 	public void setIndustry(String industry) {
 		this.industry = industry;
 	}
+	public String getMarket() {
+		if(this.itemID.startsWith("sh60")) {
+			return "上海主板";
+		}else if(this.itemID.startsWith("sh688")) {
+			return "科创板";
+		}else if(this.itemID.startsWith("sz000")) {
+			return "深圳主板";
+		}else if(this.itemID.startsWith("sz002") || this.itemID.startsWith("sz003")) {
+			return "中小板";
+		}else if(this.itemID.startsWith("sz300")) {
+			return "创业板";
+		}else {
+			return "other";
+		}
+	}
+	
 	public String getIpo() {
 		return ipo;
 	}

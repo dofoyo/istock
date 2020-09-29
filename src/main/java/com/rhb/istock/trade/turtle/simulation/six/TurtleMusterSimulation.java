@@ -148,6 +148,6 @@ public class TurtleMusterSimulation {
 		turtleSimulationRepository.save("avb", avbResult.get("breakers"), avbResult.get("CSV"), avbResult.get("dailyAmount"));
 		
 		long used = (System.currentTimeMillis() - beginTime)/1000; 
-		System.out.println("用时：" + used + "秒");          
+		System.out.println("simulate 用时：" + used + "秒");          
 	}
 }

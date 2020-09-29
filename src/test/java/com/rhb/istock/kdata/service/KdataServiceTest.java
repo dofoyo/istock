@@ -27,12 +27,12 @@ public class KdataServiceTest {
 	@Qualifier("kdataServiceImp")
 	KdataService kdataService;
 	
-	//@Test
+	@Test
 	public void generateMusters() {
 		LocalDate date = LocalDate.parse("2010-01-01");
-		kdataService.generateMusters(date);
+		//kdataService.generateMusters(date);
 		//kdataService.generateLatestMusters(null);
-		//kdataService.updateLatestMusters();
+		kdataService.updateLatestMusters();
 	}
 	
 	//@Test
@@ -67,7 +67,7 @@ public class KdataServiceTest {
 		}
 	}
 	
-	@Test
+	//@Test
 	public void downClosedDatas() {
 		LocalDate date = LocalDate.parse("2020-08-25");
 		try {
@@ -111,5 +111,12 @@ public class KdataServiceTest {
 			}
 
 		}
+	}
+	
+	//@Test
+	public void testt() {
+		LocalDate endDate = LocalDate.parse("2020-09-12");
+		List<LocalDate> dates = kdataService.getMusterDates(13, endDate);
+		System.out.println(dates);
 	}
 }

@@ -18,6 +18,10 @@ public class ItemServiceTest {
 	@Qualifier("itemServiceImp")
 	ItemService itemService;
 	
+	@Test
+	public void downTopics() {
+		itemService.downTopics();
+	}
 	
 	//@Test
 	public void getTopic() {
@@ -51,7 +55,7 @@ public class ItemServiceTest {
 		}
 	}
 	
-	@Test
+	//@Test
 	public void getHs300() {
 		LocalDate date = LocalDate.parse("2005-04-08");
 		List<String> items = itemService.getHs300(date);

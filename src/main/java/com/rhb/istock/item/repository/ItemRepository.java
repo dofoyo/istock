@@ -7,7 +7,7 @@ public interface ItemRepository {
 	public List<String> getItemIDs();
 	public List<ItemEntity> getItemEntities();
 	public void saveTopic(String itemID, String topic);
+	public void emptyTopic();
 	public Map<String,String> getTopics();
-	//public ItemEntity getItemEntity(String itemID);
 	public void cacheEvict();
 }

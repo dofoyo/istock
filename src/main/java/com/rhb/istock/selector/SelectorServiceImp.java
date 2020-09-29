@@ -471,16 +471,11 @@ public class SelectorServiceImp implements SelectorService{
 	@Override
 	public Map<String,String> getDrums() {
 		Map<String,String> ids = new HashMap<String,String>();
-		String str = drumService.getDrum();
-		if(str!=null && str.length()>11) {
-			String id,order;
-			String[] ss = str.substring(11).split(",");
+		List<String> ss = drumService.getDrums();
+		if(ss!=null && ss.size()>0) {
+			int i=0;
 			for(String s : ss) {
-				if(s.length()>8) {
-					id = s.substring(0, 8);
-					order = s.substring(9,s.indexOf(")"));
-					ids.put(id,order);
-				}
+				ids.put(s,Integer.toString(i++));
 			}
 		}
 		return ids;

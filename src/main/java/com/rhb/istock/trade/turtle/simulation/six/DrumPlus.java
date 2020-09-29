@@ -184,13 +184,12 @@ public class DrumPlus {
 		
 		List<Muster>  breakers = new ArrayList<Muster>();
 		Muster m,p;
-		Integer ratio, r;
+		Integer r;
 		StringBuffer sb = new StringBuffer(date.toString() + ":");
 		for(int i=0; i<ms.size() && breakers.size()<this.top; i++) {
 			m = ms.get(i);
 			p = previous.get(0).get(m.getItemID());
 			if(m!=null && p!=null) {
-				ratio = Functions.growthRate(m.getAveragePrice21(), m.getAveragePrice());
 				r = this.getRatio(previous,m.getItemID(),m.getLatestPrice());
 				if(!m.isUpLimited() && !m.isDownLimited()
 					&& r>0

@@ -119,6 +119,8 @@ public class TurtleSimulationRepository {
 			buys.putAll(this.getAllBuysOfType("avb", itemID));
 		}else if("dtb".equals(type)) {
 			buys.putAll(this.getAllBuysOfType("dtb", itemID));
+		}else if("manual".equals(type)) {
+			buys.putAll(this.getAllBuysOfType("manual", itemID));
 		}
 		
 		//System.out.println(type);
@@ -156,6 +158,8 @@ public class TurtleSimulationRepository {
 			sells.putAll(this.getAllSellsOfType("avb", itemID));
 		}else if("dtb".equals(type)) {
 			sells.putAll(this.getAllSellsOfType("dtb", itemID));
+		}else if("manual".equals(type)) {
+			sells.putAll(this.getAllSellsOfType("manual", itemID));
 		}
 		
 		//System.out.println(type);

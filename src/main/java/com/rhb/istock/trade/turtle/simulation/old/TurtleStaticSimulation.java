@@ -285,7 +285,7 @@ public class TurtleStaticSimulation implements TurtleSimulation{
 		Map<LocalDate, AmountEntity> amounts = turtleSimulationRepository.getAmounts(type);
 		AmountEntity entity = amounts.get(date);
 		if(entity!=null) {
-			view = new AmountView(entity.getCash(), entity.getValue());
+			view = new AmountView(entity.getCash().toString(), entity.getValue().toString());
 		}
 		
 		return view;

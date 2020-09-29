@@ -123,8 +123,7 @@ public class ItemRepositoryTushare implements ItemRepository{
 
 	@Override
 	public void saveTopic(String itemID, String topic) {
-		topic = topic.replaceAll(":", "：");
-		
+		topic = topic.replaceAll(":", "：");		
 		FileTools.writeTextFile(topicsFile, itemID + ":" + topic + "\n", true);
 	}
 
@@ -138,6 +137,11 @@ public class ItemRepositoryTushare implements ItemRepository{
 			topics.put(columns[0], columns.length>1 ? columns[1] : "");
 		}
 		return topics;
+	}
+
+	@Override
+	public void emptyTopic() {
+		FileTools.writeTextFile(topicsFile, "", false);
 	}
 
 }

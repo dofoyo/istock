@@ -302,7 +302,6 @@ public class KdataServiceImp implements KdataService{
 	@Override
 	public void generateMusters(LocalDate beginDate) {
 		long beginTime=System.currentTimeMillis(); 
-		logger.info("generateMusters ......");
 		
 		musterRepositoryImp.cleanTmpMusters();
 		
@@ -350,9 +349,8 @@ public class KdataServiceImp implements KdataService{
 		
 		musterRepositoryImp.copyTmpMusters();
 		
-		logger.info("\ngenerateMusters done!");
 		long used = (System.currentTimeMillis() - beginTime)/1000; 
-		logger.info("用时：" + used + "秒");          
+		logger.info("generateMusters done!  用时：" + used + "秒");          
 	}
 
 	class Above21{
@@ -652,8 +650,8 @@ public class KdataServiceImp implements KdataService{
 			entity = new MusterEntity(
 					muster.getItemID(), 
 					muster.getClose(), 
-					muster.getAverageAmount(),  //kbar.getAmount(), 暂时替代
-					muster.getClose(),  //kbar.getClose(), 暂时替代
+					muster.getLatestAmount(), 
+					muster.getLatestPrice(),
 					0,
 					muster.getHighest(), 
 					muster.getLowest(), 
@@ -679,8 +677,8 @@ public class KdataServiceImp implements KdataService{
 					muster.getLowest5(),
 					muster.getAmount5(),
 					muster.getPe(),
-					muster.getHighest(),   //kbar.getHigh(), 暂时替代
-					muster.getLowest(),  //kbar.getLow(), 暂时替代
+					muster.getLatestHighest(), 
+					muster.getLatestLowest(),
 					muster.getAveragePrice5()
 					);
 			

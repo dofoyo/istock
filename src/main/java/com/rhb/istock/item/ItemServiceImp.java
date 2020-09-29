@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import com.rhb.istock.comm.util.HttpClient;
+import com.rhb.istock.comm.util.Progress;
 import com.rhb.istock.item.repository.Component;
 import com.rhb.istock.item.repository.ComponentRepository;
 import com.rhb.istock.item.repository.ItemEntity;
@@ -83,9 +84,9 @@ public class ItemServiceImp implements ItemService {
 	}
 
 	@Override
-	public void download() {
+	public void downItems() {
 		try {
-			itemSpider.download();
+			itemSpider.downItems();
 			itemRepository.cacheEvict();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -100,7 +101,7 @@ public class ItemServiceImp implements ItemService {
 			topics.put(itemID, topic);
 			itemRepository.saveTopic(itemID, topic);
 			//为避免被反扒工具禁止，需要暂停一下
-			HttpClient.sleep(5);
+			HttpClient.sleep(3);
 		}
 		return topics.get(itemID);
 	}
@@ -172,4 +173,48 @@ public class ItemServiceImp implements ItemService {
 		itemRepository.cacheEvict();		
 	}
 
+	@Override
+	public void downTopics() {
+		long beginTime=System.currentTimeMillis(); 
+		
+		itemRepository.emptyTopic();
+		
+		List<String> ids = this.getItemIDs();
+		int i=1;
+		for(String id : ids) {
+			Progress.show(ids.size(), i++, "  downTopic: " + id);
+			
+			String topic = itemSpider.getTopic(id);
+			itemRepository.saveTopic(id, topic);
+			HttpClient.sleep(3);
+
+		}
+		
+		long used = (System.currentTimeMillis() - beginTime)/1000; 
+		System.out.println("downTopics 用时：" + used + "秒");          
+	}
+
+	@Override
+	public Map<String,Dimension> getDimensions() {
+		Map<String,Dimension> dimensions = new HashMap<String,Dimension>();
+		Dimension industry = new Dimension();
+		Dimension area = new Dimension();
+		Dimension market = new Dimension();
+		Dimension topic = new Dimension();
+		
+		List<Item> items = this.getItems();
+		for(Item item : items) {
+			industry.put(item.getIndustry(), item.getItemID(), item.getName());
+			area.put(item.getArea(), item.getItemID(), item.getName());
+			market.put(item.getMarket(), item.getItemID(), item.getName());
+			topic.put(this.getTopic(item.getItemID()).split("，"), item.getItemID(), item.getName());
+		}
+
+		dimensions.put("industry", industry);
+		dimensions.put("area", area);
+		dimensions.put("market", market);
+		dimensions.put("topic", topic);
+
+		return dimensions;
+	}
 }
