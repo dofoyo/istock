@@ -9,12 +9,15 @@ import java.util.Map;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import com.rhb.istock.comm.util.FileTools;
+import com.rhb.istock.fdata.eastmoney.FdataRepositoryEastmoney;
 
 @Service("itemRepositoryTushare")
 public class ItemRepositoryTushare implements ItemRepository{
@@ -23,6 +26,10 @@ public class ItemRepositoryTushare implements ItemRepository{
 
 	@Value("${topicsFile}")
 	private String topicsFile;
+	
+	@Autowired
+	@Qualifier("fdataRepositoryEastmoney")
+	FdataRepositoryEastmoney fdataRepositoryEastmoney;
 	
 	@Override
 	@Cacheable("items")
@@ -42,6 +49,7 @@ public class ItemRepositoryTushare implements ItemRepository{
 					entity.setArea(item.get(3).toString());
 					entity.setIndustry(item.get(4).toString());
 					entity.setIpo(item.get(6).toString());
+					entity.setCagr(fdataRepositoryEastmoney.getCAGR(entity.getItemId()));
 					entities.add(entity);
 					
 					//System.out.println(entity);  //***************
@@ -62,37 +70,6 @@ public class ItemRepositoryTushare implements ItemRepository{
 		});
 		
 		return entities;
-	}
-
-	//@Override
-	public ItemEntity getItemEntity(String itemID) {
-		ItemEntity itemEntity = null;
-		try {
-			JSONObject data = new JSONObject(FileTools.readTextFile(itemsFile));
-			JSONArray items = data.getJSONArray("items");
-			if(items.length()>0) {
-				JSONArray item;
-				for(int i=0; i<items.length(); i++) {
-					item = items.getJSONArray(i);
-					//System.out.println(itemID.substring(0) + "," + item.getString(1));
-					if(itemID.substring(2).equals(item.getString(0))) {
-						itemEntity = new ItemEntity();
-						itemEntity.setItemId(itemID);
-						itemEntity.setCode(item.getString(0));
-						itemEntity.setName(item.getString(1));
-						itemEntity.setArea(item.getString(2));
-						itemEntity.setIndustry(item.getString(3));
-						itemEntity.setIpo(item.getString(4));
-						break;
-					}
-				}
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
-		//System.out.println(itemEntity);
-		return itemEntity;
 	}
 
 	@Override

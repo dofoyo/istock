@@ -30,10 +30,6 @@ public class ItemServiceImp implements ItemService {
 	ItemRepository itemRepository;
 
 	@Autowired
-	@Qualifier("fdataRepositoryEastmoney")
-	FdataRepositoryEastmoney fdataRepositoryEastmoney;
-	
-	@Autowired
 	@Qualifier("itemSpiderTushare")
 	ItemSpider itemSpider;
 	
@@ -57,7 +53,7 @@ public class ItemServiceImp implements ItemService {
 			item.setName(entity.getName());
 			item.setIndustry(entity.getIndustry());
 			item.setArea(entity.getArea());
-			item.setCagr(fdataRepositoryEastmoney.getCAGR(entity.getItemId()));
+			item.setCagr(entity.getCagr());
 			items.add(item);
 		}
 		return items;
@@ -79,7 +75,7 @@ public class ItemServiceImp implements ItemService {
 				item.setIndustry(entity.getIndustry());
 				item.setArea(entity.getArea());
 				item.setIpo(entity.getIpo());
-				item.setCagr(fdataRepositoryEastmoney.getCAGR(entity.getItemId()));
+				item.setCagr(entity.getCagr());
 				break;
 			}
 		}

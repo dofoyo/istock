@@ -7,7 +7,16 @@ public class ItemEntity {
 	private String area;
 	private String industry;
 	private String ipo;
+	private Integer cagr;  //利润年均增长率
 	
+	public Integer getCagr() {
+		return cagr;
+	}
+
+	public void setCagr(Integer cagr) {
+		this.cagr = cagr;
+	}
+
 	public String getItemId() {
 		return itemID;
 	}
