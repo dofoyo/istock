@@ -20,7 +20,8 @@ public class ItemServiceTest {
 	
 	@Test
 	public void downTopics() {
-		itemService.downTopics();
+		//itemService.downTopics();
+		itemService.downItems();
 	}
 	
 	//@Test

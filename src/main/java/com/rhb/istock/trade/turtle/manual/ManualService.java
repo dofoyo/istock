@@ -37,7 +37,7 @@ public class ManualService {
 	TurtleSimulationRepository turtleSimulationRepository;
 	
 	private Map<LocalDate, String> selects = new TreeMap<LocalDate, String>();
-	BigDecimal initCash = new BigDecimal(150000);
+	BigDecimal initCash = new BigDecimal(1000000);
 
 	public void addSelects(LocalDate date, String itemID) {
 		this.selects.put(date, itemID);
@@ -47,9 +47,16 @@ public class ManualService {
 		this.selects.remove(date);
 	}
 	
-	public Map<LocalDate, String> getSelects(){
+	public Map<LocalDate, String> getSelects(LocalDate date){
 		//System.out.println(this.selects);
-		return this.selects;
+		Map<LocalDate, String> ss = new TreeMap<LocalDate, String>();
+		for(Map.Entry<LocalDate, String> entry : this.selects.entrySet()) {
+			if(entry.getKey().isBefore(date) || entry.getKey().isEqual(date)) {
+				ss.put(entry.getKey(), entry.getValue());
+			}
+		}
+		
+		return ss;
 	}
 	
 	public Map<LocalDate, String> getReselect(){
@@ -100,15 +107,15 @@ public class ManualService {
 					muster = musters.get(itemID);
 					if(muster!=null && !muster.isDownLimited() && !muster.isUpLimited()) {
 						//System.out.println(simulateType);
-						if("newb".equals(simulateType)) {
+/*						if("newb".equals(simulateType)) {
 							//有赚就卖
 							if(account.isGain(itemID,0)) {
 								account.dropWithTax(itemID, "2", muster.getLatestPrice());
 							}
-						}
+						}*/
 							
 						//高位回落超过8%
-						account.dropFallOrder(itemID, -8, "3");
+						//account.dropFallOrder(itemID, -8, "3");
 
 						//跌破21日均线就卖
 						if(muster.isDropAve(21)) { 		

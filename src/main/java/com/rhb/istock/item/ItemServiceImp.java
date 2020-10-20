@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import com.rhb.istock.comm.util.HttpClient;
 import com.rhb.istock.comm.util.Progress;
+import com.rhb.istock.fdata.eastmoney.FdataRepositoryEastmoney;
 import com.rhb.istock.item.repository.Component;
 import com.rhb.istock.item.repository.ComponentRepository;
 import com.rhb.istock.item.repository.ItemEntity;
@@ -28,6 +29,10 @@ public class ItemServiceImp implements ItemService {
 	@Qualifier("itemRepositoryTushare")
 	ItemRepository itemRepository;
 
+	@Autowired
+	@Qualifier("fdataRepositoryEastmoney")
+	FdataRepositoryEastmoney fdataRepositoryEastmoney;
+	
 	@Autowired
 	@Qualifier("itemSpiderTushare")
 	ItemSpider itemSpider;
@@ -52,7 +57,7 @@ public class ItemServiceImp implements ItemService {
 			item.setName(entity.getName());
 			item.setIndustry(entity.getIndustry());
 			item.setArea(entity.getArea());
-			
+			item.setCagr(fdataRepositoryEastmoney.getCAGR(entity.getItemId()));
 			items.add(item);
 		}
 		return items;
@@ -74,6 +79,7 @@ public class ItemServiceImp implements ItemService {
 				item.setIndustry(entity.getIndustry());
 				item.setArea(entity.getArea());
 				item.setIpo(entity.getIpo());
+				item.setCagr(fdataRepositoryEastmoney.getCAGR(entity.getItemId()));
 				break;
 			}
 		}
@@ -201,6 +207,7 @@ public class ItemServiceImp implements ItemService {
 		Dimension area = new Dimension();
 		Dimension market = new Dimension();
 		Dimension topic = new Dimension();
+		Dimension average = new Dimension();
 		
 		List<Item> items = this.getItems();
 		for(Item item : items) {
@@ -208,12 +215,14 @@ public class ItemServiceImp implements ItemService {
 			area.put(item.getArea(), item.getItemID(), item.getName());
 			market.put(item.getMarket(), item.getItemID(), item.getName());
 			topic.put(this.getTopic(item.getItemID()).split("，"), item.getItemID(), item.getName());
+			average.put("average", item.getItemID(), item.getName());
 		}
 
 		dimensions.put("industry", industry);
 		dimensions.put("area", area);
 		dimensions.put("market", market);
 		dimensions.put("topic", topic);
+		dimensions.put("average", average);
 
 		return dimensions;
 	}

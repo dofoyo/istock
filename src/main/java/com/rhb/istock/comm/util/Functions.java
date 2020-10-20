@@ -6,6 +6,10 @@ import java.math.RoundingMode;
 import java.util.List;
 
 public class Functions {
+	public static Integer cagr(Integer a, Integer b, Integer n) {
+		return cagr(new BigDecimal(a), new BigDecimal(b), new Double(n));
+	}
+	
 	//CAGR是Compound Annual Growth Rate的缩写，意思是复合年均增长率
 	public static Integer cagr(BigDecimal a, BigDecimal b, double n) {
 		if(b.equals(BigDecimal.ZERO)) return 0;

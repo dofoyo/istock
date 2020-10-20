@@ -15,6 +15,7 @@ import com.rhb.istock.index.tushare.IndexSpiderTushare;
 import com.rhb.istock.item.ItemService;
 import com.rhb.istock.kdata.KdataService;
 import com.rhb.istock.kdata.spider.KdataRealtimeSpider;
+import com.rhb.istock.selector.drum.DrumService;
 import com.rhb.istock.selector.fina.FinaService;
 import com.rhb.istock.trade.turtle.operation.TurtleOperationService;
 
@@ -43,6 +44,10 @@ public class IstockScheduledTask {
 	@Autowired
 	@Qualifier("indexServiceTushare")
 	IndexServiceTushare indexServiceTushare;
+	
+	@Autowired
+	@Qualifier("drumService")
+	DrumService drumService;
 	
 /*	@Autowired
 	@Qualifier("financialStatementServiceImp")
@@ -118,7 +123,7 @@ public class IstockScheduledTask {
 		}
 	}
 
-	@Scheduled(cron="0 45/1 9-14 ? * 1-5")  //周一至周五，每日9:45点，每1分钟刷新一次 
+	//@Scheduled(cron="0 45/1 9-14 ? * 1-5")  //周一至周五，每日9:45点，每1分钟刷新一次 
 	public void updateLatestMusters3() throws Exception {
 		System.out.println("run scheduled of '0 45/1 9-14 ? * 1-5'");
 		if(this.isTradeDate()) {
@@ -166,6 +171,7 @@ public class IstockScheduledTask {
 			indexSpiderTushare.downIndex_basic();
 			indexServiceTushare.generateIndex();
 			itemService.downTopics();
+			drumService.generateDimensions();
 			//finaService.generateQuarterCompares();
 			//huaService.generateHuaPotentials(LocalDate.now());
 			//huaService.generateLatestHuaFirst();

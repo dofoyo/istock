@@ -7,7 +7,14 @@ public class Item {
 	private String area;
 	private String industry;
 	private String ipo;
+	private Integer cagr;  //利润年均增长率
 	
+	public Integer getCagr() {
+		return cagr;
+	}
+	public void setCagr(Integer cagr) {
+		this.cagr = cagr;
+	}
 	public String getItemID() {
 		return itemID;
 	}
@@ -21,6 +28,9 @@ public class Item {
 		this.code = code;
 	}
 	public String getName() {
+		if(cagr!=null) {
+			return name + "(" + cagr.toString() + "%)";
+		}
 		return name;
 	}
 	public void setName(String name) {

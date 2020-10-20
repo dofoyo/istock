@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.rhb.istock.comm.api.ResponseContent;
 import com.rhb.istock.comm.api.ResponseEnum;
+import com.rhb.istock.fdata.eastmoney.FdataRepositoryEastmoney;
 import com.rhb.istock.fdata.sina.FinancialStatement;
 import com.rhb.istock.fdata.sina.FinancialStatementService;
 import com.rhb.istock.fdata.tushare.FdataRepositoryTushare;
@@ -30,7 +31,10 @@ public class FdataAPI {
 	@Autowired
 	@Qualifier("fdataRepositoryTushare")
 	FdataRepositoryTushare fdataRepositoryTushare;
-	
+
+	@Autowired
+	@Qualifier("fdataRepositoryEastmoney")
+	FdataRepositoryEastmoney fdataRepositoryEastmoney;
 	
 	@Autowired
 	@Qualifier("itemServiceImp")
@@ -38,6 +42,7 @@ public class FdataAPI {
 	
 	@GetMapping("/fdatas/{itemID}")
 	public ResponseContent<FdatasView> getFdatas(@PathVariable(value="itemID") String itemID) {
+		//System.out.println(itemID);
 		FdatasView view = null;
 		
 		Item item = itemService.getItem(itemID);
@@ -57,6 +62,17 @@ public class FdataAPI {
 					view.add(entry.getKey().substring(0,4), df.format(revenue), df.format(profit), df.format(cash));
 				}
 				fdataRepositoryTushare.init();
+			}
+			
+			Map<String,String[]> forcasts = fdataRepositoryEastmoney.getForcasts(itemID);
+			//System.out.println(forcasts.size());
+			String rq, yyzrs, yylr;
+			for(Map.Entry<String, String[]> entry : forcasts.entrySet()) {
+				rq = entry.getKey();
+				yyzrs = entry.getValue()[0];
+				yylr = entry.getValue()[1];
+				view.add(rq, yyzrs, yylr, yylr);
+				//System.out.println(rq + "," + yyzrs +  ", " + yylr );
 			}
 			
 		}else {

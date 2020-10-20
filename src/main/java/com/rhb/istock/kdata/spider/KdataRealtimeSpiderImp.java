@@ -9,6 +9,7 @@ import java.util.Map;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.rhb.istock.comm.util.HttpClient;
@@ -18,7 +19,9 @@ import com.rhb.istock.comm.util.ParseString;
 
 @Service("kdataRealtimeSpiderImp")
 public class KdataRealtimeSpiderImp implements KdataRealtimeSpider{
-
+	@Value("${tushareUrl}")
+	private String url;
+	
 	DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
 
 	@Override
@@ -93,7 +96,7 @@ public class KdataRealtimeSpiderImp implements KdataRealtimeSpider{
 	@Override
 	public List<LocalDate> getCalendar(LocalDate startDate, LocalDate endDate) throws Exception {
 		List<LocalDate> dates = new ArrayList<LocalDate>();
-		String url = "http://api.tushare.pro";
+		//String url = "http://api.tushare.pro";
 		JSONObject args = new JSONObject();
 		args.put("api_name", "trade_cal");
 		args.put("token", "175936caa4637bc9ac8e5e75ac92eff6887739ca6be771b81653f278");
@@ -129,7 +132,7 @@ public class KdataRealtimeSpiderImp implements KdataRealtimeSpider{
 
 	@Override
 	public boolean isTradeDate1(LocalDate date) {
-		String url = "http://api.tushare.pro";
+		//String url = "http://api.tushare.pro";
 		JSONObject args = new JSONObject();
 		args.put("api_name", "trade_cal");
 		args.put("token", "175936caa4637bc9ac8e5e75ac92eff6887739ca6be771b81653f278");

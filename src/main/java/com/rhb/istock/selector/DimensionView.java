@@ -35,14 +35,14 @@ public class DimensionView {
 		this.name = name;
 	}
 
-	public void addBoard(String code, String name, Integer ratio) {
-		boards.put(code, new Board(code,name,ratio));
+	public void addBoard(String code, String name, Integer ratio, String status) {
+		boards.put(code, new Board(code,name,ratio, status));
 	}
 	
-	public void addItem(String boardCode, String itemCode, String itemName) {
+	public void addItem(String boardCode, String itemCode, String itemName, String status) {
 		Board board = boards.get(boardCode);
 		if(board!=null) {
-			board.addItem(itemCode, itemName);
+			board.addItem(itemCode, itemName, status);
 		}
 	}
 	
@@ -63,66 +63,68 @@ public class DimensionView {
 		private String code;
 		private String name;
 		private Integer ratio;
+		private String status;  //1 - 持有, 0 - 未持有
 		List<Item> items;
 		
-		public Board(String code, String name, Integer ratio) {
+		public Board(String code, String name, Integer ratio, String status) {
 			super();
 			this.code = code;
 			this.name = name;
 			this.ratio = ratio;
+			this.status = status;
 			items = new ArrayList<Item>();
 		}
 		
-		public void addItem(String code, String name) {
-			items.add(new Item(code,name));
+		public void addItem(String code, String name, String status) {
+			items.add(new Item(code,name, status));
 		}
 		
 		public String getCode() {
 			return code;
 		}
-		public void setCode(String code) {
-			this.code = code;
-		}
 		public String getName() {
 			return name;
-		}
-		public void setName(String name) {
-			this.name = name;
 		}
 		public Integer getRatio() {
 			return ratio;
 		}
-		public void setRatio(Integer ratio) {
-			this.ratio = ratio;
-		}
 		public List<Item> getItems() {
 			return items;
 		}
-		public void setItems(List<Item> items) {
-			this.items = items;
+
+		public String getStatus() {
+			return status;
 		}
+		
+		public String getType() {
+			if(status.equals("1")) {
+				return "danger";
+			}else {
+				return "plain";
+			}
+		}
+		
 	}
 	
 	class Item{
 		private String code;
 		private String name;
+		private String status;  //1 - 持有, 0 - 未持有
 		
-		public Item(String code, String name) {
+		public Item(String code, String name, String status) {
 			super();
 			this.code = code;
 			this.name = name;
+			this.status = status;
 		}
 		public String getCode() {
 			return code;
 		}
-		public void setCode(String code) {
-			this.code = code;
-		}
 		public String getName() {
 			return name;
 		}
-		public void setName(String name) {
-			this.name = name;
+		public String getStatus() {
+			return status;
 		}
 	}
 }

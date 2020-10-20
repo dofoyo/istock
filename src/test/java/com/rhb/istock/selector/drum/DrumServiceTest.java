@@ -19,9 +19,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.rhb.istock.comm.util.Functions;
+import com.rhb.istock.comm.util.Progress;
 import com.rhb.istock.item.Dimension;
 import com.rhb.istock.item.Item;
 import com.rhb.istock.item.ItemService;
+import com.rhb.istock.kdata.KdataService;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest
@@ -34,21 +36,41 @@ public class DrumServiceTest {
 	@Qualifier("itemServiceImp")
 	ItemService itemService;
 	
-	@Test
-	public void getIndustry_count() {
+	@Autowired
+	@Qualifier("kdataServiceImp")
+	KdataService kdataService;
+	
+	//@Test
+	public void getDrumsOfTopDimensions() {
 		LocalDate date = LocalDate.parse("2020-09-21");
 		List<String> ids = drumService.getDrumsOfTopDimensions(date);
 		System.out.println(ids);
 	}
-	
-	
-	
+
 	//@Test
-	public void generateDrums() {
-		LocalDate beginDate = LocalDate.parse("2020-09-01");
-		LocalDate endDate = LocalDate.parse("2020-09-22");
-		drumService.generateDrums(beginDate, endDate);
+	public void generateDimension() {
+		LocalDate date = LocalDate.parse("2020-09-30");
+		drumService.generateDimensions(date);
 	}
 	
+	//@Test
+	public void generateDimensions() {
+		List<LocalDate> dates = kdataService.getMusterDates();
+		LocalDate begin = LocalDate.parse("2010-01-01");
 
+		int i=1;
+		for(LocalDate date : dates) {
+			Progress.show(dates.size(), i++, date.toString());
+			if(date.isAfter(begin)) {
+				drumService.generateDimensions(date);
+			}
+		}
+	}
+	
+	//@Test
+	public void getDimensions() {
+		String name = "HIT电池";
+		Map<LocalDate, Integer> result = drumService.getDimension(name);
+		System.out.println(result);
+	}
 }

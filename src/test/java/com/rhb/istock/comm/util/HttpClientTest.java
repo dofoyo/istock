@@ -6,13 +6,14 @@ import org.junit.Test;
 
 public class HttpClientTest {
 
-	//@Test
+	@Test
 	public void test() {
-		String strUrl = "http://stockpage.10jqka.com.cn/300022/";
+		String strUrl = "http://f10.eastmoney.com/ProfitForecast/ProfitForecastAjax?code=sz002610";
+		//String strUrl = "http://basic.10jqka.com.cn/002610/worth.html";
 		String result = HttpClient.doGet(strUrl);
-		String gn = ParseString.subString(result, "<dd title=\"|\">");
+		//String gn = ParseString.subString(result, "<dd title=\"|\">");
 		System.out.println(result);
-		System.out.println(gn);
+		//System.out.println(gn);
 	}
 	
 	//@Test
@@ -22,7 +23,7 @@ public class HttpClientTest {
 		}
 	}
 	
-	@Test
+	//@Test
 	public void test1() {
 		String strUrl = "http://bond.jrj.com.cn/data";
 		String result = HttpClient.doGet(strUrl);

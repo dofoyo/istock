@@ -17,6 +17,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.rhb.istock.kdata.Muster;
 import com.rhb.istock.kdata.spider.KdataFromDZHByClipboard;
+import com.rhb.istock.item.ItemService;
 import com.rhb.istock.kdata.Kbar;
 import com.rhb.istock.kdata.KdataService;
 
@@ -27,11 +28,25 @@ public class KdataServiceTest {
 	@Qualifier("kdataServiceImp")
 	KdataService kdataService;
 	
-	@Test
+	@Autowired
+	@Qualifier("itemServiceImp")
+	ItemService itemService;	
+	
+	//@Test
+	public void doOpen() throws Exception {
+		//itemService.downItems();		// 1. 下载最新股票代码
+		//itemService.init();  // 2. 
+		kdataService.downFactors(); // 3. 上一交易日的收盘数据要等开盘前才能下载到, 大约需要15分钟
+		kdataService.downSSEI();
+		kdataService.generateLatestMusters(null);
+		kdataService.updateLatestMusters();
+	}
+	
+	//@Test
 	public void generateMusters() {
 		LocalDate date = LocalDate.parse("2010-01-01");
 		//kdataService.generateMusters(date);
-		//kdataService.generateLatestMusters(null);
+		kdataService.generateLatestMusters(null);
 		kdataService.updateLatestMusters();
 	}
 	
@@ -69,9 +84,10 @@ public class KdataServiceTest {
 	
 	//@Test
 	public void downClosedDatas() {
-		LocalDate date = LocalDate.parse("2020-08-25");
+		LocalDate date = LocalDate.parse("2020-10-19");
 		try {
-			kdataService.downClosedDatas(date);
+			//kdataService.downClosedDatas(date);
+			kdataService.downFactors(date);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

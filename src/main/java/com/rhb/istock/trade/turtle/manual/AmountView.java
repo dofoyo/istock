@@ -18,7 +18,7 @@ public class AmountView {
 	
 	public Integer getRatio() {
 		//Integer a = 10000;
-		Integer b = Functions.growthRate(this.getTotal(), this.init);
+		Integer b = Functions.growthRate(cash.add(value), this.init);
 		return b;
 	}
 	
@@ -26,32 +26,20 @@ public class AmountView {
 		return this.getRatio()>0 ? "red" : "green";
 	}
 	
-	public BigDecimal getCash() {
-		return cash;
+	public Integer getCash() {
+		return cash.intValue();
 	}
 
-	public void setCash(BigDecimal cash) {
-		this.cash = cash;
+	public Integer getValue() {
+		return value.intValue();
 	}
 
-	public BigDecimal getValue() {
-		return value;
+	public Integer getInit() {
+		return init.intValue();
 	}
 
-	public void setValue(BigDecimal value) {
-		this.value = value;
-	}
-
-	public BigDecimal getInit() {
-		return init;
-	}
-
-	public void setInit(BigDecimal init) {
-		this.init = init;
-	}
-
-	public BigDecimal getTotal() {
-		return cash.add(value);
+	public Integer getTotal() {
+		return cash.add(value).intValue();
 	}
 
 	@Override

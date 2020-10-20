@@ -3,6 +3,7 @@ package com.rhb.istock.selector.drum;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -10,6 +11,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +28,7 @@ import com.rhb.istock.item.Item;
 import com.rhb.istock.item.ItemService;
 import com.rhb.istock.kdata.KdataService;
 import com.rhb.istock.kdata.Muster;
+import com.rhb.istock.selector.DdatasView;
 import com.rhb.istock.selector.DimensionView;
 
 @Service("drumService")
@@ -40,6 +43,9 @@ public class DrumService {
 	
 	@Value("${drumFile}")
 	private String drumFile;	
+
+	@Value("${drumsPath}")
+	private String drumsPath;
 	
 	protected static final Logger logger = LoggerFactory.getLogger(DrumService.class);
 
@@ -73,11 +79,70 @@ public class DrumService {
 		return this.getDrums(date);
 	}
 	
+	public Map<LocalDate, Integer> getDimension(String name){
+		Map<LocalDate, Integer> result = new TreeMap<LocalDate, Integer>();
+		String file = drumsPath + "/" + name + ".txt";
+		String[] lines = FileTools.readTextFile(file).split("\n");
+
+		String[] cols;
+		LocalDate date;
+		Integer ratio;
+		for(String line : lines) {
+			cols = line.split(",");
+			date = LocalDate.parse(cols[0]);
+			ratio = Integer.parseInt(cols[1]);
+			result.put(date, ratio);
+		}
+		
+		return result;
+	}
+	
+	public void generateDimensions() {
+		String itemID = "sh000001";
+		LocalDate date = kdataService.getLatestMarketDate(itemID);
+		this.generateDimensions(date);
+	}
+	
+	public void generateDimensions(LocalDate date) {
+		Map<String,Taoyans> dimensions = this.getDimensions(date);
+		this.writeDimension(dimensions.get("industry").getResult(),date);
+		this.writeDimension(dimensions.get("area").getResult(),date);
+		this.writeDimension(dimensions.get("market").getResult(),date);
+		this.writeDimension(dimensions.get("topic").getResult(),date);
+		this.writeDimension(dimensions.get("average").getResult(),date);
+	}
+	
+	private void writeDimension(List<Taoyan> taoyans, LocalDate date) {
+		String file;
+		String content;
+		for(Taoyan t : taoyans) {
+			file = drumsPath + "/" + t.getName() + ".txt";
+			content = date.toString() + "," + t.getRatio().toString() + "\n";
+			FileTools.writeTextFile(file, content, true);
+		}
+	}
+	
+	public Set<String> getDimensionNames(Set<String> itemIDs){
+		Set<String> dns = new HashSet<String>();
+		Item item;
+		String[] topics;
+		for(String id : itemIDs) {
+			item = itemService.getItem(id);
+			dns.add(item.getIndustry());
+			dns.add(item.getArea());
+			dns.add(item.getMarket());
+			topics = itemService.getTopic(item.getItemID()).split("，");
+			dns.addAll(Arrays.asList(topics));
+		}
+		return dns;
+	}
+	
 	private Map<String,Taoyans> getDimensions(LocalDate endDate){
 		Dimension industry_a = new Dimension();
 		Dimension area_a = new Dimension();
 		Dimension market_a = new Dimension();
 		Dimension topic_a = new Dimension();
+		Dimension average_a = new Dimension();
 		
 		List<String> ids = this.getDrums(endDate);
 		Item item;
@@ -87,6 +152,8 @@ public class DrumService {
 			area_a.put(item.getArea(), id, item.getName());
 			market_a.put(item.getMarket(), id, item.getName());
 			topic_a.put(itemService.getTopic(item.getItemID()).split("，"), id, item.getName());
+			average_a.put("average", id, item.getName());
+			
 		}
 
 		Map<String,Dimension> dimensions = itemService.getDimensions();
@@ -95,55 +162,75 @@ public class DrumService {
 		Dimension area_b = dimensions.get("area");
 		Dimension market_b = dimensions.get("market");
 		Dimension topic_b = dimensions.get("topic");
+		Dimension average_b = dimensions.get("average");
 
 		Taoyans industry = new Taoyans(industry_a,industry_b);
 		Taoyans area = new Taoyans(area_a,area_b);
 		Taoyans market = new Taoyans(market_a,market_b);
 		Taoyans topic = new Taoyans(topic_a,topic_b);
+		Taoyans average = new Taoyans(average_a,average_b);
 		
 		Map<String, Taoyans> ds = new HashMap<String,Taoyans>();
 		ds.put("topic", topic);
 		ds.put("industry", industry);
 		ds.put("area", area);
 		ds.put("market", market);
+		ds.put("average", average);
 
 		return ds;
 	}
 	
-	public List<DimensionView> getDimensionView(LocalDate endDate){
-		Map<String,Taoyans> dimensions = this.getDimensions(endDate);
+	public DdatasView getDdatasView(String name, LocalDate date){
+		Map<LocalDate, Integer> datas = this.getDimension(name);
+		Map<LocalDate, Integer> averages = this.getDimension("average");
 
+		DdatasView dv = new DdatasView(name);
+		for(Map.Entry<LocalDate, Integer> data : datas.entrySet()) {
+			if(data.getKey().isBefore(date) || data.getKey().equals(date)) {
+				dv.add(data.getKey().toString(), data.getValue().toString(), averages.get(data.getKey()).toString());
+			}
+		}
+		
+		return dv;
+	}
+	
+	public List<DimensionView> getDimensionView(LocalDate endDate, Set<String> holds){
+		Map<String,Taoyans> dimensions = this.getDimensions(endDate);
+		Set<String> holdDimensions = this.getDimensionNames(holds);
+		//List<Taoyan> averages = dimensions.get("average").getResult();
+		//Integer ratio = averages.get(averages.size()-1).getRatio();
+		Integer ratio = 34;
 		Taoyans topics = dimensions.get("topic");
-		DimensionView topicView = this.getDimensionView("topic", "概念", topics.getResult());
+		DimensionView topicView = this.getDimensionView("topic", "概念", topics.getResult(ratio), holds, holdDimensions);
 
 		Taoyans industrys = dimensions.get("industry");
-		DimensionView industryView = this.getDimensionView("industry", "行业", industrys.getResult());
+		DimensionView industryView = this.getDimensionView("industry", "行业", industrys.getResult(ratio), holds, holdDimensions);
 		
-		Taoyans areas = dimensions.get("area");
-		DimensionView areaView = this.getDimensionView("area", "省市", areas.getResult());
+		//Taoyans areas = dimensions.get("area");
+		//DimensionView areaView = this.getDimensionView("area", "省市", areas.getResult(), holds, holdDimensions);
 
-		Taoyans markets = dimensions.get("market");
-		DimensionView marketView = this.getDimensionView("market", "市场", markets.getResult());
+		//Taoyans markets = dimensions.get("market");
+		//DimensionView marketView = this.getDimensionView("market", "市场", markets.getResult(), holds, holdDimensions);
 
 		
 		List<DimensionView> views = new ArrayList<DimensionView>();
 		views.add(topicView);
 		views.add(industryView);
-		views.add(areaView);
-		views.add(marketView);
+		//views.add(areaView);
+		//views.add(marketView);
 		
 		return views;
 	}
 	
-	private DimensionView getDimensionView(String code, String name, List<Taoyan> ty) {
+	private DimensionView getDimensionView(String code, String name, List<Taoyan> ty, Set<String> holds, Set<String> holdDimensionNames) {
 		DimensionView view = new DimensionView(code, name);
 		//List<Taoyan> ty = industrys.getResult();
 		Map<String,String> ids;
 		for(Taoyan t : ty) {
-			view.addBoard(t.getName(), t.getName(), t.getRatio());
+			view.addBoard(t.getName(), t.getName(), t.getRatio(), holdDimensionNames.contains(t.getName())? "1" : "0");
 			ids = t.getDrum();
 			for(Map.Entry<String, String> entry : ids.entrySet()) {
-				view.addItem(t.getName(), entry.getKey(), entry.getValue());
+				view.addItem(t.getName(), entry.getKey(), entry.getValue(),holds.contains(entry.getKey())? "1" : "0");
 			}
 		}
 		return view;
@@ -152,14 +239,23 @@ public class DrumService {
 	public List<String> getDrumsOfTopDimensions(LocalDate endDate){
 		Map<String,Taoyans> dimensions = this.getDimensions(endDate);
 		
-		Taoyans industry = dimensions.get("industry");
-		Taoyans topic = dimensions.get("topic");
+		//List<Taoyan> averages = dimensions.get("average").getResult();
+		//Integer ratio = averages.get(averages.size()-1).getRatio();
+		Integer ratio = 49;
 		
-		
-		Integer ratio = 55;
+		Set<String> industrys = dimensions.get("industry").getHighRatioIDs(ratio);
+		Set<String> topics = dimensions.get("topic").getHighRatioIDs(ratio);
+		//Set<String> markets = dimensions.get("market").getHighRatioIDs(ratio);
+		//Set<String> areas = dimensions.get("area").getHighRatioIDs(ratio);
+
 		Set<String> oks = new HashSet<String>();
-		oks.addAll(industry.getHighRatioIDs(ratio));
-		oks.addAll(topic.getHighRatioIDs(ratio));
+		oks.addAll(industrys);
+		oks.addAll(topics);
+/*		for(String id : industrys) {
+			if(topics.contains(id) && markets.contains(id) && areas.contains(id)) {
+				oks.add(id);
+			}
+		}*/
 		
 		Map<String,Muster> musters = kdataService.getMusters(endDate);
 		List<Muster> ok_musters = new ArrayList<Muster>();
@@ -221,25 +317,30 @@ public class DrumService {
 				Integer ratio;
 				Muster m,p,b;
 				int j=1;
+				boolean flag = false;
 				for(int i=0; i<ms.size(); i++) {
-					Progress.show(ms.size(), j++, "");
 					m = ms.get(i);
+					//Progress.show(ms.size(), j++, m.getItemID());
 					if(m!=null) {
 						p = previous.get(0).get(m.getItemID());
 						b = b_musters.get(m.getItemID());
 						if(p!=null && b!=null) {
 							ratio = this.getRatio(previous,m.getItemID(),m.getLatestPrice());
+							flag = false;
 							if(ratio >= sseiRatio
 								&& ratio >0
 								&& m.isUpAve(21)
 								&& m.getAveragePrice21().compareTo(p.getAveragePrice21())==1
 								&& m.getAveragePrice21().compareTo(b.getAveragePrice21())==1
 								) {
+								flag = true;
 								ids.add(m.getItemID());
 							}
+							//logger.info(String.format("itemID=%s,sseiRatio=%d, ratio=%d, m.avp=%.2f, p.avp=%.2f, b.avp=%.2f,flag=%b", m.getItemID(),sseiRatio, ratio,m.getAveragePrice21(),p.getAveragePrice21(),b.getAveragePrice21(),flag));
 						}
 					}
 				}
+				
 			}
 		}
 		
@@ -279,6 +380,19 @@ public class DrumService {
 				ts.add(new Taoyan(entry.getKey(),mb.get(entry.getKey()),entry.getValue()));
 			}			
 		}
+
+		public List<Taoyan> getResult(Integer ratio){
+			this.sort();
+			
+			List<Taoyan> result = new ArrayList<Taoyan>();
+			for(int i=0; i<this.ts.size(); i++) {
+				if(this.ts.get(i).getRatio()>=ratio) {
+					result.add(this.ts.get(i));
+				}
+			}
+			
+			return result;
+		}
 		
 		public List<Taoyan> getResult(){
 			this.sort();
@@ -298,7 +412,7 @@ public class DrumService {
 
 				@Override
 				public int compare(Taoyan o1, Taoyan o2) {
-					return o2.getRatio().compareTo(o1.getRatio());
+					return (o2.getRatio()).compareTo(o1.getRatio());
 				}
 				
 			});
@@ -347,6 +461,10 @@ public class DrumService {
 		public Integer getRatio() {
 			Double a = drum.size()*1.0/total.size() * 100;
 			return a.intValue();
+		}
+		
+		public Integer getSize() {
+			return total.size();
 		}
 
 		@Override

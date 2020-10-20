@@ -34,6 +34,10 @@ public class Kdata {
 	}
 	
 	public Integer getRatio() {
+		if(bars==null || bars.lastEntry()==null || bars.lastEntry().getValue()==null) {
+			return 0;
+		}
+		
 		BigDecimal p1 = bars.lastEntry().getValue().getClose();
 		//BigDecimal p2 = bars.firstEntry().getValue().getClose();
 		//System.out.format("last date: %tF, %.2f\n",bars.lastEntry().getValue().getDate(),bars.lastEntry().getValue().getClose());

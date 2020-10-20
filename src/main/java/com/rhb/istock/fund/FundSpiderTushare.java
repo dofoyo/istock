@@ -18,10 +18,13 @@ public class FundSpiderTushare {
 	@Value("${fundsPath}")
 	private String fundsPath;
 	
+	@Value("${tushareUrl}")
+	private String url;	
+	
 	protected static final Logger logger = LoggerFactory.getLogger(FundSpiderTushare.class);
 	
 	public void downFundBasic() {
-		String url = "http://api.tushare.pro";
+		//String url = "http://api.tushare.pro";
 		JSONObject args = new JSONObject();
 		args.put("api_name", "fund_basic");
 		args.put("token", "175936caa4637bc9ac8e5e75ac92eff6887739ca6be771b81653f278");
@@ -33,7 +36,7 @@ public class FundSpiderTushare {
 	}
 	
 	public void downFundPortfolio(String ts_code) {
-		String url = "http://api.tushare.pro";
+		//String url = "http://api.tushare.pro";
 		JSONObject args = new JSONObject();
 		args.put("api_name", "fund_portfolio");
 		args.put("token", "175936caa4637bc9ac8e5e75ac92eff6887739ca6be771b81653f278");

@@ -27,18 +27,51 @@ public class KdataAPI {
 	@Autowired
 	@Qualifier("itemServiceImp")
 	ItemService itemService;
-	
-	@GetMapping("/kdatas/{itemID}")
-	public ResponseContent<KdatasView> getKdatas(@PathVariable(value="itemID") String itemID,
+
+	@GetMapping("/kdatas/ssei")
+	public ResponseContent<KdatasView> getSseiKdatas(
 			@RequestParam(value="endDate", required=false) String endDate
 			) {
 		
 		//System.out.println(endDate);
 		
 		LocalDate theEndDate = null;
-		/*if(endDate!=null && !endDate.isEmpty()) {
+		if(endDate!=null && !endDate.isEmpty()) {
 			theEndDate = LocalDate.parse(endDate, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-		}*/
+		}
+		String itemID = "sh000001";
+		KdatasView kdatas = new KdatasView();
+		
+		kdatas.setCode("sh000001");
+		kdatas.setName("上证指数");
+		
+		List<LocalDate> dates = kdataService.getKdata(itemID, theEndDate, true).getDates();
+		Kbar bar=null;
+		for(LocalDate date : dates) {
+			bar = kdataService.getKbar(itemID, date, true);
+			kdatas.addKdata(date, bar.getOpen(), bar.getHigh(), bar.getLow(), bar.getClose());
+		}
+		
+		Kbar latestBar;
+		if(theEndDate!=null && theEndDate.equals(LocalDate.now()) && !dates.contains(theEndDate)) {
+			latestBar = kdataService.getLatestMarketData(itemID);
+			//if(bar==null || !bar.getDate().equals(latestBar.getDate())) {
+				kdatas.addKdata(latestBar.getDate(), latestBar.getOpen(), latestBar.getHigh(), latestBar.getLow(), latestBar.getClose());
+			//}
+		}
+		
+		return new ResponseContent<KdatasView>(ResponseEnum.SUCCESS, kdatas);
+	}
+	
+	@GetMapping("/kdatas/{itemID}")
+	public ResponseContent<KdatasView> getKdatas(@PathVariable(value="itemID") String itemID,
+			@RequestParam(value="endDate", required=false) String endDate
+			) {
+		
+		LocalDate theEndDate = null;
+		if(endDate!=null && !endDate.isEmpty()) {
+			theEndDate = LocalDate.parse(endDate, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+		}
 		
 		KdatasView kdatas = new KdatasView();
 		
@@ -48,6 +81,8 @@ public class KdataAPI {
 			kdatas.setCode(item.getCode());
 			kdatas.setName(item.getName());
 			
+			//System.out.println("I want to get: " + theEndDate);
+			
 			List<LocalDate> dates = kdataService.getKdata(itemID, theEndDate, true).getDates();
 			Kbar bar=null;
 			for(LocalDate date : dates) {
@@ -55,12 +90,19 @@ public class KdataAPI {
 				kdatas.addKdata(date, bar.getOpen(), bar.getHigh(), bar.getLow(), bar.getClose());
 			}
 			
+			//System.out.println("I got: " + dates.get(dates.size()-1));
+			
+/*			Kbar latestBar = kdataService.getLatestMarketData(itemID);
+			if(bar.getDate().isBefore(latestBar.getDate())) {
+				kdatas.addKdata(latestBar.getDate(), latestBar.getOpen(), latestBar.getHigh(), latestBar.getLow(), latestBar.getClose());
+			}*/
+			
 			Kbar latestBar;
-			if(theEndDate==null) {
+			if(theEndDate!=null && theEndDate.equals(LocalDate.now()) && !dates.contains(theEndDate)) {
 				latestBar = kdataService.getLatestMarketData(itemID);
-				if(bar==null || !bar.getDate().equals(latestBar.getDate())) {
+				//if(bar==null || !bar.getDate().equals(latestBar.getDate())) {
 					kdatas.addKdata(latestBar.getDate(), latestBar.getOpen(), latestBar.getHigh(), latestBar.getLow(), latestBar.getClose());
-				}
+				//}
 			}
 		}
 		

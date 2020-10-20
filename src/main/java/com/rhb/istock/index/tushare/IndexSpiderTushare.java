@@ -19,6 +19,9 @@ public class IndexSpiderTushare {
 	@Value("${tushareKdataPath}")
 	private String kdataPath;
 
+	@Value("${tushareUrl}")
+	private String url;
+	
 	@Autowired
 	@Qualifier("itemServiceImp")
 	ItemService itemService;
@@ -26,7 +29,7 @@ public class IndexSpiderTushare {
 	protected static final Logger logger = LoggerFactory.getLogger(IndexSpiderTushare.class);
 
 	public JSONObject downIndex_basic() {
-		String url = "http://api.tushare.pro";
+		//String url = "http://api.tushare.pro";
 		JSONObject args = new JSONObject();
 		args.put("api_name", "index_basic");
 		args.put("token", "175936caa4637bc9ac8e5e75ac92eff6887739ca6be771b81653f278");
@@ -64,7 +67,7 @@ public class IndexSpiderTushare {
 	}
 		
 	public void downIndex_weight(String index_code) {
-		String url = "http://api.tushare.pro";
+		//String url = "http://api.tushare.pro";
 		JSONObject args = new JSONObject();
 		args.put("api_name", "index_weight");
 		args.put("token", "175936caa4637bc9ac8e5e75ac92eff6887739ca6be771b81653f278");
@@ -107,7 +110,7 @@ public class IndexSpiderTushare {
 	}
 	
 	public void downIndex_Daily(String ts_code) {
-		String url = "http://api.tushare.pro";
+		//String url = "http://api.tushare.pro";
 		JSONObject args = new JSONObject();
 		args.put("api_name", "index_daily");
 		args.put("token", "175936caa4637bc9ac8e5e75ac92eff6887739ca6be771b81653f278");

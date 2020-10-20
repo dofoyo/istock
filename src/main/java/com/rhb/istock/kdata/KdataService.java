@@ -36,6 +36,7 @@ public interface KdataService {
 	public void downClosedDatas()  throws Exception ;
 	public void downClosedDatas(LocalDate date)  throws Exception ;
 	public void downFactors()  throws Exception ;
+	public void downFactors(LocalDate date)  throws Exception ;
 	
 	public void generateMusters(LocalDate beginDate);  //用于simulation
 	public Map<String,Muster> getMusters(LocalDate date); //用于simulation

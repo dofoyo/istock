@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import com.rhb.istock.comm.util.HttpClient;
 import com.rhb.istock.comm.util.Progress;
 import com.rhb.istock.index.tushare.IndexSpiderTushare;
 import com.rhb.istock.item.Item;
@@ -250,6 +251,10 @@ public class KdataServiceImp implements KdataService{
 		KdataEntity entity = this.getEntity(itemID, byCache);
 		
 		//System.out.println(entity.getBarSize());
+		
+		LocalDate end = entity.getLastDate();
+		//System.out.println("the last entity is " + end);
+		
 		LocalDate date;
 		KbarEntity bar;
 		for(Map.Entry<LocalDate, KbarEntity> entry : entity.getBars().entrySet()) {
@@ -634,7 +639,11 @@ public class KdataServiceImp implements KdataService{
 	public void updateLatestMusters() {
 		LocalDate date = this.getLatestMarketDate("sh000001");
 		Map<String,Muster> musters = this.getMusters(date);
-		this.updateMusters(date, musters, null);
+		if(musters.size()>4000) {
+			this.updateMusters(date, musters, null);
+		}else {
+			System.out.println(" update Latest Musters ERROR: muster's size is small than 4000!!!");
+		}
 	}
 
 	private void updateMusters(LocalDate date, Map<String,Muster> musters, Set<String> ids) {
@@ -691,12 +700,13 @@ public class KdataServiceImp implements KdataService{
 					entity.setLatestHighest(kbar.getHigh());
 					entity.setLatestLowest(kbar.getLow());
 				}
+				HttpClient.sleep(1);
 			}
 			entities.add(entity);
 		}
 		musterRepositoryImp.saveMusters(date,entities);
 
-		logger.info("\nupdateLatestMusters done!");
+		logger.info("\n updateLatestMusters done!");
 		long used = (System.currentTimeMillis() - beginTime)/1000; 
 		logger.info("用时：" + used + "秒");     
 	}
@@ -753,7 +763,7 @@ public class KdataServiceImp implements KdataService{
 	@Override
 	public Integer getSseiRatio(LocalDate date, Integer period) {
 		Kdata ssei = this.getKdata(sseiID, date.plusDays(1), period, true);
-		if(!ssei.getLastBar().getDate().equals(date)) {
+		if(ssei!=null && ssei.getLastBar()!=null && ssei.getLastBar().getDate()!=null && !ssei.getLastBar().getDate().equals(date)) {
 			ssei.addBar(date, this.getLatestMarketData(sseiID));
 			//ssei.removeFirstBar();
 		}
@@ -891,6 +901,11 @@ public class KdataServiceImp implements KdataService{
 		}
 		//logger.info(sb.toString());
 		return musters;
+	}
+
+	@Override
+	public void downFactors(LocalDate date) throws Exception {
+		kdataSpider.downFactors(date);
 	}
 
 

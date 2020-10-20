@@ -22,13 +22,16 @@ public class ItemSpiderTushare implements ItemSpider {
 	@Value("${tushareItemsFile}")
 	private String itemsFile;
 	
+	@Value("${tushareUrl}")
+	private String url;	
+	
 	protected static final Logger logger = LoggerFactory.getLogger(ItemSpiderTushare.class);
 	
 	@Override
 	public void downItems() throws Exception {
 		logger.info("download items...");
 		
-		String url = "http://api.tushare.pro";
+		//String url = "http://api.tushare.pro";
 
 		JSONObject args = new JSONObject();
 		args.put("api_name", "stock_basic");

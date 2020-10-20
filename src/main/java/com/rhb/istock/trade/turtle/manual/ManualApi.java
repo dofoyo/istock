@@ -196,12 +196,24 @@ public class ManualApi {
 		}
 		
 		if(ids!=null && !ids.isEmpty()) {
+			Set<String> holds = this.getHoldIDs(this.generateHolds("manual",theDate));
+			
+			//System.out.println(holds);
+			//System.out.println(ids);
 			for(String id : ids) {
-				views.add(new ItemView(id,itemService.getItem(id).getName()));
+				views.add(new ItemView(id,itemService.getItem(id).getName(),holds.contains(id)? "danger" : "info"));
 			}
 		}
 		
 		return new ResponseContent<List<ItemView>>(ResponseEnum.SUCCESS, views);
+	}
+	
+	private Set<String> getHoldIDs(Set<Hold> holds){
+		Set<String> ids = new HashSet<String>();
+		for(Hold h : holds) {
+			ids.add(h.getItemID());
+		}
+		return ids;
 	}
 	
 	@GetMapping("/turtle/manual/selected/{date}/{itemID}")
@@ -245,17 +257,29 @@ public class ManualApi {
 		return new ResponseContent<List<ItemView>>(ResponseEnum.SUCCESS, views);
 	}
 	
-	@GetMapping("/turtle/manual/selects")
-	public ResponseContent<List<SelectView>> getSelects() {
+	@GetMapping("/turtle/manual/selects/{date}")
+	public ResponseContent<List<SelectView>> getSelects(
+			@PathVariable(value="date") String date
+			) {
 		List<SelectView> views = new ArrayList<SelectView>();
-		
-		Map<LocalDate, String> selects = manualService.getSelects();
-		//System.out.println(selects);
-		
-		for(Map.Entry<LocalDate, String> entry : selects.entrySet()) {
-			views.add(new SelectView(entry.getValue(),itemService.getItem(entry.getValue()).getName(),entry.getKey()));
+
+		LocalDate theDate = null;
+		try{
+			theDate = LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+		}catch(Exception e){
+			new ResponseContent<List<SelectView>>(ResponseEnum.ERROR, views);
 		}
 		
+		//System.out.println(theDate);
+		
+		Map<LocalDate, String> selects = manualService.getSelects(theDate);
+		//System.out.println(selects);
+		if(selects != null) {
+			Set<String> holds = this.getHoldIDs(this.generateHolds("manual",theDate));
+			for(Map.Entry<LocalDate, String> entry : selects.entrySet()) {
+				views.add(new SelectView(entry.getValue(),itemService.getItem(entry.getValue()).getName(),entry.getKey(),holds.contains(entry.getValue())?"danger":""));
+			}			
+		}
 		return new ResponseContent<List<SelectView>>(ResponseEnum.SUCCESS, views);
 	}
 	
@@ -264,10 +288,12 @@ public class ManualApi {
 		List<SelectView> views = new ArrayList<SelectView>();
 		
 		Map<LocalDate, String> selects = manualService.getReselect();
-		
-		for(Map.Entry<LocalDate, String> entry : selects.entrySet()) {
-			views.add(new SelectView(entry.getValue(),itemService.getItem(entry.getValue()).getName(),entry.getKey()));
-		}
+		if(selects != null) {
+			for(Map.Entry<LocalDate, String> entry : selects.entrySet()) {
+				views.add(new SelectView(entry.getValue(),itemService.getItem(entry.getValue()).getName(),entry.getKey(),"warning"));
+			}
+		}		
+
 		
 		return new ResponseContent<List<SelectView>>(ResponseEnum.SUCCESS, views);
 	}
@@ -290,14 +316,13 @@ public class ManualApi {
 			new ResponseContent<List<ItemView>>(ResponseEnum.ERROR, views);
 		}
 		
-		
 		Map<LocalDate,List<String>> breakers = turtleSimulationRepository.getBreakers(type);
-		
 		
 		List<String> ids = breakers.get(theDate);
 		if(ids!=null && !ids.isEmpty()) {
+			Set<String> holds = this.getHoldIDs(this.generateHolds("manual",theDate));
 			for(String id : ids) {
-				views.add(new ItemView(id,itemService.getItem(id).getName()));
+				views.add(new ItemView(id,itemService.getItem(id).getName(),holds.contains(id)? "danger" : "warning"));
 			}
 		}
 		
@@ -346,7 +371,9 @@ public class ManualApi {
 			@PathVariable(value="date") String date
 			) {
 		
-		AmountView view = new AmountView(BigDecimal.ZERO,BigDecimal.ZERO,new BigDecimal(150000));
+		BigDecimal initCash = new BigDecimal(1000000);
+		
+		AmountView view = new AmountView(BigDecimal.ZERO,BigDecimal.ZERO,initCash);
 
 		LocalDate theDate = null;
 		try{
@@ -359,7 +386,7 @@ public class ManualApi {
 		Map<LocalDate, AmountEntity> amounts = turtleSimulationRepository.getAmounts(type);
 		AmountEntity entity = amounts.get(theDate);
 		if(entity!=null) {
-			view = new AmountView(entity.getCash(), entity.getValue(),new BigDecimal(150000));
+			view = new AmountView(entity.getCash(), entity.getValue(),initCash);
 		}
 		
 		return new ResponseContent<AmountView>(ResponseEnum.SUCCESS, view);

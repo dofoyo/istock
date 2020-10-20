@@ -20,9 +20,12 @@ import com.rhb.istock.item.ItemService;
 
 @Service("fdataSpiderTushare")
 public class FdataSpiderTushare {
+	@Value("${tushareUrl}")
+	private String url;
+
 	@Value("${tushareFdataPath}")
 	private String fdataPath;
-
+	
 	@Autowired
 	@Qualifier("itemServiceImp")
 	ItemService itemService;
@@ -49,7 +52,7 @@ public class FdataSpiderTushare {
 	
 	private void down(String itemID, String type) {
 		String tushareID = itemID.indexOf("sh")==0 ? itemID.substring(2)+".SH" : itemID.substring(2)+".SZ";
-		String url = "http://api.tushare.pro";
+		//String url = "http://api.waditu.com";
 		JSONObject args = new JSONObject();
 		args.put("api_name", type);
 		args.put("token", "175936caa4637bc9ac8e5e75ac92eff6887739ca6be771b81653f278");
@@ -89,7 +92,7 @@ public class FdataSpiderTushare {
 	public void downForecast(LocalDate date) {
 		DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyyMMdd");
 
-		String url = "http://api.tushare.pro";
+		//String url = "http://api.waditu.com";
 		JSONObject args = new JSONObject();
 		args.put("api_name", "forecast");
 		args.put("token", "175936caa4637bc9ac8e5e75ac92eff6887739ca6be771b81653f278");
@@ -142,7 +145,7 @@ public class FdataSpiderTushare {
 		DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyyMMdd");
 		String tushareID = itemID.indexOf("sh")==0 ? itemID.substring(2)+".SH" : itemID.substring(2)+".SZ";
 
-		String url = "http://api.tushare.pro";
+		//String url = "http://api.waditu.com";
 		JSONObject args = new JSONObject();
 		args.put("api_name", "top10_floatholders");
 		args.put("token", "175936caa4637bc9ac8e5e75ac92eff6887739ca6be771b81653f278");

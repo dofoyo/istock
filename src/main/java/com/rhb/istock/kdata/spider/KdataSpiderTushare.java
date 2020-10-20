@@ -25,6 +25,9 @@ import com.rhb.istock.comm.util.Progress;
 public class KdataSpiderTushare implements KdataSpider {
 	@Value("${tushareKdataPath}")
 	private String kdataPath;
+
+	@Value("${tushareUrl}")
+	private String url;
 	
 	private DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyyMMdd");
 
@@ -34,7 +37,7 @@ public class KdataSpiderTushare implements KdataSpider {
 	public void downKdatas(String itemID) {
 		String tushareID = itemID.indexOf("sh")==0 ? itemID.substring(2)+".SH" : itemID.substring(2)+".SZ";
 		
-		String url = "http://api.tushare.pro";
+		//String url = "http://api.tushare.pro";
 		JSONObject args = new JSONObject();
 		args.put("api_name", "daily");
 		args.put("token", "175936caa4637bc9ac8e5e75ac92eff6887739ca6be771b81653f278");
@@ -54,7 +57,7 @@ public class KdataSpiderTushare implements KdataSpider {
 	@Override
 	public void downFactors(String itemID) {
 		String tushareID = itemID.indexOf("sh")==0 ? itemID.substring(2)+".SH" : itemID.substring(2)+".SZ";
-		String url = "http://api.tushare.pro";
+		//String url = "http://api.tushare.pro";
 		JSONObject args = new JSONObject();
 		args.put("api_name", "adj_factor");
 		args.put("token", "175936caa4637bc9ac8e5e75ac92eff6887739ca6be771b81653f278");
@@ -76,7 +79,7 @@ public class KdataSpiderTushare implements KdataSpider {
 		long beginTime=System.currentTimeMillis(); 
 		logger.info("KdataSpiderTushare.downloadKdata of " + date + "....");
 
-		String url = "http://api.tushare.pro";
+		//String url = "http://api.tushare.pro";
 		JSONObject args = new JSONObject();
 		args.put("api_name", "daily");
 		args.put("token", "175936caa4637bc9ac8e5e75ac92eff6887739ca6be771b81653f278");
@@ -152,7 +155,7 @@ public class KdataSpiderTushare implements KdataSpider {
 	}
 	
 	private String downloadFactors(LocalDate date) {
-		String url = "http://api.tushare.pro";
+		//String url = "http://api.tushare.pro";
 		JSONObject args = new JSONObject();
 		args.put("api_name", "adj_factor");
 		args.put("token", "175936caa4637bc9ac8e5e75ac92eff6887739ca6be771b81653f278");
@@ -273,7 +276,7 @@ public class KdataSpiderTushare implements KdataSpider {
 	@Override
 	public void downBasics(String itemID) throws Exception {
 		String tushareID = itemID.indexOf("sh")==0 ? itemID.substring(2)+".SH" : itemID.substring(2)+".SZ";
-		String url = "http://api.tushare.pro";
+		//String url = "http://api.tushare.pro";
 		JSONObject args = new JSONObject();
 		args.put("api_name", "daily_basic");
 		args.put("token", "175936caa4637bc9ac8e5e75ac92eff6887739ca6be771b81653f278");
@@ -351,7 +354,7 @@ public class KdataSpiderTushare implements KdataSpider {
 	}
 	
 	private String downloadBasics(LocalDate date) {
-		String url = "http://api.tushare.pro";
+		//String url = "http://api.tushare.pro";
 		JSONObject args = new JSONObject();
 		args.put("api_name", "daily_basic");
 		args.put("token", "175936caa4637bc9ac8e5e75ac92eff6887739ca6be771b81653f278");
