@@ -41,24 +41,26 @@ public class FdataRepositoryEastmoney {
 					
 					if(rq.contains("预测") && !yylr.equals("--")) {
 						forcasts.put(rq.substring(0, 4), this.getBigDecimal(yylr));
-						count = this.getCount(yylr);
+						count = this.getCount(yylr); 
 					}
 				}
 
 				boolean flag = false;
-				if(p!=null && p>=0 && forcasts.size()>0 && count>=3) {
+				if(p!=null && p>=0 && forcasts.size()>0 && count>=3) {  //三个以上的机构预测
 					item = items.getJSONObject(p);   //得到最后一个实际值
 					yylr = item.get("yylr").toString();
 					BigDecimal b = this.getBigDecimal(yylr);
-					for(Map.Entry<String, BigDecimal> entry : forcasts.entrySet()) {
-						if(b.compareTo(entry.getValue())==-1) {
-							flag = true;
-						}else {
-							flag = false;
-							break;
+					if(b.compareTo(new BigDecimal(1))==1) {  //最后一个实际值在一个亿以上
+						for(Map.Entry<String, BigDecimal> entry : forcasts.entrySet()) {
+							if(b.compareTo(entry.getValue())==-1) {
+								flag = true;
+							}else {
+								flag = false;
+								break;
+							}
+							b = entry.getValue();
 						}
-						b = entry.getValue();
-					}
+					}					
 				}
 				
 				if(flag) {
