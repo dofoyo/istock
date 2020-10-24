@@ -42,7 +42,7 @@ public class KdataAPI {
 		String itemID = "sh000001";
 		KdatasView kdatas = new KdatasView();
 		
-		kdatas.setCode("sh000001");
+		kdatas.setCode(itemID);
 		kdatas.setName("上证指数");
 		
 		List<LocalDate> dates = kdataService.getKdata(itemID, theEndDate, true).getDates();

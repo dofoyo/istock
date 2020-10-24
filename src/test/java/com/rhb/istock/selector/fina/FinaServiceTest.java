@@ -36,7 +36,7 @@ public class FinaServiceTest {
 		}
 	}
 	
-	@Test
+	//@Test
 	public void generateNewPE() {
 		String date = "20191231";
 		List<NewPE> pes = finaService.generateNewPE(date);
@@ -47,5 +47,11 @@ public class FinaServiceTest {
 				break;
 			}
 		}
+	}
+	
+	@Test
+	public void getHighCAGR() {
+		List<String> ids = finaService.getHighCAGR(10000);
+		System.out.println(ids);
 	}
 }

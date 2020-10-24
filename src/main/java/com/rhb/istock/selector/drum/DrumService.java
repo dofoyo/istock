@@ -30,6 +30,7 @@ import com.rhb.istock.kdata.KdataService;
 import com.rhb.istock.kdata.Muster;
 import com.rhb.istock.selector.DdatasView;
 import com.rhb.istock.selector.DimensionView;
+import com.rhb.istock.selector.fina.FinaService;
 
 @Service("drumService")
 public class DrumService {
@@ -46,6 +47,10 @@ public class DrumService {
 
 	@Value("${drumsPath}")
 	private String drumsPath;
+	
+	@Autowired
+	@Qualifier("finaService")
+	FinaService finaService;
 	
 	protected static final Logger logger = LoggerFactory.getLogger(DrumService.class);
 
@@ -124,6 +129,9 @@ public class DrumService {
 	
 	public Set<String> getDimensionNames(Set<String> itemIDs){
 		Set<String> dns = new HashSet<String>();
+		if(itemIDs==null) {
+			return dns;
+		}
 		Item item;
 		String[] topics;
 		for(String id : itemIDs) {
@@ -236,15 +244,29 @@ public class DrumService {
 		return view;
 	}
 	
-	public List<String> getDrumsOfTopDimensions(LocalDate endDate){
+	public List<String> getDrumsOfCAGR(LocalDate endDate, Integer top){
+		List<String> results = new ArrayList<String>();
+		List<String> ids = finaService.getHighCAGR(top);
+		List<String> ss = this.getDrums(endDate);
+		for(String id : ss) {
+			if(ids.contains(id)) {
+				results.add(id);
+			}
+		}
+		//System.out.format("there are %d drums and %d high cagrs --> %d high_cagr_drums\n", ss.size(),ids.size(),results.size());
+		return results;
+	}
+	
+	public List<String> getDrumsOfTopDimensions(LocalDate endDate,Set<String> holds){
+		Set<String> holdDimensions = this.getDimensionNames(holds);
 		Map<String,Taoyans> dimensions = this.getDimensions(endDate);
 		
 		//List<Taoyan> averages = dimensions.get("average").getResult();
 		//Integer ratio = averages.get(averages.size()-1).getRatio();
 		Integer ratio = 49;
 		
-		Set<String> industrys = dimensions.get("industry").getHighRatioIDs(ratio);
-		Set<String> topics = dimensions.get("topic").getHighRatioIDs(ratio);
+		Set<String> industrys = dimensions.get("industry").getHighRatioIDs(ratio,holdDimensions);
+		Set<String> topics = dimensions.get("topic").getHighRatioIDs(ratio,holdDimensions);
 		//Set<String> markets = dimensions.get("market").getHighRatioIDs(ratio);
 		//Set<String> areas = dimensions.get("area").getHighRatioIDs(ratio);
 
@@ -268,10 +290,10 @@ public class DrumService {
 			public int compare(Muster o1, Muster o2) {
 				//return o1.getLatestPrice().compareTo(o2.getLatestPrice());
 				
-				if(o1.getHLGap().compareTo(o2.getHLGap())==0){
-					return o1.getLNGap().compareTo(o2.getLNGap());
+				if(o1.getN21Gap().compareTo(o2.getN21Gap())==0){
+					return o2.getHLGap().compareTo(o1.getHLGap());
 				}else {
-					return o1.getHLGap().compareTo(o2.getHLGap());
+					return o1.getN21Gap().compareTo(o2.getN21Gap());
 				}
 			}
 		});	
@@ -305,10 +327,10 @@ public class DrumService {
 					public int compare(Muster o1, Muster o2) {
 						//return o1.getLatestPrice().compareTo(o2.getLatestPrice());
 
-						if(o1.getHLGap().compareTo(o2.getHLGap())==0){
-							return o1.getLNGap().compareTo(o2.getLNGap());
-						}else {
+						if(o1.getN21Gap().compareTo(o2.getN21Gap())==0){
 							return o1.getHLGap().compareTo(o2.getHLGap());
+						}else {
+							return o1.getN21Gap().compareTo(o2.getN21Gap());
 						}
 					}
 				});
@@ -432,6 +454,18 @@ public class DrumService {
 			for(int i=0; i<ts.size(); i++) {
 				if(this.ts.get(i).getRatio() > ratio) {
 					ids.addAll(this.ts.get(i).getDrum().keySet());
+				}
+			}
+			return ids;
+		}
+		
+		public Set<String> getHighRatioIDs(Integer ratio, Set<String> excludes){
+			Set<String> ids = new HashSet<String>();
+			Taoyan ty;
+			for(int i=0; i<ts.size(); i++) {
+				ty = this.ts.get(i);
+				if(!excludes.contains(ty.getName()) && ty.getRatio()>ratio) {
+					ids.addAll(ty.getDrum().keySet());
 				}
 			}
 			return ids;

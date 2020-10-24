@@ -77,8 +77,8 @@ public class B21plus {
 					droped = true;
 				}*/
 				
-				//高位快速回落超过13%
-				//account.dropFallOrder(itemID, -13,"3");
+				//高位快速回落超过8%
+				//account.dropFallOrder(itemID, -8,"3");
 
 				
 /*				//大盘不好,有赚就卖

@@ -1,5 +1,8 @@
 package com.rhb.istock.index.tushare;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -13,6 +16,8 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import com.rhb.istock.comm.util.FileTools;
+import com.rhb.istock.kdata.Kdata;
+import com.rhb.istock.kdata.repository.KdataEntity;
 
 @Service("indexRepositoryTushare")
 public class IndexRepositoryTushare {
@@ -142,4 +147,67 @@ public class IndexRepositoryTushare {
 		
 		return kdata;
 	}
+	
+	@Cacheable("indexKdatas")
+	public KdataEntity getKdataByCache(String ts_code) {
+		return this.getKdata(ts_code);
+	}
+	
+	
+	public KdataEntity getKdata(String ts_code) {
+		KdataEntity kdata = new KdataEntity(ts_code);
+
+		String kdataFile = kdataPath + "/index/" + ts_code + "_kdatas.json";
+
+		if(FileTools.isExists(kdataFile)) {
+			//String trade_date,close,open,high,low,pre_close,vol,amount;
+			LocalDate date;
+			BigDecimal open,high,low,close,amount,quantity;
+			BigDecimal zero = BigDecimal.ZERO;
+
+			JSONObject data = new JSONObject(FileTools.readTextFile(kdataFile));
+			JSONArray items = data.getJSONArray("items");
+			if(items.length()>0) {
+				JSONArray item;
+				for(int i=0; i<items.length(); i++) {
+					item = items.getJSONArray(i);
+					
+					date = LocalDate.parse(item.get(1).toString(),DateTimeFormatter.ofPattern("yyyyMMdd"));;
+					close = item.getBigDecimal(2);
+					open = item.getBigDecimal(3);
+					high = item.getBigDecimal(4);
+					low = item.getBigDecimal(5);
+					//pre_close = item.getBigDecimal(6);
+					quantity = item.getBigDecimal(8);
+					amount = item.getBigDecimal(10);
+					kdata.addBar(date,open,high,low,close,amount,quantity,zero,zero,zero,zero,zero,zero,zero,zero);
+						
+					//kdata.addBar(date,close, open, high, low, pre_close, vol, amount);
+				}
+			}
+		}else {
+			System.out.println(kdataFile + " NOT exist!");
+		}
+		
+		//System.out.println(kdata.getBarSize());
+		
+		return kdata;
+	}
+	/*
+	 * LocalDate date,
+			BigDecimal open,
+			BigDecimal high,
+			BigDecimal low,
+			BigDecimal close,
+			BigDecimal amount,
+			BigDecimal quantity,
+			BigDecimal turnover_rate_f,
+			BigDecimal volume_ratio,
+			BigDecimal total_mv,
+			BigDecimal circ_mv,
+			BigDecimal total_share,
+			BigDecimal float_share,
+			BigDecimal free_share,
+			BigDecimal pe
+	 */
 }

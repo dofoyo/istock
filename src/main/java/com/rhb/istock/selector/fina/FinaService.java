@@ -24,6 +24,7 @@ import com.rhb.istock.fdata.tushare.FdataServiceTushare;
 import com.rhb.istock.fdata.tushare.FdataSpiderTushare;
 import com.rhb.istock.fdata.tushare.FinaForecast;
 import com.rhb.istock.fdata.tushare.FinaIndicator;
+import com.rhb.istock.item.Item;
 import com.rhb.istock.item.ItemService;
 import com.rhb.istock.kdata.KdataService;
 import com.rhb.istock.kdata.Muster;
@@ -55,6 +56,36 @@ public class FinaService {
 	
 	protected static final Logger logger = LoggerFactory.getLogger(FinaService.class);
 
+	
+	public List<String> getHighCAGR(Integer top){
+		List<String> results = new ArrayList<String>();
+		List<Item> tmp = new ArrayList<Item>();
+		
+		List<Item> items = itemService.getItems();
+		for(Item item : items) {
+			if(item.getCagr()!=null && item.getCagr()>20) {
+				tmp.add(item);
+			}
+		}
+		Collections.sort(tmp, new Comparator<Item>() {
+			@Override
+			public int compare(Item o1, Item o2) {
+				return o2.getCagr().compareTo(o1.getCagr());
+			}
+			
+		});
+
+		int i=0;
+		for(Item item : tmp) {
+			results.add(item.getItemID());
+			if(i++ >= top) {
+				break;
+			}
+		}
+		
+		return results;
+	}
+	
 	public Map<String,QuarterCompare> getQuarterCompares(){
 		Map<String,QuarterCompare> qcs = new HashMap<String,QuarterCompare>();
 		QuarterCompare qc;

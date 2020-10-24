@@ -68,6 +68,7 @@ public class DrumPlus {
 
 				//跌破21日均线
 				if(muster.isDropAve(21) 
+						 //&& sseiFlag!=1
 						//&& muster.getAverageAmount5().compareTo(muster.getAverageAmount())==-1
 						) { 		
 					account.dropWithTax(itemID, "1", muster.getLatestPrice());
@@ -81,8 +82,8 @@ public class DrumPlus {
 					droped = true;
 				}*/
 				
-				//高位快速回落超过13%
-				//account.dropFallOrder(itemID, -13,"3");
+				//高位快速回落超过8%
+				//account.dropFallOrder(itemID, -8,"3");
 			}
 		}
 		

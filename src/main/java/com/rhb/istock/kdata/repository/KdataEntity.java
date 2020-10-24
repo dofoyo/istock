@@ -30,7 +30,9 @@ public class KdataEntity {
 					BigDecimal free_share,
 					BigDecimal pe
 					) {
-		this.bars.put(date, new KbarEntity(open, high, low, close, amount, quantity, turnover_rate_f, volume_ratio,total_mv,circ_mv,total_share,float_share,free_share,pe));
+		KbarEntity bar = new KbarEntity(open, high, low, close, amount, quantity, turnover_rate_f, volume_ratio,total_mv,circ_mv,total_share,float_share,free_share,pe);
+		//System.out.println(date + ": " + bar.toString());
+		this.bars.put(date, bar);
 	}
 	
 	public void addBar(String date,

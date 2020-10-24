@@ -146,7 +146,7 @@ public class KbarEntity {
 		return "KbarEntity [open=" + open + ", high=" + high + ", low=" + low + ", close=" + close + ", amount="
 				+ amount + ", quantity=" + quantity + ", turnover_rate_f=" + turnover_rate_f + ", volume_ratio="
 				+ volume_ratio + ", total_mv=" + total_mv + ", circ_mv=" + circ_mv + ", total_share=" + total_share
-				+ ", float_share=" + float_share + ", free_share=" + free_share + "]";
+				+ ", float_share=" + float_share + ", free_share=" + free_share + ", pe=" + pe + "]";
 	}
 	
 	public String getStr() {

@@ -41,7 +41,7 @@ public class NewbService {
 		
 		int i=1;
 		for(Muster m : musters.values()) {
-			Progress.show(musters.values().size(), i++, "  get newbs, " + m.getItemID());
+			//Progress.show(musters.values().size(), i++, "  get newbs, " + m.getItemID());
 
 			if(m.isUpBreaker()) {
 				ms.add(m);

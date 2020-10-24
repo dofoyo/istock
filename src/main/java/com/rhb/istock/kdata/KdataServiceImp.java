@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import com.rhb.istock.comm.util.HttpClient;
 import com.rhb.istock.comm.util.Progress;
+import com.rhb.istock.index.tushare.IndexRepositoryTushare;
 import com.rhb.istock.index.tushare.IndexSpiderTushare;
 import com.rhb.istock.item.Item;
 import com.rhb.istock.item.ItemService;
@@ -50,6 +51,10 @@ public class KdataServiceImp implements KdataService{
 	@Autowired
 	@Qualifier("kdataSpider163")
 	KdataSpider kdataSpider163;
+
+	@Autowired
+	@Qualifier("indexRepositoryTushare")
+	IndexRepositoryTushare indexRepositoryTushare;
 	
 	@Autowired
 	@Qualifier("itemServiceImp")
@@ -70,16 +75,21 @@ public class KdataServiceImp implements KdataService{
 	private Integer dropDuration;
 	
 	private String sseiID = "sh000001"; //上证指数
+	private String ssei_code = "000001.SH";
 
 	protected static final Logger logger = LoggerFactory.getLogger(KdataServiceImp.class);
 			
 	private KdataEntity getEntity(String itemID, boolean byCache) {
 		KdataEntity entity = null;
 		if(byCache) {
-			entity = sseiID.equals(itemID)? kdataRepository163.getKdataByCache(sseiID): kdataRepositoryTushare.getKdataByCache(itemID);
+			//entity = sseiID.equals(itemID)? kdataRepository163.getKdataByCache(sseiID): kdataRepositoryTushare.getKdataByCache(itemID);
+			entity = sseiID.equals(itemID)? indexRepositoryTushare.getKdataByCache(ssei_code): kdataRepositoryTushare.getKdataByCache(itemID);
 		}else {
-			entity = sseiID.equals(itemID)? kdataRepository163.getKdata(sseiID): kdataRepositoryTushare.getKdata(itemID);
+			//entity = sseiID.equals(itemID)? kdataRepository163.getKdata(sseiID): kdataRepositoryTushare.getKdata(itemID);
+			entity = sseiID.equals(itemID)? indexRepositoryTushare.getKdata(ssei_code): kdataRepositoryTushare.getKdata(itemID);
 		}
+		
+		//System.out.println(entity.getBarSize());
 		return entity;
 	}
 	
@@ -89,7 +99,6 @@ public class KdataServiceImp implements KdataService{
 		
 		KdataEntity entity = this.getEntity(itemID, byCache);
 		
-		//System.out.println(entity.getBarSize());
 		LocalDate date;
 		KbarEntity bar;
 		for(Map.Entry<LocalDate, KbarEntity> entry : entity.getBars().entrySet()) {
@@ -252,7 +261,7 @@ public class KdataServiceImp implements KdataService{
 		
 		//System.out.println(entity.getBarSize());
 		
-		LocalDate end = entity.getLastDate();
+		//LocalDate end = entity.getLastDate();
 		//System.out.println("the last entity is " + end);
 		
 		LocalDate date;

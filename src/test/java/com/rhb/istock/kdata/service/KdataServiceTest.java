@@ -19,6 +19,7 @@ import com.rhb.istock.kdata.Muster;
 import com.rhb.istock.kdata.spider.KdataFromDZHByClipboard;
 import com.rhb.istock.item.ItemService;
 import com.rhb.istock.kdata.Kbar;
+import com.rhb.istock.kdata.Kdata;
 import com.rhb.istock.kdata.KdataService;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -31,6 +32,14 @@ public class KdataServiceTest {
 	@Autowired
 	@Qualifier("itemServiceImp")
 	ItemService itemService;	
+	
+	@Test
+	public void getSSEI() {
+		String itemID = "sh000001";
+		boolean byCache = true;
+		Kdata kdata = kdataService.getKdata(itemID, byCache);
+		System.out.println(kdata.getLastBar().getDate());
+	}
 	
 	//@Test
 	public void doOpen() throws Exception {

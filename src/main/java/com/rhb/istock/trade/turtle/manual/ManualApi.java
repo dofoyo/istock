@@ -28,6 +28,7 @@ import com.rhb.istock.kdata.Kbar;
 import com.rhb.istock.kdata.KdataService;
 import com.rhb.istock.kdata.api.KdatasView;
 import com.rhb.istock.selector.drum.DrumService;
+import com.rhb.istock.selector.fina.FinaService;
 import com.rhb.istock.selector.newb.NewbService;
 import com.rhb.istock.trade.turtle.simulation.six.TurtleMusterSimulation;
 import com.rhb.istock.trade.turtle.simulation.six.TurtleMusterSimulation_avb_plus;
@@ -72,6 +73,10 @@ public class ManualApi {
 	@Autowired
 	@Qualifier("manualService")
 	ManualService manualService;
+
+	@Autowired
+	@Qualifier("finaService")
+	FinaService finaService;
 	
 	@GetMapping("/turtle/manual/kdatas/{itemID}")
 	public ResponseContent<KdatasView> getKdatas(@PathVariable(value="itemID") String itemID,
@@ -187,23 +192,38 @@ public class ManualApi {
 		}catch(Exception e){
 			new ResponseContent<List<ItemView>>(ResponseEnum.ERROR, views);
 		}
-		
+
+		Set<String> holds = this.getHoldIDs(this.generateHolds("manual",theDate));
+
 		List<String> ids = null;
 		if("newb".equals(type)) {
 			ids = newbService.getNewbs(theDate);
 		}else if("drum".equals(type)) {
-			ids = drumService.getDrumsOfTopDimensions(theDate);
+			ids = drumService.getDrumsOfTopDimensions(theDate, holds);
+		}else if("cagr".equals(type)) {
+			ids = drumService.getDrumsOfCAGR(theDate, 100);
 		}
 		
 		if(ids!=null && !ids.isEmpty()) {
-			Set<String> holds = this.getHoldIDs(this.generateHolds("manual",theDate));
-			
-			//System.out.println(holds);
-			//System.out.println(ids);
+			Item item;
 			for(String id : ids) {
-				views.add(new ItemView(id,itemService.getItem(id).getName(),holds.contains(id)? "danger" : "info"));
+				item = itemService.getItem(id);
+				if(item.getCagr()!=null && item.getCagr()>20) {
+					views.add(new ItemView(id,item.getName(),holds.contains(id)? "danger" : "info",item.getCagr()));
+				}
 			}
 		}
+		/*
+		Collections.sort(views, new Comparator<ItemView>() {
+
+			@Override
+			public int compare(ItemView o1, ItemView o2) {
+				Integer a = o2.getCagr()==null ? 0 : o2.getCagr();
+				Integer b = o1.getCagr()==null ? 0 : o1.getCagr();
+				return a.compareTo(b);
+			}
+			
+		});*/
 		
 		return new ResponseContent<List<ItemView>>(ResponseEnum.SUCCESS, views);
 	}
@@ -319,10 +339,12 @@ public class ManualApi {
 		Map<LocalDate,List<String>> breakers = turtleSimulationRepository.getBreakers(type);
 		
 		List<String> ids = breakers.get(theDate);
+		Item item;
 		if(ids!=null && !ids.isEmpty()) {
 			Set<String> holds = this.getHoldIDs(this.generateHolds("manual",theDate));
 			for(String id : ids) {
-				views.add(new ItemView(id,itemService.getItem(id).getName(),holds.contains(id)? "danger" : "warning"));
+				item = itemService.getItem(id);
+				views.add(new ItemView(id,item.getName(),holds.contains(id)? "danger" : "warning",item.getCagr()));
 			}
 		}
 		
