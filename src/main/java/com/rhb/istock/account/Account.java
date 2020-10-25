@@ -498,9 +498,20 @@ public class Account {
 	}
 	
 	public void dropFallOrder(String itemID,Integer rate, String note) {
-		HoldState hs = states.get(itemID);
-		if(hs!=null && hs.getFallRate()<=rate){
-			this.dropWithTax(itemID, note, hs.getLatestPrice());
+		if(holds.size()==0) return;
+		
+		BigDecimal price = null;
+
+		for(Order order : holds.values()) {
+			if(order.getItemID().equals(itemID)) {
+				if(order.getFallRate()<=rate){
+					price = order.getLatest();
+					break;
+				}				
+			}
+		}
+		if(price!=null) {
+			this.dropWithTax(itemID, note, price);
 		}
 	}
 	
@@ -976,6 +987,10 @@ public class Account {
 
 		public BigDecimal getHighest() {
 			return highest;
+		}
+		
+		public Integer getFallRate() {
+			return Functions.growthRate(this.latest,this.highest);
 		}
 
 		public BigDecimal getAmount() {

@@ -128,14 +128,15 @@ public class ManualApi {
 	
 	
 	@GetMapping("/turtle/manual/run/{simulateType}")
-	public ResponseContent<String> simulate(@PathVariable(value="simulateType") String simulateType){
+	public ResponseContent<String> simulate(
+			@PathVariable(value="simulateType") String simulateType
+			){
 		
 		turtleSimulationRepository.evictAmountsCache();
 		turtleSimulationRepository.evictBreakersCache();
 		turtleSimulationRepository.evictBuysCache();
 		turtleSimulationRepository.evictSellsCache();
 
-		
 		manualService.simulate(simulateType); 
 		
 		kdataService.evictKDataCache();

@@ -25,29 +25,9 @@ public class FdataSpiderEastmoneyTest {
 	@Qualifier("itemRepositoryTushare")
 	ItemRepository itemRepository;
 	
-	//@Test
-	public void downIndicators() throws Exception {
-		long beginTime=System.currentTimeMillis(); 
-
-		List<ItemEntity> items = itemRepository.getItemEntities();
-		int i=1;
-		for(ItemEntity item : items){
-			Progress.show(items.size(),i++, item.getItemId());
-			try {
-
-			} catch (Exception e) {
-				e.printStackTrace();
-			} 
-		}
-		
-		long used = (System.currentTimeMillis() - beginTime)/1000; 
-		System.out.println("用时：" + used + "秒");          
-
-	}
-	
 	@Test
 	public void downForecast() throws Exception {
-		String itemID = "sz002610";
+		//String itemID = "sz002610";
 		//fdataSpiderEastmoney.down(itemID);
 		fdataSpiderEastmoney.downAll();
 	}

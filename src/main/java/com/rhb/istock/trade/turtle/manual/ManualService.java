@@ -115,7 +115,7 @@ public class ManualService {
 						}*/
 							
 						//高位回落超过8%
-						//account.dropFallOrder(itemID, -8, "3");
+						account.dropFallOrder(itemID, -8, "3");
 
 						//跌破21日均线就卖
 						if(muster.isDropAve(21)) { 		

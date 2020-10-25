@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import com.rhb.istock.fdata.eastmoney.FdataSpiderEastmoney;
 import com.rhb.istock.fdata.tushare.FdataSpiderTushare;
 import com.rhb.istock.index.tushare.IndexServiceTushare;
 import com.rhb.istock.index.tushare.IndexSpiderTushare;
@@ -48,6 +49,11 @@ public class IstockScheduledTask {
 	@Autowired
 	@Qualifier("drumService")
 	DrumService drumService;
+
+	
+	@Autowired
+	@Qualifier("fdataSpiderEastmoney")
+	FdataSpiderEastmoney fdataSpiderEastmoney;
 	
 /*	@Autowired
 	@Qualifier("financialStatementServiceImp")
@@ -166,10 +172,11 @@ public class IstockScheduledTask {
 			kdataService.downClosedDatas(LocalDate.now());
 			kdataService.generateMusters(LocalDate.parse("2000-01-01"));   //生成muster，需要192分钟，即3个多小时
 			fdataSpiderTushare.downAll();  //财务报告、预告、股东信息等下载
-			indexSpiderTushare.downIndex_Daily();
-			indexSpiderTushare.downIndex_weight();
-			indexSpiderTushare.downIndex_basic();
-			indexServiceTushare.generateIndex();
+			//indexSpiderTushare.downIndex_Daily();
+			//indexSpiderTushare.downIndex_weight();
+			//indexSpiderTushare.downIndex_basic();
+			//indexServiceTushare.generateIndex();
+			fdataSpiderEastmoney.downAll();
 			itemService.downTopics();
 			drumService.generateDimensions();
 			//finaService.generateQuarterCompares();

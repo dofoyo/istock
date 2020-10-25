@@ -40,6 +40,13 @@ public class DrumServiceTest {
 	@Qualifier("kdataServiceImp")
 	KdataService kdataService;
 	
+	@Test
+	public void getDrumsOfCAGR() {
+		LocalDate date = LocalDate.parse("2020-10-23");
+		List<String> ids = drumService.getDrumsOfCAGR(date, 100);
+		System.out.println(ids);
+	}
+	
 	//@Test
 	public void getDrumsOfTopDimensions() {
 		LocalDate date = LocalDate.parse("2020-09-21");
