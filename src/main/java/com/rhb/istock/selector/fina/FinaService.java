@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import com.rhb.istock.comm.util.FileTools;
 import com.rhb.istock.comm.util.Progress;
+import com.rhb.istock.fdata.eastmoney.FdataRepositoryEastmoney;
 import com.rhb.istock.fdata.tushare.FdataRepositoryTushare;
 import com.rhb.istock.fdata.tushare.FdataServiceTushare;
 import com.rhb.istock.fdata.tushare.FdataSpiderTushare;
@@ -51,11 +52,62 @@ public class FinaService {
 	@Qualifier("kdataServiceImp")
 	KdataService kdataService;
 	
+	@Autowired
+	@Qualifier("fdataRepositoryEastmoney")
+	FdataRepositoryEastmoney fdataRepositoryEastmoney;
+	
+	
 	@Value("${quarterCompareFile}")
 	private String quarterCompareFile;	
 	
 	protected static final Logger logger = LoggerFactory.getLogger(FinaService.class);
 
+	public Integer getRecommendationCount(String itemID, LocalDate date) {
+		return fdataRepositoryEastmoney.getRecommendations(itemID, date);
+	}
+	
+	public List<String> getHighRecommendations(LocalDate date, Integer top){
+		List<String> results = new ArrayList<String>();
+		
+		List<Recommendation> res = new ArrayList<Recommendation>();
+		Map<String, Integer> ids = fdataRepositoryEastmoney.getRecommendations(date);
+		for(Map.Entry<String, Integer> entry : ids.entrySet()) {
+			res.add(new Recommendation(entry.getKey(),entry.getValue()));
+		}
+		
+		Collections.sort(res, new Comparator<Recommendation>() {
+			@Override
+			public int compare(Recommendation o1, Recommendation o2) {
+				return o2.getCount().compareTo(o1.getCount());
+			}
+			
+		});
+		
+		int i=0;
+		for(Recommendation re : res) {
+			results.add(re.getId());
+			if(i++ >= top) {
+				break;
+			}
+		}
+		
+		return results;
+	}
+	
+	class Recommendation{
+		private String id;
+		private Integer count;
+		public Recommendation(String id, Integer count) {
+			this.id = id;
+			this.count = count;
+		}
+		public String getId() {
+			return id;
+		}
+		public Integer getCount() {
+			return count;
+		}
+	}
 	
 	public List<String> getHighCAGR(Integer top){
 		List<String> results = new ArrayList<String>();

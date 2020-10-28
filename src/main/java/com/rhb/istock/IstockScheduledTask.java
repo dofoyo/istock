@@ -163,7 +163,7 @@ public class IstockScheduledTask {
 		}
 	}*/
 	
-	@Scheduled(cron="0 35 20 ? * 1-5") //周一至周五，每日20点 执行收盘
+	@Scheduled(cron="0 25 22 ? * 1-5") //周一至周五，每日20点 执行收盘
 	public void downloadKdatas()  throws Exception{
 		System.out.println("run scheduled of '0 0 18 ? * 1-5'");
 		long beginTime=System.currentTimeMillis(); 
@@ -172,11 +172,11 @@ public class IstockScheduledTask {
 			kdataService.downClosedDatas(LocalDate.now());
 			kdataService.generateMusters(LocalDate.parse("2000-01-01"));   //生成muster，需要192分钟，即3个多小时
 			fdataSpiderTushare.downAll();  //财务报告、预告、股东信息等下载
-			//indexSpiderTushare.downIndex_Daily();
-			//indexSpiderTushare.downIndex_weight();
-			//indexSpiderTushare.downIndex_basic();
-			//indexServiceTushare.generateIndex();
-			fdataSpiderEastmoney.downAll();
+			indexSpiderTushare.downIndex_Daily();
+			indexSpiderTushare.downIndex_weight();
+			indexSpiderTushare.downIndex_basic();
+			indexServiceTushare.generateIndex();
+			fdataSpiderEastmoney.downProfitForecasts();
 			itemService.downTopics();
 			drumService.generateDimensions();
 			//finaService.generateQuarterCompares();

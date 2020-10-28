@@ -1,7 +1,11 @@
 package com.rhb.istock.fdata.eastmoney;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,12 +28,40 @@ public class FdataSpiderEastmoneyTest {
 	@Autowired
 	@Qualifier("itemRepositoryTushare")
 	ItemRepository itemRepository;
+
+	@Autowired
+	@Qualifier("fdataRepositoryEastmoney")
+	FdataRepositoryEastmoney fdataRepositoryEastmoney;
 	
 	@Test
+	public void getRecommendations() {
+		LocalDate date = LocalDate.parse("2020-10-27");
+		Map<String, Integer> results = fdataRepositoryEastmoney.getRecommendations(date);
+		System.out.println(results);
+
+	}
+	
+	//@Test
+	public void generateRecommendation() {
+		fdataRepositoryEastmoney.generateRecommendation();
+	}
+	
+	//@Test
 	public void downForecast() throws Exception {
-		//String itemID = "sz002610";
-		//fdataSpiderEastmoney.down(itemID);
-		fdataSpiderEastmoney.downAll();
+/*		String code = "603345";
+		
+		Integer year = 2020;
+		JSONArray str = fdataSpiderEastmoney.downReports(code, year);
+		System.out.println(str);
+		System.out.println(str.length());
+		
+		 year = 2019;
+		 str = fdataSpiderEastmoney.downReports(code, year);
+		System.out.println(str);
+		System.out.println(str.length());
+*/
+		fdataSpiderEastmoney.downReports();
+	
 	}
 
 }

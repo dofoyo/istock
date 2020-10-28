@@ -22,6 +22,18 @@ public class IndexServiceTushareTest {
 	@Qualifier("indexServiceTushare")
 	IndexServiceTushare indexServiceTushare;
 
+	@Autowired
+	@Qualifier("indexSpiderTushare")
+	IndexSpiderTushare indexSpiderTushare;
+	
+	@Test
+	public void down() {
+		indexSpiderTushare.downIndex_Daily();
+		indexSpiderTushare.downIndex_weight();
+		indexSpiderTushare.downIndex_basic();
+		indexServiceTushare.generateIndex();
+	}
+	
 	//@Test
 	public void getGrowthRate() throws Exception {
 		long beginTime=System.currentTimeMillis(); 
@@ -56,7 +68,7 @@ public class IndexServiceTushareTest {
 		indexServiceTushare.generateIndex();
 	}
 	
-	@Test
+	//@Test
 	public void getGrowthRateOfAll() {
 		long beginTime=System.currentTimeMillis(); 
 		

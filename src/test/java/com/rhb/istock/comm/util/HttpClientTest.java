@@ -8,8 +8,9 @@ public class HttpClientTest {
 
 	@Test
 	public void test() {
-		String strUrl = "http://f10.eastmoney.com/ProfitForecast/ProfitForecastAjax?code=sz002610";
+		//String strUrl = "http://f10.eastmoney.com/ProfitForecast/ProfitForecastAjax?code=sz002610";
 		//String strUrl = "http://basic.10jqka.com.cn/002610/worth.html";
+		String strUrl = "http://reportapi.eastmoney.com/report/list?cb=datatable8515095&pageNo=1&pageSize=200&code=603345&industryCode=*&industry=*&rating=*&ratingchange=*&beginTime=2017-01-01&endTime=2018-01-01&fields=&qType=0&_=1603757059836";
 		String result = HttpClient.doGet(strUrl);
 		//String gn = ParseString.subString(result, "<dd title=\"|\">");
 		System.out.println(result);

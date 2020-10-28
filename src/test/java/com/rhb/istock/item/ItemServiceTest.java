@@ -18,7 +18,7 @@ public class ItemServiceTest {
 	@Qualifier("itemServiceImp")
 	ItemService itemService;
 	
-	@Test
+	//@Test
 	public void downTopics() {
 		//itemService.downTopics();
 		itemService.downItems();
@@ -31,9 +31,9 @@ public class ItemServiceTest {
 		System.out.println(topic);
 	}
 	
-	//@Test
+	@Test
 	public void getItem() {
-		String itemID = "sz002174";
+		String itemID = "sz000858";
 		Item item = itemService.getItem(itemID);
 		System.out.println(item);
 	}

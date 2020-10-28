@@ -243,8 +243,21 @@ public class DrumService {
 		}
 		return view;
 	}
+
+	public List<String> getDrumsOfHighRecommendations(LocalDate endDate, Integer top){
+		List<String> results = new ArrayList<String>();
+		List<String> ids = finaService.getHighRecommendations(endDate, top);
+		List<String> ss = this.getDrums(endDate);
+		for(String id : ss) {
+			if(ids.contains(id)) {
+				results.add(id);
+			}
+		}
+		//System.out.format("there are %d drums and %d high cagrs --> %d high_cagr_drums\n", ss.size(),ids.size(),results.size());
+		return results;
+	}
 	
-	public List<String> getDrumsOfCAGR(LocalDate endDate, Integer top){
+	public List<String> getDrumsOfHighCAGR(LocalDate endDate, Integer top){
 		List<String> results = new ArrayList<String>();
 		List<String> ids = finaService.getHighCAGR(top);
 		List<String> ss = this.getDrums(endDate);

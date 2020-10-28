@@ -199,22 +199,31 @@ public class ManualApi {
 		List<String> ids = null;
 		if("newb".equals(type)) {
 			ids = newbService.getNewbs(theDate);
+			System.out.println("getNewbs(" + theDate + ")");
 		}else if("drum".equals(type)) {
 			ids = drumService.getDrumsOfTopDimensions(theDate, holds);
+			System.out.println("getDrumsOfTopDimensions(" + theDate + ")");
 		}else if("cagr".equals(type)) {
-			ids = drumService.getDrumsOfCAGR(theDate, 100);
+			//ids = drumService.getDrumsOfHighCAGR(theDate, 100);
+		//}else if("recommendation".equals(type)) {
+			ids = drumService.getDrumsOfHighRecommendations(theDate, 100);
+			System.out.println("getDrumsOfHighRecommendations(" + theDate + ")");
 		}
 		
 		if(ids!=null && !ids.isEmpty()) {
 			Item item;
+			Integer recommendationCount;
 			for(String id : ids) {
 				item = itemService.getItem(id);
-				if(item.getCagr()!=null && item.getCagr()>20) {
-					views.add(new ItemView(id,item.getName(),holds.contains(id)? "danger" : "info",item.getCagr()));
+				recommendationCount = finaService.getRecommendationCount(id, theDate);
+				//if(item.getCagr()!=null && item.getCagr()>20) {
+				if(recommendationCount!=null && recommendationCount>2) {
+					//views.add(new ItemView(id,item.getName(),holds.contains(id)? "danger" : "info",item.getCagr()));
+					views.add(new ItemView(id,item.getName(),holds.contains(id)? "danger" : "info",recommendationCount));
 				}
 			}
 		}
-		/*
+		
 		Collections.sort(views, new Comparator<ItemView>() {
 
 			@Override
@@ -224,7 +233,7 @@ public class ManualApi {
 				return a.compareTo(b);
 			}
 			
-		});*/
+		});
 		
 		return new ResponseContent<List<ItemView>>(ResponseEnum.SUCCESS, views);
 	}

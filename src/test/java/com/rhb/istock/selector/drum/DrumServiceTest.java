@@ -43,7 +43,7 @@ public class DrumServiceTest {
 	@Test
 	public void getDrumsOfCAGR() {
 		LocalDate date = LocalDate.parse("2020-10-23");
-		List<String> ids = drumService.getDrumsOfCAGR(date, 100);
+		List<String> ids = drumService.getDrumsOfHighCAGR(date, 100);
 		System.out.println(ids);
 	}
 	
