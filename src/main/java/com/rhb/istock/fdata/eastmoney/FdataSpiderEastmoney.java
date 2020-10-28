@@ -52,16 +52,16 @@ public class FdataSpiderEastmoney {
 		}
 	}
 	
-	public void downReports() {
+	public void downRecommendations() {
 		List<Item> items = itemService.getItems();
-		System.out.println(items.size());
+		//System.out.println(items.size());
 		String year="", fdataFile;
 		JSONArray reports;
 		int i=1;
 		for(Item item : items) {
 			if(item.getIpo()!=null) {
 				year = item.getIpo().substring(0, 4);
-				reports = this.downReports(item.getCode(), Integer.parseInt(year));
+				reports = this.downRecommendations(item.getCode(), Integer.parseInt(year));
 				if(reports.length()>0) {
 					fdataFile = eastmoneyFataPath + "/" + item.getItemID() + "_yb.json";
 					FileTools.writeTextFile(fdataFile, reports.toString(), false);		
@@ -72,20 +72,20 @@ public class FdataSpiderEastmoney {
 		}
 	}
 	
-	public JSONArray downReports(String code, Integer year) {
+	public JSONArray downRecommendations(String code, Integer year) {
 		JSONArray reports = new JSONArray();
 		JSONArray rs;
 		LocalDate today = LocalDate.now();
 		Integer end = today.getYear();
 		for(int i = year; i<=end; i++) {
 			//Progress.show(end-year+1, i, "");
-			rs = this.downReports(code, Integer.toString(i));
+			rs = this.downRecommendations(code, Integer.toString(i));
 			rs.forEach(obj -> reports.put(obj));
 		}
 		return reports;
 	}
 	
-	private JSONArray downReports(String code, String year) {
+	private JSONArray downRecommendations(String code, String year) {
 		String url = "http://reportapi.eastmoney.com/report/list?cb=datatable8515095&pageNo=1&pageSize=200&code="+code+"&beginTime="+year+"-01-01&endTime="+year+"-12-31&qType=0&_=1603757059836";
 		JSONObject args = new JSONObject();
 		String str = HttpClient.doGet(url);

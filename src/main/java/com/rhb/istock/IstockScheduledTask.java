@@ -163,9 +163,9 @@ public class IstockScheduledTask {
 		}
 	}*/
 	
-	@Scheduled(cron="0 25 22 ? * 1-5") //周一至周五，每日20点 执行收盘
+	@Scheduled(cron="0 0 21 ? * 1-5") //周一至周五，每日21点 执行收盘
 	public void downloadKdatas()  throws Exception{
-		System.out.println("run scheduled of '0 0 18 ? * 1-5'");
+		System.out.println("run scheduled of '0 0 21 ? * 1-5'");
 		long beginTime=System.currentTimeMillis(); 
 
 		if(this.isTradeDate()) {
@@ -177,6 +177,7 @@ public class IstockScheduledTask {
 			indexSpiderTushare.downIndex_basic();
 			indexServiceTushare.generateIndex();
 			fdataSpiderEastmoney.downProfitForecasts();
+			fdataSpiderEastmoney.downRecommendations();
 			itemService.downTopics();
 			drumService.generateDimensions();
 			//finaService.generateQuarterCompares();

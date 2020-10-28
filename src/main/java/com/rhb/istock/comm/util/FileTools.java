@@ -1,5 +1,6 @@
 package com.rhb.istock.comm.util;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -35,6 +36,37 @@ public class FileTools {
 		return lines;
 	}
 
+
+	/**
+	 * 判断文件的编码格式
+	 * @param fileName :file
+	 * @return 文件编码格式
+	 * @throws Exception
+	 */
+	public static String getCharset(String fileName){
+		String code = "GBK";
+
+		try {
+			BufferedInputStream bin = new BufferedInputStream(new FileInputStream(fileName));
+			int p = (bin.read() << 8) + bin.read();
+			
+			switch (p) {
+				case 0xefbb:
+					code = "UTF-8";
+					break;
+				case 0xfffe:
+					code = "Unicode";
+					break;
+				case 0xfeff:
+					code = "UTF-16BE";
+			}
+			
+		}catch(Exception e) {}
+		
+		return code;
+	}
+
+	
 	public static void write(String fileContent, String fileName, String encoding) {
 		try {
 			FileOutputStream fos = new FileOutputStream(fileName);

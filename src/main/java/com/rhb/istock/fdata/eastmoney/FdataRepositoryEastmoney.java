@@ -204,7 +204,9 @@ public class FdataRepositoryEastmoney {
 		String fdataFile = eastmoneyFataPath + "/" + itemID + ".json";
 		//System.out.println(fdataFile);
 		if(FileTools.isExists(fdataFile)) {
-			JSONArray items = (new JSONObject(FileTools.readTextFile(fdataFile))).getJSONObject("yctj").getJSONArray("data");
+			String charset = FileTools.getCharset(fdataFile);
+			//JSONArray items = (new JSONObject(FileTools.readTextFile(fdataFile))).getJSONObject("yctj").getJSONArray("data");
+			JSONArray items = (new JSONObject(FileTools.read(fdataFile,charset))).getJSONObject("yctj").getJSONArray("data");
 			//System.out.println(items);
 			if(items.length()>0) {
 				JSONObject item;
@@ -265,7 +267,8 @@ public class FdataRepositoryEastmoney {
 		
 		String fdataFile = eastmoneyFataPath + "/" + itemID + ".json";
 		if(FileTools.isExists(fdataFile)) {
-			JSONArray items = (new JSONObject(FileTools.read(fdataFile,"UTF-8"))).getJSONObject("yctj").getJSONArray("data");
+			String charset = FileTools.getCharset(fdataFile);
+			JSONArray items = (new JSONObject(FileTools.read(fdataFile,charset))).getJSONObject("yctj").getJSONArray("data");
 			if(items.length()>0) {
 				JSONObject item;
 				String rq, yyzsr, yylr;
