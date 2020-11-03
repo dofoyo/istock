@@ -47,6 +47,7 @@ public class FavorServiceImp implements FavorService {
 			}
 		}
 		
+		/*
 		String id, value;
 		Map<String,String> all = this.getAllFavors();
 		for(Map.Entry<String, String> entry : all.entrySet()) {
@@ -67,7 +68,7 @@ public class FavorServiceImp implements FavorService {
 				articles.put(entry.getKey(), value + "," + this.getMakers(entry.getValue()));
 			}
 			
-		}
+		}*/
 		
 		return articles;
 	}

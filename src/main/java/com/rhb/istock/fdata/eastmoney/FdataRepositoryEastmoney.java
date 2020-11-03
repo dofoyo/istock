@@ -43,26 +43,27 @@ public class FdataRepositoryEastmoney {
 		Map<LocalDate,Integer> count = new TreeMap<LocalDate,Integer>();
 		
 		TreeMap<LocalDate,Integer> records = this.getRecommendationRecords(itemID);
-		TreeMap<LocalDate,Integer> tmp = new TreeMap<LocalDate, Integer>();
-		Integer total = 0, ct;
-		for(LocalDate pDate = records.firstKey(); pDate.isBefore(date)||pDate.equals(date); pDate = pDate.plusDays(1)) {
-			ct = records.get(pDate);
-			if(ct!=null) {
-				total = total + ct;
-			}else {
-				ct = 0;
-			}
-			tmp.put(pDate, ct);
-			if(tmp.size()>=period) {
-				total = total - tmp.firstEntry().getValue();
-				tmp.remove(tmp.firstKey());
-			}
-			if(ct>0) {
-				count.put(pDate, total);
+		if(records != null && records.size()>0) {
+			TreeMap<LocalDate,Integer> tmp = new TreeMap<LocalDate, Integer>();
+			Integer total = 0, ct;
+			for(LocalDate pDate = records.firstKey(); pDate.isBefore(date)||pDate.equals(date); pDate = pDate.plusDays(1)) {
+				ct = records.get(pDate);
+				if(ct!=null) {
+					total = total + ct;
+				}else {
+					ct = 0;
+				}
+				tmp.put(pDate, ct);
+				if(tmp.size()>=period) {
+					total = total - tmp.firstEntry().getValue();
+					tmp.remove(tmp.firstKey());
+				}
+				if(ct>0) {
+					count.put(pDate, total);
+				}
+			
 			}
 		}
-
-		
 		return count;
 	}
 	

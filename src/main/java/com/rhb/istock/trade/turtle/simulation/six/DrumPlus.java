@@ -52,7 +52,7 @@ public class DrumPlus {
 		this.type = type;
 	}
 	
-	public void doIt(Map<String,Muster> musters,List<Map<String,Muster>> previous, LocalDate date, Integer sseiFlag, Integer sseiRatio) {
+	public void doIt(Map<String,Muster> musters,List<Map<String,Muster>> previous, LocalDate date, Integer sseiFlag, Integer sseiRatio, Integer sseiTrend) {
 		Muster muster;
 		account.setLatestDate(date);
 		Integer ratio;
@@ -74,6 +74,12 @@ public class DrumPlus {
 					account.dropWithTax(itemID, "1", muster.getLatestPrice());
 					droped = true;
 				}
+				
+				//大盘下降通道走坏,所持股跟随下跌
+				if(sseiFlag==0 && sseiTrend<0 && muster.getClose().compareTo(muster.getLatestPrice())>0) {
+					account.dropWithTax(itemID, "4", muster.getLatestPrice());
+					droped = true;
+				}
 /*
 				//走势弱于大盘
 				ratio = this.getRatio(previous, itemID, muster.getLatestPrice());
@@ -88,7 +94,7 @@ public class DrumPlus {
 		}
 		
 		//行情好，才买入
-		//if(sseiFlag==1) {
+		if(sseiFlag==1) {
 			//确定突破走势的股票
 			Set<String> holdItemIDs = account.getItemIDsOfHolds();
 			Set<Muster> dds = new HashSet<Muster>();  //用set，无重复，表示不可加仓
@@ -120,7 +126,7 @@ public class DrumPlus {
 				}
 			}					
 			account.openAll(dds);			//后买
-		//}
+		}
 		
 		dailyAmount_sb.append(account.getDailyAmount() + "\n");
 

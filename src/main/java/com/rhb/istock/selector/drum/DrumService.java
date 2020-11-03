@@ -52,6 +52,9 @@ public class DrumService {
 	@Qualifier("finaService")
 	FinaService finaService;
 	
+	@Value("${dimensionsFile}")
+	private String dimensionsFile;
+	
 	protected static final Logger logger = LoggerFactory.getLogger(DrumService.class);
 
 	public void generateDrums(LocalDate beginDate, LocalDate endDate) {
@@ -153,14 +156,19 @@ public class DrumService {
 		Dimension average_a = new Dimension();
 		
 		List<String> ids = this.getDrums(endDate);
+		Integer recommendationCount;
 		Item item;
 		for(String id: ids) {
 			item = itemService.getItem(id);
-			industry_a.put(item.getIndustry(), id, item.getName());
-			area_a.put(item.getArea(), id, item.getName());
-			market_a.put(item.getMarket(), id, item.getName());
-			topic_a.put(itemService.getTopic(item.getItemID()).split("，"), id, item.getName());
-			average_a.put("average", id, item.getName());
+			
+			recommendationCount = finaService.getRecommendationCount(id, endDate);
+			item.setRecommendations(recommendationCount);
+			
+			industry_a.put(item.getIndustry(), id, item.getNameWithCAGR());
+			area_a.put(item.getArea(), id, item.getNameWithCAGR());
+			market_a.put(item.getMarket(), id, item.getNameWithCAGR());
+			topic_a.put(itemService.getTopic(item.getItemID()).split("，"), id, item.getNameWithCAGR());
+			average_a.put("average", id, item.getNameWithCAGR());
 			
 		}
 
@@ -202,17 +210,29 @@ public class DrumService {
 		return dv;
 	}
 	
-	public List<DimensionView> getDimensionView(LocalDate endDate, Set<String> holds){
+	private Set<String> getDefaultDeimensions(){
+		Set<String> ss = new HashSet<String>();
+		String[] lines = FileTools.readTextFile(dimensionsFile).split("\n");
+		for(String line : lines) {
+			ss.add(line);
+		}
+		return ss;
+	}
+	
+	public List<DimensionView> getDimensionView(LocalDate endDate, Set<String> holds, Integer ratio){
 		Map<String,Taoyans> dimensions = this.getDimensions(endDate);
 		Set<String> holdDimensions = this.getDimensionNames(holds);
 		//List<Taoyan> averages = dimensions.get("average").getResult();
 		//Integer ratio = averages.get(averages.size()-1).getRatio();
-		Integer ratio = 34;
+		//Integer ratio = 34;
+		
+		Set<String> defaultDimensions = this.getDefaultDeimensions();
+		
 		Taoyans topics = dimensions.get("topic");
-		DimensionView topicView = this.getDimensionView("topic", "概念", topics.getResult(ratio), holds, holdDimensions);
+		DimensionView topicView = this.getDimensionView("topic", "概念", topics.getResult(ratio, defaultDimensions), holds, holdDimensions);
 
 		Taoyans industrys = dimensions.get("industry");
-		DimensionView industryView = this.getDimensionView("industry", "行业", industrys.getResult(ratio), holds, holdDimensions);
+		DimensionView industryView = this.getDimensionView("industry", "行业", industrys.getResult(ratio, defaultDimensions), holds, holdDimensions);
 		
 		//Taoyans areas = dimensions.get("area");
 		//DimensionView areaView = this.getDimensionView("area", "省市", areas.getResult(), holds, holdDimensions);
@@ -243,7 +263,44 @@ public class DrumService {
 		}
 		return view;
 	}
+	
+	private List<String> getLowest(LocalDate endDate, Integer top){
+		Map<String,Muster> musters = kdataService.getMusters(endDate);
+		List<Muster>  ms = new ArrayList<Muster>(musters.values());
+		Collections.sort(ms, new Comparator<Muster>() {
+			@Override
+			public int compare(Muster o1, Muster o2) {
+				return o1.getLatestPrice().compareTo(o2.getLatestPrice());
+			}
+		});
+		
+		List<String> ids = new ArrayList<String>();
+		for(int i=0; i<ms.size() && i<top; i++) {
+			ids.add(ms.get(i).getItemID());
+		}
+		return ids;
+	}
 
+	public List<String> getDrumsOfLowest(LocalDate endDate, Integer top){
+		List<String> results = new ArrayList<String>();
+		List<String> ss = this.getDrums(endDate);
+		if(ss!=null && ss.size()>0) {
+			for(int i=0; i<ss.size() && i<top; i++) {
+				results.add(ss.get(i));
+			}
+		}
+		
+/*		List<String> ids = this.getLowest(endDate, top);
+		for(String id : ss) {
+			if(ids.contains(id)) {
+				results.add(id);
+			}
+		}*/
+		return results;
+		
+		
+	}
+	
 	public List<String> getDrumsOfHighRecommendations(LocalDate endDate, Integer top){
 		List<String> results = new ArrayList<String>();
 		List<String> ids = finaService.getHighRecommendations(endDate, top);
@@ -270,13 +327,13 @@ public class DrumService {
 		return results;
 	}
 	
-	public List<String> getDrumsOfTopDimensions(LocalDate endDate,Set<String> holds){
+	public List<String> getDrumsOfTopDimensions(LocalDate endDate,Set<String> holds, Integer ratio){
 		Set<String> holdDimensions = this.getDimensionNames(holds);
 		Map<String,Taoyans> dimensions = this.getDimensions(endDate);
 		
 		//List<Taoyan> averages = dimensions.get("average").getResult();
 		//Integer ratio = averages.get(averages.size()-1).getRatio();
-		Integer ratio = 49;
+		//Integer ratio = 34;
 		
 		Set<String> industrys = dimensions.get("industry").getHighRatioIDs(ratio,holdDimensions);
 		Set<String> topics = dimensions.get("topic").getHighRatioIDs(ratio,holdDimensions);
@@ -294,8 +351,12 @@ public class DrumService {
 		
 		Map<String,Muster> musters = kdataService.getMusters(endDate);
 		List<Muster> ok_musters = new ArrayList<Muster>();
+		Muster muster;
 		for(String id : oks) {
-			ok_musters.add(musters.get(id));
+			muster = musters.get(id);
+			if(muster!=null && muster.isUpBreaker()) {
+				ok_musters.add(muster);
+			}
 		}
 		
 		Collections.sort(ok_musters, new Comparator<Muster>() {
@@ -303,10 +364,10 @@ public class DrumService {
 			public int compare(Muster o1, Muster o2) {
 				//return o1.getLatestPrice().compareTo(o2.getLatestPrice());
 				
-				if(o1.getN21Gap().compareTo(o2.getN21Gap())==0){
-					return o2.getHLGap().compareTo(o1.getHLGap());
+				if(o1.getHNGap().compareTo(o2.getHNGap())==0){
+					return o1.getLatestPrice().compareTo(o2.getLatestPrice());
 				}else {
-					return o1.getN21Gap().compareTo(o2.getN21Gap());
+					return o1.getHNGap().compareTo(o2.getHNGap());
 				}
 			}
 		});	
@@ -364,6 +425,7 @@ public class DrumService {
 							flag = false;
 							if(ratio >= sseiRatio
 								&& ratio >0
+								&& m.getHLGap()<=89
 								&& m.isUpAve(21)
 								&& m.getAveragePrice21().compareTo(p.getAveragePrice21())==1
 								&& m.getAveragePrice21().compareTo(b.getAveragePrice21())==1
@@ -415,13 +477,13 @@ public class DrumService {
 				ts.add(new Taoyan(entry.getKey(),mb.get(entry.getKey()),entry.getValue()));
 			}			
 		}
-
-		public List<Taoyan> getResult(Integer ratio){
+		
+		public List<Taoyan> getResult(Integer ratio, Set<String> defaultDimensions){
 			this.sort();
 			
 			List<Taoyan> result = new ArrayList<Taoyan>();
 			for(int i=0; i<this.ts.size(); i++) {
-				if(this.ts.get(i).getRatio()>=ratio) {
+				if(this.ts.get(i).getRatio()>=ratio || defaultDimensions.contains(this.ts.get(i).getName())) {
 					result.add(this.ts.get(i));
 				}
 			}

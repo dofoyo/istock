@@ -15,6 +15,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import com.rhb.istock.kdata.KdataService;
+
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest
 public class IndexServiceTushareTest {
@@ -25,8 +27,12 @@ public class IndexServiceTushareTest {
 	@Autowired
 	@Qualifier("indexSpiderTushare")
 	IndexSpiderTushare indexSpiderTushare;
-	
-	@Test
+
+	@Autowired
+	@Qualifier("kdataServiceImp")
+	KdataService kdataService;
+
+	//@Test
 	public void down() {
 		indexSpiderTushare.downIndex_Daily();
 		indexSpiderTushare.downIndex_weight();
@@ -34,10 +40,21 @@ public class IndexServiceTushareTest {
 		indexServiceTushare.generateIndex();
 	}
 	
+	@Test
+	public void getSseiGrowthRate() {
+		LocalDate date = LocalDate.parse("2018-05-31");
+		Integer sseiFlag = kdataService.getSseiFlag(date);
+		Integer sseiTrend = kdataService.getSseiTrend(date,13);
+		Integer sseiRatio = indexServiceTushare.getSseiGrowthRate(date, 13);
+		System.out.println("sseiFlag=" + sseiFlag);
+		System.out.println("sseiTrend=" + sseiTrend);
+		System.out.println("sseiRatio=" + sseiRatio);
+	}
+	
 	//@Test
 	public void getGrowthRate() throws Exception {
 		long beginTime=System.currentTimeMillis(); 
-		String ts_code = "h50008.SH";
+		String ts_code = "000001.SH";
 		LocalDate endDate = LocalDate.now();
 		Integer period = 13;
 		Integer rate = indexServiceTushare.getGrowthRate(ts_code, endDate, period);

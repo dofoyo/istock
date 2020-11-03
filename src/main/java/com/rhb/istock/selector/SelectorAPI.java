@@ -43,7 +43,8 @@ public class SelectorAPI {
 		}
 
 		Set<String> holds = this.generateHolds("manual",theEndDate);
-		List<DimensionView> views = drumService.getDimensionView(theEndDate, holds);
+		Integer ratio = 34;
+		List<DimensionView> views = drumService.getDimensionView(theEndDate, holds, ratio);
 		
 		return new ResponseContent<List<DimensionView>>(ResponseEnum.SUCCESS, views);
 	}

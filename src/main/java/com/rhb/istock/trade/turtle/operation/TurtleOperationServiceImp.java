@@ -217,6 +217,7 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 		Map<String,String> finas = fdataServiceTushare.getFinaGrowthRatioInfo(favors.keySet());
 
 		List<ItemView> views = buildItemViews(new ArrayList<String>(favors.keySet()), true);
+		Item item;
 
 		LocalDate endDate = kdataService.getLatestMarketDate("sh000001");
 		Map<String,String> b21s = b21Service.getStates(new ArrayList<String>(favors.keySet()), endDate);
@@ -227,6 +228,12 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 				view.setFina(finas.get(view.getItemID()));
 			}
 			view.setStatus(b21s.get(view.getItemID()));
+			
+			item = itemService.getItem(view.getItemID());
+			item.setRecommendations(finaService.getRecommendationCount(view.getItemID(), endDate));
+			
+			view.setName(item.getNameWithCAGR());
+
 		}
 		
 		return views;

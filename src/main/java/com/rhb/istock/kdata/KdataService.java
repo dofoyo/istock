@@ -14,6 +14,7 @@ public interface KdataService {
 	public void downSSEI();  //下载上证指数
 	public Integer getSseiFlag(LocalDate date); 
 	public Integer getSseiRatio(LocalDate date, Integer period);
+	public Integer getSseiTrend(LocalDate date, Integer period);
 	
 	public BigDecimal getHighestPrice(String itemID, LocalDate beginDate, boolean byCache);
 	

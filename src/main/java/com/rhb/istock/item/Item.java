@@ -8,6 +8,7 @@ public class Item {
 	private String industry;
 	private String ipo;
 	private Integer cagr;  //利润年均增长率
+	private Integer recommendations;  //机构推荐买入次数
 	
 	public Integer getCagr() {
 		return cagr;
@@ -28,10 +29,17 @@ public class Item {
 		this.code = code;
 	}
 	public String getName() {
-		if(cagr!=null) {
-			return name + "(" + cagr.toString() + "%)";
-		}
 		return name;
+	}
+	public String getNameWithCAGR() {
+		String str = name;
+		if(cagr!=null && cagr!=0) {
+			str = str + "(" + cagr.toString() + "%)";
+		}
+		if(recommendations!=null && recommendations!=0) {
+			str = str + "(" + recommendations.toString() + ")";
+		}
+		return str;
 	}
 	public void setName(String name) {
 		this.name = name;
@@ -74,6 +82,12 @@ public class Item {
 	public String toString() {
 		return "Item [itemID=" + itemID + ", code=" + code + ", name=" + name + ", area=" + area + ", industry="
 				+ industry + ", ipo=" + ipo + ", cagr=" + cagr + "]";
+	}
+	public Integer getRecommendations() {
+		return recommendations;
+	}
+	public void setRecommendations(Integer recommendations) {
+		this.recommendations = recommendations;
 	}
 
 }

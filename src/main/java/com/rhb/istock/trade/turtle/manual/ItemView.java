@@ -4,13 +4,11 @@ public class ItemView {
 	private String itemID;
 	private String name;
 	private String type;
-	private Integer cagr;  //利润年均增长率
 	
-	public ItemView(String itemID, String name, String type, Integer cagr) {
+	public ItemView(String itemID, String name, String type) {
 		this.itemID = itemID;
 		this.name = name;
 		this.type = type;
-		this.cagr  =cagr;
 	}
 	
 	public String getItemID() {
@@ -25,13 +23,7 @@ public class ItemView {
 		return type;
 	}
 
-	public Integer getCagr() {
-		return cagr;
+	public void setType(String type) {
+		this.type = type;
 	}
-
-	@Override
-	public String toString() {
-		return "ItemView [itemID=" + itemID + ", name=" + name + ", type=" + type + ", cagr=" + cagr + "]";
-	}
-	
 }

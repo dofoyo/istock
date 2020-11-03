@@ -71,6 +71,8 @@ public class KdataAPI {
 		LocalDate theEndDate = null;
 		if(endDate!=null && !endDate.isEmpty()) {
 			theEndDate = LocalDate.parse(endDate, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+		}else {
+			theEndDate = LocalDate.now();
 		}
 		
 		KdatasView kdatas = new KdatasView();
@@ -81,7 +83,7 @@ public class KdataAPI {
 			kdatas.setCode(item.getCode());
 			kdatas.setName(item.getName());
 			
-			//System.out.println("I want to get: " + theEndDate);
+			System.out.println("I want: " + theEndDate);
 			
 			List<LocalDate> dates = kdataService.getKdata(itemID, theEndDate, true).getDates();
 			Kbar bar=null;
@@ -90,7 +92,7 @@ public class KdataAPI {
 				kdatas.addKdata(date, bar.getOpen(), bar.getHigh(), bar.getLow(), bar.getClose());
 			}
 			
-			//System.out.println("I got: " + dates.get(dates.size()-1));
+			System.out.println("I got: " + dates.get(dates.size()-1));
 			
 /*			Kbar latestBar = kdataService.getLatestMarketData(itemID);
 			if(bar.getDate().isBefore(latestBar.getDate())) {
@@ -98,7 +100,7 @@ public class KdataAPI {
 			}*/
 			
 			Kbar latestBar;
-			if(theEndDate!=null && theEndDate.equals(LocalDate.now()) && !dates.contains(theEndDate)) {
+			if(!dates.contains(theEndDate)) {
 				latestBar = kdataService.getLatestMarketData(itemID);
 				//if(bar==null || !bar.getDate().equals(latestBar.getDate())) {
 					kdatas.addKdata(latestBar.getDate(), latestBar.getOpen(), latestBar.getHigh(), latestBar.getLow(), latestBar.getClose());

@@ -50,7 +50,7 @@ public class DrumServiceTest {
 	//@Test
 	public void getDrumsOfTopDimensions() {
 		LocalDate date = LocalDate.parse("2020-09-21");
-		List<String> ids = drumService.getDrumsOfTopDimensions(date, null);
+		List<String> ids = drumService.getDrumsOfTopDimensions(date, null,34);
 		System.out.println(ids);
 	}
 

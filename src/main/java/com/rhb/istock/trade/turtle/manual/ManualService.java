@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import com.rhb.istock.account.Account;
 import com.rhb.istock.comm.util.Progress;
+import com.rhb.istock.index.tushare.IndexServiceTushare;
 import com.rhb.istock.kdata.KdataService;
 import com.rhb.istock.kdata.Muster;
 import com.rhb.istock.trade.turtle.simulation.six.TurtleMusterSimulation;
@@ -35,6 +36,10 @@ public class ManualService {
 	@Autowired
 	@Qualifier("turtleSimulationRepository")
 	TurtleSimulationRepository turtleSimulationRepository;
+
+	@Autowired
+	@Qualifier("indexServiceTushare")
+	IndexServiceTushare indexServiceTushare;
 	
 	private Map<LocalDate, String> selects = new TreeMap<LocalDate, String>();
 	BigDecimal initCash = new BigDecimal(1000000);
@@ -82,6 +87,11 @@ public class ManualService {
 		Map<String,Muster> musters;
 		Muster muster;
 		String id;
+
+		Integer previous_period  = 13; //历史纪录区间，主要用于后面判断
+
+		Integer sseiFlag, sseiRatio, sseiTrend;
+
 		
 		Map<LocalDate, AmountEntity> amounts = turtleSimulationRepository.getAmounts("avb");
 		List<LocalDate> dates = new ArrayList<LocalDate>(amounts.keySet());
@@ -91,6 +101,11 @@ public class ManualService {
 			Progress.show(dates.size(), i++, date.toString());
 
 			musters = kdataService.getMusters(date);
+
+			sseiFlag = kdataService.getSseiFlag(date);
+			sseiTrend = kdataService.getSseiTrend(date, 21);
+			sseiRatio = indexServiceTushare.getSseiGrowthRate(date, previous_period);
+
 			if(musters!=null && musters.size()>0) {
 				account.setLatestDate(date);
 				//更新价格
@@ -114,6 +129,12 @@ public class ManualService {
 							}
 						}*/
 							
+						//大盘下降通道走坏,所持股跟随下跌
+						//logger.info(String.format("sseiFlag=%d, sseiRatio", args));
+						if(sseiFlag==0 && sseiTrend<0 && muster.getClose().compareTo(muster.getLatestPrice())>0) {
+							account.dropWithTax(itemID, "4", muster.getLatestPrice());
+						}
+						
 						//高位回落超过8%
 						account.dropFallOrder(itemID, -8, "3");
 

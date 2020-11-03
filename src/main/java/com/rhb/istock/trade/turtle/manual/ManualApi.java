@@ -78,6 +78,8 @@ public class ManualApi {
 	@Qualifier("finaService")
 	FinaService finaService;
 	
+	private List<String> previous = null;
+	
 	@GetMapping("/turtle/manual/kdatas/{itemID}")
 	public ResponseContent<KdatasView> getKdatas(@PathVariable(value="itemID") String itemID,
 			@RequestParam(value="endDate") String endDate
@@ -197,34 +199,40 @@ public class ManualApi {
 		Set<String> holds = this.getHoldIDs(this.generateHolds("manual",theDate));
 
 		List<String> ids = null;
-		if("newb".equals(type)) {
+		if("newb".equals(type)) {  //创新高
 			ids = newbService.getNewbs(theDate);
-			System.out.println("getNewbs(" + theDate + ")");
-		}else if("drum".equals(type)) {
-			ids = drumService.getDrumsOfTopDimensions(theDate, holds);
-			System.out.println("getDrumsOfTopDimensions(" + theDate + ")");
-		}else if("cagr".equals(type)) {
-			//ids = drumService.getDrumsOfHighCAGR(theDate, 100);
-		//}else if("recommendation".equals(type)) {
+		}else if("drum".equals(type)) {  //低价
+			ids = drumService.getDrumsOfLowest(theDate,21);
+		}else if("dime".equals(type)) {   //强板块
+			Integer ratio = 34;
+			ids = drumService.getDrumsOfTopDimensions(theDate, holds, ratio);
+		}else if("cagr".equals(type)) {    //高增长
+			ids = drumService.getDrumsOfHighCAGR(theDate, 100);
+		}else if("reco".equals(type)) {     //强推荐
 			ids = drumService.getDrumsOfHighRecommendations(theDate, 100);
-			System.out.println("getDrumsOfHighRecommendations(" + theDate + ")");
 		}
 		
 		if(ids!=null && !ids.isEmpty()) {
 			Item item;
 			Integer recommendationCount;
+			ItemView iv;
 			for(String id : ids) {
 				item = itemService.getItem(id);
 				recommendationCount = finaService.getRecommendationCount(id, theDate);
-				//if(item.getCagr()!=null && item.getCagr()>20) {
-				if(recommendationCount!=null && recommendationCount>2) {
-					//views.add(new ItemView(id,item.getName(),holds.contains(id)? "danger" : "info",item.getCagr()));
-					views.add(new ItemView(id,item.getName(),holds.contains(id)? "danger" : "info",recommendationCount));
+				item.setRecommendations(recommendationCount);
+				if(recommendationCount!=null && recommendationCount>0) {
+					iv = new ItemView(id,item.getNameWithCAGR(),holds.contains(id)? "danger" : "info");
+					if(previous!=null && !previous.contains(id)) {
+						iv.setType("warning");
+					}
+					views.add(iv);
 				}
 			}
 		}
 		
-		Collections.sort(views, new Comparator<ItemView>() {
+		previous = ids;
+		
+/*		Collections.sort(views, new Comparator<ItemView>() {
 
 			@Override
 			public int compare(ItemView o1, ItemView o2) {
@@ -233,7 +241,7 @@ public class ManualApi {
 				return a.compareTo(b);
 			}
 			
-		});
+		});*/
 		
 		return new ResponseContent<List<ItemView>>(ResponseEnum.SUCCESS, views);
 	}
@@ -354,7 +362,7 @@ public class ManualApi {
 			Set<String> holds = this.getHoldIDs(this.generateHolds("manual",theDate));
 			for(String id : ids) {
 				item = itemService.getItem(id);
-				views.add(new ItemView(id,item.getName(),holds.contains(id)? "danger" : "warning",item.getCagr()));
+				views.add(new ItemView(id,item.getName(),holds.contains(id)? "danger" : "warning"));
 			}
 		}
 		

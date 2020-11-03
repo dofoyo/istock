@@ -269,7 +269,7 @@ public class KdataServiceImp implements KdataService{
 		for(Map.Entry<LocalDate, KbarEntity> entry : entity.getBars().entrySet()) {
 				date = entry.getKey();
 				bar = entry.getValue();
-				if(date.isBefore(endDate.plusDays(1))) {
+				if(date.isBefore(endDate) || date.equals(endDate)) {
 					kdata.addBar(date, bar.getOpen(), bar.getHigh(), 
 							bar.getLow(), bar.getClose(), 
 							bar.getAmount(), bar.getQuantity(), 
@@ -770,6 +770,21 @@ public class KdataServiceImp implements KdataService{
 	}
 	
 	@Override
+	public Integer getSseiTrend(LocalDate date, Integer period) {
+		Kdata ssei = this.getKdata(sseiID, date, true);
+		Kdata ssei_p = this.getKdata(sseiID, date.minusDays(period), true);
+		
+		Integer a = ssei.getAveragePrices().get("a34").intValue();
+		Integer p = ssei_p.getAveragePrices().get("a34").intValue();
+		
+		//System.out.println(date + ":" + a);
+		//System.out.println(date.minusDays(period) + ":" + p);
+		
+		return a.compareTo(p);
+		
+	}
+	
+	@Override
 	public Integer getSseiRatio(LocalDate date, Integer period) {
 		Kdata ssei = this.getKdata(sseiID, date.plusDays(1), period, true);
 		if(ssei!=null && ssei.getLastBar()!=null && ssei.getLastBar().getDate()!=null && !ssei.getLastBar().getDate().equals(date)) {
@@ -786,7 +801,7 @@ public class KdataServiceImp implements KdataService{
 		//flag = ssei.isAboveAveragePrice(openDuration) && ssei.isAboveAveragePrice(21) && ssei.isAboveAverageAmount() ? 1 : 0;
 		//flag = (ssei.isAboveAveragePrice(openDuration) && ssei.isAboveAveragePrice(21)) || ssei.isAboveAverageAmount() ? 1 : 0;
 		//flag = (ssei.isAboveAveragePrice(openDuration) && ssei.isAboveAveragePrice(21)) ? 1 : 0;
-		flag = ssei.isAboveAveragePrice(21) ? 1 : 0;
+		flag = ssei.isAboveAveragePrice(34) ? 1 : 0;
 /*		if(flag==1) {
 			logger.info("***********" +  date.toString() +  " up!");
 		}*/
