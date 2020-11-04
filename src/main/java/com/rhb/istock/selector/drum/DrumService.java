@@ -30,6 +30,7 @@ import com.rhb.istock.kdata.KdataService;
 import com.rhb.istock.kdata.Muster;
 import com.rhb.istock.selector.DdatasView;
 import com.rhb.istock.selector.DimensionView;
+import com.rhb.istock.selector.favor.FavorService;
 import com.rhb.istock.selector.fina.FinaService;
 
 @Service("drumService")
@@ -51,6 +52,10 @@ public class DrumService {
 	@Autowired
 	@Qualifier("finaService")
 	FinaService finaService;
+
+	@Autowired
+	@Qualifier("favorServiceImp")
+	FavorService favorService;
 	
 	@Value("${dimensionsFile}")
 	private String dimensionsFile;
@@ -340,9 +345,12 @@ public class DrumService {
 		//Set<String> markets = dimensions.get("market").getHighRatioIDs(ratio);
 		//Set<String> areas = dimensions.get("area").getHighRatioIDs(ratio);
 
+		Set<String> favors = favorService.getFavors().keySet();
+		
 		Set<String> oks = new HashSet<String>();
 		oks.addAll(industrys);
 		oks.addAll(topics);
+		oks.addAll(favors);
 /*		for(String id : industrys) {
 			if(topics.contains(id) && markets.contains(id) && areas.contains(id)) {
 				oks.add(id);
