@@ -3,10 +3,8 @@ package com.rhb.istock.fdata.eastmoney;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
 
 import org.json.JSONArray;
@@ -20,7 +18,6 @@ import org.springframework.stereotype.Service;
 
 import com.rhb.istock.comm.util.FileTools;
 import com.rhb.istock.comm.util.Functions;
-import com.rhb.istock.comm.util.ParseString;
 import com.rhb.istock.comm.util.Progress;
 import com.rhb.istock.item.ItemService;
 import com.rhb.istock.selector.drum.DrumService;
@@ -103,8 +100,6 @@ public class FdataRepositoryEastmoney {
 		return records;
 	}
 	
-	
-	
 	public Map<String, Integer> getRecommendations(LocalDate date) {
 		if(this.recommendations==null) this.generateRecommendation();
 		
@@ -112,7 +107,7 @@ public class FdataRepositoryEastmoney {
 		
 		Map<String, Integer> ids;
 		Integer count;
-		for(int i=0; i<180; i++) {
+		for(int i=0; i<period; i++) {
 			ids = this.recommendations.get(date.minusDays(i));
 			if(ids != null) {
 				for(Map.Entry<String, Integer> entry : ids.entrySet()) {

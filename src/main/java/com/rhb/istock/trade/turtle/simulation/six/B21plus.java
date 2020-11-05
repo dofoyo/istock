@@ -84,7 +84,7 @@ public class B21plus {
 				}*/
 				
 				//高位快速回落超过8%
-				//account.dropFallOrder(itemID, -8,"3");
+				account.dropFallOrder(itemID, -8,"3");
 
 				
 /*				//大盘不好,有赚就卖

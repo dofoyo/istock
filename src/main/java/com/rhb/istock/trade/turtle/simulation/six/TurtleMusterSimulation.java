@@ -3,6 +3,7 @@ package com.rhb.istock.trade.turtle.simulation.six;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -21,6 +22,7 @@ import com.rhb.istock.item.ItemService;
 import com.rhb.istock.kdata.KdataService;
 import com.rhb.istock.kdata.Muster;
 import com.rhb.istock.selector.bluechip.BluechipService;
+import com.rhb.istock.selector.fina.FinaService;
 import com.rhb.istock.trade.turtle.simulation.six.repository.TurtleSimulationRepository;
 
 @Service("turtleMusterSimulation")
@@ -53,6 +55,10 @@ public class TurtleMusterSimulation {
 	@Autowired
 	@Qualifier("fdataServiceTushare")
 	FdataServiceTushare fdataServiceTushare;
+
+	@Autowired
+	@Qualifier("finaService")
+	FinaService finaService;
 	
 	BigDecimal initCash = new BigDecimal(1000000);
 	
@@ -75,10 +81,10 @@ public class TurtleMusterSimulation {
 		//System.out.println("Functions.ratio(this.averagePrice21, this.averagePrice)<=13");
 		System.out.println("simulate from " + beginDate + " to " + endDate +" ......");
 
-		NEWBplus hlb = new NEWBplus(initCash,1); //高价创新高
+		RecoNEWB hlb = new RecoNEWB(initCash,1); //高价创新高
 		NEWBplus bdt = new NEWBplus(initCash,0); //低价创新高
 
-		B21plus avb = new B21plus(initCash,1);  //平衡市策略：高价破21日线
+		RecoB21 avb = new RecoB21(initCash,1);  //平衡市策略：高价破21日线
 		B21plus bhl = new B21plus(initCash,0);  //牛市和平衡市策略：低价破21日线
 		
 
@@ -88,10 +94,11 @@ public class TurtleMusterSimulation {
 		Above avb = new Above(initCash,55);  //连续55天在21日线上
 		Above bhl = new Above(initCash,89);  //连续89天在21日线上
 */		
-		DrumPlus bav = new DrumPlus(initCash,1);  //高价+上升趋势+强于大盘
+		RecoDrum bav = new RecoDrum(initCash,1);  //高价+上升趋势+强于大盘
 		DrumPlus dtb = new DrumPlus(initCash,0);  //低价+上升趋势+强于大盘
 
-		Map<String,Muster> musters;
+		Map<String,Muster> musters, tmps;
+		Muster muster;
 		
 		List<Map<String,Muster>> previous = new ArrayList<Map<String,Muster>>();
 		Integer previous_period  = 13; //历史纪录区间，主要用于后面判断
@@ -101,6 +108,7 @@ public class TurtleMusterSimulation {
 		//Map<Integer,Set<String>> year_oks = fdataServiceTushare.getOks();
 		
 		Set<String> oks = null;
+		List<String> recommendations = null;
 		
 		long days = endDate.toEpochDay()- beginDate.toEpochDay();
 		int i=1;
@@ -119,15 +127,22 @@ public class TurtleMusterSimulation {
 				sseiFlag = kdataService.getSseiFlag(date);
 				sseiRatio = indexServiceTushare.getSseiGrowthRate(date, 21);
 				sseiTrend = kdataService.getSseiTrend(date, previous_period);
-				//oks = year_oks.get(date.getYear());
+				recommendations = finaService.getHighRecommendations(date, 10000); //推荐买入的顺序是从大到小
+				tmps = new HashMap<String,Muster>();
+				for(String id : recommendations) {
+					muster = musters.get(id);
+					if(muster!=null) {
+						tmps.put(id, muster);
+					}
+				}
 
-				hlb.doIt(musters, previous, date, sseiFlag, sseiRatio, sseiTrend);
+				hlb.doIt(musters, tmps, previous, date, sseiFlag, sseiRatio, sseiTrend);
 				bdt.doIt(musters, previous, date, sseiFlag, sseiRatio, sseiTrend);
 
-				avb.doIt(musters, previous, date, sseiFlag, sseiRatio, sseiTrend);
+				avb.doIt(musters, tmps, previous, date, sseiFlag, sseiRatio, sseiTrend);
 				bhl.doIt(musters, previous, date, sseiFlag, sseiRatio, sseiTrend);
 
-				bav.doIt(musters, previous, date, sseiFlag, sseiRatio, sseiTrend);
+				bav.doIt(musters, tmps, previous, date, sseiFlag, sseiRatio, sseiTrend);
 				dtb.doIt(musters, previous, date, sseiFlag, sseiRatio, sseiTrend);
 			}
 		}

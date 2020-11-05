@@ -17,88 +17,87 @@ import org.slf4j.LoggerFactory;
 import com.rhb.istock.account.Account;
 import com.rhb.istock.comm.util.Functions;
 import com.rhb.istock.kdata.Muster;
-
-
 /*
- * 强于大盘
+ * 高价或低价创新高
  * 
- * 
- * 买入:
- * 1. 大盘上升趋势形成
- * 2. 近期走势强于大盘的最低价股
- * 
- * 卖出:
- * 跌破21日均线
- * 
+ * 操作策略
+ * 买入：全部股票,按价格排序，选出价格最高或最低的55个，突破89日高点
+ * 卖出：跌破21日均线
+ * 仓位控制：满仓，每只股票的均衡市值
  *
  */
-public class DrumPlus {
-	protected static final Logger logger = LoggerFactory.getLogger(DrumPlus.class);
+public class RecoNEWB {
+	protected static final Logger logger = LoggerFactory.getLogger(HLB_try.class);
 
 	private Account account = null;
 	private BigDecimal initCash = null;
 	
 	private StringBuffer dailyAmount_sb = new StringBuffer("date,cash,value,total\n");
 	private StringBuffer breakers_sb = new StringBuffer();
-	
-	private BigDecimal valueRatio = new BigDecimal(3);  //每只股票不能超过市值的1/3
 	private Integer pool = 21;
 	private Integer top = 1;
 	private Integer type = 1;// 1 - 高价， 0 - 低价
-
-	public DrumPlus(BigDecimal initCash, Integer type) {
+	
+	public RecoNEWB(BigDecimal initCash, Integer type) {
 		account = new Account(initCash);
 		this.initCash = initCash;
 		this.type = type;
 	}
 	
-	public void doIt(Map<String,Muster> musters,List<Map<String,Muster>> previous, LocalDate date, Integer sseiFlag, Integer sseiRatio, Integer sseiTrend) {
-		Muster muster;
+	public void doIt(Map<String,Muster> musters,Map<String,Muster> ms,List<Map<String,Muster>> previous, LocalDate date, Integer sseiFlag, Integer sseiRatio, Integer sseiTrend) {
+		Muster muster, pre;
 		account.setLatestDate(date);
 		Integer ratio;
 		
-		//卖出
-		boolean droped = false;
-		Set<String> holdIDs = account.getItemIDsOfHolds();
-		for(String itemID: holdIDs) {
+		Set<String> holdItemIDs = account.getItemIDsOfHolds();
+		for(String itemID : holdItemIDs) {
 			muster = musters.get(itemID);
-			//pre = previous.get(0).get(itemID);
-			if(muster!=null && !muster.isDownLimited()) {
+			if(muster != null) {
 				account.refreshHoldsPrice(itemID, muster.getLatestPrice(), muster.getLatestHighest());
-
-				//跌破21日均线
-				if(muster.isDropAve(21) 
-						 //&& sseiFlag!=1
-						//&& muster.getAverageAmount5().compareTo(muster.getAverageAmount())==-1
-						) { 		
+			}
+		}
+		
+		//卖出跌破dropline的股票
+		boolean droped = false;
+		for(String itemID: holdItemIDs) {
+			muster = musters.get(itemID);
+			pre = previous.get(0).get(itemID);
+			if(muster!=null && !muster.isDownLimited()) {
+				//跌破21日均线就卖
+				if(muster.isDropAve(21)) { 		
 					account.dropWithTax(itemID, "1", muster.getLatestPrice());
-					droped = true;
+					droped=true;
 				}
 				
 				//大盘下降通道走坏,所持股跟随下跌
-				if(sseiFlag==0 && sseiTrend<0 && muster.getClose().compareTo(muster.getLatestPrice())>0) {
+/*				if(sseiFlag==0 && sseiTrend<0 && muster.getClose().compareTo(muster.getLatestPrice())>0) {
 					account.dropWithTax(itemID, "4", muster.getLatestPrice());
 					droped = true;
-				}
-/*
-				//走势弱于大盘
+				}*/
+				
+/*				//走势弱于大盘
 				ratio = this.getRatio(previous, itemID, muster.getLatestPrice());
 				if(ratio < sseiRatio) {
 					account.dropWithTax(itemID, "2", muster.getLatestPrice());
 					droped = true;
 				}*/
 				
-				//高位快速回落超过8%
-				account.dropFallOrder(itemID, -8,"3");
+				//高位回落超过8%
+				//account.dropFallOrder(itemID, -8,"3");
 			}
 		}
 		
 		//行情好，才买入
-		if(sseiFlag==1) {
-			//确定突破走势的股票
-			Set<String> holdItemIDs = account.getItemIDsOfHolds();
+		//if(sseiFlag==1) {
+			holdItemIDs = account.getItemIDsOfHolds();
+			
 			Set<Muster> dds = new HashSet<Muster>();  //用set，无重复，表示不可加仓
-			List<Muster> breakers = this.getBreakers(new ArrayList<Muster>(musters.values()),previous,date,sseiRatio,holdItemIDs);
+			//List<Muster> dds = new ArrayList<Muster>();  //用list，有重复，表示可以加仓
+			
+			//确定突破走势的股票
+			List<Muster> breakers = this.getBreakers(new ArrayList<Muster>(ms.values()),holdItemIDs);
+			//breakers.addAll(keeps.getUps(musters));
+			
 			breakers_sb.append(date.toString() + ",");
 			StringBuffer sb = new StringBuffer();
 			for(Muster breaker : breakers) {
@@ -126,12 +125,11 @@ public class DrumPlus {
 				}
 			}					
 			account.openAll(dds);			//后买
-		}
-		
-		dailyAmount_sb.append(account.getDailyAmount() + "\n");
+			//}
+		//}
 
+		dailyAmount_sb.append(account.getDailyAmount() + "\n");
 	}
-	
 	
 	public Map<String,String> result() {
 		if(account == null) return null;
@@ -151,14 +149,8 @@ public class DrumPlus {
 		return result;
 	}
 	
-	private Integer getQuantity(BigDecimal cash, BigDecimal total,BigDecimal price) {
-		BigDecimal dd = total.divide(valueRatio,BigDecimal.ROUND_DOWN);
-		BigDecimal ee = dd.compareTo(cash)<=0 ? dd : cash;
-		return ee.divide(price,BigDecimal.ROUND_DOWN).divide(new BigDecimal(100),BigDecimal.ROUND_DOWN).intValue()*100;
-	}
-	
-	private List<Muster> getBreakers(List<Muster> musters,List<Map<String,Muster>> previous, LocalDate date, Integer sseiRatio, Set<String> holds){
-		//List<Muster>  ms = new ArrayList<Muster>(musters.values());
+	private List<Muster> getBreakers(List<Muster> musters, Set<String> holds){
+		List<Muster> breakers = new ArrayList<Muster>();
 
 		if(this.type == 0) {
 			Collections.sort(musters, new Comparator<Muster>() {
@@ -189,30 +181,17 @@ public class DrumPlus {
 			}
 		});
 		
-		List<Muster>  breakers = new ArrayList<Muster>();
-		Muster m,p;
-		Integer r;
-		StringBuffer sb = new StringBuffer(date.toString() + ":");
-		for(int i=0; i<ms.size() && breakers.size()<this.top; i++) {
+		Muster m;
+		for(int i=0; i<ms.size() && breakers.size()<top; i++) {
 			m = ms.get(i);
-			p = previous.get(0).get(m.getItemID());
-			if(m!=null && p!=null) {
-				r = this.getRatio(previous,m.getItemID(),m.getLatestPrice());
-				if(!m.isUpLimited() && !m.isDownLimited()
-					&& r>0
-					&& r >= sseiRatio   // 强于大盘
+			if(m!=null && !m.isUpLimited() 
+					&& m.isUpBreaker() 
 					&& m.getHLGap()<=55
-					&& m.isUpAve(21)
-					&& m.getAveragePrice21().compareTo(p.getAveragePrice21())==1  //上升趋势
 					&& !holds.contains(m.getItemID())
 					) {
 				breakers.add(m);
-				sb.append(m.getItemID() + "(" + i + ")" +",");
-				}
 			}
 		}
-		
-		//logger.info(date.toString());
 		
 		return breakers;
 	}
@@ -225,9 +204,7 @@ public class DrumPlus {
 			m = ms.get(itemID);
 			if(m!=null) {
 				lowest = (lowest==null || lowest.compareTo(m.getLatestPrice())==1) ? m.getLatestPrice() : lowest;
-				//logger.info(String.format("%s, date=%s, price=%.2f", itemID, m.getDate().toString(), m.getLatestPrice()));
 			}
-			
 		}
 		
 		if(lowest!=null && lowest.compareTo(BigDecimal.ZERO)>0) {

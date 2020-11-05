@@ -72,7 +72,9 @@ public class FinaService {
 		List<Recommendation> res = new ArrayList<Recommendation>();
 		Map<String, Integer> ids = fdataRepositoryEastmoney.getRecommendations(date);
 		for(Map.Entry<String, Integer> entry : ids.entrySet()) {
-			res.add(new Recommendation(entry.getKey(),entry.getValue()));
+			if(entry.getValue()>13) {  //有5次以上的买入推荐
+				res.add(new Recommendation(entry.getKey(),entry.getValue()));
+			}
 		}
 		
 		Collections.sort(res, new Comparator<Recommendation>() {
