@@ -127,7 +127,7 @@ public class TurtleMusterSimulation {
 				sseiFlag = kdataService.getSseiFlag(date);
 				sseiRatio = indexServiceTushare.getSseiGrowthRate(date, 21);
 				sseiTrend = kdataService.getSseiTrend(date, previous_period);
-				recommendations = finaService.getHighRecommendations(date, 10000); //推荐买入的顺序是从大到小
+				recommendations = finaService.getHighRecommendations(date, 10000, 13); //推荐买入的顺序是从大到小
 				tmps = new HashMap<String,Muster>();
 				for(String id : recommendations) {
 					muster = musters.get(id);

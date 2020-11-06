@@ -66,13 +66,13 @@ public class FinaService {
 		return fdataRepositoryEastmoney.getRecommendations(itemID, date);
 	}
 	
-	public List<String> getHighRecommendations(LocalDate date, Integer top){
+	public List<String> getHighRecommendations(LocalDate date, Integer top, Integer count){
 		List<String> results = new ArrayList<String>();
 		
 		List<Recommendation> res = new ArrayList<Recommendation>();
 		Map<String, Integer> ids = fdataRepositoryEastmoney.getRecommendations(date);
 		for(Map.Entry<String, Integer> entry : ids.entrySet()) {
-			if(entry.getValue()>13) {  //有5次以上的买入推荐
+			if(entry.getValue()>count) {  //有多少次以上的买入推荐
 				res.add(new Recommendation(entry.getKey(),entry.getValue()));
 			}
 		}

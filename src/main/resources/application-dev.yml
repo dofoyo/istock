@@ -36,6 +36,7 @@ fundsFile: d:/dev/istock-data/funds.txt
 fundsPath: D:/dev/istock-data/funds
 tushareUrl: http://api.waditu.com
 dimensionsFile: D:/dev/istock-data/dimensions.txt
+operationsFile: D:/dev/istock-data/operations.txt
 openDuration: 89
 dropDuration: 21
 

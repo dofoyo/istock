@@ -308,7 +308,7 @@ public class DrumService {
 	
 	public List<String> getDrumsOfHighRecommendations(LocalDate endDate, Integer top){
 		List<String> results = new ArrayList<String>();
-		List<String> ids = finaService.getHighRecommendations(endDate, top);
+		List<String> ids = finaService.getHighRecommendations(endDate, top, 13);
 		List<String> ss = this.getDrums(endDate);
 		for(String id : ss) {
 			if(ids.contains(id)) {
@@ -372,10 +372,10 @@ public class DrumService {
 			public int compare(Muster o1, Muster o2) {
 				//return o1.getLatestPrice().compareTo(o2.getLatestPrice());
 				
-				if(o1.getHNGap().compareTo(o2.getHNGap())==0){
+				if(o1.getLNGap().compareTo(o2.getLNGap())==0){
 					return o1.getLatestPrice().compareTo(o2.getLatestPrice());
 				}else {
-					return o1.getHNGap().compareTo(o2.getHNGap());
+					return o1.getLNGap().compareTo(o2.getLNGap());
 				}
 			}
 		});	
@@ -433,10 +433,10 @@ public class DrumService {
 							flag = false;
 							if(ratio >= sseiRatio
 								&& ratio >0
-								&& m.getHLGap()<=89
+								&& m.getHLGap()<=55
 								&& m.isUpAve(21)
 								&& m.getAveragePrice21().compareTo(p.getAveragePrice21())==1
-								&& m.getAveragePrice21().compareTo(b.getAveragePrice21())==1
+								//&& m.getAveragePrice21().compareTo(b.getAveragePrice21())==1
 								) {
 								flag = true;
 								ids.add(m.getItemID());

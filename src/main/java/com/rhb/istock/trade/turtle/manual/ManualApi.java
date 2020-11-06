@@ -199,17 +199,17 @@ public class ManualApi {
 		Set<String> holds = this.getHoldIDs(this.generateHolds("manual",theDate));
 
 		List<String> ids = null;
-		if("newb".equals(type)) {  //创新高
-			ids = newbService.getNewbs(theDate);
-		}else if("drum".equals(type)) {  //低价
-			ids = drumService.getDrumsOfLowest(theDate,21);
-		}else if("dime".equals(type)) {   //强板块
+		if("newb".equals(type)) { 
+			ids = newbService.getNewbs(theDate);   //创新高
+		}else if("drum".equals(type)) { 
+			ids = drumService.getDrumsOfLowest(theDate,21);    //低价
+		}else if("dime".equals(type)) {  
 			Integer ratio = 34;
-			ids = drumService.getDrumsOfTopDimensions(theDate, holds, ratio);
-		}else if("cagr".equals(type)) {    //高增长
-			ids = drumService.getDrumsOfHighCAGR(theDate, 100);
-		}else if("reco".equals(type)) {     //强推荐
-			ids = drumService.getDrumsOfHighRecommendations(theDate, 100);
+			ids = drumService.getDrumsOfTopDimensions(theDate, holds, ratio);   //强板块
+		}else if("cagr".equals(type)) {    
+			ids = drumService.getDrumsOfHighCAGR(theDate, 100);  //高增长
+		}else if("reco".equals(type)) {     
+			ids = drumService.getDrumsOfHighRecommendations(theDate, 100);  //强推荐
 		}
 		
 		if(ids!=null && !ids.isEmpty()) {
