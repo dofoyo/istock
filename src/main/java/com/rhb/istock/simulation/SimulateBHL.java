@@ -35,14 +35,12 @@ public class SimulateBHL {
 	@Qualifier("conservativeOperation")
 	ConservativeOperation conservativeOperation;
 	
-	BigDecimal initCash = new BigDecimal(1000000);
-	
 	@Async("taskExecutor")
 	public Future<String> run(LocalDate beginDate, LocalDate endDate)  throws InterruptedException {
 		BigDecimal initCash = new BigDecimal(1000000);
 		Account account = new Account(initCash);
 		Map<LocalDate, List<String>> operationList = b21plus.getResults(beginDate, endDate);
-		Map<String, String> operateResult = conservativeOperation.run(account, operationList, beginDate, endDate);
+		Map<String, String> operateResult = conservativeOperation.run(account, operationList, beginDate, endDate, "bhl");
 		turtleSimulationRepository.save("bhl", operateResult.get("breakers"), operateResult.get("CSV"), operateResult.get("dailyAmount"));
 		return new AsyncResult<String>("bhl执行完毕");
 	}

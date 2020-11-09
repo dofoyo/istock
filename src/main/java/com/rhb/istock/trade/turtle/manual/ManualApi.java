@@ -222,7 +222,11 @@ public class ManualApi {
 			}
 			tmp = drumReco.getResults(theDate);
 			if(tmp!=null && tmp.size()>0) {
-				ids.addAll(tmp);
+				for(String id : tmp) {
+					if(!ids.contains(id)) {
+						ids.add(id);
+					}
+				}
 			}			
 		}else if("darker".equals(type)) { 
 			List<String> tmp = drumPlus.getResults(theDate);
@@ -231,7 +235,11 @@ public class ManualApi {
 			}
 			tmp = newbPlus.getResults(theDate);
 			if(tmp!=null && tmp.size()>0) {
-				ids.addAll(tmp);
+				for(String id : tmp) {
+					if(!ids.contains(id)) {
+						ids.add(id);
+					}
+				}
 			}
 		}else if("dime".equals(type)) {  
 			Integer ratio = 34;
@@ -248,7 +256,7 @@ public class ManualApi {
 				item.setRecommendations(recommendationCount);
 				//if(recommendationCount!=null && recommendationCount>0) {
 					iv = new ItemView(id,item.getNameWithCAGR(),holds.contains(id)? "danger" : "info");
-					if(previous!=null && !previous.contains(id)) {
+					if(previous!=null && !previous.contains(id) && !holds.contains(id)) {
 						iv.setType("warning");
 					}
 					views.add(iv);
@@ -351,13 +359,14 @@ public class ManualApi {
 	public ResponseContent<List<SelectView>> getReselect() {
 		List<SelectView> views = new ArrayList<SelectView>();
 		
-		Map<LocalDate, String> selects = manualService.getReselect();
+		Map<LocalDate, List<String>> selects = manualService.getReselect();
 		if(selects != null) {
-			for(Map.Entry<LocalDate, String> entry : selects.entrySet()) {
-				views.add(new SelectView(entry.getValue(),itemService.getItem(entry.getValue()).getName(),entry.getKey(),"warning"));
+			for(Map.Entry<LocalDate, List<String>> entry : selects.entrySet()) {
+				for(String id : entry.getValue()) {
+					views.add(new SelectView(id,itemService.getItem(id).getName(),entry.getKey(),"warning"));
+				}
 			}
 		}		
-
 		
 		return new ResponseContent<List<SelectView>>(ResponseEnum.SUCCESS, views);
 	}

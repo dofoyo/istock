@@ -19,6 +19,14 @@ public class ProduceTest {
 	@Autowired
 	@Qualifier("newbDime")
 	Producer produce;
+
+	@Test
+	public void produce1() {  //做收盘
+		LocalDate date = LocalDate.parse("2020-11-09");
+		
+		produce.produce(date, true);
+		System.out.println("收盘 Test");
+	}
 	
 	//@Test
 	public void produce() {
@@ -29,7 +37,7 @@ public class ProduceTest {
 		System.out.println("produce Test");
 	}
 	
-	@Test
+	//@Test
 	public void getResult() {
 		LocalDate bDate = LocalDate.parse("2020-01-25");
 		LocalDate eDate = LocalDate.parse("2020-11-07");

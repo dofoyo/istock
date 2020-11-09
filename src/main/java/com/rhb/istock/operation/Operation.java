@@ -7,5 +7,5 @@ import java.util.Map;
 import com.rhb.istock.account.Account;
 
 public interface Operation {
-	public Map<String,String> run(Account account, Map<LocalDate, List<String>> buyList,LocalDate beginDate, LocalDate endDate);
+	public Map<String,String> run(Account account, Map<LocalDate, List<String>> buyList,LocalDate beginDate, LocalDate endDate, String label);
 }

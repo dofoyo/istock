@@ -42,7 +42,7 @@ public class SimulateBAV {
 		BigDecimal initCash = new BigDecimal(1000000);
 		Account account = new Account(initCash);
 		Map<LocalDate, List<String>> operationList = drumReco.getResults(beginDate, endDate);
-		Map<String, String> operateResult = aggressiveOperation.run(account, operationList, beginDate, endDate);
+		Map<String, String> operateResult = aggressiveOperation.run(account, operationList, beginDate, endDate, "bav");
 		turtleSimulationRepository.save("bav", operateResult.get("breakers"), operateResult.get("CSV"), operateResult.get("dailyAmount"));
 		return new AsyncResult<String>("bav执行完毕");
 	}

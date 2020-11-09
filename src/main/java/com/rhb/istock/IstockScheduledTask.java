@@ -16,6 +16,7 @@ import com.rhb.istock.index.tushare.IndexSpiderTushare;
 import com.rhb.istock.item.ItemService;
 import com.rhb.istock.kdata.KdataService;
 import com.rhb.istock.kdata.spider.KdataRealtimeSpider;
+import com.rhb.istock.producer.ProducerService;
 import com.rhb.istock.selector.drum.DrumService;
 import com.rhb.istock.selector.fina.FinaService;
 import com.rhb.istock.trade.turtle.operation.TurtleOperationService;
@@ -70,6 +71,10 @@ public class IstockScheduledTask {
 	@Autowired
 	@Qualifier("kdataRealtimeSpiderImp")
 	KdataRealtimeSpider kdataRealtimeSpider;
+	
+	@Autowired
+	@Qualifier("producerService")
+	ProducerService producerService;
 	
 /*	@Autowired
 	@Qualifier("huaService")
@@ -169,7 +174,9 @@ public class IstockScheduledTask {
 		long beginTime=System.currentTimeMillis(); 
 
 		if(this.isTradeDate()) {
-			kdataService.downClosedDatas(LocalDate.now());
+			LocalDate date = LocalDate.now();
+			producerService.produce(date);
+			kdataService.downClosedDatas(date);
 			//kdataService.downClosedDatas(LocalDate.parse("2020-11-05"));
 			kdataService.generateMusters(LocalDate.parse("2000-01-01"));   //生成muster，需要192分钟，即3个多小时
 			fdataSpiderTushare.downAll();  //财务报告、预告、股东信息等下载

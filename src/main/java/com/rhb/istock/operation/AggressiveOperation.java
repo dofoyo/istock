@@ -39,12 +39,12 @@ public class AggressiveOperation implements Operation {
 	private StringBuffer breakers_sb = new StringBuffer();
 	private Integer top = 1;
 	
-	public Map<String,String> run(Account account, Map<LocalDate, List<String>> buyList,LocalDate beginDate, LocalDate endDate) {
+	public Map<String,String> run(Account account, Map<LocalDate, List<String>> buyList,LocalDate beginDate, LocalDate endDate, String label) {
 		long days = endDate.toEpochDay()- beginDate.toEpochDay();
 		int i=1;
 		for(LocalDate date = beginDate; (date.isBefore(endDate) || date.equals(endDate)); date = date.plusDays(1)) {
 
-			Progress.show((int)days, i++, "  operation.run: " + date.toString());
+			Progress.show((int)days, i++," " + label +  " run:" + date.toString());
 			
 			this.doIt(date, account, buyList);
 		}

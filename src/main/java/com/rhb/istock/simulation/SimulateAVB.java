@@ -40,7 +40,7 @@ public class SimulateAVB {
 		BigDecimal initCash = new BigDecimal(1000000);
 		Account account = new Account(initCash);
 		Map<LocalDate, List<String>> operationList = b21Reco.getResults(beginDate, endDate);
-		Map<String, String> operateResult = aggressiveOperation.run(account, operationList, beginDate, endDate);
+		Map<String, String> operateResult = aggressiveOperation.run(account, operationList, beginDate, endDate, "avb");
 		turtleSimulationRepository.save("avb", operateResult.get("breakers"), operateResult.get("CSV"), operateResult.get("dailyAmount"));		
 		return new AsyncResult<String>("avb执行完毕");
 	}
