@@ -2,7 +2,6 @@ package com.rhb.istock.fund;
 
 import java.math.BigDecimal;
 
-import com.rhb.istock.comm.util.Functions;
 
 public class ItemPortfolio {
 	private String symbol;	//str	Y	TS基金代码

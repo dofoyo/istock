@@ -26,10 +26,10 @@ import com.rhb.istock.item.ItemService;
 import com.rhb.istock.kdata.Kbar;
 import com.rhb.istock.kdata.KdataService;
 import com.rhb.istock.kdata.api.KdatasView;
+import com.rhb.istock.simulation.Simulation;
 import com.rhb.istock.trade.turtle.simulation.six.TurtleMusterSimulation;
 import com.rhb.istock.trade.turtle.simulation.six.TurtleMusterSimulation_avb_plus;
 import com.rhb.istock.trade.turtle.simulation.six.TurtleMusterSimulation_hua;
-import com.rhb.istock.trade.turtle.simulation.six.TurtleMusterSimulation_hunt;
 import com.rhb.istock.trade.turtle.simulation.six.repository.AmountEntity;
 import com.rhb.istock.trade.turtle.simulation.six.repository.TurtleSimulationRepository;
 
@@ -40,8 +40,8 @@ public class TurtleSimulationApi {
 	TurtleSimulationRepository turtleSimulationRepository;
 
 	@Autowired
-	@Qualifier("turtleMusterSimulation")
-	TurtleMusterSimulation turtleMusterSimulation;
+	@Qualifier("simulation")
+	Simulation simulation;
 
 	@Autowired
 	@Qualifier("turtleMusterSimulation_hua")
@@ -128,7 +128,12 @@ public class TurtleSimulationApi {
 		turtleSimulationRepository.evictSellsCache();
 
 		
-		turtleMusterSimulation.simulate(theBeginDate, theEndDate); 
+		try {
+			simulation.simulate(theBeginDate, theEndDate);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
 		//turtleMusterSimulation_hua.simulate(theBeginDate, theEndDate);
 		//turtleMusterSimulation_avb_plus.simulate(theBeginDate, theEndDate);
 		

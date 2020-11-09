@@ -13,10 +13,12 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.TreeMap;
+
 
 public class FileTools {
 	private static final String SEP = System.getProperty("line.separator");
+	
 	public static List<String> readAsLines(String fileName, String encoding) {
 		List<String> lines = new ArrayList<String>();
 		try {
@@ -60,7 +62,7 @@ public class FileTools {
 				case 0xfeff:
 					code = "UTF-16BE";
 			}
-			
+			bin.close();
 		}catch(Exception e) {}
 		
 		return code;
@@ -105,11 +107,11 @@ public class FileTools {
 		return file.exists();
 	}
 	
-	public static void writeTextFile(String path, Map<LocalDate,Set<String>> content, boolean append) {
+	public static void writeMapFile(String path, Map<LocalDate,List<String>> content, boolean append) {
 		StringBuffer sb = new StringBuffer();
-		for(Map.Entry<LocalDate, Set<String>> entry : content.entrySet()) {
+		for(Map.Entry<LocalDate, List<String>> entry : content.entrySet()) {
 			sb.append(entry.getKey());
-			sb.append(",");
+			sb.append(":");
 			for(String str : entry.getValue()) {
 				sb.append(str);
 				sb.append(",");
@@ -141,6 +143,27 @@ public class FileTools {
 		
 	}
 
+	public static Map<LocalDate, List<String>> readMapFile(String path) {
+		Map<LocalDate, List<String>> results = new TreeMap<LocalDate, List<String>>();
+		LocalDate date;
+		List<String> ids;
+		String[] lines = readTextFile(path).split("\n");
+		String[] dateAndList;
+		String[] list;
+		for(String line : lines) {
+			dateAndList = line.split(":");
+			date = LocalDate.parse(dateAndList[0]);
+			list = dateAndList[1].split(",");
+			ids = new ArrayList<String>();
+			for(String id : list) {
+				ids.add(id);
+			}
+			results.put(date, ids);
+			
+		}
+		return results;
+	}
+	
 	public static String readTextFile(String path) {
 		StringBuffer buffer = new StringBuffer();
 		try {

@@ -3,7 +3,6 @@ package com.rhb.istock.trade.turtle.manual;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -88,10 +87,7 @@ public class ManualService {
 		Muster muster;
 		String id;
 
-		Integer previous_period  = 13; //历史纪录区间，主要用于后面判断
-
-		Integer sseiFlag, sseiRatio, sseiTrend;
-
+		Integer sseiFlag,  sseiTrend;
 		
 		Map<LocalDate, AmountEntity> amounts = turtleSimulationRepository.getAmounts("avb");
 		List<LocalDate> dates = new ArrayList<LocalDate>(amounts.keySet());
@@ -104,7 +100,6 @@ public class ManualService {
 
 			sseiFlag = kdataService.getSseiFlag(date);
 			sseiTrend = kdataService.getSseiTrend(date, 21);
-			sseiRatio = indexServiceTushare.getSseiGrowthRate(date, previous_period);
 
 			if(musters!=null && musters.size()>0) {
 				account.setLatestDate(date);

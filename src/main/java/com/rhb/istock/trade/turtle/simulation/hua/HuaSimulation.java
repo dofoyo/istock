@@ -2,27 +2,20 @@ package com.rhb.istock.trade.turtle.simulation.hua;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.rhb.istock.comm.util.FileTools;
 import com.rhb.istock.comm.util.Progress;
 import com.rhb.istock.item.ItemService;
 import com.rhb.istock.kdata.Kbar;
 import com.rhb.istock.kdata.Kdata;
 import com.rhb.istock.kdata.KdataService;
-import com.rhb.istock.kdata.Muster;
 import com.rhb.istock.selector.SelectorService;
-import com.rhb.istock.selector.potential.Potential;
-import com.rhb.istock.selector.potential.PotentialService;
 
 @Service("huaSimulation")
 public class HuaSimulation {

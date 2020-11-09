@@ -47,7 +47,7 @@ public class DimensionView {
 	}
 	
 	public List<Board> getBoards() {
-		List<Board> bs = new ArrayList(boards.values());
+		List<Board> bs = new ArrayList<Board>(boards.values());
 		Collections.sort(bs, new Comparator<Board>() {
 
 			@Override

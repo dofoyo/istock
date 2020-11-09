@@ -1,7 +1,6 @@
 package com.rhb.istock.trade.turtle.simulation.six;
 
 import java.time.LocalDate;
-import java.util.Map;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

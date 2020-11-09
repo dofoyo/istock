@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.rhb.istock.comm.util.HttpDownload;
-import com.rhb.istock.kdata.KdataServiceImp;
 
 @Service("kdataSpider163")
 public class KdataSpider163 implements KdataSpider {

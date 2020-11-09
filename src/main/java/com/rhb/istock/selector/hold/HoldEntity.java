@@ -1,7 +1,5 @@
 package com.rhb.istock.selector.hold;
 
-import java.math.BigDecimal;
-
 public class HoldEntity {
 	private String itemID;
 	private String itemName;

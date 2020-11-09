@@ -1,12 +1,6 @@
 package com.rhb.istock.selector.drum;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -18,10 +12,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import com.rhb.istock.comm.util.Functions;
 import com.rhb.istock.comm.util.Progress;
-import com.rhb.istock.item.Dimension;
-import com.rhb.istock.item.Item;
 import com.rhb.istock.item.ItemService;
 import com.rhb.istock.kdata.KdataService;
 
@@ -41,10 +32,13 @@ public class DrumServiceTest {
 	KdataService kdataService;
 	
 	@Test
-	public void getDrumsOfCAGR() {
-		LocalDate date = LocalDate.parse("2020-10-23");
-		List<String> ids = drumService.getDrumsOfHighCAGR(date, 100);
+	public void getDrumsOfDimensions() {
+		LocalDate date = LocalDate.parse("2020-11-06");
+		Set<String> ids = drumService.getDrumsOfDimensions(date, 34);
 		System.out.println(ids);
+		System.out.println(ids.size());
+		System.out.println("getDrumsOfDimensions test");
+
 	}
 	
 	//@Test

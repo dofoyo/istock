@@ -12,11 +12,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import com.rhb.istock.comm.util.HttpClient;
 import com.rhb.istock.comm.util.Progress;
-import com.rhb.istock.fdata.eastmoney.FdataRepositoryEastmoney;
 import com.rhb.istock.item.repository.Component;
 import com.rhb.istock.item.repository.ComponentRepository;
 import com.rhb.istock.item.repository.ItemEntity;
@@ -198,6 +198,7 @@ public class ItemServiceImp implements ItemService {
 	}
 
 	@Override
+	@Cacheable("dimensions")
 	public Map<String,Dimension> getDimensions() {
 		Map<String,Dimension> dimensions = new HashMap<String,Dimension>();
 		Dimension industry = new Dimension();

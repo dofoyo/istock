@@ -5,10 +5,8 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -41,18 +39,18 @@ public class HuaService {
 	@Value("${mcstFile}")
 	private String mcstFile;
 	
-	private TreeMap<LocalDate,Set<String>> huas = null;
+	private TreeMap<LocalDate,List<String>> huas = null;
 	
 	private void init() {
-		huas = new TreeMap<LocalDate,Set<String>>();
+		huas = new TreeMap<LocalDate,List<String>>();
 		String[] lines = FileTools.readTextFile(huaFile).split("\n");
 		String[] columns;
-		Set<String> ids;
+		List<String> ids;
 		LocalDate date;
 		for(String line : lines) {
 			columns = line.split(",");
 			date = LocalDate.parse(columns[0]);
-			ids = new HashSet<String>();
+			ids = new ArrayList<String>();
 			for(int i=1; i<columns.length; i++) {
 				ids.add(columns[i]);
 			}
@@ -70,9 +68,9 @@ public class HuaService {
 		long beginTime=System.currentTimeMillis(); 
 		System.out.println("generate Hua potentials begin......");
 
-		huas = new TreeMap<LocalDate,Set<String>>();
+		huas = new TreeMap<LocalDate,List<String>>();
 		List<LocalDate> dates;
-		Set<String> tmp;
+		List<String> tmp;
 		
 		List<String> ids = itemService.getItemIDs();
 		Set<String> excludes = new HashSet<String>();
@@ -87,7 +85,7 @@ public class HuaService {
 					if(huas.containsKey(date)) {
 						tmp = huas.get(date);
 					}else {
-						tmp = new HashSet<String>();
+						tmp = new ArrayList<String>();
 						huas.put(date, tmp);
 					}
 					tmp.add(id);
@@ -95,7 +93,7 @@ public class HuaService {
 			}
 		}
 		
-		FileTools.writeTextFile(huaPotentialFile, huas, append);
+		FileTools.writeMapFile(huaPotentialFile, huas, append);
 		
 		long used = (System.currentTimeMillis() - beginTime)/1000; 
 		System.out.println("generate Hua potential 用时：" + used + "秒");          
@@ -115,9 +113,9 @@ public class HuaService {
 		long beginTime=System.currentTimeMillis(); 
 		System.out.println("generate Hua begin......");
 
-		huas = new TreeMap<LocalDate,Set<String>>();
+		huas = new TreeMap<LocalDate,List<String>>();
 		List<LocalDate> dates;
-		Set<String> tmp;
+		List<String> tmp;
 		
 		List<String> ids = itemService.getItemIDs();
 		int i=1;
@@ -128,14 +126,14 @@ public class HuaService {
 				if(huas.containsKey(date)) {
 					tmp = huas.get(date);
 				}else {
-					tmp = new HashSet<String>();
+					tmp = new ArrayList<String>();
 					huas.put(date, tmp);
 				}
 				tmp.add(id);
 			}
 		}
 		
-		FileTools.writeTextFile(huaFile, huas, append);
+		FileTools.writeMapFile(huaFile, huas, append);
 		
 		long used = (System.currentTimeMillis() - beginTime)/1000; 
 		System.out.println("generate Hua 用时：" + used + "秒");          
@@ -145,12 +143,12 @@ public class HuaService {
 	 * 收盘后才能筛选出符合花式1号的股票
 	 * 因此根据当前日期得到的是上一交易日的符合花式1号的股票
 	 */
-	public Set<String> getHua(LocalDate date){
+	public List<String> getHua(LocalDate date){
 		if(huas == null) {
 			this.init();
 		}
 		
-		Set<String> ids = null;
+		List<String> ids = null;
 		for(int i=0; i<this.huas.size(); i++) {
 			date = date.minusDays(1);
 			ids = huas.get(date);

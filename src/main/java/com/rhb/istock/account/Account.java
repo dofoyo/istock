@@ -56,6 +56,10 @@ public class Account {
 		prices = new TreeMap<String,BigDecimal>();
 	}
 	
+	public BigDecimal getInitCash() {
+		return initCash;
+	}
+
 	public boolean isEnoughCash(Integer count) {
 		if(holds.size()==0) return true;
 		

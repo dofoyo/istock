@@ -11,7 +11,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -27,6 +26,7 @@ import com.rhb.istock.item.ItemService;
 import com.rhb.istock.kdata.Kbar;
 import com.rhb.istock.kdata.KdataService;
 import com.rhb.istock.kdata.api.KdatasView;
+import com.rhb.istock.producer.Producer;
 import com.rhb.istock.selector.drum.DrumService;
 import com.rhb.istock.selector.fina.FinaService;
 import com.rhb.istock.selector.newb.NewbService;
@@ -77,6 +77,22 @@ public class ManualApi {
 	@Autowired
 	@Qualifier("finaService")
 	FinaService finaService;
+	
+	@Autowired
+	@Qualifier("newbReco")
+	Producer newbReco;
+
+	@Autowired
+	@Qualifier("newbPlus")
+	Producer newbPlus;
+
+	@Autowired
+	@Qualifier("drumReco")
+	Producer drumReco;
+	
+	@Autowired
+	@Qualifier("drumPlus")
+	Producer drumPlus;
 	
 	private List<String> previous = null;
 	
@@ -198,18 +214,28 @@ public class ManualApi {
 
 		Set<String> holds = this.getHoldIDs(this.generateHolds("manual",theDate));
 
-		List<String> ids = null;
-		if("newb".equals(type)) { 
-			ids = newbService.getNewbs(theDate);   //创新高
-		}else if("drum".equals(type)) { 
-			ids = drumService.getDrumsOfLowest(theDate,21);    //低价
+		List<String> ids = new ArrayList<String>();
+		if("power".equals(type)) { 
+			List<String> tmp = newbReco.getResults(theDate);
+			if(tmp!=null && tmp.size()>0) {
+				ids.addAll(tmp);
+			}
+			tmp = drumReco.getResults(theDate);
+			if(tmp!=null && tmp.size()>0) {
+				ids.addAll(tmp);
+			}			
+		}else if("darker".equals(type)) { 
+			List<String> tmp = drumPlus.getResults(theDate);
+			if(tmp!=null && tmp.size()>0) {
+				ids.addAll(tmp);
+			}
+			tmp = newbPlus.getResults(theDate);
+			if(tmp!=null && tmp.size()>0) {
+				ids.addAll(tmp);
+			}
 		}else if("dime".equals(type)) {  
 			Integer ratio = 34;
 			ids = drumService.getDrumsOfTopDimensions(theDate, holds, ratio);   //强板块
-		}else if("cagr".equals(type)) {    
-			ids = drumService.getDrumsOfHighCAGR(theDate, 100);  //高增长
-		}else if("reco".equals(type)) {     
-			ids = drumService.getDrumsOfHighRecommendations(theDate, 100);  //强推荐
 		}
 		
 		if(ids!=null && !ids.isEmpty()) {
@@ -220,13 +246,13 @@ public class ManualApi {
 				item = itemService.getItem(id);
 				recommendationCount = finaService.getRecommendationCount(id, theDate);
 				item.setRecommendations(recommendationCount);
-				if(recommendationCount!=null && recommendationCount>0) {
+				//if(recommendationCount!=null && recommendationCount>0) {
 					iv = new ItemView(id,item.getNameWithCAGR(),holds.contains(id)? "danger" : "info");
 					if(previous!=null && !previous.contains(id)) {
 						iv.setType("warning");
 					}
 					views.add(iv);
-				}
+				//}
 			}
 		}
 		

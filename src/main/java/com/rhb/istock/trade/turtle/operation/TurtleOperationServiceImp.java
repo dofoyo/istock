@@ -20,7 +20,6 @@ import org.springframework.stereotype.Service;
 
 import com.rhb.istock.comm.util.Progress;
 import com.rhb.istock.fdata.tushare.FdataServiceTushare;
-import com.rhb.istock.fdata.tushare.GrowModel;
 import com.rhb.istock.item.Item;
 import com.rhb.istock.item.ItemService;
 import com.rhb.istock.kdata.Kbar;
@@ -290,7 +289,7 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 
 	private List<TurtleView> getLpb2(){
 		Map<String,String> ids = selectorService.getLpb2();
-		List<TurtleView> views = this.getTurtleViews(new ArrayList(ids.keySet()), "LPB2",true); 
+		List<TurtleView> views = this.getTurtleViews(new ArrayList<String>(ids.keySet()), "LPB2",true); 
 		for(TurtleView view : views) {
 			view.setLabel(ids.get(view.getItemID()));
 		}
@@ -310,7 +309,7 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 	
 	private List<TurtleView> getHlb2(){
 		Map<String,String> ids = selectorService.getHlb2();
-		List<TurtleView> views = this.getTurtleViews(new ArrayList(ids.keySet()), "HLB2",true); 
+		List<TurtleView> views = this.getTurtleViews(new ArrayList<String>(ids.keySet()), "HLB2",true); 
 		for(TurtleView view : views) {
 			view.setLabel(ids.get(view.getItemID()));
 		}
@@ -329,7 +328,7 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 	
 	private List<TurtleView> getLpb(){
 		Map<String,String> ids = selectorService.getLpbs();
-		List<TurtleView> views = this.getTurtleViews(new ArrayList(ids.keySet()), "LPB",true); 
+		List<TurtleView> views = this.getTurtleViews(new ArrayList<String>(ids.keySet()), "LPB",true); 
 		for(TurtleView view : views) {
 			view.setLabel(ids.get(view.getItemID()));
 		}
@@ -348,7 +347,7 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 	
 	private List<TurtleView> getDrum(){
 		Map<String,String> ids = selectorService.getDrums();
-		List<TurtleView> views = this.getTurtleViews(new ArrayList(ids.keySet()), "DRUM",true); 
+		List<TurtleView> views = this.getTurtleViews(new ArrayList<String>(ids.keySet()), "DRUM",true); 
 		for(TurtleView view : views) {
 			view.setLabel(ids.get(view.getItemID()));
 		}

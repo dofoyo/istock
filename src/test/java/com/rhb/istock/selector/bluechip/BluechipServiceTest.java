@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import com.rhb.istock.fdata.sina.FinancialStatement;
 import com.rhb.istock.fdata.sina.FinancialStatementService;
 import com.rhb.istock.item.Item;
 import com.rhb.istock.item.ItemService;

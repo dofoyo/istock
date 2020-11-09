@@ -2,7 +2,6 @@ package com.rhb.istock.trade.turtle.simulation.hua;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.List;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

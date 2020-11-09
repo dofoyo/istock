@@ -1,7 +1,5 @@
 package com.rhb.istock.fdata.tushare;
 
-import java.math.BigDecimal;
-
 import org.json.JSONArray;
 
 public class Floatholder {

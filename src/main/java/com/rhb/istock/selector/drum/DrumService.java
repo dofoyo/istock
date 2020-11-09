@@ -153,6 +153,39 @@ public class DrumService {
 		return dns;
 	}
 	
+	private Map<String,Taoyans> getThinDimensions(LocalDate endDate){
+		Dimension industry_a = new Dimension();
+		Dimension topic_a = new Dimension();
+		
+		List<String> ids = this.getDrums(endDate);
+		//System.out.println(ids.size());
+		Item item;
+		for(String id: ids) {
+			item = itemService.getItem(id);
+			industry_a.put(item.getIndustry(), id, item.getNameWithCAGR());
+			topic_a.put(itemService.getTopic(item.getItemID()).split("，"), id, item.getNameWithCAGR());
+		}
+
+		Map<String,Dimension> dimensions = itemService.getDimensions();
+
+		Dimension industry_b = dimensions.get("industry");
+		Dimension topic_b = dimensions.get("topic");
+
+		Taoyans industry = new Taoyans(industry_a,industry_b);
+		Taoyans topic = new Taoyans(topic_a,topic_b);
+
+		//System.out.println("industry");
+		//industry.print();
+		//System.out.println("topic");
+		//topic.print();
+		
+		Map<String, Taoyans> ds = new HashMap<String,Taoyans>();
+		ds.put("topic", topic);
+		ds.put("industry", industry);
+
+		return ds;
+	}
+	
 	private Map<String,Taoyans> getDimensions(LocalDate endDate){
 		Dimension industry_a = new Dimension();
 		Dimension area_a = new Dimension();
@@ -332,6 +365,18 @@ public class DrumService {
 		return results;
 	}
 	
+	public Set<String> getDrumsOfDimensions(LocalDate endDate, Integer ratio){
+		Map<String,Taoyans> dimensions = this.getThinDimensions(endDate);
+		Set<String> industrys = dimensions.get("industry").getHighRatioIDs(ratio);
+		//System.out.println("strong industrys.size=" + industrys.size());
+		Set<String> topics = dimensions.get("topic").getHighRatioIDs(ratio);
+		//System.out.println("strong topics.size=" + topics.size());
+		Set<String> oks = new HashSet<String>();
+		oks.addAll(industrys);
+		oks.addAll(topics);
+		return oks;
+	}
+	
 	public List<String> getDrumsOfTopDimensions(LocalDate endDate,Set<String> holds, Integer ratio){
 		Set<String> holdDimensions = this.getDimensionNames(holds);
 		Map<String,Taoyans> dimensions = this.getDimensions(endDate);
@@ -345,12 +390,12 @@ public class DrumService {
 		//Set<String> markets = dimensions.get("market").getHighRatioIDs(ratio);
 		//Set<String> areas = dimensions.get("area").getHighRatioIDs(ratio);
 
-		Set<String> favors = favorService.getFavors().keySet();
+		//Set<String> favors = favorService.getFavors().keySet();
 		
 		Set<String> oks = new HashSet<String>();
 		oks.addAll(industrys);
 		oks.addAll(topics);
-		oks.addAll(favors);
+		//oks.addAll(favors);
 /*		for(String id : industrys) {
 			if(topics.contains(id) && markets.contains(id) && areas.contains(id)) {
 				oks.add(id);
@@ -404,7 +449,7 @@ public class DrumService {
 				
 				List<Muster>  ms = new ArrayList<Muster>(musters.values());
 				
-				Collections.sort(ms, new Comparator<Muster>() {
+/*				Collections.sort(ms, new Comparator<Muster>() {
 					@Override
 					public int compare(Muster o1, Muster o2) {
 						//return o1.getLatestPrice().compareTo(o2.getLatestPrice());
@@ -415,13 +460,11 @@ public class DrumService {
 							return o1.getN21Gap().compareTo(o2.getN21Gap());
 						}
 					}
-				});
+				});*/
 				
 				Integer sseiRatio = kdataService.getSseiRatio(endDate, previous_period);
 				Integer ratio;
 				Muster m,p,b;
-				int j=1;
-				boolean flag = false;
 				for(int i=0; i<ms.size(); i++) {
 					m = ms.get(i);
 					//Progress.show(ms.size(), j++, m.getItemID());
@@ -430,7 +473,6 @@ public class DrumService {
 						b = b_musters.get(m.getItemID());
 						if(p!=null && b!=null) {
 							ratio = this.getRatio(previous,m.getItemID(),m.getLatestPrice());
-							flag = false;
 							if(ratio >= sseiRatio
 								&& ratio >0
 								&& m.getHLGap()<=55
@@ -438,7 +480,6 @@ public class DrumService {
 								&& m.getAveragePrice21().compareTo(p.getAveragePrice21())==1
 								//&& m.getAveragePrice21().compareTo(b.getAveragePrice21())==1
 								) {
-								flag = true;
 								ids.add(m.getItemID());
 							}
 							//logger.info(String.format("itemID=%s,sseiRatio=%d, ratio=%d, m.avp=%.2f, p.avp=%.2f, b.avp=%.2f,flag=%b", m.getItemID(),sseiRatio, ratio,m.getAveragePrice21(),p.getAveragePrice21(),b.getAveragePrice21(),flag));
@@ -539,6 +580,8 @@ public class DrumService {
 					ids.addAll(this.ts.get(i).getDrum().keySet());
 				}
 			}
+			//System.out.println("ts.size=" + ts.size());
+			//System.out.println(">" + ratio + "的个数" + ids.size());
 			return ids;
 		}
 		
@@ -586,7 +629,7 @@ public class DrumService {
 
 		@Override
 		public String toString() {
-			return String.format("%s total=%d drum=%d ratio=%.2f", name, total.size(), drum.size(), getRatio());
+			return String.format("%s total=%d drum=%d ratio=%d", name, total.size(), drum.size(), getRatio());
 		}
 		
 	}

@@ -1,6 +1,5 @@
 package com.rhb.istock.selector.hlt;
 
-import java.time.LocalDate;
 import java.util.List;
 
 import org.junit.Test;

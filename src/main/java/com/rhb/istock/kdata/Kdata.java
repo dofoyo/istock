@@ -12,7 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.rhb.istock.comm.util.Functions;
-import com.rhb.istock.selector.b21.B21Service;
 
 public class Kdata {
 	private String itemID;

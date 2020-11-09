@@ -1,6 +1,5 @@
 package com.rhb.istock.selector.txt;
 
-import java.util.List;
 import java.util.Map;
 
 import org.junit.Test;

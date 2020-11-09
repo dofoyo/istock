@@ -16,7 +16,6 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import com.rhb.istock.comm.util.FileTools;
-import com.rhb.istock.kdata.Kdata;
 import com.rhb.istock.kdata.repository.KdataEntity;
 
 @Service("indexRepositoryTushare")

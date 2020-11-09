@@ -87,7 +87,7 @@ public class TurtleMusterSimulation_hua {
 	
 	private Set<String> getIDs(Map<String,Muster> musters, LocalDate date){
 		Set<String> ids = new HashSet<String>();
-		Set<String> hua_ids = huaService.getHua(date);
+		List<String> hua_ids = huaService.getHua(date);
 		Muster muster;
 		if(hua_ids!=null && !hua_ids.isEmpty()) {
 			List<Muster> ls = new ArrayList<Muster>();

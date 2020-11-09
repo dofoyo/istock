@@ -2,7 +2,7 @@ package com.rhb.istock.selector.hua;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Set;
+import java.util.List;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -49,7 +49,7 @@ public class HuaServiceTest {
 	//@Test
 	public void test() {
 		LocalDate date = LocalDate.parse("2019-11-11");
-		Set<String> huas = huaService.getHua(date);
+		List<String> huas = huaService.getHua(date);
 		System.out.println(huas);
 	}
 }
