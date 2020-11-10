@@ -1,6 +1,7 @@
 package com.rhb.istock.producer;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -35,13 +36,26 @@ public class ProducerService {
 	public void produce(LocalDate date) {
 		System.out.println("收盘后生成买入清单");
 		long beginTime=System.currentTimeMillis(); 
-
-		b21Reco.produce(date, true);
-		drumReco.produce(date, true);
-		newbPlus.produce(date, true);
-		b21plus.produce(date, true);
-		drumPlus.produce(date, true);
-		newbReco.produce(date, true);
+		
+		List<String> results;
+		
+		results  = b21Reco.produce(date, true);
+		System.out.println("b21Reco: " + results);
+		
+		results  = drumReco.produce(date, true);
+		System.out.println("drumReco: " + results);
+		
+		results  = newbPlus.produce(date, true);
+		System.out.println("newbPlus: " + results);
+		
+		results  = b21plus.produce(date, true);
+		System.out.println("b21plus: " + results);
+		
+		results  = drumPlus.produce(date, true);
+		System.out.println("drumPlus: " + results);
+		
+		results  = newbReco.produce(date, true);
+		System.out.println("newbReco: " + results);
 		
 		long used = (System.currentTimeMillis() - beginTime)/1000; 
 		System.out.println("执行“收盘后生成买入清单”完成，用时：" + used + "秒");          

@@ -17,10 +17,23 @@ import com.rhb.istock.producer.Producer;
 @SpringBootTest
 public class ProduceTest {
 	@Autowired
+	@Qualifier("producerService")
+	ProducerService producerService;
+	
+	@Autowired
 	@Qualifier("newbDime")
 	Producer produce;
 
 	@Test
+	public void produce2() {  //做收盘
+		LocalDate bDate = LocalDate.parse("2010-01-01");
+		LocalDate eDate = LocalDate.parse("2020-11-09");
+		
+		producerService.produce(bDate, eDate);
+		System.out.println("收盘 Test");
+	}
+	
+	//@Test
 	public void produce1() {  //做收盘
 		LocalDate date = LocalDate.parse("2020-11-09");
 		

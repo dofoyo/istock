@@ -175,10 +175,10 @@ public class IstockScheduledTask {
 
 		if(this.isTradeDate()) {
 			LocalDate date = LocalDate.now();
-			producerService.produce(date);
 			kdataService.downClosedDatas(date);
 			//kdataService.downClosedDatas(LocalDate.parse("2020-11-05"));
-			kdataService.generateMusters(LocalDate.parse("2000-01-01"));   //生成muster，需要192分钟，即3个多小时
+			kdataService.generateMusters(LocalDate.parse("2010-01-01"));   //生成muster，需要192分钟，即3个多小时
+			producerService.produce(date);
 			fdataSpiderTushare.downAll();  //财务报告、预告、股东信息等下载
 			indexSpiderTushare.downIndex_Daily();
 			indexSpiderTushare.downIndex_weight();
