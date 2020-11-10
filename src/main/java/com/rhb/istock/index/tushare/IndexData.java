@@ -111,7 +111,7 @@ public class IndexData {
 	
 	public Integer growthRate() {
 		BigDecimal lowest = this.getLowest();
-		if(lowest ==null) {
+		if(lowest ==null || lowest.compareTo(BigDecimal.ZERO)<1) {
 			return 0;
 		}else {
 			BigDecimal close = bars.lastEntry().getValue().getClose();
