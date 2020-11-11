@@ -3,8 +3,6 @@ package com.rhb.istock.producer;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -22,26 +20,26 @@ import com.rhb.istock.comm.util.Progress;
 import com.rhb.istock.index.tushare.IndexServiceTushare;
 import com.rhb.istock.kdata.KdataService;
 import com.rhb.istock.kdata.Muster;
-import com.rhb.istock.selector.fina.FinaService;
+import com.rhb.istock.selector.favor.FavorService;
 
 /*
- * 买入推荐  + 高价 + 横盘 + 强于大盘
+ * 低价 + 横盘 + 强于大盘
  * 
- * 研究报告“买入”评级 + 股价由高到低排序 + 前21只  + 强于大盘
+ * 股价由低到高排序 + 前21只  + 强于大盘
  */
 
-@Service("drumReco")
-public class DrumReco implements Producer{
-	protected static final Logger logger = LoggerFactory.getLogger(DrumReco.class);
+@Service("drumFavor")
+public class DrumFavor implements Producer{
+	protected static final Logger logger = LoggerFactory.getLogger(DrumFavor.class);
 	
+	@Autowired
+	@Qualifier("favorServiceImp")
+	FavorService favorService;
+
 	@Autowired
 	@Qualifier("kdataServiceImp")
 	KdataService kdataService;
-
-	@Autowired
-	@Qualifier("finaService")
-	FinaService finaService;
-
+	
 	@Autowired
 	@Qualifier("indexServiceTushare")
 	IndexServiceTushare indexServiceTushare;
@@ -49,8 +47,7 @@ public class DrumReco implements Producer{
 	@Value("${operationsPath}")
 	private String operationsPath;
 	
-	private Integer pool = 21;
-	private String fileName  = "DrumReco.txt";
+	private String fileName  = "DrumFavor.txt";
 
 	@Override
 	public Map<LocalDate, List<String>> produce(LocalDate bDate, LocalDate eDate) {
@@ -128,51 +125,17 @@ public class DrumReco implements Producer{
 	@Override
 	public List<String> produce(LocalDate date, boolean write) {
 		List<String> breakers = new ArrayList<String>();
-		Map<String,Muster> musters;
-		List<Muster> tmps;
-		Muster muster, p;
-		List<String> recommendations;
-		Integer sseiRatio, ratio;
 		
-		Integer previous_period  = 13; //历史纪录区间，主要用于后面判断
+		List<Muster> musters = favorService.getFavors(date);
 
-		musters = kdataService.getMusters(date);
 		if(musters!=null && musters.size()>0) {
+			Muster p;
+			Integer sseiRatio, ratio;
+			Integer previous_period  = 13; //历史纪录区间，主要用于后面判断
 			List<Map<String,Muster>> previous = kdataService.getPreviousMusters(previous_period, date);
-
-			recommendations = finaService.getHighRecommendations(date, 10000, 13); //推荐买入
-			tmps = new ArrayList<Muster>();
-			for(String id : recommendations) {
-				muster = musters.get(id);
-				if(muster!=null) {
-					tmps.add(muster);
-				}
-			}
-			//System.out.println("there are " + tmps.size() + " stocks.");
-			
-			Collections.sort(tmps, new Comparator<Muster>() {
-				@Override
-				public int compare(Muster o1, Muster o2) {
-					return o2.getLatestPrice().compareTo(o1.getLatestPrice()); //价格大到小排序
-				}
-			});
-			
-			List<Muster> ms = tmps.subList(0, tmps.size()>=pool ? pool : tmps.size());    //最高价的前21只
-			
-			Collections.sort(ms, new Comparator<Muster>() {
-				@Override
-				public int compare(Muster o1, Muster o2) {
-					if(o1.getHLGap().compareTo(o2.getHLGap())==0){            //横盘波动
-						return o1.getLNGap().compareTo(o2.getLNGap());
-					}else {
-						return o1.getHLGap().compareTo(o2.getHLGap());
-					}
-				}
-			});
-			
 			sseiRatio = indexServiceTushare.getSseiGrowthRate(date, 21);
-			//System.out.println("sseiRatio = " + sseiRatio);
-			for(Muster m : ms) {
+
+			for(Muster m : musters) {
 				p = previous.get(0).get(m.getItemID());
 				if(m!=null && p!=null) {
 					ratio = this.getRatio(previous,m.getItemID(),m.getLatestPrice());
@@ -192,12 +155,8 @@ public class DrumReco implements Producer{
 				results.put(date, breakers);
 				FileTools.writeMapFile(this.getFileName(), results, true);
 			}
-		}else {
-			System.out.println("muster is NULL!");
+			
 		}
-		//System.out.println("there are " + breakers.size() + " DrumReco stocks.");
-		//System.out.println(breakers);
-
 		
 		return breakers;
 	}

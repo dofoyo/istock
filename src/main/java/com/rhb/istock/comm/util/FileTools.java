@@ -152,20 +152,27 @@ public class FileTools {
 		String[] list;
 		for(String line : lines) {
 			dateAndList = line.split(":");
-			date = LocalDate.parse(dateAndList[0]);
-			list = dateAndList[1].split(",");
-			ids = new ArrayList<String>();
-			for(String id : list) {
-				ids.add(id);
+			if(dateAndList.length>0 && dateAndList[0].length()>0) {
+				date = LocalDate.parse(dateAndList[0]);
+				list = dateAndList[1].split(",");
+				ids = new ArrayList<String>();
+				for(String id : list) {
+					ids.add(id);
+				}
+				results.put(date, ids);
 			}
-			results.put(date, ids);
-			
 		}
 		return results;
 	}
 	
 	public static String readTextFile(String path) {
 		StringBuffer buffer = new StringBuffer();
+
+		File file = new File(path);
+		if(!file.exists()) {
+			return buffer.toString();
+		}
+		
 		try {
 			InputStream is = new FileInputStream(path);
 			String line; // 用来保存每行读取的内容

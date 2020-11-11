@@ -93,6 +93,15 @@ public class ManualApi {
 	@Autowired
 	@Qualifier("drumPlus")
 	Producer drumPlus;
+
+	@Autowired
+	@Qualifier("drumFavor")
+	Producer drumFavor;
+	
+	@Autowired
+	@Qualifier("newbFavor")
+	Producer newbFavor;
+
 	
 	private List<String> previous = null;
 	
@@ -202,7 +211,10 @@ public class ManualApi {
 			@PathVariable(value="type") String type,
 			@PathVariable(value="date") String date
 			) {
-
+		
+		//System.out.println(type);
+		//System.out.println(date);
+		
 		List<ItemView> views = new ArrayList<ItemView>();
 		
 		LocalDate theDate = null;
@@ -217,10 +229,12 @@ public class ManualApi {
 		List<String> ids = new ArrayList<String>();
 		if("power".equals(type)) { 
 			List<String> tmp = newbReco.getResults(theDate);
+			//System.out.println(tmp);
 			if(tmp!=null && tmp.size()>0) {
 				ids.addAll(tmp);
 			}
 			tmp = drumReco.getResults(theDate);
+			//System.out.println(tmp);
 			if(tmp!=null && tmp.size()>0) {
 				for(String id : tmp) {
 					if(!ids.contains(id)) {
@@ -234,6 +248,19 @@ public class ManualApi {
 				ids.addAll(tmp);
 			}
 			tmp = newbPlus.getResults(theDate);
+			if(tmp!=null && tmp.size()>0) {
+				for(String id : tmp) {
+					if(!ids.contains(id)) {
+						ids.add(id);
+					}
+				}
+			}
+		}else if("favor".equals(type)) { 
+			List<String> tmp = drumFavor.getResults(theDate);
+			if(tmp!=null && tmp.size()>0) {
+				ids.addAll(tmp);
+			}
+			tmp = newbFavor.getResults(theDate);
 			if(tmp!=null && tmp.size()>0) {
 				for(String id : tmp) {
 					if(!ids.contains(id)) {
@@ -309,12 +336,13 @@ public class ManualApi {
 		return new ResponseContent<List<ItemView>>(ResponseEnum.SUCCESS, views);
 	}
 	
-	@GetMapping("/turtle/manual/selected/delete/{date}")
+	@GetMapping("/turtle/manual/selected/delete/{date}/{itemID}")
 	public ResponseContent<List<ItemView>> deleteSelects(
+			@PathVariable(value="itemID") String itemID,
 			@PathVariable(value="date") String date
 			) {
 
-		//System.out.println("delete " + date);
+		System.out.println(date + "--" + itemID);
 		List<ItemView> views = new ArrayList<ItemView>();
 		
 		LocalDate theDate = null;
@@ -324,7 +352,7 @@ public class ManualApi {
 			new ResponseContent<List<ItemView>>(ResponseEnum.ERROR, views);
 		}
 		
-		manualService.deleteSelects(theDate);
+		manualService.deleteSelects(theDate,itemID);
 
 		return new ResponseContent<List<ItemView>>(ResponseEnum.SUCCESS, views);
 	}
@@ -344,12 +372,16 @@ public class ManualApi {
 		
 		//System.out.println(theDate);
 		
-		Map<LocalDate, String> selects = manualService.getSelects(theDate);
+		Map<LocalDate, List<String>> selects = manualService.getSelects(theDate);
 		//System.out.println(selects);
 		if(selects != null) {
 			Set<String> holds = this.getHoldIDs(this.generateHolds("manual",theDate));
-			for(Map.Entry<LocalDate, String> entry : selects.entrySet()) {
-				views.add(new SelectView(entry.getValue(),itemService.getItem(entry.getValue()).getName(),entry.getKey(),holds.contains(entry.getValue())?"danger":""));
+			List<String> ids;
+			for(Map.Entry<LocalDate, List<String>> entry : selects.entrySet()) {
+				ids = entry.getValue();
+				for(String id : ids) {
+					views.add(new SelectView(id,itemService.getItem(id).getName(),entry.getKey(),holds.contains(id)?"danger":""));
+				}
 			}			
 		}
 		return new ResponseContent<List<SelectView>>(ResponseEnum.SUCCESS, views);

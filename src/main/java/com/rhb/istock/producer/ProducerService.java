@@ -33,6 +33,19 @@ public class ProducerService {
 	@Qualifier("newbReco")
 	Producer newbReco;
 	
+	@Autowired
+	@Qualifier("b21Favor")
+	Producer b21Favor;
+
+	@Autowired
+	@Qualifier("drumFavor")
+	Producer drumFavor;
+
+	@Autowired
+	@Qualifier("newbFavor")
+	Producer newbFavor;
+
+	
 	public void produce(LocalDate date) {
 		System.out.println("收盘后生成买入清单");
 		long beginTime=System.currentTimeMillis(); 
@@ -44,7 +57,10 @@ public class ProducerService {
 		
 		results  = drumReco.produce(date, true);
 		System.out.println("drumReco: " + results);
-		
+
+		results  = newbReco.produce(date, true);
+		System.out.println("newbReco: " + results);
+
 		results  = newbPlus.produce(date, true);
 		System.out.println("newbPlus: " + results);
 		
@@ -54,8 +70,14 @@ public class ProducerService {
 		results  = drumPlus.produce(date, true);
 		System.out.println("drumPlus: " + results);
 		
-		results  = newbReco.produce(date, true);
-		System.out.println("newbReco: " + results);
+		results  = newbPlus.produce(date, true);
+		System.out.println("newbFavor: " + results);
+		
+		results  = b21plus.produce(date, true);
+		System.out.println("b21Favor: " + results);
+		
+		results  = drumPlus.produce(date, true);
+		System.out.println("drumFavor: " + results);
 		
 		long used = (System.currentTimeMillis() - beginTime)/1000; 
 		System.out.println("执行“收盘后生成买入清单”完成，用时：" + used + "秒");          
@@ -67,10 +89,16 @@ public class ProducerService {
 
 		b21Reco.produce(bDate, eDate);
 		drumReco.produce(bDate, eDate);
+		newbReco.produce(bDate, eDate);
+
 		newbPlus.produce(bDate, eDate);
 		b21plus.produce(bDate, eDate);
 		drumPlus.produce(bDate, eDate);
+
+		b21plus.produce(bDate, eDate);
+		drumPlus.produce(bDate, eDate);
 		newbReco.produce(bDate, eDate);
+
 		
 		long used = (System.currentTimeMillis() - beginTime)/1000; 
 		System.out.println("执行“重新生成买入清单”完成，用时：" + used + "秒");          

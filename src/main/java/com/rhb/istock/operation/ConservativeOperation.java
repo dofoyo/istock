@@ -89,16 +89,16 @@ public class ConservativeOperation implements Operation{
 				
 				//大盘下降通道走坏,所持股跟随下跌
 				if(sseiFlag==0 && sseiTrend<0 && muster.getClose().compareTo(muster.getLatestPrice())>0) {
-					account.dropWithTax(itemID, "4", muster.getLatestPrice());
+					account.dropWithTax(itemID, "3", muster.getLatestPrice());
 				}
 				
 				//高位快速回落超过8%
-				account.dropFallOrder(itemID, -8,"3");
+				account.dropFallOrder(itemID, -8,"2");
 			}
 		}
 		
 		//买入
-		if(sseiFlag==1) {  //行情好，才买入
+		//if(sseiFlag==1) {  //行情好，才买入
 			holdItemIDs = account.getItemIDsOfHolds();
 			
 			Set<Muster> dds = new HashSet<Muster>();  //用set，无重复，表示不可加仓
@@ -138,7 +138,7 @@ public class ConservativeOperation implements Operation{
 				}
 			}					
 			account.openAll(dds);			//后买
-		}
+	//	}
 
 		dailyAmount_sb.append(account.getDailyAmount() + "\n");
 	}

@@ -21,13 +21,31 @@ public class ProduceTest {
 	ProducerService producerService;
 	
 	@Autowired
-	@Qualifier("newbDime")
-	Producer produce;
+	@Qualifier("b21Favor")
+	Producer b21Favor;
 
-	@Test
+	@Autowired
+	@Qualifier("drumFavor")
+	Producer drumFavor;
+
+	@Autowired
+	@Qualifier("newbFavor")
+	Producer newbFavor;
+
+	
+	//@Test
+	public void produce4() {  
+		LocalDate date = LocalDate.parse("2020-11-10");
+		
+		List<String> results = b21Favor.produce(date, false);
+		System.out.println("there are " + results.size() + " stocks.");
+		System.out.println(results);
+	}
+	
+	//@Test
 	public void produce2() {  //做收盘
-		LocalDate bDate = LocalDate.parse("2010-01-01");
-		LocalDate eDate = LocalDate.parse("2020-11-09");
+		LocalDate bDate = LocalDate.parse("2020-01-01");
+		LocalDate eDate = LocalDate.parse("2020-11-10");
 		
 		producerService.produce(bDate, eDate);
 		System.out.println("收盘 Test");
@@ -37,16 +55,18 @@ public class ProduceTest {
 	public void produce1() {  //做收盘
 		LocalDate date = LocalDate.parse("2020-11-09");
 		
-		produce.produce(date, true);
+		b21Favor.produce(date, true);
 		System.out.println("收盘 Test");
 	}
 	
-	//@Test
+	@Test
 	public void produce() {
-		LocalDate bDate = LocalDate.parse("2010-01-01");
-		LocalDate eDate = LocalDate.parse("2020-11-07");
+		LocalDate bDate = LocalDate.parse("2020-01-01");
+		LocalDate eDate = LocalDate.parse("2020-11-10");
 		
-		produce.produce(bDate, eDate);
+		b21Favor.produce(bDate, eDate);
+		newbFavor.produce(bDate, eDate);
+		drumFavor.produce(bDate, eDate);
 		System.out.println("produce Test");
 	}
 	
@@ -55,7 +75,7 @@ public class ProduceTest {
 		LocalDate bDate = LocalDate.parse("2020-01-25");
 		LocalDate eDate = LocalDate.parse("2020-11-07");
 		
-		Map<LocalDate, List<String>> results = produce.getResults(bDate, eDate);
+		Map<LocalDate, List<String>> results = b21Favor.getResults(bDate, eDate);
 		System.out.println(results);
 		
 	}

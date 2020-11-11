@@ -2,6 +2,7 @@ package com.rhb.istock.selector.favor;
 
 import java.io.File;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -158,6 +159,23 @@ public class FavorServiceImp implements FavorService {
 			}
 		}
 		
+		return results;
+	}
+
+	@Override
+	public List<Muster> getFavors(LocalDate date) {
+		List<Muster> results = new ArrayList<Muster>();
+		Muster muster;
+		Map<String,Muster> musters = kdataService.getMusters(date);
+		if(musters!=null && musters.size()>0) {
+			Map<String, String> favors = this.getFavors();
+			for(String id : favors.keySet()) {
+				muster = musters.get(id);
+				if(muster!=null) {
+					results.add(muster);
+				}
+			}
+		}
 		return results;
 	}
 	
