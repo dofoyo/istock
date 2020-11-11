@@ -42,7 +42,7 @@ public class ConservativeOperation implements Operation{
 	
 	private StringBuffer dailyAmount_sb = new StringBuffer("date,cash,value,total\n");
 	private StringBuffer breakers_sb = new StringBuffer();
-	private Integer top = 1;
+	private Integer top = 3;
 	Integer previous_period  = 13; //历史纪录区间，主要用于后面判断
 	
 	public Map<String,String> run(Account account, Map<LocalDate, List<String>> buyList,LocalDate beginDate, LocalDate endDate, String label) {

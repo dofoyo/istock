@@ -37,7 +37,7 @@ public class AggressiveOperation implements Operation {
 	
 	private StringBuffer dailyAmount_sb = new StringBuffer("date,cash,value,total\n");
 	private StringBuffer breakers_sb = new StringBuffer();
-	private Integer top = 1;
+	private Integer top = 3;
 	
 	public Map<String,String> run(Account account, Map<LocalDate, List<String>> buyList,LocalDate beginDate, LocalDate endDate, String label) {
 		long days = endDate.toEpochDay()- beginDate.toEpochDay();
