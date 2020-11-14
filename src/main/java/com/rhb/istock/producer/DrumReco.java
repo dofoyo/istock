@@ -49,7 +49,9 @@ public class DrumReco implements Producer{
 	@Value("${operationsPath}")
 	private String operationsPath;
 	
-	private Integer pool = 21;
+	@Value("${operationPool}")
+	private Integer operationPool;
+
 	private String fileName  = "DrumReco.txt";
 
 	@Override
@@ -157,7 +159,7 @@ public class DrumReco implements Producer{
 				}
 			});
 			
-			List<Muster> ms = tmps.subList(0, tmps.size()>=pool ? pool : tmps.size());    //最高价的前21只
+			List<Muster> ms = tmps.subList(0, tmps.size()>=operationPool ? operationPool : tmps.size());    //最高价的前21只
 			
 			Collections.sort(ms, new Comparator<Muster>() {
 				@Override

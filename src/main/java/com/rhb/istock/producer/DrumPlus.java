@@ -49,7 +49,9 @@ public class DrumPlus implements Producer{
 	@Value("${operationsPath}")
 	private String operationsPath;
 	
-	private Integer pool = 21;
+	@Value("${operationPool}")
+	private Integer pool;
+
 	private String fileName  = "DrumPlus.txt";
 
 	@Override

@@ -40,6 +40,7 @@ operationsFile: D:/dev/istock-data/operations.txt
 operationsPath: D:/dev/istock-data/operations/
 openDuration: 89
 dropDuration: 21
+operationPool: 21
 
 
 

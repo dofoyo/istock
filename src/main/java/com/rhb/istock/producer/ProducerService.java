@@ -70,13 +70,13 @@ public class ProducerService {
 		results  = drumPlus.produce(date, true);
 		System.out.println("drumPlus: " + results);
 		
-		results  = newbPlus.produce(date, true);
+		results  = newbFavor.produce(date, true);
 		System.out.println("newbFavor: " + results);
 		
-		results  = b21plus.produce(date, true);
+		results  = b21Favor.produce(date, true);
 		System.out.println("b21Favor: " + results);
 		
-		results  = drumPlus.produce(date, true);
+		results  = drumFavor.produce(date, true);
 		System.out.println("drumFavor: " + results);
 		
 		long used = (System.currentTimeMillis() - beginTime)/1000; 
@@ -95,9 +95,9 @@ public class ProducerService {
 		b21plus.produce(bDate, eDate);
 		drumPlus.produce(bDate, eDate);
 
-		b21plus.produce(bDate, eDate);
-		drumPlus.produce(bDate, eDate);
-		newbReco.produce(bDate, eDate);
+		//b21Favor.produce(bDate, eDate);
+		//drumFavor.produce(bDate, eDate);
+		//newbFavor.produce(bDate, eDate);
 
 		
 		long used = (System.currentTimeMillis() - beginTime)/1000; 

@@ -47,7 +47,7 @@ public class NewbDime implements Producer{
 	@Value("${operationsPath}")
 	private String operationsPath;
 	
-	private Integer pool = 21;
+	private Integer pool = 55;
 	private String fileName  = "NewbDime.txt";
 
 	@Override

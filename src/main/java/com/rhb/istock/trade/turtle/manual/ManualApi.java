@@ -318,6 +318,9 @@ public class ManualApi {
 					}
 				}
 			}
+		}else if("dime".equals(type)) {
+			Integer ratio = 34;
+			ids = drumService.getDrumsOfTopDimensions(theDate, holds, ratio);   //强板块
 		}
 		
 		if(ids!=null && !ids.isEmpty()) {
