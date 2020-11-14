@@ -58,7 +58,7 @@ public class DrumFavor implements Producer{
 		int i=1;
 		for(LocalDate date = bDate; (date.isBefore(eDate) || date.equals(eDate)); date = date.plusDays(1)) {
 			Progress.show((int)days, i++, fileName + ", " + date.toString());
-			breakers = this.getResults(date);
+			breakers = this.produce(date,false);
 			if(breakers!=null && breakers.size()>0) {
 				results.put(date, breakers);
 			}
@@ -141,7 +141,7 @@ public class DrumFavor implements Producer{
 					ratio = this.getRatio(previous,m.getItemID(),m.getLatestPrice());
 					if(ratio>0
 							&& ratio >= sseiRatio   // 强于大盘
-							&& m.getHLGap()<=55
+							//&& m.getHLGap()<=55
 							&& m.isUpAve(21)
 							&& m.getAveragePrice21().compareTo(p.getAveragePrice21())==1  //上升趋势
 							) {

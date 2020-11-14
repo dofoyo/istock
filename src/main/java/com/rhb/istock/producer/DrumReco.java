@@ -61,7 +61,7 @@ public class DrumReco implements Producer{
 		int i=1;
 		for(LocalDate date = bDate; (date.isBefore(eDate) || date.equals(eDate)); date = date.plusDays(1)) {
 			Progress.show((int)days, i++, fileName + ", " + date.toString());
-			breakers = this.getResults(date);
+			breakers = this.produce(date,false);
 			if(breakers!=null && breakers.size()>0) {
 				results.put(date, breakers);
 			}

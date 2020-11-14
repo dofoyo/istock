@@ -34,10 +34,11 @@ public class IndexSpiderTushareTest {
 	
 	@Test
 	public void downIndex_Daily() {
-		//String itemID = "sh000001";
-		//indexSpiderTushare.downIndex_Daily(itemID);
-		indexSpiderTushare.downIndex_Daily();
-		
+		indexSpiderTushare.downIndex_Daily("000001.SH");
+
+		//indexSpiderTushare.downIndex_Daily();
+		//indexSpiderTushare.downIndex_weight();
+		//indexSpiderTushare.downIndex_basic();
 	}
 	
 }

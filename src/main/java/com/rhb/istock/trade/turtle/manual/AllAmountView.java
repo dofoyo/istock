@@ -18,7 +18,7 @@ public class AllAmountView {
 	DecimalFormat df = new DecimalFormat("#.00");
 
 	public AllAmountView() {
-		min = null;
+		min = BigDecimal.ZERO;
 		dates = new ArrayList<String>();
 		bhls = new ArrayList<String>();
 		bavs = new ArrayList<String>();

@@ -126,7 +126,7 @@ public class FileTools {
 		try {
 			File file = new File(path);
 
-			if (file.exists() == false) { // 如果文本文件不存在则创建它
+			if (!file.exists()) { // 如果文本文件不存在则创建它
 				file.createNewFile();
 				file = new File(path); // 重新实例化
 			}

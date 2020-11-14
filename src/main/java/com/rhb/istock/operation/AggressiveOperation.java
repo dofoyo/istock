@@ -35,24 +35,27 @@ public class AggressiveOperation implements Operation {
 	@Qualifier("kdataServiceImp")
 	KdataService kdataService;
 	
-	private StringBuffer dailyAmount_sb = new StringBuffer("date,cash,value,total\n");
-	private StringBuffer breakers_sb = new StringBuffer();
-	private Integer top = 3;
+	private StringBuffer dailyAmount_sb;
+	private StringBuffer breakers_sb;
 	
-	public Map<String,String> run(Account account, Map<LocalDate, List<String>> buyList,LocalDate beginDate, LocalDate endDate, String label) {
+	public Map<String,String> run(Account account, Map<LocalDate, List<String>> buyList,LocalDate beginDate, LocalDate endDate, String label, int top) {
+		dailyAmount_sb = new StringBuffer("date,cash,value,total\n");
+		breakers_sb = new StringBuffer();
+
+		
 		long days = endDate.toEpochDay()- beginDate.toEpochDay();
 		int i=1;
 		for(LocalDate date = beginDate; (date.isBefore(endDate) || date.equals(endDate)); date = date.plusDays(1)) {
 
 			Progress.show((int)days, i++," " + label +  " run:" + date.toString());
 			
-			this.doIt(date, account, buyList);
+			this.doIt(date, account, buyList, top);
 		}
 		
 		return this.result(account);
 	}
 	
-	private void doIt(LocalDate date,Account account, Map<LocalDate, List<String>> buyList) {
+	private void doIt(LocalDate date,Account account, Map<LocalDate, List<String>> buyList, int top) {
 		Map<String,Muster> musters = kdataService.getMusters(date);
 		if(musters==null || musters.size()==0) return;
 

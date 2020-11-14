@@ -7,8 +7,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
+//@Scope("prototype")
 @Service("simulation")
 public class Simulation {
 	protected static final Logger logger = LoggerFactory.getLogger(Simulation.class);
@@ -37,17 +39,11 @@ public class Simulation {
 	@Qualifier("hlb")
 	SimulateHLB hlb;
 
-	
 	public void simulate(LocalDate beginDate, LocalDate endDate) throws InterruptedException {
 		long beginTime=System.currentTimeMillis(); 
 		
-/*		Future<String> fhlb = hlb.run(beginDate, endDate);
-		Future<String> fbdt = bdt.run(beginDate, endDate);
-		Future<String> favb = avb.run(beginDate, endDate);
-		Future<String> fbhl = bhl.run(beginDate, endDate);
-		Future<String> fbav = bav.run(beginDate, endDate);
-		Future<String> fdtb = dtb.run(beginDate, endDate);
-*/		
+		System.out.println("simulate from " + beginDate + " to " + endDate +" ......");
+
 		Future<String> fhlb = hlb.run(beginDate, endDate);
 		Future<String> fbdt = bdt.run(beginDate, endDate);
 		Future<String> favb = avb.run(beginDate, endDate);

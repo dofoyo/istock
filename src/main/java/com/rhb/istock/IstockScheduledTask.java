@@ -174,25 +174,20 @@ public class IstockScheduledTask {
 		long beginTime=System.currentTimeMillis(); 
 
 		if(this.isTradeDate()) {
+			//LocalDate date = LocalDate.parse("2020-11-12");
 			LocalDate date = LocalDate.now();
 			kdataService.downClosedDatas(date);
-			//kdataService.downClosedDatas(LocalDate.parse("2020-11-05"));
-			kdataService.generateMusters(LocalDate.parse("2010-01-01"));   //生成muster，需要192分钟，即3个多小时
+			kdataService.generateMusters(LocalDate.parse("2009-01-01"));   //生成muster，需要192分钟，即3个多小时
 			producerService.produce(date);
-			fdataSpiderTushare.downAll();  //财务报告、预告、股东信息等下载
-			indexSpiderTushare.downIndex_Daily();
-			indexSpiderTushare.downIndex_weight();
-			indexSpiderTushare.downIndex_basic();
-			indexServiceTushare.generateIndex();
-			fdataSpiderEastmoney.downProfitForecasts();
+			//fdataSpiderTushare.downAll();  //财务报告、预告、股东信息等下载
+			indexSpiderTushare.downIndex_Daily("000001.SH");
+			//indexSpiderTushare.downIndex_weight();
+			//indexSpiderTushare.downIndex_basic();
+			//indexServiceTushare.generateIndex();
+			//fdataSpiderEastmoney.downProfitForecasts();
 			fdataSpiderEastmoney.downRecommendations();
 			itemService.downTopics();
 			drumService.generateDimensions();
-			//finaService.generateQuarterCompares();
-			//huaService.generateHuaPotentials(LocalDate.now());
-			//huaService.generateLatestHuaFirst();
-			//bavService.generateBAV(LocalDate.now(),13);
-			//lpbService.generateLPB(LocalDate.now(), 13);
 			
 		}
 

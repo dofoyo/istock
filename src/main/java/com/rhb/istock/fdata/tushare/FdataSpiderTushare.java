@@ -63,10 +63,22 @@ public class FdataSpiderTushare {
 		args.put("params", params);
 		
 		String str = HttpClient.doPostJson(url, args.toString());
-		JSONObject data = (new JSONObject(str)).getJSONObject("data");
-		
-		String kdataFile = fdataPath + "/" + itemID + "_"+type+".json";
-		FileTools.writeTextFile(kdataFile, data.toString(), false);		
+		try {
+			JSONObject obj = new JSONObject(str);
+			if(obj!=null && obj.has("data") && obj.getJSONObject("data")!=null) {
+				JSONObject data = obj.getJSONObject("data");
+				
+				String kdataFile = fdataPath + "/" + itemID + "_"+type+".json";
+				FileTools.writeTextFile(kdataFile, data.toString(), false);		
+			}else {
+				logger.error("down " + type);
+				logger.error(str);
+			}
+		}catch(Exception e) {
+			logger.error("down " + type);
+			logger.error(str);
+			e.printStackTrace();
+		}
 	}
 
 	public void downIncome(String itemID) throws Exception {
@@ -118,7 +130,7 @@ public class FdataSpiderTushare {
 			this.down(itemID, "cashflow");
 			this.down(itemID, "fina_indicator");
 			this.down(itemID, "forecast");
-			this.down(itemID, "top10_floatholders");
+			//this.down(itemID, "top10_floatholders");
 			try {
 				Thread.sleep(1000);  //一分钟200个	
 			} catch (InterruptedException e) {

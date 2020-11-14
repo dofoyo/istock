@@ -59,10 +59,10 @@ public class ProduceTest {
 		System.out.println("收盘 Test");
 	}
 	
-	//@Test
+	@Test
 	public void produce() {
 		LocalDate bDate = LocalDate.parse("2020-01-01");
-		LocalDate eDate = LocalDate.parse("2020-11-10");
+		LocalDate eDate = LocalDate.parse("2020-11-11");
 		
 		b21Favor.produce(bDate, eDate);
 		newbFavor.produce(bDate, eDate);

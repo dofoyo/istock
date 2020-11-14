@@ -154,17 +154,25 @@ public class ManualApi {
 	
 	
 	
-	@GetMapping("/turtle/manual/run/{simulateType}")
+	@GetMapping("/turtle/manual/run/{simulateType}/{date}")
 	public ResponseContent<String> simulate(
-			@PathVariable(value="simulateType") String simulateType
+			@PathVariable(value="simulateType") String simulateType,
+			@PathVariable(value="date") String date
 			){
+		
+		LocalDate theEndDate = null;
+		try{
+			theEndDate = LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+		}catch(Exception e){
+			return new ResponseContent<String>(ResponseEnum.SUCCESS, "");
+		}
 		
 		turtleSimulationRepository.evictAmountsCache();
 		turtleSimulationRepository.evictBreakersCache();
 		turtleSimulationRepository.evictBuysCache();
 		turtleSimulationRepository.evictSellsCache();
 
-		manualService.simulate(simulateType); 
+		manualService.simulate(simulateType, theEndDate); 
 		
 		kdataService.evictKDataCache();
 		turtleSimulationRepository.evictAmountsCache();
@@ -268,9 +276,48 @@ public class ManualApi {
 					}
 				}
 			}
-		}else if("dime".equals(type)) {  
-			Integer ratio = 34;
-			ids = drumService.getDrumsOfTopDimensions(theDate, holds, ratio);   //强板块
+		}else if("newb".equals(type)) {  
+			List<String> tmp = newbFavor.getResults(theDate);
+			if(tmp!=null && tmp.size()>0) {
+				ids.addAll(tmp);
+			}
+			tmp = newbPlus.getResults(theDate);
+			if(tmp!=null && tmp.size()>0) {
+				for(String id : tmp) {
+					if(!ids.contains(id)) {
+						ids.add(id);
+					}
+				}
+			}
+			tmp = newbReco.getResults(theDate);
+			if(tmp!=null && tmp.size()>0) {
+				for(String id : tmp) {
+					if(!ids.contains(id)) {
+						ids.add(id);
+					}
+				}
+			}
+		}else if("drum".equals(type)) {  
+			List<String> tmp = drumFavor.getResults(theDate);
+			if(tmp!=null && tmp.size()>0) {
+				ids.addAll(tmp);
+			}
+			tmp = drumPlus.getResults(theDate);
+			if(tmp!=null && tmp.size()>0) {
+				for(String id : tmp) {
+					if(!ids.contains(id)) {
+						ids.add(id);
+					}
+				}
+			}
+			tmp = drumReco.getResults(theDate);
+			if(tmp!=null && tmp.size()>0) {
+				for(String id : tmp) {
+					if(!ids.contains(id)) {
+						ids.add(id);
+					}
+				}
+			}
 		}
 		
 		if(ids!=null && !ids.isEmpty()) {

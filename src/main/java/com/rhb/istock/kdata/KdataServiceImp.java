@@ -41,7 +41,7 @@ public class KdataServiceImp implements KdataService{
 
 	@Autowired
 	@Qualifier("kdataSpiderTushare")
-	KdataSpider kdataSpider;
+	KdataSpider kdataSpiderTushare;
 
 	@Autowired
 	@Qualifier("kdataRepository163")
@@ -189,20 +189,20 @@ public class KdataServiceImp implements KdataService{
 		for(int i=0; i<dates.size(); i++) {
 			date = dates.get(i);
 			logger.info("download "+ date +" kdatas from tushare, please wait....... ");
-			kdataSpider.downKdatas(date);
+			kdataSpiderTushare.downKdatas(date);
 			logger.info("downloaded "+ date +" kdatas from tushare.");
 		}
 		
 		for(int i=1; i<dates.size(); i++) { //因为factor比收盘数据早得到（开盘前就得到factor，收盘后才得到kdata）,
 			date = dates.get(i);
 			logger.info("download "+ date +" factors from tushare, please wait....... ");
-			kdataSpider.downFactors(date);
+			kdataSpiderTushare.downFactors(date);
 			logger.info("downloaded "+ date +" factors from tushare.");
 		}
 		
 		if(dates.size()>0) {
 			logger.info("download latest date "+ latestDate +" factors from tushare, please wait....... ");
-			kdataSpider.downFactors(latestDate);  //执行了这一步后，不需要再对收盘数据额外的复权处理了
+			kdataSpiderTushare.downFactors(latestDate);  //执行了这一步后，不需要再对收盘数据额外的复权处理了
 			logger.info("downloaded latest date "+ latestDate +" factors from tushare.");
 			
 			kdataSpider163.downKdatas(sseiID);
@@ -831,7 +831,7 @@ public class KdataServiceImp implements KdataService{
 		logger.info("KdataService.downFactors..........");
 		
 		LocalDate latestDate = kdataRealtimeSpider.getLatestMarketDate("sh000001");
-		kdataSpider.downFactors(latestDate);
+		kdataSpiderTushare.downFactors(latestDate);
 		
 	}
 
@@ -844,9 +844,9 @@ public class KdataServiceImp implements KdataService{
 		for(String id : ids){
 			Progress.show(ids.size(),i++, " down closed  datas: " + id);
 			try {
-				kdataSpider.downKdatas(id);
-				kdataSpider.downFactors(id);
-				kdataSpider.downBasics(id);
+				kdataSpiderTushare.downKdatas(id);
+				kdataSpiderTushare.downFactors(id);
+				kdataSpiderTushare.downBasics(id);
 				//Thread.sleep(300); //一分钟200个
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -865,8 +865,8 @@ public class KdataServiceImp implements KdataService{
 
 		this.downSSEI();
 
-		kdataSpider.downKdatas(date);
-		kdataSpider.downBasics(date);
+		kdataSpiderTushare.downKdatas(date);
+		kdataSpiderTushare.downBasics(date);
 		
 		long used = (System.currentTimeMillis() - beginTime)/1000; 
 		System.out.println("用时：" + used + "秒");          
@@ -928,7 +928,7 @@ public class KdataServiceImp implements KdataService{
 
 	@Override
 	public void downFactors(LocalDate date) throws Exception {
-		kdataSpider.downFactors(date);
+		kdataSpiderTushare.downFactors(date);
 	}
 
 

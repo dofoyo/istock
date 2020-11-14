@@ -99,11 +99,12 @@ public class IndexSpiderTushare {
 					
 					this.downIndex_Daily(index_code);
 					
-					try {
+					HttpClient.sleep(6); //每分钟10次
+					/*try {
 						Thread.sleep(1000);  //一分钟200个	
 					} catch (InterruptedException e) {
 						e.printStackTrace();
-					} 
+					} */
 				}
 			}			
 		}

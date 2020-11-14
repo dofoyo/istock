@@ -40,26 +40,28 @@ public class ConservativeOperation implements Operation{
 	@Qualifier("indexServiceTushare")
 	IndexServiceTushare indexServiceTushare;
 	
-	private StringBuffer dailyAmount_sb = new StringBuffer("date,cash,value,total\n");
-	private StringBuffer breakers_sb = new StringBuffer();
-	private Integer top = 3;
+	private StringBuffer dailyAmount_sb;
+	private StringBuffer breakers_sb;
 	Integer previous_period  = 13; //历史纪录区间，主要用于后面判断
 	
-	public Map<String,String> run(Account account, Map<LocalDate, List<String>> buyList,LocalDate beginDate, LocalDate endDate, String label) {
+	public Map<String,String> run(Account account, Map<LocalDate, List<String>> buyList,LocalDate beginDate, LocalDate endDate, String label, int top) {
+		dailyAmount_sb = new StringBuffer("date,cash,value,total\n");
+		breakers_sb = new StringBuffer();
+
 		long days = endDate.toEpochDay()- beginDate.toEpochDay();
 		int i=1;
 		for(LocalDate date = beginDate; (date.isBefore(endDate) || date.equals(endDate)); date = date.plusDays(1)) {
 
 			Progress.show((int)days, i++, " " + label +  " run:" + date.toString());
 			
-			this.doIt(date, account, buyList);
+			this.doIt(date, account, buyList, top);
 		}
 		
 		return this.result(account);
 
 	}
 	
-	public void doIt(LocalDate date,Account account, Map<LocalDate, List<String>> buyList) {
+	public void doIt(LocalDate date,Account account, Map<LocalDate, List<String>> buyList, int top) {
 		Map<String,Muster> musters = kdataService.getMusters(date);
 		if(musters==null || musters.size()==0) return;
 
@@ -98,7 +100,7 @@ public class ConservativeOperation implements Operation{
 		}
 		
 		//买入
-		//if(sseiFlag==1) {  //行情好，才买入
+		if(sseiFlag==1 && sseiTrend>=0) {  //行情好，才买入
 			holdItemIDs = account.getItemIDsOfHolds();
 			
 			Set<Muster> dds = new HashSet<Muster>();  //用set，无重复，表示不可加仓
@@ -138,7 +140,7 @@ public class ConservativeOperation implements Operation{
 				}
 			}					
 			account.openAll(dds);			//后买
-	//	}
+		}
 
 		dailyAmount_sb.append(account.getDailyAmount() + "\n");
 	}
