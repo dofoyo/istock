@@ -108,19 +108,21 @@ public class AggressiveOperation implements Operation {
 				breakers_sb.append("\n");
 			}
 			
-			//市值平均
-			Set<Integer> holdOrderIDs;
-			for(String itemID: holdItemIDs) {
-				holdOrderIDs = 	account.getHoldOrderIDs(itemID);
-				muster = musters.get(itemID);
-				if(muster!=null) {
-					for(Integer holdOrderID : holdOrderIDs) {
-						account.dropByOrderID(holdOrderID, "0", muster.getLatestPrice());   //先卖
-						dds.add(muster);						
+			//每天做市值平均
+			//if(dds.size()>0) {
+				Set<Integer> holdOrderIDs;
+				for(String itemID: holdItemIDs) {
+					holdOrderIDs = 	account.getHoldOrderIDs(itemID);
+					muster = musters.get(itemID);
+					if(muster!=null) {
+						for(Integer holdOrderID : holdOrderIDs) {
+							account.dropByOrderID(holdOrderID, "0", muster.getLatestPrice());   //先卖
+							dds.add(muster);						
+						}
 					}
-				}
-			}					
-			account.openAll(dds);			//后买
+				}					
+				account.openAll(dds);			//后买
+			//}
 		//}
 
 		dailyAmount_sb.append(account.getDailyAmount() + "\n");
