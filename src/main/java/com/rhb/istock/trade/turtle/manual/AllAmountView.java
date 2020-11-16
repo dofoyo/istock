@@ -51,7 +51,7 @@ public class AllAmountView {
 	}
 
 	public void setMin(BigDecimal a) {
-		if(this.min==null) {
+		if(this.min==null || this.min.equals(BigDecimal.ZERO)) {
 			this.min = a;
 		}else if(a.compareTo(this.min)==-1) {
 			this.min = a;			
