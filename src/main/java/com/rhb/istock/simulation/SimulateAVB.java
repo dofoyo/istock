@@ -38,10 +38,8 @@ public class SimulateAVB {
 	AggressiveOperation aggressiveOperation;
 	
 	@Async("taskExecutor")
-	public Future<String> run(LocalDate beginDate, LocalDate endDate) throws InterruptedException {
-		BigDecimal initCash = new BigDecimal(1000000);
+	public Future<String> run(LocalDate beginDate, LocalDate endDate, BigDecimal initCash, Integer top) throws Exception {
 		Account account = new Account(initCash);
-		Integer top = 1;
 		Map<LocalDate, List<String>> operationList = b21Reco.getResults(beginDate, endDate);
 		Map<String, String> operateResult = aggressiveOperation.run(account, operationList, beginDate, endDate, "avb", top);
 		turtleSimulationRepository.save("avb", operateResult.get("breakers"), operateResult.get("CSV"), operateResult.get("dailyAmount"));		

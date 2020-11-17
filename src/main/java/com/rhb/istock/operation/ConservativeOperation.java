@@ -127,13 +127,15 @@ public class ConservativeOperation implements Operation{
 				breakers_sb.append("\n");
 			}
 			
-			//每天做市值平均
-			//if(dds.size()>0) {   //买入前做市值平均
+			//市值平均
+			if(dds.size()>0  //买入新股
+					//|| account.getHLRatio()>=34 //或市值差异大
+					) {  
 				Set<Integer> holdOrderIDs;
 				for(String itemID: holdItemIDs) {
 					holdOrderIDs = 	account.getHoldOrderIDs(itemID);
 					muster = musters.get(itemID);
-					if(muster!=null) {
+					if(muster!=null && !muster.isUpLimited() && !muster.isDownLimited()) {
 						for(Integer holdOrderID : holdOrderIDs) {
 							account.dropByOrderID(holdOrderID, "0", muster.getLatestPrice());   //先卖
 							dds.add(muster);						
@@ -141,7 +143,7 @@ public class ConservativeOperation implements Operation{
 					}
 				}					
 				account.openAll(dds);			//后买
-			//}
+			}
 		}
 
 		dailyAmount_sb.append(account.getDailyAmount() + "\n");

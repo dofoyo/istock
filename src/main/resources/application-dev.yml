@@ -41,6 +41,7 @@ operationsPath: D:/dev/istock-data/operations/
 openDuration: 89
 dropDuration: 21
 operationPool: 21
+initCash: 1000000
 
 
 

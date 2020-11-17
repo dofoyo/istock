@@ -91,12 +91,13 @@ public class ManualService {
 		long beginTime=System.currentTimeMillis(); 
 		String label = "manual " + simulateType;
 		BigDecimal initCash = new BigDecimal(1000000);
+		Integer top = 5;
 		Account account = new Account(initCash);
 		Map<String, String> operateResult;
 		if("aggressive".equals(simulateType)) {
-			operateResult = aggressiveOperation.run(account, this.selects, this.getBeginDate(), this.getEndDate(), label, 5);
+			operateResult = aggressiveOperation.run(account, this.selects, this.getBeginDate(), this.getEndDate(), label, top);
 		}else {
-			operateResult = conservativeOperation.run(account, this.selects, this.getBeginDate(), this.getEndDate(), label, 5);
+			operateResult = conservativeOperation.run(account, this.selects, this.getBeginDate(), this.getEndDate(), label, top);
 		}
 		turtleSimulationRepository.save("manual", operateResult.get("breakers"), operateResult.get("CSV"), operateResult.get("dailyAmount"));
 		

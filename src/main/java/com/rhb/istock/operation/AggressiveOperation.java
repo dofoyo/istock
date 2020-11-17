@@ -37,6 +37,7 @@ public class AggressiveOperation implements Operation {
 	
 	private StringBuffer dailyAmount_sb;
 	private StringBuffer breakers_sb;
+	Integer previous_period  = 13; //历史纪录区间，主要用于后面判断
 	
 	public Map<String,String> run(Account account, Map<LocalDate, List<String>> buyList,LocalDate beginDate, LocalDate endDate, String label, int top) {
 		dailyAmount_sb = new StringBuffer("date,cash,value,total\n");
@@ -59,6 +60,9 @@ public class AggressiveOperation implements Operation {
 		Map<String,Muster> musters = kdataService.getMusters(date);
 		if(musters==null || musters.size()==0) return;
 
+		Integer sseiFlag = kdataService.getSseiFlag(date);
+		Integer sseiTrend = kdataService.getSseiTrend(date, previous_period);
+		
 		Muster muster;
 		account.setLatestDate(date);
 		
@@ -81,7 +85,7 @@ public class AggressiveOperation implements Operation {
 		}
 		
 		//买入
-		//if(sseiFlag==1) {　　//行情好，才买入
+		//if(sseiFlag==1 && sseiTrend>=0) {　　//行情好，才买入
 			holdItemIDs = account.getItemIDsOfHolds();
 			
 			Set<Muster> dds = new HashSet<Muster>();  //用set，无重复，表示不可加仓
@@ -108,13 +112,15 @@ public class AggressiveOperation implements Operation {
 				breakers_sb.append("\n");
 			}
 			
-			//每天做市值平均
-			//if(dds.size()>0) {
+			if(dds.size()>0  //买入新股
+					|| (sseiFlag==1 && sseiTrend>=0)  //行情好
+					//|| account.getHLRatio()>=34 //市值差异大
+					) {  
 				Set<Integer> holdOrderIDs;
 				for(String itemID: holdItemIDs) {
 					holdOrderIDs = 	account.getHoldOrderIDs(itemID);
 					muster = musters.get(itemID);
-					if(muster!=null) {
+					if(muster!=null && !muster.isUpLimited() && !muster.isDownLimited()) {
 						for(Integer holdOrderID : holdOrderIDs) {
 							account.dropByOrderID(holdOrderID, "0", muster.getLatestPrice());   //先卖
 							dds.add(muster);						
@@ -122,7 +128,7 @@ public class AggressiveOperation implements Operation {
 					}
 				}					
 				account.openAll(dds);			//后买
-			//}
+			}
 		//}
 
 		dailyAmount_sb.append(account.getDailyAmount() + "\n");

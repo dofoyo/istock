@@ -1,5 +1,6 @@
 package com.rhb.istock.simulation;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.concurrent.Future;
 
@@ -7,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
@@ -39,32 +41,41 @@ public class Simulation {
 	@Qualifier("hlb")
 	SimulateHLB hlb;
 
-	public void simulate(LocalDate beginDate, LocalDate endDate) throws InterruptedException {
+	@Value("${initCash}")
+	private BigDecimal initCash;
+	
+	public void simulate(LocalDate beginDate, LocalDate endDate){
 		long beginTime=System.currentTimeMillis(); 
 		
 		System.out.println("simulate from " + beginDate + " to " + endDate +" ......");
-
-		Future<String> fhlb = hlb.run(beginDate, endDate);
-		Future<String> fbdt = bdt.run(beginDate, endDate);
-		Future<String> favb = avb.run(beginDate, endDate);
-		Future<String> fbhl = bhl.run(beginDate, endDate);
-		Future<String> fbav = bav.run(beginDate, endDate);
-		Future<String> fdtb = dtb.run(beginDate, endDate);
 		
-		while(true) {
-			if(fhlb.isDone() 
-				&& fbdt.isDone()
-				&& favb.isDone()
-				&& fbhl.isDone()
-				&& fbav.isDone()
-				&& fdtb.isDone()
-					) {
-				break;
+		//BigDecimal ic = new BigDecimal(initCash);
+		Integer top = 1;
+		try {
+			Future<String> fhlb = hlb.run(beginDate, endDate, initCash, top);
+			Future<String> fbdt = bdt.run(beginDate, endDate, initCash, top);
+			Future<String> favb = avb.run(beginDate, endDate, initCash, top);
+			Future<String> fbhl = bhl.run(beginDate, endDate, initCash, top);
+			Future<String> fbav = bav.run(beginDate, endDate, initCash, top);
+			Future<String> fdtb = dtb.run(beginDate, endDate, initCash, top);
+			
+			while(true) {
+				if(fhlb.isDone() 
+					&& fbdt.isDone()
+					&& favb.isDone()
+					&& fbhl.isDone()
+					&& fbav.isDone()
+					&& fdtb.isDone()
+						) {
+					break;
+				}
 			}
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 		
 		long used = (System.currentTimeMillis() - beginTime)/1000; 
-		System.out.println("simulate 用时：" + used + "秒");          
+		System.out.println("\nsimulate over, 用时：" + used + "秒");          
 	}
 	
 }

@@ -14,6 +14,7 @@ import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -58,6 +59,10 @@ public class TurtleSimulationApi {
 	@Autowired
 	@Qualifier("kdataServiceImp")
 	KdataService kdataService;
+	
+	@Value("${initCash}")
+	private BigDecimal initCash;
+
 
 	@GetMapping("/turtle/simulation/kdatas/{itemID}")
 	public ResponseContent<KdatasView> getKdatas(@PathVariable(value="itemID") String itemID,
@@ -128,12 +133,7 @@ public class TurtleSimulationApi {
 		turtleSimulationRepository.evictSellsCache();
 
 		
-		try {
-			simulation.simulate(theBeginDate, theEndDate);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} 
+		simulation.simulate(theBeginDate, theEndDate);
 		//turtleMusterSimulation_hua.simulate(theBeginDate, theEndDate);
 		//turtleMusterSimulation_avb_plus.simulate(theBeginDate, theEndDate);
 		

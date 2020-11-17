@@ -3,7 +3,6 @@ package com.rhb.istock.trade.turtle.simulation.six.api;
 import java.math.BigDecimal;
 
 public class AmountView {
-
 	private Integer cash;
 	private Integer value;
 	

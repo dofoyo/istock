@@ -341,7 +341,8 @@ public class Account {
 	}
 	
 	private Integer getQuantity(BigDecimal quota,BigDecimal price) {
-		return quota.divide(price,BigDecimal.ROUND_DOWN).divide(new BigDecimal(100),BigDecimal.ROUND_DOWN).intValue()*100;
+		Integer hand = 1;
+		return quota.divide(price,BigDecimal.ROUND_DOWN).divide(new BigDecimal(hand),BigDecimal.ROUND_DOWN).intValue()*hand;
 	}
 	
 	public void open(String itemID, String itemName, String industry, Integer quantity, String note) {
@@ -561,6 +562,28 @@ public class Account {
 			ids.add(order.getItemID());
 		}
 		return ids;
+	}
+	
+	public Integer getHLRatio() {
+		if(holds.values().size()<2) {
+			return 0;
+		}
+		BigDecimal highest=null, lowest=null;
+		for(Order order : holds.values()) {
+			value = order.getValue();
+			if(highest==null) {
+				highest = value;
+				lowest = value;
+			}else {
+				highest = highest.compareTo(value)==1? highest : value;
+				lowest = lowest.compareTo(value)==1? value : highest;
+			}
+		}
+		
+		Integer rate = Functions.growthRate(highest, lowest);
+		//System.out.println(String.format("\nhighest=%.2f, lowest=%.2f, ratio=%d", highest, lowest, rate));
+		
+		return rate;
 	}
 	
 	public Integer getProfitRatio(String itemID) {
