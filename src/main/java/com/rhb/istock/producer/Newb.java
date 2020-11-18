@@ -22,7 +22,7 @@ import com.rhb.istock.kdata.Muster;
 import com.rhb.istock.selector.fina.FinaService;
 
 /*
- * 横盘 + 新高
+ * 新高
  */
 
 @Service("newb")
@@ -117,7 +117,7 @@ public class Newb implements Producer{
 			for(Muster m : tmps) {
 				if(m!=null
 						&& m.isUpBreaker() 				//股价创新高
-						&& m.getHLGap()<=55             //涨幅不大
+						//&& m.getHLGap()<=55             //涨幅不大
 						) {
 					breakers.add(m.getItemID());
 				}

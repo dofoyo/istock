@@ -25,7 +25,7 @@ import com.rhb.istock.kdata.Muster;
 import com.rhb.istock.selector.fina.FinaService;
 
 /*
- * 横盘 + 强于大盘
+ * 强于大盘
  * 
  */
 
@@ -152,7 +152,7 @@ public class Drum implements Producer{
 					ratio = this.getRatio(previous,m.getItemID(),m.getLatestPrice());
 					if(ratio>0
 							&& ratio >= sseiRatio   // 强于大盘
-							&& m.getHLGap()<=55
+							//&& m.getHLGap()<=55
 							&& m.isUpAve(21)
 							&& m.getAveragePrice21().compareTo(p.getAveragePrice21())==1  //上升趋势
 							) {

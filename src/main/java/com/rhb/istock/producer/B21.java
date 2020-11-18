@@ -22,7 +22,7 @@ import com.rhb.istock.kdata.Muster;
 import com.rhb.istock.selector.fina.FinaService;
 
 /*
- * 横盘 +  向上破21日线
+ * 向上破21日线
  * 
  */
 
@@ -116,7 +116,7 @@ public class B21 implements Producer{
 			for(Muster m : ms) {
 				if(m!=null
 						&& m.isJustBreaker() 				//股价破21日线
-						&& m.getHLGap()<=55             //涨幅不大
+						//&& m.getHLGap()<=55             //涨幅不大
 						) {
 					breakers.add(m.getItemID());
 				}
