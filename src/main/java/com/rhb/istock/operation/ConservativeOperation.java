@@ -99,12 +99,11 @@ public class ConservativeOperation implements Operation{
 			}
 		}
 		
-		//买入
+		//买入清单
+		Set<Muster> dds = new HashSet<Muster>();  //用set，无重复，表示不可加仓
+		//List<Muster> dds = new ArrayList<Muster>();  //用list，有重复，表示可以加仓
 		if(sseiFlag==1 && sseiTrend>=0) {  //行情好，才买入
 			holdItemIDs = account.getItemIDsOfHolds();
-			
-			Set<Muster> dds = new HashSet<Muster>();  //用set，无重复，表示不可加仓
-			//List<Muster> dds = new ArrayList<Muster>();  //用list，有重复，表示可以加仓
 			
 			//选择股票
 			List<String> ids = buyList.get(date);
@@ -126,24 +125,24 @@ public class ConservativeOperation implements Operation{
 				breakers_sb.deleteCharAt(breakers_sb.length()-1);
 				breakers_sb.append("\n");
 			}
-			
-			//市值平均
-			if(dds.size()>0  //买入新股
-					//|| account.getHLRatio()>=34 //或市值差异大
-					) {  
-				Set<Integer> holdOrderIDs;
-				for(String itemID: holdItemIDs) {
-					holdOrderIDs = 	account.getHoldOrderIDs(itemID);
-					muster = musters.get(itemID);
-					if(muster!=null && !muster.isUpLimited() && !muster.isDownLimited()) {
-						for(Integer holdOrderID : holdOrderIDs) {
-							account.dropByOrderID(holdOrderID, "0", muster.getLatestPrice());   //先卖
-							dds.add(muster);						
-						}
+		}
+		
+		//市值平均
+		if(dds.size()>0  //买入新股
+				|| account.getHLRatio()>=21 //市值差异大
+				) {  
+			Set<Integer> holdOrderIDs;
+			for(String itemID: holdItemIDs) {
+				holdOrderIDs = 	account.getHoldOrderIDs(itemID);
+				muster = musters.get(itemID);
+				if(muster!=null && !muster.isUpLimited() && !muster.isDownLimited()) {
+					for(Integer holdOrderID : holdOrderIDs) {
+						account.dropByOrderID(holdOrderID, "0", muster.getLatestPrice());   //先卖
+						dds.add(muster);						
 					}
-				}					
-				account.openAll(dds);			//后买
-			}
+				}
+			}					
+			account.openAll(dds);			//后买
 		}
 
 		dailyAmount_sb.append(account.getDailyAmount() + "\n");

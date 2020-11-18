@@ -45,12 +45,32 @@ public class ProducerService {
 	@Qualifier("newbFavor")
 	Producer newbFavor;
 
+	@Autowired
+	@Qualifier("b21")
+	Producer b21;
+
+	@Autowired
+	@Qualifier("drum")
+	Producer drum;
+
+	@Autowired
+	@Qualifier("newb")
+	Producer newb;
 	
 	public void produce(LocalDate date) {
 		System.out.println("收盘后生成买入清单");
 		long beginTime=System.currentTimeMillis(); 
 		
 		List<String> results;
+
+		results  = b21.produce(date, true);
+		System.out.println("b21: " + results);
+		
+		results  = drum.produce(date, true);
+		System.out.println("drum: " + results);
+
+		results  = newb.produce(date, true);
+		System.out.println("newb: " + results);
 		
 		results  = b21Reco.produce(date, true);
 		System.out.println("b21Reco: " + results);
@@ -70,7 +90,7 @@ public class ProducerService {
 		results  = drumPlus.produce(date, true);
 		System.out.println("drumPlus: " + results);
 		
-		results  = newbFavor.produce(date, true);
+/*		results  = newbFavor.produce(date, true);
 		System.out.println("newbFavor: " + results);
 		
 		results  = b21Favor.produce(date, true);
@@ -78,7 +98,7 @@ public class ProducerService {
 		
 		results  = drumFavor.produce(date, true);
 		System.out.println("drumFavor: " + results);
-		
+*/		
 		long used = (System.currentTimeMillis() - beginTime)/1000; 
 		System.out.println("执行“收盘后生成买入清单”完成，用时：" + used + "秒");          
 	}
@@ -86,6 +106,10 @@ public class ProducerService {
 	public void produce(LocalDate bDate, LocalDate eDate) {
 		System.out.println("重新生成买入清单");
 		long beginTime=System.currentTimeMillis(); 
+
+		b21.produce(bDate, eDate);
+		drum.produce(bDate, eDate);
+		newb.produce(bDate, eDate);
 
 		b21Reco.produce(bDate, eDate);
 		drumReco.produce(bDate, eDate);
@@ -95,11 +119,6 @@ public class ProducerService {
 		b21plus.produce(bDate, eDate);
 		drumPlus.produce(bDate, eDate);
 
-		//b21Favor.produce(bDate, eDate);
-		//drumFavor.produce(bDate, eDate);
-		//newbFavor.produce(bDate, eDate);
-
-		
 		long used = (System.currentTimeMillis() - beginTime)/1000; 
 		System.out.println("执行“重新生成买入清单”完成，用时：" + used + "秒");          
 	}

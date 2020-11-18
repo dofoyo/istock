@@ -32,20 +32,31 @@ public class ProduceTest {
 	@Qualifier("newbFavor")
 	Producer newbFavor;
 
+	@Autowired
+	@Qualifier("b21")
+	Producer b21;
+
+	@Autowired
+	@Qualifier("drum")
+	Producer drum;
+
+	@Autowired
+	@Qualifier("newb")
+	Producer newb;
 	
 	//@Test
 	public void produce4() {  
-		LocalDate date = LocalDate.parse("2020-11-10");
+		LocalDate date = LocalDate.parse("2020-11-11");
 		
-		List<String> results = b21Favor.produce(date, false);
+		List<String> results = drumFavor.produce(date, false);
 		System.out.println("there are " + results.size() + " stocks.");
 		System.out.println(results);
 	}
 	
-	@Test
+	//@Test
 	public void produce2() {  //做收盘
 		LocalDate bDate = LocalDate.parse("2010-01-01");
-		LocalDate eDate = LocalDate.parse("2020-11-13");
+		LocalDate eDate = LocalDate.parse("2020-11-17");
 		
 		producerService.produce(bDate, eDate);
 		System.out.println("收盘 Test");
@@ -53,20 +64,20 @@ public class ProduceTest {
 	
 	//@Test
 	public void produce1() {  //做收盘
-		LocalDate date = LocalDate.parse("2020-11-09");
+		LocalDate date = LocalDate.parse("2020-11-17");
 		
-		b21Favor.produce(date, true);
+		drumFavor.produce(date, true);
 		System.out.println("收盘 Test");
 	}
 	
 	//@Test
 	public void produce() {
 		LocalDate bDate = LocalDate.parse("2020-01-01");
-		LocalDate eDate = LocalDate.parse("2020-11-11");
+		LocalDate eDate = LocalDate.parse("2020-11-17");
 		
-		b21Favor.produce(bDate, eDate);
-		newbFavor.produce(bDate, eDate);
-		drumFavor.produce(bDate, eDate);
+		b21.produce(bDate, eDate);
+		newb.produce(bDate, eDate);
+		drum.produce(bDate, eDate);
 		System.out.println("produce Test");
 	}
 	
