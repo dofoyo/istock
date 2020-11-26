@@ -31,7 +31,7 @@ public class KdataServiceTest {
 	@Qualifier("itemServiceImp")
 	ItemService itemService;	
 	
-	@Test
+	//@Test
 	public void getSSEI() {
 		String itemID = "sh000001";
 		boolean byCache = true;
@@ -49,9 +49,9 @@ public class KdataServiceTest {
 		kdataService.updateLatestMusters();
 	}
 	
-	//@Test
+	@Test
 	public void generateMusters() {
-		LocalDate date = LocalDate.parse("2010-01-01");
+		LocalDate date = LocalDate.parse("2020-01-25");
 		//kdataService.generateMusters(date);
 		kdataService.generateLatestMusters(null);
 		kdataService.updateLatestMusters();

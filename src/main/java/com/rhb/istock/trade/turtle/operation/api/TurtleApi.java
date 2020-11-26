@@ -108,6 +108,12 @@ public class TurtleApi{
 		List<HoldView> holds = ts.getHolds();
 		return new ResponseContent<List<HoldView>>(ResponseEnum.SUCCESS, holds);
 	}
+
+	@GetMapping("/turtle/newbs")
+	public ResponseContent<List<ItemView>> getNewbs() {
+		List<ItemView> views = ts.getNewbs();
+		return new ResponseContent<List<ItemView>>(ResponseEnum.SUCCESS, views);
+	}	
 	
 	@GetMapping("/turtle/b21")
 	public ResponseContent<List<ItemView>> getB21Views() {

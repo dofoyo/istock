@@ -43,6 +43,38 @@ public class ProduceTest {
 	@Autowired
 	@Qualifier("newb")
 	Producer newb;
+
+	@Autowired
+	@Qualifier("dimeReco")
+	Producer dimeReco;
+
+	@Autowired
+	@Qualifier("dimeNewbReco")
+	Producer dimeNewbReco;
+	
+	@Autowired
+	@Qualifier("b21Reco")
+	Producer b21Reco;
+	
+	@Autowired
+	@Qualifier("b21plusH21")
+	Producer b21plusH21;
+
+	@Autowired
+	@Qualifier("b21plusL21")
+	Producer b21plusL21;
+
+	@Autowired
+	@Qualifier("b21RecoH21")
+	Producer b21RecoH21;
+
+	@Autowired
+	@Qualifier("drumRecoH21")
+	Producer drumRecoH21;
+	
+	@Autowired
+	@Qualifier("newbRecoH21")
+	Producer newbRecoH21;
 	
 	//@Test
 	public void produce4() {  
@@ -53,10 +85,10 @@ public class ProduceTest {
 		System.out.println(results);
 	}
 	
-	@Test
+	//@Test
 	public void produce2() {  //做收盘
-		LocalDate bDate = LocalDate.parse("2020-01-01");
-		LocalDate eDate = LocalDate.parse("2020-11-17");
+		LocalDate bDate = LocalDate.parse("2018-01-01");
+		LocalDate eDate = LocalDate.parse("2020-11-23");
 		
 		producerService.produce(bDate, eDate);
 		System.out.println("收盘 Test");
@@ -70,14 +102,13 @@ public class ProduceTest {
 		System.out.println("收盘 Test");
 	}
 	
-	//@Test
+	@Test
 	public void produce() {
-		LocalDate bDate = LocalDate.parse("2020-01-01");
-		LocalDate eDate = LocalDate.parse("2020-11-17");
+		LocalDate bDate = LocalDate.parse("2018-02-16");
+		LocalDate eDate = LocalDate.parse("2020-11-23");
 		
-		b21.produce(bDate, eDate);
-		newb.produce(bDate, eDate);
-		drum.produce(bDate, eDate);
+		dimeReco.produce(bDate, eDate);
+		dimeNewbReco.produce(bDate, eDate);
 		System.out.println("produce Test");
 	}
 	

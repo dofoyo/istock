@@ -26,6 +26,7 @@ public interface TurtleOperationService {
 	 */
 	public List<HoldView> getHolds();
 	public List<ItemView> getFavors();
+	public List<ItemView> getNewbs();
 	public List<TurtleView> getPotentials(String type);
 	public List<PotentialView> getPotentials(String type, LocalDate date);
 	public List<PotentialView> getPotentials_hlb(LocalDate date);

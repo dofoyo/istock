@@ -22,9 +22,8 @@ import com.rhb.istock.kdata.Muster;
 import com.rhb.istock.selector.fina.FinaService;
 
 /*
- * 低价 + 横盘 + 向上破21日线
+ * b21 + 涨幅不大
  * 
- * 股价由高到低排序 + 前21只  + 股价创新高
  */
 
 @Service("b21plus")
@@ -41,10 +40,7 @@ public class B21plus implements Producer{
 	
 	@Value("${operationsPath}")
 	private String operationsPath;
-	
-	@Value("${operationPool}")
-	private Integer operationPool;
-	
+		
 	private String fileName  = "B21plus.txt";
 
 	@Override
@@ -103,19 +99,10 @@ public class B21plus implements Producer{
 		List<String> breakers = new ArrayList<String>();
 
 		Map<String,Muster> musters = kdataService.getMusters(date);
-		List<Muster> tmps;
+		List<Muster> ms;
 
 		if(musters!=null && musters.size()>0) {
-			tmps = new ArrayList<Muster>(musters.values());
-
-			Collections.sort(tmps, new Comparator<Muster>() {
-				@Override
-				public int compare(Muster o1, Muster o2) {
-					return o1.getLatestPrice().compareTo(o2.getLatestPrice()); //价格小到大排序
-				}
-			});
-			
-			List<Muster> ms = tmps.subList(0, tmps.size()>=operationPool ? operationPool : tmps.size());    //最低价的前21只
+			ms = new ArrayList<Muster>(musters.values());
 			
 			Collections.sort(ms, new Comparator<Muster>() {
 				@Override

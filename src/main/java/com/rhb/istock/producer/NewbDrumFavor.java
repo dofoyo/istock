@@ -16,20 +16,26 @@ import org.springframework.stereotype.Service;
 import com.rhb.istock.selector.favor.FavorService;
 
 /*
- * newb + favor
+ * drum + favor
+ * 
  */
 
-@Service("newbFavor")
-public class NewbFavor implements Producer{
-	protected static final Logger logger = LoggerFactory.getLogger(NewbFavor.class);
+@Service("newbDrumFavor")
+public class NewbDrumFavor implements Producer{
+	protected static final Logger logger = LoggerFactory.getLogger(NewbDrumFavor.class);
+	
 	@Autowired
 	@Qualifier("favorServiceImp")
 	FavorService favorService;
-	
+
+	@Autowired
+	@Qualifier("drum")
+	Producer drum;
+		
 	@Autowired
 	@Qualifier("newb")
 	Producer newb;
-		
+	
 	@Override
 	public Map<LocalDate, List<String>> produce(LocalDate bDate, LocalDate eDate) {
 		return this.getResults(bDate, eDate);
@@ -59,6 +65,15 @@ public class NewbFavor implements Producer{
 				for(String id : newbs) {
 					if(favors.contains(id)) {
 						results.add(id);
+					}
+				}
+			}
+			List<String> drums = drum.getResults(date);
+			if(drums!=null && drums.size()>0) {
+				for(String id : drums) {
+					if(favors.contains(id) && !results.contains(id)) {
+						results.add(id);
+						//System.out.println(id);
 					}
 				}	
 			}

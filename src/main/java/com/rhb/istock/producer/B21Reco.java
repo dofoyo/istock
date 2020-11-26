@@ -22,9 +22,8 @@ import com.rhb.istock.kdata.Muster;
 import com.rhb.istock.selector.fina.FinaService;
 
 /*
- * 买入评级 + 高价 + 横盘 +  向上破21日线
+ * b21plus + 买入评级
  * 
- * 研究报告“买入”评级 + 股价由高到低排序 + 前21只  + 股价创新高
  */
 
 @Service("b21Reco")
@@ -41,9 +40,6 @@ public class B21Reco implements Producer{
 	
 	@Value("${operationsPath}")
 	private String operationsPath;
-	
-	@Value("${operationPool}")
-	private Integer operationPool;
 
 	private String fileName  = "B21Reco.txt";
 
@@ -102,28 +98,19 @@ public class B21Reco implements Producer{
 	public List<String> produce(LocalDate date, boolean write) {
 		List<String> breakers = new ArrayList<String>();
 		
-		List<Muster> tmps;
+		List<Muster> ms;
 		Muster muster;
 		List<String> recommendations;
 		Map<String,Muster> musters = kdataService.getMusters(date);
 		if(musters!=null && musters.size()>0) {
 			recommendations = finaService.getHighRecommendations(date, 10000, 13); //推荐买入
-			tmps = new ArrayList<Muster>();
+			ms = new ArrayList<Muster>();
 			for(String id : recommendations) {
 				muster = musters.get(id);
 				if(muster!=null) {
-					tmps.add(muster);
+					ms.add(muster);
 				}
 			}
-			
-			Collections.sort(tmps, new Comparator<Muster>() {
-				@Override
-				public int compare(Muster o1, Muster o2) {
-					return o2.getLatestPrice().compareTo(o1.getLatestPrice()); //价格大到小排序
-				}
-			});
-			
-			List<Muster> ms = tmps.subList(0, tmps.size()>=operationPool ? operationPool : tmps.size());    //最高价的前21只
 			
 			Collections.sort(ms, new Comparator<Muster>() {
 				@Override
@@ -137,10 +124,15 @@ public class B21Reco implements Producer{
 			});
 			
 			breakers = new ArrayList<String>();
+			Integer previous_period  = 13; //历史纪录区间，主要用于后面判断
+			List<Map<String,Muster>> previous = kdataService.getPreviousMusters(previous_period, date);
+			Muster p;
 			for(Muster m : ms) {
-				if(m!=null
+				p = previous.get(0).get(m.getItemID());
+				if(m!=null && p!=null
 						&& m.isJustBreaker() 				//股价破21日线
 						&& m.getHLGap()<=55             //涨幅不大
+						&& m.getAveragePrice21().compareTo(p.getAveragePrice21())==1  //上升趋势
 						) {
 					breakers.add(m.getItemID());
 				}

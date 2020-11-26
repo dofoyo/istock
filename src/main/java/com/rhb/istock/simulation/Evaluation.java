@@ -13,9 +13,9 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 //@Scope("prototype")
-@Service("simulation")
-public class Simulation {
-	protected static final Logger logger = LoggerFactory.getLogger(Simulation.class);
+@Service("evaluation")
+public class Evaluation {
+	protected static final Logger logger = LoggerFactory.getLogger(Evaluation.class);
 
 	@Autowired
 	@Qualifier("avb")
@@ -44,30 +44,31 @@ public class Simulation {
 	@Value("${initCash}")
 	private BigDecimal initCash;
 	
-	public void simulate(LocalDate beginDate, LocalDate endDate){
+	public void evaluate(LocalDate beginDate, LocalDate endDate){
 		long beginTime=System.currentTimeMillis(); 
 		
 		System.out.println("simulate from " + beginDate + " to " + endDate +" ......");
 		
 		//BigDecimal ic = new BigDecimal(initCash);
-		Integer top = 1;
-		boolean isAveValue = true;
-		Integer quantityType = 0;
+		Integer top = 1000;  //买入所有符合的股票
+		boolean isAveValue = false;  //买入前不做市值平均
+		Integer quantityType = 3;  //按固定数量买入
 		try {
-			Future<String> fhlb = hlb.run(beginDate, endDate, initCash, top, isAveValue, quantityType);
-			Future<String> fbdt = bdt.run(beginDate, endDate, initCash, top, isAveValue, quantityType);
+			//Future<String> fhlb = hlb.run(beginDate, endDate, initCash, top, isAveValue, quantityType);
+			//Future<String> fbdt = bdt.run(beginDate, endDate, initCash, top, isAveValue, quantityType);
 			Future<String> favb = avb.run(beginDate, endDate, initCash, top, isAveValue, quantityType);
-			Future<String> fbhl = bhl.run(beginDate, endDate, initCash, top, isAveValue, quantityType);
-			Future<String> fbav = bav.run(beginDate, endDate, initCash, top, isAveValue, quantityType);
-			Future<String> fdtb = dtb.run(beginDate, endDate, initCash, top, isAveValue, quantityType);
+			//Future<String> fbhl = bhl.run(beginDate, endDate, initCash, top, isAveValue, quantityType);
+			//Future<String> fbav = bav.run(beginDate, endDate, initCash, top, isAveValue, quantityType);
+			//Future<String> fdtb = dtb.run(beginDate, endDate, initCash, top, isAveValue, quantityType);
 			
 			while(true) {
-				if(fhlb.isDone() 
-					&& fbdt.isDone()
+				if(true 
+					//&& fhlb.isDone() 
+					//&& fbdt.isDone()
 					&& favb.isDone()
-					&& fbhl.isDone()
-					&& fbav.isDone()
-					&& fdtb.isDone()
+					//&& fbhl.isDone()
+					//&& fbav.isDone()
+					//&& fdtb.isDone()
 						) {
 					break;
 				}

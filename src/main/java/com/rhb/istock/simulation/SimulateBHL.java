@@ -16,6 +16,7 @@ import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Component;
 
 import com.rhb.istock.account.Account;
+import com.rhb.istock.operation.AggressiveOperation;
 import com.rhb.istock.operation.ConservativeOperation;
 import com.rhb.istock.producer.Producer;
 import com.rhb.istock.trade.turtle.simulation.six.repository.TurtleSimulationRepository;
@@ -30,18 +31,23 @@ public class SimulateBHL {
 	TurtleSimulationRepository turtleSimulationRepository;
 
 	@Autowired
-	@Qualifier("b21plus")
-	Producer b21plus;
+	@Qualifier("dimeNewbReco")
+	Producer producer;
 	
 	@Autowired
 	@Qualifier("conservativeOperation")
 	ConservativeOperation conservativeOperation;
 	
+	@Autowired
+	@Qualifier("aggressiveOperation")
+	AggressiveOperation aggressiveOperation;
+
+	
 	@Async("taskExecutor")
-	public Future<String> run(LocalDate beginDate, LocalDate endDate, BigDecimal initCash, Integer top)  throws Exception {
+	public Future<String> run(LocalDate beginDate, LocalDate endDate, BigDecimal initCash, Integer top, boolean isAveValue, Integer quantityType)  throws Exception {
 		Account account = new Account(initCash);
-		Map<LocalDate, List<String>> operationList = b21plus.getResults(beginDate, endDate);
-		Map<String, String> operateResult = conservativeOperation.run(account, operationList, beginDate, endDate, "bhl", top);
+		Map<LocalDate, List<String>> operationList = producer.getResults(beginDate, endDate);
+		Map<String, String> operateResult = aggressiveOperation.run(account, operationList, beginDate, endDate, "bhl", top, isAveValue,quantityType);
 		turtleSimulationRepository.save("bhl", operateResult.get("breakers"), operateResult.get("CSV"), operateResult.get("dailyAmount"));
 		return new AsyncResult<String>("bhl执行完毕");
 	}

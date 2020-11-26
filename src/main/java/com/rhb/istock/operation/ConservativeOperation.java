@@ -44,7 +44,7 @@ public class ConservativeOperation implements Operation{
 	private StringBuffer breakers_sb;
 	Integer previous_period  = 13; //历史纪录区间，主要用于后面判断
 	
-	public Map<String,String> run(Account account, Map<LocalDate, List<String>> buyList,LocalDate beginDate, LocalDate endDate, String label, int top) {
+	public Map<String,String> run(Account account, Map<LocalDate, List<String>> buyList,LocalDate beginDate, LocalDate endDate, String label, int top, boolean isAveValue, Integer quantityType) {
 		dailyAmount_sb = new StringBuffer("date,cash,value,total\n");
 		breakers_sb = new StringBuffer();
 
@@ -54,14 +54,14 @@ public class ConservativeOperation implements Operation{
 
 			Progress.show((int)days, i++, " " + label +  " run:" + date.toString());
 			
-			this.doIt(date, account, buyList, top);
+			this.doIt(date, account, buyList, top, isAveValue, quantityType);
 		}
 		
 		return this.result(account);
 
 	}
 	
-	public void doIt(LocalDate date,Account account, Map<LocalDate, List<String>> buyList, int top) {
+	public void doIt(LocalDate date,Account account, Map<LocalDate, List<String>> buyList, int top, boolean isAveValue, Integer quantityType) {
 		Map<String,Muster> musters = kdataService.getMusters(date);
 		if(musters==null || musters.size()==0) return;
 
@@ -128,9 +128,9 @@ public class ConservativeOperation implements Operation{
 		}
 		
 		//市值平均
-		if(dds.size()>0  //买入新股
+		if(isAveValue && (dds.size()>0  //买入新股
 				|| account.getHLRatio()>=21 //市值差异大
-				) {  
+				)) {  
 			Set<Integer> holdOrderIDs;
 			for(String itemID: holdItemIDs) {
 				holdOrderIDs = 	account.getHoldOrderIDs(itemID);
@@ -142,7 +142,14 @@ public class ConservativeOperation implements Operation{
 					}
 				}
 			}					
+		}
+
+		if(quantityType==0) {
 			account.openAll(dds);			//后买
+		}else if(quantityType==1) {
+			account.openAllWithFixAmount(dds);
+		}else {
+			account.openAllWithFixQuantity(dds);
 		}
 
 		dailyAmount_sb.append(account.getDailyAmount() + "\n");

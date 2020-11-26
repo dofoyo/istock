@@ -29,9 +29,9 @@ import com.rhb.istock.selector.fina.FinaService;
  * 
  */
 
-@Service("drumPlus")
-public class DrumPlus implements Producer{
-	protected static final Logger logger = LoggerFactory.getLogger(DrumPlus.class);
+@Service("drumPlusL21")
+public class DrumPlusL21 implements Producer{
+	protected static final Logger logger = LoggerFactory.getLogger(DrumPlusL21.class);
 	
 	@Autowired
 	@Qualifier("kdataServiceImp")
@@ -48,7 +48,8 @@ public class DrumPlus implements Producer{
 	@Value("${operationsPath}")
 	private String operationsPath;
 	
-	private String fileName  = "DrumPlus.txt";
+	private String fileName  = "DrumPlusL21.txt";
+	private Integer pool = 21;
 
 	@Override
 	public Map<LocalDate, List<String>> produce(LocalDate bDate, LocalDate eDate) {
@@ -127,7 +128,7 @@ public class DrumPlus implements Producer{
 	public List<String> produce(LocalDate date, boolean write) {
 		List<String> breakers = new ArrayList<String>();
 		Map<String,Muster> musters;
-		List<Muster> ms;
+		List<Muster> ms, tmps;
 		Muster p;
 		Integer sseiRatio, ratio;
 		
@@ -138,8 +139,16 @@ public class DrumPlus implements Producer{
 
 			List<Map<String,Muster>> previous = kdataService.getPreviousMusters(previous_period, date);
 
-			ms = new ArrayList<Muster>(musters.values());
+			tmps = new ArrayList<Muster>(musters.values());
+			Collections.sort(tmps, new Comparator<Muster>() {
+				@Override
+				public int compare(Muster o1, Muster o2) {
+					return o1.getLatestPrice().compareTo(o2.getLatestPrice()); //价格小到大排序
+				}
+			});
 			
+			ms = tmps.subList(0, tmps.size()>=pool ? pool : tmps.size());    //最低价的前21只
+
 			Collections.sort(ms, new Comparator<Muster>() {
 				@Override
 				public int compare(Muster o1, Muster o2) {

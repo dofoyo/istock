@@ -10,44 +10,24 @@ import org.springframework.stereotype.Service;
 @Service("producerService")
 public class ProducerService {
 	@Autowired
-	@Qualifier("b21Reco")
-	Producer b21Reco;
-	
-	@Autowired
-	@Qualifier("drumReco")
-	Producer drumReco;
-	
-	@Autowired
-	@Qualifier("newbPlus")
-	Producer newbPlus;
-	
-	@Autowired
-	@Qualifier("b21plus")
-	Producer b21plus;
-	
-	@Autowired
-	@Qualifier("drumPlus")
-	Producer drumPlus;
-	
-	@Autowired
-	@Qualifier("newbReco")
-	Producer newbReco;
-	
-	@Autowired
-	@Qualifier("b21Favor")
-	Producer b21Favor;
+	@Qualifier("newbRecoH21")
+	Producer newbRecoH21;
 
 	@Autowired
-	@Qualifier("drumFavor")
-	Producer drumFavor;
+	@Qualifier("newbPlusL21")
+	Producer newbPlusL21;
 
 	@Autowired
-	@Qualifier("newbFavor")
-	Producer newbFavor;
+	@Qualifier("drumRecoH21")
+	Producer drumRecoH21;
 
 	@Autowired
-	@Qualifier("b21")
-	Producer b21;
+	@Qualifier("drumPlusL21")
+	Producer drumPlusL21;
+	
+	@Autowired
+	@Qualifier("dimeNewbReco")
+	Producer dimeNewbReco;
 
 	@Autowired
 	@Qualifier("drum")
@@ -63,42 +43,16 @@ public class ProducerService {
 		
 		List<String> results;
 
-		results  = b21.produce(date, true);
-		System.out.println("b21: " + results);
-		
-		results  = drum.produce(date, true);
-		System.out.println("drum: " + results);
-
 		results  = newb.produce(date, true);
-		System.out.println("newb: " + results);
-		
-		results  = b21Reco.produce(date, true);
-		System.out.println("b21Reco: " + results);
-		
-		results  = drumReco.produce(date, true);
-		System.out.println("drumReco: " + results);
+		results  = newbRecoH21.produce(date, true);
+		results  = newbPlusL21.produce(date, true);
 
-		results  = newbReco.produce(date, true);
-		System.out.println("newbReco: " + results);
+		results  = drum.produce(date, true);
+		results  = drumRecoH21.produce(date, true);
+		results  = drumPlusL21.produce(date, true);
 
-		results  = newbPlus.produce(date, true);
-		System.out.println("newbPlus: " + results);
+		results  = dimeNewbReco.produce(date, true);
 		
-		results  = b21plus.produce(date, true);
-		System.out.println("b21plus: " + results);
-		
-		results  = drumPlus.produce(date, true);
-		System.out.println("drumPlus: " + results);
-		
-/*		results  = newbFavor.produce(date, true);
-		System.out.println("newbFavor: " + results);
-		
-		results  = b21Favor.produce(date, true);
-		System.out.println("b21Favor: " + results);
-		
-		results  = drumFavor.produce(date, true);
-		System.out.println("drumFavor: " + results);
-*/		
 		long used = (System.currentTimeMillis() - beginTime)/1000; 
 		System.out.println("执行“收盘后生成买入清单”完成，用时：" + used + "秒");          
 	}
@@ -107,17 +61,15 @@ public class ProducerService {
 		System.out.println("重新生成买入清单");
 		long beginTime=System.currentTimeMillis(); 
 
-		b21.produce(bDate, eDate);
-		drum.produce(bDate, eDate);
 		newb.produce(bDate, eDate);
+		newbRecoH21.produce(bDate, eDate);
+		newbPlusL21.produce(bDate, eDate);
 
-		b21Reco.produce(bDate, eDate);
-		drumReco.produce(bDate, eDate);
-		newbReco.produce(bDate, eDate);
+		drum.produce(bDate, eDate);
+		drumRecoH21.produce(bDate, eDate);
+		drumPlusL21.produce(bDate, eDate);
 
-		newbPlus.produce(bDate, eDate);
-		b21plus.produce(bDate, eDate);
-		drumPlus.produce(bDate, eDate);
+		dimeNewbReco.produce(bDate, eDate);
 
 		long used = (System.currentTimeMillis() - beginTime)/1000; 
 		System.out.println("执行“重新生成买入清单”完成，用时：" + used + "秒");          

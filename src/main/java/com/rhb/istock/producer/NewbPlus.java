@@ -22,8 +22,7 @@ import com.rhb.istock.kdata.Muster;
 import com.rhb.istock.selector.fina.FinaService;
 
 /*
- * 低价 + 横盘 + 新高
- * 股价由低到高排序 + 前21只  + 股价创新高
+ * newb + 涨幅不大
  */
 
 @Service("newbPlus")
@@ -41,9 +40,6 @@ public class NewbPlus implements Producer{
 	@Value("${operationsPath}")
 	private String operationsPath;
 	
-	@Value("${operationPool}")
-	private Integer pool;
-
 	private String fileName  = "NewbPlus.txt";
 	
 	@Override
@@ -101,21 +97,12 @@ public class NewbPlus implements Producer{
 	public List<String> produce(LocalDate date, boolean write) {
 		List<String> breakers = new ArrayList<String>();
 		Map<String,Muster> musters;
-		List<Muster> tmps;
+		List<Muster> ms;
 		musters = kdataService.getMusters(date);
 		
 		if(musters!=null && musters.size()>0) {
 			
-			tmps = new ArrayList<Muster>(musters.values());
-			
-			Collections.sort(tmps, new Comparator<Muster>() {
-				@Override
-				public int compare(Muster o1, Muster o2) {
-					return o1.getLatestPrice().compareTo(o2.getLatestPrice()); //价格小到大排序
-				}
-			});
-			
-			List<Muster> ms = tmps.subList(0, tmps.size()>=pool ? pool : tmps.size());    //最低价的前21只
+			ms = new ArrayList<Muster>(musters.values());
 			
 			Collections.sort(ms, new Comparator<Muster>() {
 				@Override

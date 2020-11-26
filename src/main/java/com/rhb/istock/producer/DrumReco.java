@@ -25,9 +25,8 @@ import com.rhb.istock.kdata.Muster;
 import com.rhb.istock.selector.fina.FinaService;
 
 /*
- * 买入推荐  + 高价 + 横盘 + 强于大盘
+ * drumPlus + 买入评级
  * 
- * 研究报告“买入”评级 + 股价由高到低排序 + 前21只  + 强于大盘
  */
 
 @Service("drumReco")
@@ -48,9 +47,6 @@ public class DrumReco implements Producer{
 	
 	@Value("${operationsPath}")
 	private String operationsPath;
-	
-	@Value("${operationPool}")
-	private Integer operationPool;
 
 	private String fileName  = "DrumReco.txt";
 
@@ -131,7 +127,7 @@ public class DrumReco implements Producer{
 	public List<String> produce(LocalDate date, boolean write) {
 		List<String> breakers = new ArrayList<String>();
 		Map<String,Muster> musters;
-		List<Muster> tmps;
+		List<Muster> ms;
 		Muster muster, p;
 		List<String> recommendations;
 		Integer sseiRatio, ratio;
@@ -143,23 +139,13 @@ public class DrumReco implements Producer{
 			List<Map<String,Muster>> previous = kdataService.getPreviousMusters(previous_period, date);
 
 			recommendations = finaService.getHighRecommendations(date, 10000, 13); //推荐买入
-			tmps = new ArrayList<Muster>();
+			ms = new ArrayList<Muster>();
 			for(String id : recommendations) {
 				muster = musters.get(id);
 				if(muster!=null) {
-					tmps.add(muster);
+					ms.add(muster);
 				}
 			}
-			//System.out.println("there are " + tmps.size() + " stocks.");
-			
-			Collections.sort(tmps, new Comparator<Muster>() {
-				@Override
-				public int compare(Muster o1, Muster o2) {
-					return o2.getLatestPrice().compareTo(o1.getLatestPrice()); //价格大到小排序
-				}
-			});
-			
-			List<Muster> ms = tmps.subList(0, tmps.size()>=operationPool ? operationPool : tmps.size());    //最高价的前21只
 			
 			Collections.sort(ms, new Comparator<Muster>() {
 				@Override

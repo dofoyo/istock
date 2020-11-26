@@ -15,13 +15,25 @@ public class SimulationTest {
 	@Autowired
 	@Qualifier("simulation")
 	Simulation simulation;
+
+	@Autowired
+	@Qualifier("evaluation")
+	Evaluation evaluation;
 	
-	@Test
+	//@Test
 	public void simulate() {
 		LocalDate beginDate = LocalDate.parse("2020-01-25");
 		LocalDate endDate = LocalDate.parse("2020-10-29");
 
 		simulation.simulate(beginDate, endDate);
+	}
+	
+	@Test
+	public void evaluation() {
+		LocalDate beginDate = LocalDate.parse("2018-02-16");
+		LocalDate endDate = LocalDate.parse("2020-11-23");
+
+		evaluation.evaluate(beginDate, endDate);
 	}
 	
 }

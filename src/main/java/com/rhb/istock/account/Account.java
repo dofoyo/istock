@@ -40,6 +40,7 @@ public class Account {
 	private Integer orderID=0;
 	DecimalFormat orderIDFormat = new DecimalFormat("0000"); 
 	private BigDecimal fix_amount;
+	private Integer fix_quantity = 100;
 	
 	public Account(BigDecimal cash) {
 		this.initCash = cash;
@@ -336,6 +337,16 @@ public class Account {
 			this.prices.put(item.getItemID(), item.getLatestPrice());
 			if(this.cash.compareTo(BigDecimal.ZERO)==1) {
 				this.open(item.getItemID(), item.getItemName(), item.getIndustry(), this.getQuantity(quota, item.getLatestPrice()), item.getNote() , item.getLatestPrice());
+			}
+		}
+	}
+	
+	public void openAllWithFixQuantity(Set<Muster> items) {
+		if(items.isEmpty()) return;
+		for(Muster item : items) {
+			this.prices.put(item.getItemID(), item.getLatestPrice());
+			if(this.cash.compareTo(BigDecimal.ZERO)==1) {
+				this.open(item.getItemID(), item.getItemName(), item.getIndustry(),this.fix_quantity, item.getNote() , item.getLatestPrice());
 			}
 		}
 	}

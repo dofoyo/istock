@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,7 +16,7 @@ import org.springframework.stereotype.Service;
 import com.rhb.istock.selector.favor.FavorService;
 
 /*
- * favor  + 向上破21日线
+ * b21 + favor
  * 
  */
 
@@ -33,14 +34,21 @@ public class B21Favor implements Producer{
 		
 	@Override
 	public Map<LocalDate, List<String>> produce(LocalDate bDate, LocalDate eDate) {
-		System.out.println("do NOT used!!");
-		return null;
+		return this.getResults(bDate, eDate);
 	}
 
 	@Override
 	public Map<LocalDate, List<String>> getResults(LocalDate bDate, LocalDate eDate) {
-		System.out.println("do NOT used!!");
-		return null;
+		Map<LocalDate, List<String>> results = new TreeMap<LocalDate, List<String>>();
+		List<String> favors;
+		for(LocalDate date=bDate; date.isBefore(eDate)||date.equals(eDate); date = date.plusDays(1)) {
+			favors = this.getResults(date);
+			if(favors!=null && favors.size()>0) {
+				results.put(date, favors);
+			}
+		}
+		
+		return results;	
 	}
 
 	@Override

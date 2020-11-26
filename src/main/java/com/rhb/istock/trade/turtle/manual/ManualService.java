@@ -95,9 +95,9 @@ public class ManualService {
 		Account account = new Account(initCash);
 		Map<String, String> operateResult;
 		if("aggressive".equals(simulateType)) {
-			operateResult = aggressiveOperation.run(account, this.selects, this.getBeginDate(), this.getEndDate(), label, top);
+			operateResult = aggressiveOperation.run(account, this.selects, this.getBeginDate(), this.getEndDate(), label, top, true,0);
 		}else {
-			operateResult = conservativeOperation.run(account, this.selects, this.getBeginDate(), this.getEndDate(), label, top);
+			operateResult = conservativeOperation.run(account, this.selects, this.getBeginDate(), this.getEndDate(), label, top, true,0);
 		}
 		turtleSimulationRepository.save("manual", operateResult.get("breakers"), operateResult.get("CSV"), operateResult.get("dailyAmount"));
 		

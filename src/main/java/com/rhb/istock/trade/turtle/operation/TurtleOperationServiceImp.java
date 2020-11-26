@@ -29,9 +29,11 @@ import com.rhb.istock.kdata.Muster;
 import com.rhb.istock.kdata.api.KdatasView;
 import com.rhb.istock.selector.SelectorService;
 import com.rhb.istock.selector.b21.B21Service;
+import com.rhb.istock.selector.drum.DrumService;
 import com.rhb.istock.selector.fina.FinaService;
 import com.rhb.istock.selector.fina.QuarterCompare;
 import com.rhb.istock.selector.hold.HoldEntity;
+import com.rhb.istock.selector.newb.NewbService;
 import com.rhb.istock.selector.potential.Potential;
 import com.rhb.istock.trade.turtle.domain.Tfeature;
 import com.rhb.istock.trade.turtle.domain.Tbar;
@@ -68,6 +70,14 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 	@Autowired
 	@Qualifier("b21Service")
 	B21Service b21Service;
+
+	@Autowired
+	@Qualifier("newbService")
+	NewbService newbService;
+	
+	@Autowired
+	@Qualifier("drumService")
+	DrumService drumService;
 	
 	DecimalFormat df = new DecimalFormat("0.00"); 
 	DecimalFormat df_integer = new DecimalFormat("000"); 
@@ -215,10 +225,11 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 		Map<String, String> favors = selectorService.getFavors();
 		Map<String,String> finas = fdataServiceTushare.getFinaGrowthRatioInfo(favors.keySet());
 
-		List<ItemView> views = buildItemViews(new ArrayList<String>(favors.keySet()), true);
+		LocalDate endDate = kdataService.getLatestMarketDate("sh000001");
+
+		List<ItemView> views = buildItemViews(new ArrayList<String>(favors.keySet()), true, endDate);
 		Item item;
 
-		LocalDate endDate = kdataService.getLatestMarketDate("sh000001");
 		Map<String,String> b21s = b21Service.getStates(new ArrayList<String>(favors.keySet()), endDate);
 		
 		for(ItemView view : views) {
@@ -510,7 +521,7 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 	}
 
 	
-	private List<ItemView> buildItemViews(List<String> itemIDs, boolean resort) {
+	private List<ItemView> buildItemViews(List<String> itemIDs, boolean resort, LocalDate date) {
 		long beginTime=System.currentTimeMillis(); 
 		logger.info("building itemViews ......");
 		
@@ -521,7 +532,7 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 		Item item;
 
 		List<String> holds = selectorService.getHoldIDs();
-		Map<String,Muster> musters = kdataService.getLatestMusters();
+		Map<String,Muster> musters = kdataService.getMusters(date);
 		Muster muster;
 		
 		int i=1;
@@ -539,7 +550,8 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 					preyMap.put("name", item.getName());
 					preyMap.put("industry", item.getIndustry());
 					preyMap.put("area", item.getArea());
-					preyMap.put("topic", this.getTopic(id));
+					//preyMap.put("topic", this.getTopic(id));
+					preyMap.put("topic", this.getDimensions(id, date));
 					preyMap.put("price", muster==null ? "0" : muster.getLatestPrice().toString());
 					preyMap.put("hlgap", muster==null ? "0" : muster.getHLGap().toString());
 					views.add(new ItemView(preyMap));						
@@ -634,6 +646,16 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 		logger.info("用时：" + used + "秒");     
 		
 		return views;
+	}
+	
+	private String getDimensions(String itemID, LocalDate date) {
+		Set<String> dimensions = drumService.getDimensions(date, itemID);
+		StringBuffer sb = new StringBuffer();
+		for(String str : dimensions) {
+			sb.append(str);
+			sb.append(",");
+		}
+		return sb.toString();
 	}
 	
 	private String getTopic(String itemID) {
@@ -808,7 +830,7 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 		LocalDate endDate = kdataService.getLatestMarketDate("sh000001");
 		Map<String,String> b21s = b21Service.getStates(models, endDate);
 
-		List<ItemView> views = buildItemViews(models, true);
+		List<ItemView> views = buildItemViews(models, true, endDate);
 		for(ItemView view : views) {
 			view.setStatus(b21s.get(view.getItemID()));
 		}
@@ -902,14 +924,14 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 
 	@Override
 	public List<ItemView> getB21Views() {
-		//LocalDate endDate = kdataService.getLatestMarketDate("sh000001");
+		LocalDate endDate = kdataService.getLatestMarketDate("sh000001");
 		//List<String> b21s = b21Service.getB21s(endDate);
 		
 		Map<String, String> favors = selectorService.getFavorsOfB21();
 		Map<String,String> finas = fdataServiceTushare.getFinaGrowthRatioInfo(new HashSet<String>(favors.keySet()));
 		
 		
-		List<ItemView> views = buildItemViews(new ArrayList<String>(favors.keySet()), true);
+		List<ItemView> views = buildItemViews(new ArrayList<String>(favors.keySet()), true, endDate);
 		
 		for(ItemView view : views) {
 			view.setLabel(favors.get(view.getItemID()));
@@ -924,14 +946,14 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 	
 	@Override
 	public List<ItemView> getB21upViews() {
-		//LocalDate endDate = kdataService.getLatestMarketDate("sh000001");
+		LocalDate endDate = kdataService.getLatestMarketDate("sh000001");
 		//List<String> b21s = b21Service.getB21s(endDate);
 		
 		Map<String, String> favors = selectorService.getFavorsOfB21up();
 		Map<String,String> finas = fdataServiceTushare.getFinaGrowthRatioInfo(new HashSet<String>(favors.keySet()));
 		
 		
-		List<ItemView> views = buildItemViews(new ArrayList<String>(favors.keySet()), true);
+		List<ItemView> views = buildItemViews(new ArrayList<String>(favors.keySet()), true,endDate);
 		
 		for(ItemView view : views) {
 			view.setLabel(favors.get(view.getItemID()));
@@ -942,6 +964,34 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 		}
 		
 		return views;
+	}
+
+	@Override
+	public List<ItemView> getNewbs() {
+		LocalDate endDate = kdataService.getLatestMarketDate("sh000001");
+		List<String> newbs = newbService.getNewbs(endDate);
+		Map<String,String> finas = fdataServiceTushare.getFinaGrowthRatioInfo(new HashSet<String>(newbs));
+
+		List<ItemView> views = buildItemViews(new ArrayList<String>(newbs), true,endDate);
+		Item item;
+
+		Map<String,String> b21s = b21Service.getStates(new ArrayList<String>(newbs), endDate);
+		
+		for(ItemView view : views) {
+			//view.setLabel(newbs.get(view.getItemID()));
+			if(finas.get(view.getItemID())!=null) {
+				view.setFina(finas.get(view.getItemID()));
+			}
+			view.setStatus(b21s.get(view.getItemID()));
+			
+			item = itemService.getItem(view.getItemID());
+			item.setRecommendations(finaService.getRecommendationCount(view.getItemID(), endDate));
+			
+			view.setName(item.getNameWithCAGR());
+
+		}
+		
+		return views;	
 	}
 
 	

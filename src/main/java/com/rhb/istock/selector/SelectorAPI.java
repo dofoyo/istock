@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.rhb.istock.comm.api.ResponseContent;
 import com.rhb.istock.comm.api.ResponseEnum;
+import com.rhb.istock.producer.Producer;
 import com.rhb.istock.selector.drum.DrumService;
 import com.rhb.istock.trade.turtle.simulation.six.repository.TurtleSimulationRepository;
 
@@ -30,6 +31,10 @@ public class SelectorAPI {
 	@Qualifier("drumService")
 	DrumService drumService;
 	
+	@Autowired
+	@Qualifier("newb")
+	Producer newb;
+	
 	@GetMapping("/selector/dimension/{date}")
 	public ResponseContent<List<DimensionView>> getDiemension(
 			@PathVariable(value="date") String endDate
@@ -42,9 +47,11 @@ public class SelectorAPI {
 			theEndDate = LocalDate.parse(endDate, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 		}
 
-		Set<String> holds = this.generateHolds("manual",theEndDate);
-		Integer ratio = 34;
-		List<DimensionView> views = drumService.getDimensionView(theEndDate, holds, ratio);
+		
+		//Set<String> holds = this.generateHolds("manual",theEndDate);
+		Set<String> newbs = new HashSet<String>(newb.getResults(theEndDate));
+		Integer ratio = 21;
+		List<DimensionView> views = drumService.getDimensionView(theEndDate, newbs, ratio);
 		
 		return new ResponseContent<List<DimensionView>>(ResponseEnum.SUCCESS, views);
 	}

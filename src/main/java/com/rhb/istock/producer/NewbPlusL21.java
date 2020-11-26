@@ -6,7 +6,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
 
 import org.slf4j.Logger;
@@ -20,21 +19,15 @@ import com.rhb.istock.comm.util.FileTools;
 import com.rhb.istock.comm.util.Progress;
 import com.rhb.istock.kdata.KdataService;
 import com.rhb.istock.kdata.Muster;
-import com.rhb.istock.selector.drum.DrumService;
 import com.rhb.istock.selector.fina.FinaService;
 
 /*
- * 强板块中的强个股  + 高价 + 横盘 + 新高
- * 
- * 强势板块中的股票 + 股价由高到低排序 + 前21只  + 股价创新高
+ * newbplus + 低价
  */
 
-@Service("newbDime")
-public class NewbDime implements Producer{
-	protected static final Logger logger = LoggerFactory.getLogger(NewbDime.class);
-	@Autowired
-	@Qualifier("drumService")
-	DrumService drumService;
+@Service("newbPlusL21")
+public class NewbPlusL21 implements Producer{
+	protected static final Logger logger = LoggerFactory.getLogger(NewbPlusL21.class);
 	
 	@Autowired
 	@Qualifier("kdataServiceImp")
@@ -47,8 +40,8 @@ public class NewbDime implements Producer{
 	@Value("${operationsPath}")
 	private String operationsPath;
 	
-	private Integer pool = 55;
-	private String fileName  = "NewbDime.txt";
+	private String fileName  = "NewbPlusL21.txt";
+	private Integer pool = 21;
 
 	@Override
 	public Map<LocalDate, List<String>> produce(LocalDate bDate, LocalDate eDate) {
@@ -105,32 +98,20 @@ public class NewbDime implements Producer{
 	public List<String> produce(LocalDate date, boolean write) {
 		List<String> breakers = new ArrayList<String>();
 		Map<String,Muster> musters;
-		List<Muster> tmps;
-		Muster muster;
-		//List<String> recommendations;
-		Set<String> dimens;
-		Integer ratio = 34; //一个板块中，有34%的个股强于大盘，即为强势板块
-
+		List<Muster> ms, tmps;
 		musters = kdataService.getMusters(date);
+		
 		if(musters!=null && musters.size()>0) {
-			dimens = drumService.getDrumsOfDimensions(date, ratio);   //强板块中的强个股
-			//recommendations = finaService.getHighRecommendations(date, 10000, 13); //推荐买入
-			tmps = new ArrayList<Muster>();
-			for(String id : dimens) {
-				muster = musters.get(id);
-				if(muster!=null) {
-					tmps.add(muster);
-				}
-			}
 			
+			tmps = new ArrayList<Muster>(musters.values());
 			Collections.sort(tmps, new Comparator<Muster>() {
 				@Override
 				public int compare(Muster o1, Muster o2) {
-					return o2.getLatestPrice().compareTo(o1.getLatestPrice()); //价格大到小排序
+					return o1.getLatestPrice().compareTo(o2.getLatestPrice()); //价格小到大排序
 				}
 			});
 			
-			List<Muster> ms = tmps.subList(0, tmps.size()>=pool ? pool : tmps.size());    //最高价的前21只
+			ms = tmps.subList(0, tmps.size()>=pool ? pool : tmps.size());    //最低价的前21只
 			
 			Collections.sort(ms, new Comparator<Muster>() {
 				@Override
@@ -157,6 +138,7 @@ public class NewbDime implements Producer{
 				results.put(date, breakers);
 				FileTools.writeMapFile(this.getFileName(), results, true);
 			}
+			
 		}
 		
 		return breakers;

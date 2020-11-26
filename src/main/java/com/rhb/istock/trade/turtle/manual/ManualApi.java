@@ -79,20 +79,20 @@ public class ManualApi {
 	FinaService finaService;
 	
 	@Autowired
-	@Qualifier("newbReco")
-	Producer newbReco;
+	@Qualifier("newbRecoH21")
+	Producer newbRecoH21;
 
 	@Autowired
-	@Qualifier("newbPlus")
-	Producer newbPlus;
+	@Qualifier("newbPlusL21")
+	Producer newbPlusL21;
 
 	@Autowired
-	@Qualifier("drumReco")
-	Producer drumReco;
+	@Qualifier("drumRecoH21")
+	Producer drumRecoH21;
 	
 	@Autowired
-	@Qualifier("drumPlus")
-	Producer drumPlus;
+	@Qualifier("drumPlusL21")
+	Producer drumPlusL21;
 
 	@Autowired
 	@Qualifier("drumFavor")
@@ -222,6 +222,8 @@ public class ManualApi {
 		
 		//System.out.println(type);
 		//System.out.println(date);
+		Integer lRatio = 21;
+		Integer hRatio = 55;
 		
 		List<ItemView> views = new ArrayList<ItemView>();
 		
@@ -236,12 +238,12 @@ public class ManualApi {
 
 		List<String> ids = new ArrayList<String>();
 		if("power".equals(type)) { 
-			List<String> tmp = newbReco.getResults(theDate);
+			List<String> tmp = newbRecoH21.getResults(theDate);
 			//System.out.println(tmp);
 			if(tmp!=null && tmp.size()>0) {
 				ids.addAll(tmp);
 			}
-			tmp = drumReco.getResults(theDate);
+			tmp = drumRecoH21.getResults(theDate);
 			//System.out.println(tmp);
 			if(tmp!=null && tmp.size()>0) {
 				for(String id : tmp) {
@@ -251,11 +253,11 @@ public class ManualApi {
 				}
 			}			
 		}else if("darker".equals(type)) { 
-			List<String> tmp = drumPlus.getResults(theDate);
+			List<String> tmp = drumPlusL21.getResults(theDate);
 			if(tmp!=null && tmp.size()>0) {
 				ids.addAll(tmp);
 			}
-			tmp = newbPlus.getResults(theDate);
+			tmp = newbPlusL21.getResults(theDate);
 			if(tmp!=null && tmp.size()>0) {
 				for(String id : tmp) {
 					if(!ids.contains(id)) {
@@ -281,7 +283,7 @@ public class ManualApi {
 			if(tmp!=null && tmp.size()>0) {
 				ids.addAll(tmp);
 			}
-			tmp = newbPlus.getResults(theDate);
+			tmp = newbPlusL21.getResults(theDate);
 			if(tmp!=null && tmp.size()>0) {
 				for(String id : tmp) {
 					if(!ids.contains(id)) {
@@ -289,7 +291,15 @@ public class ManualApi {
 					}
 				}
 			}
-			tmp = newbReco.getResults(theDate);
+			tmp = newbRecoH21.getResults(theDate);
+			if(tmp!=null && tmp.size()>0) {
+				for(String id : tmp) {
+					if(!ids.contains(id)) {
+						ids.add(id);
+					}
+				}
+			}
+			tmp = drumService.getDrumsOfTopDimensions(theDate, holds, lRatio, hRatio, true);
 			if(tmp!=null && tmp.size()>0) {
 				for(String id : tmp) {
 					if(!ids.contains(id)) {
@@ -302,7 +312,7 @@ public class ManualApi {
 			if(tmp!=null && tmp.size()>0) {
 				ids.addAll(tmp);
 			}
-			tmp = drumPlus.getResults(theDate);
+			tmp = drumPlusL21.getResults(theDate);
 			if(tmp!=null && tmp.size()>0) {
 				for(String id : tmp) {
 					if(!ids.contains(id)) {
@@ -310,7 +320,15 @@ public class ManualApi {
 					}
 				}
 			}
-			tmp = drumReco.getResults(theDate);
+			tmp = drumRecoH21.getResults(theDate);
+			if(tmp!=null && tmp.size()>0) {
+				for(String id : tmp) {
+					if(!ids.contains(id)) {
+						ids.add(id);
+					}
+				}
+			}
+			tmp = drumService.getDrumsOfTopDimensions(theDate, holds, lRatio, hRatio, true);
 			if(tmp!=null && tmp.size()>0) {
 				for(String id : tmp) {
 					if(!ids.contains(id)) {
@@ -319,8 +337,7 @@ public class ManualApi {
 				}
 			}
 		}else if("dime".equals(type)) {
-			Integer ratio = 34;
-			ids = drumService.getDrumsOfTopDimensions(theDate, holds, ratio);   //强板块
+			ids = drumService.getDrumsOfTopDimensions(theDate, holds, lRatio, hRatio, true);   //强板块
 		}
 		
 		if(ids!=null && !ids.isEmpty()) {

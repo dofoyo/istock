@@ -32,19 +32,26 @@ public class DrumServiceTest {
 	KdataService kdataService;
 	
 	@Test
+	public void test() {
+		LocalDate date = LocalDate.parse("2020-11-20");
+		String itemID = "sh600189";
+		Set<String> dimensions = drumService.getDimensions(date, itemID);
+		System.out.println(dimensions);
+	}
+	
+	//@Test
 	public void getDrumsOfDimensions() {
 		LocalDate date = LocalDate.parse("2020-11-06");
-		Set<String> ids = drumService.getDrumsOfDimensions(date, 34);
+		Set<String> ids = drumService.getDrumsOfDimensions(date, 21, 55);
 		System.out.println(ids);
 		System.out.println(ids.size());
 		System.out.println("getDrumsOfDimensions test");
-
 	}
 	
 	//@Test
 	public void getDrumsOfTopDimensions() {
 		LocalDate date = LocalDate.parse("2020-09-21");
-		List<String> ids = drumService.getDrumsOfTopDimensions(date, null,34);
+		List<String> ids = drumService.getDrumsOfTopDimensions(date, null, 21, 55, false);
 		System.out.println(ids);
 	}
 

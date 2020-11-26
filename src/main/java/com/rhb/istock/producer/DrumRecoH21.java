@@ -25,13 +25,13 @@ import com.rhb.istock.kdata.Muster;
 import com.rhb.istock.selector.fina.FinaService;
 
 /*
- * drum + 涨幅不大
+ * drumReco + 相对高价
  * 
  */
 
-@Service("drumPlus")
-public class DrumPlus implements Producer{
-	protected static final Logger logger = LoggerFactory.getLogger(DrumPlus.class);
+@Service("drumRecoH21")
+public class DrumRecoH21 implements Producer{
+	protected static final Logger logger = LoggerFactory.getLogger(DrumRecoH21.class);
 	
 	@Autowired
 	@Qualifier("kdataServiceImp")
@@ -47,8 +47,10 @@ public class DrumPlus implements Producer{
 	
 	@Value("${operationsPath}")
 	private String operationsPath;
+
+	private String fileName  = "DrumRecoH21.txt";
 	
-	private String fileName  = "DrumPlus.txt";
+	private Integer pool = 21;
 
 	@Override
 	public Map<LocalDate, List<String>> produce(LocalDate bDate, LocalDate eDate) {
@@ -127,18 +129,34 @@ public class DrumPlus implements Producer{
 	public List<String> produce(LocalDate date, boolean write) {
 		List<String> breakers = new ArrayList<String>();
 		Map<String,Muster> musters;
-		List<Muster> ms;
-		Muster p;
+		List<Muster> tmps;
+		Muster muster, p;
+		List<String> recommendations;
 		Integer sseiRatio, ratio;
 		
 		Integer previous_period  = 13; //历史纪录区间，主要用于后面判断
-		
+
 		musters = kdataService.getMusters(date);
 		if(musters!=null && musters.size()>0) {
-
 			List<Map<String,Muster>> previous = kdataService.getPreviousMusters(previous_period, date);
 
-			ms = new ArrayList<Muster>(musters.values());
+			recommendations = finaService.getHighRecommendations(date, 10000, 13); //推荐买入
+			tmps = new ArrayList<Muster>();
+			for(String id : recommendations) {
+				muster = musters.get(id);
+				if(muster!=null) {
+					tmps.add(muster);
+				}
+			}
+			
+			Collections.sort(tmps, new Comparator<Muster>() {
+				@Override
+				public int compare(Muster o1, Muster o2) {
+					return o2.getLatestPrice().compareTo(o1.getLatestPrice()); //价格大到小排序
+				}
+			});
+			
+			List<Muster> ms = tmps.subList(0, tmps.size()>=pool ? pool : tmps.size());    //最高价的前21只
 			
 			Collections.sort(ms, new Comparator<Muster>() {
 				@Override
@@ -152,6 +170,7 @@ public class DrumPlus implements Producer{
 			});
 			
 			sseiRatio = indexServiceTushare.getSseiGrowthRate(date, 21);
+			//System.out.println("sseiRatio = " + sseiRatio);
 			for(Muster m : ms) {
 				p = previous.get(0).get(m.getItemID());
 				if(m!=null && p!=null) {
@@ -172,8 +191,12 @@ public class DrumPlus implements Producer{
 				results.put(date, breakers);
 				FileTools.writeMapFile(this.getFileName(), results, true);
 			}
-			
+		}else {
+			System.out.println("muster is NULL!");
 		}
+		//System.out.println("there are " + breakers.size() + " DrumReco stocks.");
+		//System.out.println(breakers);
+
 		
 		return breakers;
 	}

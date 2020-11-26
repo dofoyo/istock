@@ -60,6 +60,9 @@ public class DrumService {
 	@Value("${dimensionsFile}")
 	private String dimensionsFile;
 	
+	LocalDate tmp_taoyans_date = null;
+	Map<String, Taoyans> tmp_taoyans = null;
+	
 	protected static final Logger logger = LoggerFactory.getLogger(DrumService.class);
 
 	public void generateDrums(LocalDate beginDate, LocalDate endDate) {
@@ -153,7 +156,30 @@ public class DrumService {
 		return dns;
 	}
 	
+	public Set<String> getDimensions(LocalDate date, String itemID){
+		Set<String> results = new HashSet<String>();
+		List<Taoyan> taoyans;
+		Map<String,String> ids;
+		String str;
+		Map<String,Taoyans> dimensions = this.getThinDimensions(date);
+		for(Map.Entry<String, Taoyans> entry : dimensions.entrySet()) {
+			taoyans = entry.getValue().getResult();
+			for(Taoyan taoyan : taoyans) {
+				ids = taoyan.getAll();
+				if(ids.containsKey(itemID)) {
+					str = String.format("%s(%d)", taoyan.getName(),taoyan.getRatio());
+					results.add(str);
+				}
+			}
+		}
+		return results;
+	}
+	
 	private Map<String,Taoyans> getThinDimensions(LocalDate endDate){
+		if(endDate.equals(this.tmp_taoyans_date)) {
+			return this.tmp_taoyans;
+		}
+		
 		Dimension industry_a = new Dimension();
 		Dimension topic_a = new Dimension();
 		
@@ -179,11 +205,12 @@ public class DrumService {
 		//System.out.println("topic");
 		//topic.print();
 		
-		Map<String, Taoyans> ds = new HashMap<String,Taoyans>();
-		ds.put("topic", topic);
-		ds.put("industry", industry);
+		this.tmp_taoyans = new HashMap<String,Taoyans>();
+		this.tmp_taoyans_date = endDate;
+		tmp_taoyans.put("topic", topic);
+		tmp_taoyans.put("industry", industry);
 
-		return ds;
+		return tmp_taoyans;
 	}
 	
 	private Map<String,Taoyans> getDimensions(LocalDate endDate){
@@ -365,11 +392,11 @@ public class DrumService {
 		return results;
 	}
 	
-	public Set<String> getDrumsOfDimensions(LocalDate endDate, Integer ratio){
+	public Set<String> getDrumsOfDimensions(LocalDate endDate, Integer lRatio, Integer hRatio){
 		Map<String,Taoyans> dimensions = this.getThinDimensions(endDate);
-		Set<String> industrys = dimensions.get("industry").getHighRatioIDs(ratio);
+		Set<String> industrys = dimensions.get("industry").getHighRatioIDs(lRatio, hRatio);
 		//System.out.println("strong industrys.size=" + industrys.size());
-		Set<String> topics = dimensions.get("topic").getHighRatioIDs(ratio);
+		Set<String> topics = dimensions.get("topic").getHighRatioIDs(lRatio, hRatio);
 		//System.out.println("strong topics.size=" + topics.size());
 		Set<String> oks = new HashSet<String>();
 		oks.addAll(industrys);
@@ -377,7 +404,7 @@ public class DrumService {
 		return oks;
 	}
 	
-	public List<String> getDrumsOfTopDimensions(LocalDate endDate,Set<String> holds, Integer ratio){
+	public List<String> getDrumsOfTopDimensions(LocalDate endDate,Set<String> holds, Integer lRatio, Integer hRatio, boolean newb){
 		Set<String> holdDimensions = this.getDimensionNames(holds);
 		Map<String,Taoyans> dimensions = this.getDimensions(endDate);
 		
@@ -385,8 +412,8 @@ public class DrumService {
 		//Integer ratio = averages.get(averages.size()-1).getRatio();
 		//Integer ratio = 34;
 		
-		Set<String> industrys = dimensions.get("industry").getHighRatioIDs(ratio,holdDimensions);
-		Set<String> topics = dimensions.get("topic").getHighRatioIDs(ratio,holdDimensions);
+		Set<String> industrys = dimensions.get("industry").getHighRatioIDs(lRatio, hRatio,holdDimensions);
+		Set<String> topics = dimensions.get("topic").getHighRatioIDs(lRatio, hRatio,holdDimensions);
 		//Set<String> markets = dimensions.get("market").getHighRatioIDs(ratio);
 		//Set<String> areas = dimensions.get("area").getHighRatioIDs(ratio);
 
@@ -402,12 +429,14 @@ public class DrumService {
 			}
 		}*/
 		
+		List<String> recommendations = finaService.getHighRecommendations(endDate, 10000, 13); //推荐买入
 		Map<String,Muster> musters = kdataService.getMusters(endDate);
 		List<Muster> ok_musters = new ArrayList<Muster>();
 		Muster muster;
 		for(String id : oks) {
 			muster = musters.get(id);
-			if(muster!=null && muster.isUpBreaker()) {
+			if(muster!=null 
+					&& recommendations.contains(id)) {
 				ok_musters.add(muster);
 			}
 		}
@@ -427,7 +456,13 @@ public class DrumService {
 		
 		List<String> results = new ArrayList<String>();
 		for(Muster m : ok_musters) {
-			results.add(m.getItemID());
+			if(newb) {
+				if(m.isUpBreaker()) {
+					results.add(m.getItemID());
+				}
+			}else {
+				results.add(m.getItemID());
+			}
 		}
 		
 		return results;
@@ -573,10 +608,10 @@ public class DrumService {
 			return ids;
 		}
 		
-		public Set<String> getHighRatioIDs(Integer ratio){
+		public Set<String> getHighRatioIDs(Integer lRatio, Integer hRatio){
 			Set<String> ids = new HashSet<String>();
 			for(int i=0; i<ts.size(); i++) {
-				if(this.ts.get(i).getRatio() > ratio) {
+				if(this.ts.get(i).getRatio()>=lRatio && this.ts.get(i).getRatio()<=hRatio) {
 					ids.addAll(this.ts.get(i).getDrum().keySet());
 				}
 			}
@@ -585,12 +620,12 @@ public class DrumService {
 			return ids;
 		}
 		
-		public Set<String> getHighRatioIDs(Integer ratio, Set<String> excludes){
+		public Set<String> getHighRatioIDs(Integer lRatio, Integer hRatio, Set<String> excludes){
 			Set<String> ids = new HashSet<String>();
 			Taoyan ty;
 			for(int i=0; i<ts.size(); i++) {
 				ty = this.ts.get(i);
-				if(!excludes.contains(ty.getName()) && ty.getRatio()>ratio) {
+				if(!excludes.contains(ty.getName()) && ty.getRatio()>=lRatio && ty.getRatio()<=hRatio) {
 					ids.addAll(ty.getDrum().keySet());
 				}
 			}
@@ -617,6 +652,10 @@ public class DrumService {
 		public Map<String,String> getDrum(){
 			return this.drum;
 		}
+		
+		public Map<String,String> getAll(){
+			return this.total;
+		}
 
 		public Integer getRatio() {
 			Double a = drum.size()*1.0/total.size() * 100;
@@ -629,7 +668,7 @@ public class DrumService {
 
 		@Override
 		public String toString() {
-			return String.format("%s total=%d drum=%d ratio=%d", name, total.size(), drum.size(), getRatio());
+			return String.format("%s total=%d drum=%d ratio=%d, drums:[%s]", name, total.size(), drum.size(), getRatio(),drum.toString());
 		}
 		
 	}
