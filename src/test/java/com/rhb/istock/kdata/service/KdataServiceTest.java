@@ -49,7 +49,7 @@ public class KdataServiceTest {
 		kdataService.updateLatestMusters();
 	}
 	
-	@Test
+	//@Test
 	public void generateMusters() {
 		LocalDate date = LocalDate.parse("2020-01-25");
 		//kdataService.generateMusters(date);
@@ -89,12 +89,12 @@ public class KdataServiceTest {
 		}
 	}
 	
-	//@Test
+	@Test
 	public void downClosedDatas() {
-		LocalDate date = LocalDate.parse("2020-10-19");
+		LocalDate date = LocalDate.parse("2020-11-25");
 		try {
-			//kdataService.downClosedDatas(date);
-			kdataService.downFactors(date);
+			kdataService.downClosedDatas(date);
+			//kdataService.downFactors(date);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

@@ -54,21 +54,21 @@ public class Evaluation {
 		boolean isAveValue = false;  //买入前不做市值平均
 		Integer quantityType = 3;  //按固定数量买入
 		try {
-			//Future<String> fhlb = hlb.run(beginDate, endDate, initCash, top, isAveValue, quantityType);
-			//Future<String> fbdt = bdt.run(beginDate, endDate, initCash, top, isAveValue, quantityType);
+			Future<String> fhlb = hlb.run(beginDate, endDate, initCash, top, isAveValue, quantityType);
+			Future<String> fbdt = bdt.run(beginDate, endDate, initCash, top, isAveValue, quantityType);
 			Future<String> favb = avb.run(beginDate, endDate, initCash, top, isAveValue, quantityType);
-			//Future<String> fbhl = bhl.run(beginDate, endDate, initCash, top, isAveValue, quantityType);
-			//Future<String> fbav = bav.run(beginDate, endDate, initCash, top, isAveValue, quantityType);
-			//Future<String> fdtb = dtb.run(beginDate, endDate, initCash, top, isAveValue, quantityType);
+			Future<String> fbhl = bhl.run(beginDate, endDate, initCash, top, isAveValue, quantityType);
+			Future<String> fbav = bav.run(beginDate, endDate, initCash, top, isAveValue, quantityType);
+			Future<String> fdtb = dtb.run(beginDate, endDate, initCash, top, isAveValue, quantityType);
 			
 			while(true) {
 				if(true 
-					//&& fhlb.isDone() 
-					//&& fbdt.isDone()
+					&& fhlb.isDone() 
+					&& fbdt.isDone()
 					&& favb.isDone()
-					//&& fbhl.isDone()
-					//&& fbav.isDone()
-					//&& fdtb.isDone()
+					&& fbhl.isDone()
+					&& fbav.isDone()
+					&& fdtb.isDone()
 						) {
 					break;
 				}
