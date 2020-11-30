@@ -53,13 +53,14 @@ public class Simulation {
 		Integer top = 1;
 		boolean isAveValue = true;
 		Integer quantityType = 0;
+		boolean isEvaluation = false;
 		try {
-			Future<String> fhlb = hlb.run(beginDate, endDate, initCash, top, isAveValue, quantityType);
-			Future<String> fbdt = bdt.run(beginDate, endDate, initCash, top, isAveValue, quantityType);
-			Future<String> favb = avb.run(beginDate, endDate, initCash, top, isAveValue, quantityType);
-			Future<String> fbhl = bhl.run(beginDate, endDate, initCash, top, isAveValue, quantityType);
-			Future<String> fbav = bav.run(beginDate, endDate, initCash, top, isAveValue, quantityType);
-			Future<String> fdtb = dtb.run(beginDate, endDate, initCash, top, isAveValue, quantityType);
+			Future<String> fhlb = hlb.run(beginDate, endDate, initCash, top, isAveValue, quantityType, isEvaluation);
+			Future<String> fbdt = bdt.run(beginDate, endDate, initCash, top, isAveValue, quantityType, isEvaluation);
+			Future<String> favb = avb.run(beginDate, endDate, initCash, top, isAveValue, quantityType, isEvaluation);
+			Future<String> fbhl = bhl.run(beginDate, endDate, initCash, top, isAveValue, quantityType, isEvaluation);
+			Future<String> fbav = bav.run(beginDate, endDate, initCash, top, isAveValue, quantityType, isEvaluation);
+			Future<String> fdtb = dtb.run(beginDate, endDate, initCash, top, isAveValue, quantityType, isEvaluation);
 			
 			while(true) {
 				if(fhlb.isDone() 

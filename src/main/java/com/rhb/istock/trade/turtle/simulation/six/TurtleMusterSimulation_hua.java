@@ -57,6 +57,7 @@ public class TurtleMusterSimulation_hua {
 	public void simulate(LocalDate beginDate, LocalDate endDate) {
 		long beginTime=System.currentTimeMillis(); 
 		System.out.println("simulate hua from " + beginDate + " to " + endDate +" ......");
+		boolean isEvaluation = false;
 
 		Hua dtb = new Hua(initCash);
 
@@ -79,7 +80,7 @@ public class TurtleMusterSimulation_hua {
 		
 		Map<String, String> dtbResult = dtb.result();
 		
-		turtleSimulationRepository.save("dtb", dtbResult.get("breakers"), dtbResult.get("CSV"), dtbResult.get("dailyAmount"));
+		turtleSimulationRepository.save("dtb", dtbResult.get("breakers"), dtbResult.get("CSV"), dtbResult.get("dailyAmount"), isEvaluation);
 
 		long used = (System.currentTimeMillis() - beginTime)/1000; 
 		System.out.println("用时：" + used + "秒");          

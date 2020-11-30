@@ -93,13 +93,14 @@ public class ManualService {
 		BigDecimal initCash = new BigDecimal(1000000);
 		Integer top = 5;
 		Account account = new Account(initCash);
+		boolean isEvaluation = false;
 		Map<String, String> operateResult;
 		if("aggressive".equals(simulateType)) {
 			operateResult = aggressiveOperation.run(account, this.selects, this.getBeginDate(), this.getEndDate(), label, top, true,0);
 		}else {
 			operateResult = conservativeOperation.run(account, this.selects, this.getBeginDate(), this.getEndDate(), label, top, true,0);
 		}
-		turtleSimulationRepository.save("manual", operateResult.get("breakers"), operateResult.get("CSV"), operateResult.get("dailyAmount"));
+		turtleSimulationRepository.save("manual", operateResult.get("breakers"), operateResult.get("CSV"), operateResult.get("dailyAmount"), isEvaluation);
 		
 		long used = (System.currentTimeMillis() - beginTime)/1000; 
 		System.out.println("manual simulate 用时：" + used + "秒");          

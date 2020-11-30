@@ -22,8 +22,8 @@ import com.rhb.istock.trade.balloon.domain.Balloon;
  */
 @Service("balloonStaticSimulation")
 public class BalloonStaticSimulation implements BalloonSimulation{
-	@Value("${reportPath}")
-	private String reportPath;
+	@Value("${simulationPath}")
+	private String simulationPath;
 	
 	@Autowired
 	@Qualifier("kdataServiceImp")
@@ -71,7 +71,7 @@ public class BalloonStaticSimulation implements BalloonSimulation{
 		System.out.println("total: " + result.get("total"));
 		System.out.println("CAGR: " + result.get("cagr"));
 		System.out.println("winRatio: " + result.get("winRatio"));
-		FileTools.writeTextFile(reportPath + "/one_item_simulation_" + System.currentTimeMillis() + ".csv", result.get("CSV"), false);
+		FileTools.writeTextFile(simulationPath + "/one_item_simulation_" + System.currentTimeMillis() + ".csv", result.get("CSV"), false);
 		return result;
 	}
 

@@ -20,8 +20,8 @@ import com.rhb.istock.selector.potential.PotentialService;
 
 @Service("powerSimulation")
 public class PowerSimulation {
-	@Value("${reportPath}")
-	private String reportPath;
+	@Value("${simulationPath}")
+	private String simulationPath;
 	
 	@Autowired
 	@Qualifier("kdataServiceImp")
@@ -76,7 +76,7 @@ public class PowerSimulation {
 			}
 		}
 		
-		FileTools.writeTextFile(reportPath + "/simulation_power.csv", pd.getResult(), false);
+		FileTools.writeTextFile(simulationPath + "/simulation_power.csv", pd.getResult(), false);
 		
 		System.out.println("power simulate done!");
 		long used = (System.currentTimeMillis() - beginTime)/1000; 

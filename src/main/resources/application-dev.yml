@@ -5,7 +5,8 @@ tushareKdataPath: D:/dev/istock-data/kdata/tushare
 tushareFdataPath: D:/dev/istock-data/fdata/tushare
 eastmoneyFataPath: D:/dev/istock-data/fdata/eastmoney
 kdataPath163: D:/dev/istock-data/kdata/163
-reportPath: D:/dev/istock-data/reports
+simulationPath: D:/dev/istock-data/simulations
+evaluationPath: D:/dev/istock-data/evaluations
 musterPath: d:/dev/istock-data/kdata/muster
 tmpMusterPath: d:/dev/istock-data/kdata/muster_tmp
 tushareItemsFile: D:/dev/istock-data/tushare_items.json

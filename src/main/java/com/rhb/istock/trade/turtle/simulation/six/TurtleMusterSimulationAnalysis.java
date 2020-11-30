@@ -15,8 +15,8 @@ import com.rhb.istock.comm.util.FileTools;
 
 @Service("turtleMusterSimulationAnalysis")
 public class TurtleMusterSimulationAnalysis {
-	@Value("${reportPath}")
-	private String reportPath;
+	@Value("${simulationPath}")
+	private String simulationPath;
 
 	@Value("${openDuration}")
 	private String openDuration;
@@ -25,7 +25,7 @@ public class TurtleMusterSimulationAnalysis {
 	private String dropDuration;
 	
 	public void generateRecords(String type){
-		String theFile = reportPath + "/" + type + "_simulation_detail_"+openDuration+"_"+dropDuration+".csv"; 
+		String theFile = simulationPath + "/" + type + "_simulation_detail_"+openDuration+"_"+dropDuration+".csv"; 
 
 		String[] lines = FileTools.readTextFile(theFile).split("\n");
 		String[] columns;
@@ -98,7 +98,7 @@ public class TurtleMusterSimulationAnalysis {
 			sb.append(r.getStr() +"\n");
 		}
 		
-		String file = reportPath + "/" + type + "_simulation_detail_plus_"+openDuration+"_"+dropDuration+".csv"; 
+		String file = simulationPath + "/" + type + "_simulation_detail_plus_"+openDuration+"_"+dropDuration+".csv"; 
 		FileTools.writeTextFile(file, sb.toString(), false);
 
 	}

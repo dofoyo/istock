@@ -385,6 +385,7 @@ public class Account {
 		Order openOrder = holds.get(orderID);
 		Order dropOrder = new Order(openOrder.getOrderID(),openOrder.getItemID(),openOrder.getItemName(),openOrder.getIndustry(), LocalDate.parse(endDate.toString()), price, openOrder.getQuantity());
 		dropOrder.setNote(note);
+		dropOrder.setHighest(openOrder.getHighest());
 
 		//System.out.println(dropOrder); //----------------------------------------------
 	
@@ -817,19 +818,23 @@ public class Account {
 		sb.append("month");
 		sb.append(",");
 		sb.append("industry");
+		sb.append(",");
+		sb.append("highest");
 		sb.append("\n");
 		return sb.toString();
 	}
 	
 	public String getCSV() {
-		Order openOrder, dsOrder;
+		Order openOrder, dsOrder,holdOrder;
 		StringBuffer sb = new StringBuffer(this.getCSVTitle());
 		for(Map.Entry<Integer,Order> entry : opens.entrySet()) {
 			openOrder = entry.getValue();
 			dsOrder = getDropOrStopOrder(entry.getKey());
 			if(dsOrder==null) {
-				dsOrder = new Order(openOrder.getOrderID(),openOrder.getItemID(),openOrder.getItemName(), openOrder.getIndustry(),endDate,prices.get(openOrder.getItemID()),openOrder.getQuantity());
+				holdOrder = holds.get(openOrder.getOrderID());
+				dsOrder = new Order(holdOrder.getOrderID(),holdOrder.getItemID(),holdOrder.getItemName(), holdOrder.getIndustry(),endDate,prices.get(holdOrder.getItemID()),holdOrder.getQuantity());
 				dsOrder.setNote("hold");
+				dsOrder.setHighest(holdOrder.getHighest());
 			}
 			sb.append(openOrder.getOrderID());
 			sb.append(",");
@@ -862,6 +867,8 @@ public class Account {
 			sb.append(dsOrder.getDate().getMonth().getValue());
 			sb.append(",");
 			sb.append(openOrder.getIndustry());
+			sb.append(",");
+			sb.append(dsOrder.getHighest());
 			sb.append("\n");
 
 		}
@@ -1021,6 +1028,10 @@ public class Account {
 			if(highest.compareTo(latest)==-1) {
 				highest = latest;
 			}
+		}
+		
+		public void setHighest(BigDecimal highest) {
+			this.highest = highest;
 		}
 
 		public BigDecimal getHighest() {

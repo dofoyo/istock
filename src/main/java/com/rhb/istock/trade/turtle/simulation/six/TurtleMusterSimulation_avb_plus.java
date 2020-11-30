@@ -56,6 +56,7 @@ public class TurtleMusterSimulation_avb_plus {
 		long beginTime=System.currentTimeMillis(); 
 		System.out.println("simulate hunt from " + beginDate + " to " + endDate +" ......");
 
+		boolean isEvaluation = false;
 		Hunt bdt = new Hunt(initCash, true);
 
 		TreeMap<LocalDate,List<String>> sells = turtleSimulationRepository.getSells("avb");
@@ -87,7 +88,7 @@ public class TurtleMusterSimulation_avb_plus {
 		
 		Map<String, String> dtbResult = bdt.result();
 		
-		turtleSimulationRepository.save("bdt", dtbResult.get("breakers"), dtbResult.get("CSV"), dtbResult.get("dailyAmount"));
+		turtleSimulationRepository.save("bdt", dtbResult.get("breakers"), dtbResult.get("CSV"), dtbResult.get("dailyAmount"), isEvaluation);
 
 		long used = (System.currentTimeMillis() - beginTime)/1000; 
 		System.out.println("用时：" + used + "秒");          

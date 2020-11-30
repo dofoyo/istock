@@ -17,8 +17,11 @@ import com.rhb.istock.comm.util.FileTools;
 
 @Service("turtleSimulationRepository")
 public class TurtleSimulationRepository {
-	@Value("${reportPath}")
-	private String reportPath;
+	@Value("${simulationPath}")
+	private String simulationPath;
+
+	@Value("${evaluationPath}")
+	private String evaluationPath;
 	
 	@Value("${dailyMeansFile}")
 	private String dailyMeansFile;
@@ -72,17 +75,19 @@ public class TurtleSimulationRepository {
 		FileTools.writeTextFile(dailyMeansFile, sb.toString(), false);
 	}
 	
-	public void save(String type, String breakers, String details, String dailyAmounts) {
-		FileTools.writeTextFile(reportPath + "/" + type + "_simulation_breakers_"+openDuration+"_"+dropDuration+".csv", breakers, false);
-		FileTools.writeTextFile(reportPath + "/" + type + "_simulation_detail_"+openDuration+"_"+dropDuration+".csv", details, false);
-		FileTools.writeTextFile(reportPath + "/" + type + "_simulation_dailyAmount_"+openDuration+"_"+dropDuration+".csv", dailyAmounts, false);
+	public void save(String type, String breakers, String details, String dailyAmounts, boolean isEvaluation) {
+		String path = isEvaluation ? evaluationPath : simulationPath;
+		
+		FileTools.writeTextFile(path + "/" + type + "_simulation_breakers_"+openDuration+"_"+dropDuration+".csv", breakers, false);
+		FileTools.writeTextFile(path + "/" + type + "_simulation_detail_"+openDuration+"_"+dropDuration+".csv", details, false);
+		FileTools.writeTextFile(path + "/" + type + "_simulation_dailyAmount_"+openDuration+"_"+dropDuration+".csv", dailyAmounts, false);
 	}
 	
 	@Cacheable("breakers")
 	public Map<LocalDate, List<String>>  getBreakers(String type){
 		Map<LocalDate, List<String>> breakers = new TreeMap<LocalDate, List<String>>();
 		
-		String theFile = reportPath + "/" + type + "_simulation_breakers_"+openDuration+"_"+dropDuration+".csv"; 
+		String theFile = simulationPath + "/" + type + "_simulation_breakers_"+openDuration+"_"+dropDuration+".csv"; 
 		//System.out.println(theFile);
 		String[] lines = FileTools.readTextFile(theFile).split("\n");
 		String[] columns;
@@ -131,7 +136,7 @@ public class TurtleSimulationRepository {
 	
 	private Map<String, String> getAllBuysOfType(String type, String itemID){
 		Map<String, String> buys = new HashMap<String, String>();
-		String theFile = reportPath + "/" + type + "_simulation_detail_"+openDuration+"_"+dropDuration+".csv"; 
+		String theFile = simulationPath + "/" + type + "_simulation_detail_"+openDuration+"_"+dropDuration+".csv"; 
 		String[] lines = FileTools.readTextFile(theFile).split("\n");
 		String[] columns;
 		for(int j=1; j<lines.length; j++) {
@@ -170,7 +175,7 @@ public class TurtleSimulationRepository {
 	
 	private Map<String, String> getAllSellsOfType(String type, String itemID){
 		Map<String, String> sells = new HashMap<String, String>();
-		String theFile = reportPath + "/" + type + "_simulation_detail_"+openDuration+"_"+dropDuration+".csv"; 
+		String theFile = simulationPath + "/" + type + "_simulation_detail_"+openDuration+"_"+dropDuration+".csv"; 
 		String[] lines = FileTools.readTextFile(theFile).split("\n");
 		String[] columns;
 		for(int j=1; j<lines.length; j++) {
@@ -186,7 +191,7 @@ public class TurtleSimulationRepository {
 	public TreeMap<LocalDate, List<String>>  getBuys(String type){
 		TreeMap<LocalDate, List<String>> buys = new TreeMap<LocalDate, List<String>>();
 		
-		String theFile = reportPath + "/" + type + "_simulation_detail_"+openDuration+"_"+dropDuration+".csv"; 
+		String theFile = simulationPath + "/" + type + "_simulation_detail_"+openDuration+"_"+dropDuration+".csv"; 
 		//System.out.println(theFile);
 		String[] lines = FileTools.readTextFile(theFile).split("\n");
 		String[] columns;
@@ -212,7 +217,7 @@ public class TurtleSimulationRepository {
 	public TreeMap<LocalDate, List<String>>  getSells(String type){
 		TreeMap<LocalDate, List<String>> sells = new TreeMap<LocalDate, List<String>>();
 		
-		String theFile = reportPath + "/" + type + "_simulation_detail_"+openDuration+"_"+dropDuration+".csv"; 
+		String theFile = simulationPath + "/" + type + "_simulation_detail_"+openDuration+"_"+dropDuration+".csv"; 
 		//System.out.println(theFile);
 		String[] lines = FileTools.readTextFile(theFile).split("\n");
 		String[] columns;
@@ -240,7 +245,7 @@ public class TurtleSimulationRepository {
 	public TreeMap<LocalDate, AmountEntity>  getAmounts(String type){
 		TreeMap<LocalDate, AmountEntity> amounts = new TreeMap<LocalDate, AmountEntity>();
 		
-		String theFile = reportPath + "/" + type + "_simulation_dailyAmount_"+openDuration+"_"+dropDuration+".csv"; 
+		String theFile = simulationPath + "/" + type + "_simulation_dailyAmount_"+openDuration+"_"+dropDuration+".csv"; 
 		//System.out.println(theFile);
 		String[] lines = FileTools.readTextFile(theFile).split("\n");
 		String[] columns;

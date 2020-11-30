@@ -24,8 +24,8 @@ import com.rhb.istock.trade.kelly.domain.Kelly;
  */
 @Service("kellySimulation")
 public class KellySimulation{
-	@Value("${reportPath}")
-	private String reportPath;
+	@Value("${simulationPath}")
+	private String simulationPath;
 	
 	@Autowired
 	@Qualifier("kdataServiceImp")
@@ -102,9 +102,9 @@ public class KellySimulation{
 		System.out.println("total: " + result.get("total"));
 		System.out.println("CAGR: " + result.get("cagr"));
 		System.out.println("winRatio: " + result.get("winRatio"));
-		FileTools.writeTextFile(reportPath + "/kelly_simulation_detail" + System.currentTimeMillis() + ".csv", result.get("CSV"), false);
-		FileTools.writeTextFile(reportPath + "/kelly_simulation_dailyAmount" + System.currentTimeMillis() + ".csv", result.get("dailyAmount"), false);
-		FileTools.writeTextFile(reportPath + "/kelly_simulation_breakers" + System.currentTimeMillis() + ".csv", result.get("breakers"), false);
+		FileTools.writeTextFile(simulationPath + "/kelly_simulation_detail" + System.currentTimeMillis() + ".csv", result.get("CSV"), false);
+		FileTools.writeTextFile(simulationPath + "/kelly_simulation_dailyAmount" + System.currentTimeMillis() + ".csv", result.get("dailyAmount"), false);
+		FileTools.writeTextFile(simulationPath + "/kelly_simulation_breakers" + System.currentTimeMillis() + ".csv", result.get("breakers"), false);
 		return result;
 	}
 

@@ -33,8 +33,8 @@ import com.rhb.istock.trade.turtle.simulation.six.repository.TurtleSimulationRep
  */
 @Service("turtleStaticSimulation")
 public class TurtleStaticSimulation implements TurtleSimulation{
-	@Value("${reportPath}")
-	private String reportPath;
+	@Value("${simulationPath}")
+	private String simulationPath;
 	
 	@Autowired
 	@Qualifier("kdataServiceImp")
@@ -113,9 +113,9 @@ public class TurtleStaticSimulation implements TurtleSimulation{
 		System.out.println("total: " + result.get("total"));
 		System.out.println("CAGR: " + result.get("cagr"));
 		System.out.println("winRatio: " + result.get("winRatio"));
-		FileTools.writeTextFile(reportPath + "/simulation_detail" + System.currentTimeMillis() + ".csv", result.get("CSV"), false);
-		FileTools.writeTextFile(reportPath + "/simulation_dailyAmount" + System.currentTimeMillis() + ".csv", result.get("dailyAmount"), false);
-		FileTools.writeTextFile(reportPath + "/simulation_breakers" + System.currentTimeMillis() + ".csv", result.get("breakers"), false);
+		FileTools.writeTextFile(simulationPath + "/simulation_detail" + System.currentTimeMillis() + ".csv", result.get("CSV"), false);
+		FileTools.writeTextFile(simulationPath + "/simulation_dailyAmount" + System.currentTimeMillis() + ".csv", result.get("dailyAmount"), false);
+		FileTools.writeTextFile(simulationPath + "/simulation_breakers" + System.currentTimeMillis() + ".csv", result.get("breakers"), false);
 		return result;
 	}
 
