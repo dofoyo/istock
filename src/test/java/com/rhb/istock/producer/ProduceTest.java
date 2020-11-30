@@ -85,10 +85,10 @@ public class ProduceTest {
 		System.out.println(results);
 	}
 	
-	//@Test
+	@Test
 	public void produce2() {  //做收盘
-		LocalDate bDate = LocalDate.parse("2018-01-01");
-		LocalDate eDate = LocalDate.parse("2020-11-23");
+		LocalDate bDate = LocalDate.parse("2010-01-01");
+		LocalDate eDate = LocalDate.parse("2020-11-27");
 		
 		producerService.produce(bDate, eDate);
 		System.out.println("收盘 Test");

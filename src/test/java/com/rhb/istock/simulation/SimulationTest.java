@@ -30,7 +30,7 @@ public class SimulationTest {
 	
 	@Test
 	public void evaluation() {
-		LocalDate beginDate = LocalDate.parse("2020-03-23");
+		LocalDate beginDate = LocalDate.parse("2010-02-14");
 		LocalDate endDate = LocalDate.parse("2020-11-27");
 
 		evaluation.evaluate(beginDate, endDate);
