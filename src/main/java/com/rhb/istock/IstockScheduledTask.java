@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import com.rhb.istock.evaluation.Evaluation;
 import com.rhb.istock.fdata.eastmoney.FdataSpiderEastmoney;
 import com.rhb.istock.fdata.tushare.FdataSpiderTushare;
 import com.rhb.istock.index.tushare.IndexServiceTushare;
@@ -51,6 +52,9 @@ public class IstockScheduledTask {
 	@Qualifier("drumService")
 	DrumService drumService;
 
+	@Autowired
+	@Qualifier("evaluation")
+	Evaluation evaluation;
 	
 	@Autowired
 	@Qualifier("fdataSpiderEastmoney")
@@ -189,6 +193,8 @@ public class IstockScheduledTask {
 			itemService.downTopics();
 			drumService.generateDimensions();
 			
+			evaluation.evaluate(LocalDate.parse("2017-01-01"), date);
+
 		}
 
 		long used = (System.currentTimeMillis() - beginTime)/1000; 

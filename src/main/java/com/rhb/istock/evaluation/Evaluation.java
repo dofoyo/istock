@@ -1,4 +1,4 @@
-package com.rhb.istock.simulation;
+package com.rhb.istock.evaluation;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -12,11 +12,21 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
+import com.rhb.istock.simulation.SimulateAVB;
+import com.rhb.istock.simulation.SimulateBAV;
+import com.rhb.istock.simulation.SimulateBDT;
+import com.rhb.istock.simulation.SimulateBHL;
+import com.rhb.istock.simulation.SimulateDTB;
+import com.rhb.istock.simulation.SimulateHLB;
+
 //@Scope("prototype")
 @Service("evaluation")
 public class Evaluation {
 	protected static final Logger logger = LoggerFactory.getLogger(Evaluation.class);
-
+	@Autowired
+	@Qualifier("evaluationRepository")
+	EvaluationRepository evaluationRepository;
+	
 	@Autowired
 	@Qualifier("avb")
 	SimulateAVB avb;
@@ -77,6 +87,8 @@ public class Evaluation {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		
+		evaluationRepository.evictBusisCache();
 		
 		long used = (System.currentTimeMillis() - beginTime)/1000; 
 		System.out.println("\nsimulate over, 用时：" + used + "秒");          
