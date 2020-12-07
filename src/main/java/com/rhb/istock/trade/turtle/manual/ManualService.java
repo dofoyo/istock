@@ -18,6 +18,7 @@ import com.rhb.istock.index.tushare.IndexServiceTushare;
 import com.rhb.istock.kdata.KdataService;
 import com.rhb.istock.operation.AggressiveOperation;
 import com.rhb.istock.operation.ConservativeOperation;
+import com.rhb.istock.operation.OptimizeOperation;
 import com.rhb.istock.trade.turtle.simulation.six.TurtleMusterSimulation;
 import com.rhb.istock.trade.turtle.simulation.six.repository.AmountEntity;
 import com.rhb.istock.trade.turtle.simulation.six.repository.TurtleSimulationRepository;
@@ -45,7 +46,11 @@ public class ManualService {
 	@Autowired
 	@Qualifier("conservativeOperation")
 	ConservativeOperation conservativeOperation;
-	
+
+	@Autowired
+	@Qualifier("optimizeOperation")
+	OptimizeOperation optimizeOperation;
+
 	private Map<LocalDate, List<String>> selects = new TreeMap<LocalDate, List<String>>();
 
 	public void addSelects(LocalDate date, String itemID) {
@@ -91,14 +96,16 @@ public class ManualService {
 		long beginTime=System.currentTimeMillis(); 
 		String label = "manual " + simulateType;
 		BigDecimal initCash = new BigDecimal(1000000);
-		Integer top = 5;
+		Integer top = 100;
 		Account account = new Account(initCash);
 		boolean isEvaluation = false;
 		Map<String, String> operateResult;
 		if("aggressive".equals(simulateType)) {
 			operateResult = aggressiveOperation.run(account, this.selects, this.getBeginDate(), this.getEndDate(), label, top, true,0);
-		}else {
+		}else if("conservative".equals(simulateType)) {
 			operateResult = conservativeOperation.run(account, this.selects, this.getBeginDate(), this.getEndDate(), label, top, true,0);
+		}else {
+			operateResult = optimizeOperation.run(account, this.selects, this.getBeginDate(), this.getEndDate(), label, top, true,0);
 		}
 		turtleSimulationRepository.save("manual", operateResult.get("breakers"), operateResult.get("CSV"), operateResult.get("dailyAmount"), isEvaluation);
 		

@@ -87,4 +87,41 @@ b表示获胜增长率，指获胜后押注的资金从1变成1+b
 		
 		return new BusiView(winPR,winRate,losePR,loseRate,kelly);
 	}
+	
+	public BusiView  getMaxBusiView(String type, LocalDate bDate, LocalDate eDate){
+		List<Busi> orders = evaluationRepository.getBusis(type);
+		Integer win=0, lose=0;
+		BigDecimal winOpen=BigDecimal.ZERO, winClose=BigDecimal.ZERO, loseOpen=BigDecimal.ZERO, loseClose=BigDecimal.ZERO; 
+		for(Busi order : orders) {
+			if((order.getOpenDate().isBefore(eDate) || order.getOpenDate().equals(eDate))
+					&& (order.getOpenDate().isAfter(bDate) || order.getOpenDate().equals(bDate))
+					) {
+				if(order.isGood()) {
+					win++;
+					winOpen = winOpen.add(order.getOpenPrice());
+					winClose = winClose.add(order.getHighestPrice());
+				}else {
+					lose++;
+					loseOpen = loseOpen.add(order.getOpenPrice());
+					loseClose = loseClose.add(order.getClosePrice());
+				}
+			}
+		}
+		
+		Integer winPR = (win+lose)!=0 ? win*100/(win+lose) : 0;
+		Integer winRate = Functions.growthRate(winClose, winOpen);
+		
+		Integer losePR = (win+lose)!=0 ? lose*100/(win+lose) : 0;
+		Integer loseRate = Functions.growthRate(loseOpen, loseClose);
+
+		Integer kelly = (loseRate!=0 && winRate!=0) ? 100*winPR/loseRate/100 - 100*losePR/winRate/100 : 0;
+		if(losePR==0 && winPR!=0) {
+			kelly = 100;
+		}
+		//System.out.format("win=%d, lose=%d,winPR=%d,winOpen=%.2f,winClose=%.2f,winRate=%d,losePR=%d,loseOpen=%.2f,loseClose=%.2f,loseRate=%d\n",win,lose,winPR,winOpen,winClose,winRate,losePR,loseOpen,loseClose,loseRate);
+		
+		
+		return new BusiView(winPR,winRate,losePR,loseRate,kelly);
+	}
+
 }

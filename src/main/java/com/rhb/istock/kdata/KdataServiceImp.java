@@ -708,7 +708,7 @@ public class KdataServiceImp implements KdataService{
 					entity.setLatestHighest(kbar.getHigh());
 					entity.setLatestLowest(kbar.getLow());
 				}
-				HttpClient.sleep(1);
+				HttpClient.sleep(2);
 			}
 			entities.add(entity);
 		}

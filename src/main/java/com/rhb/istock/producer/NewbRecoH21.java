@@ -123,6 +123,7 @@ public class NewbRecoH21 implements Producer{
 			
 			List<Muster> ms = tmps.subList(0, tmps.size()>=pool ? pool : tmps.size());    //最高价的前21只
 */	
+			
 			tmps = new ArrayList<Muster>(musters.values());
 			Collections.sort(tmps, new Comparator<Muster>() {
 				@Override

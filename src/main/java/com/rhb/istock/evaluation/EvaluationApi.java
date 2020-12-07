@@ -34,11 +34,12 @@ public class EvaluationApi {
 		
 	}	
 	
-	@GetMapping("/evaluation/busi/{type}/{bdate}/{edate}")
+	@GetMapping("/evaluation/busi/{type}/{bdate}/{edate}/{isHighest}")
 	public ResponseContent<BusiView> getDailyMeans(
 			@PathVariable(value="type") String type,
 			@PathVariable(value="bdate") String bdate,
-			@PathVariable(value="edate") String edate){
+			@PathVariable(value="edate") String edate,
+			@PathVariable(value="isHighest") String isHighest){
 
 		BusiView view = null;
 
@@ -51,7 +52,15 @@ public class EvaluationApi {
 			return new ResponseContent<BusiView>(ResponseEnum.ERROR, view);
 		}
 		
-		view = evaluationService.getBusiView(type, theBeginDate, theEndDate);
+		//System.out.println(isHighest);
+		
+		if("1".equals(isHighest)) {
+			//System.out.println("isHighest=1");
+			view = evaluationService.getMaxBusiView(type, theBeginDate, theEndDate);
+		}else {
+			//System.out.println("isHighest=0");
+			view = evaluationService.getBusiView(type, theBeginDate, theEndDate);
+		}
 	
 		return new ResponseContent<BusiView>(ResponseEnum.SUCCESS, view);
 	}

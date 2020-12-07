@@ -28,7 +28,10 @@ public class Busi {
 		return closePrice;
 	}
 	public boolean isWin() {
-		return this.closePrice.compareTo(this.openPrice)>=0;
+		return this.closePrice.compareTo(this.openPrice)>0;
+	}
+	public boolean isGood() {
+		return this.highestPrice.compareTo(this.openPrice)>0;
 	}
 
 }
