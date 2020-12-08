@@ -148,6 +148,8 @@ public class KdataSpiderTushare implements KdataSpider {
 			}
 
 			FileTools.writeTextFile(kdataFile, result, false);
+		}else {
+			logger.info(" factor file has exists.");
 		}
 		
 		long used = (System.currentTimeMillis() - beginTime)/1000; 

@@ -645,25 +645,100 @@ public class KdataServiceImp implements KdataService{
 	
 	@Override
 	public void updateLatestMusters() {
-		LocalDate date = this.getLatestMarketDate("sh000001");
+/*		LocalDate date = this.getLatestMarketDate("sh000001");
 		Map<String,Muster> musters = this.getMusters(date);
 		if(musters.size()>4000) {
 			this.updateMusters(date, musters, null);
 		}else {
 			System.out.println(" update Latest Musters ERROR: muster's size is small than 4000!!!");
 		}
+*/
+		this.updateMustersWithLatestKdata();
+	}
+	
+	private void updateMustersWithLatestKdata() {
+		long beginTime=System.currentTimeMillis(); 
+		logger.info("updateMustersWithLatestKdata ......");
+
+		Set<Kbar> bars = kdataRealtimeSpider.getLatestMarketData();
+		if(bars!=null && bars.iterator()!=null && bars.iterator().next()!=null) {
+			LocalDate date = bars.iterator().next().getDate();
+			Map<String,Muster> musters = this.getMusters(date);
+			if(musters!=null && musters.size()>4000) {
+				List<MusterEntity> entities = new ArrayList<MusterEntity>();
+				MusterEntity entity;
+				Muster muster;
+				for(Kbar bar : bars) {
+					muster = musters.get(bar.getId());
+					if(muster!=null) {
+						entity = new MusterEntity(
+								muster.getItemID(), 
+								muster.getClose(), 
+								muster.getLatestAmount(), 
+								muster.getLatestPrice(),
+								0,
+								muster.getHighest(), 
+								muster.getLowest(), 
+								muster.getAverageAmount(), 
+								muster.getAveragePrice(), 
+								muster.getAveragePrice8(), 
+								muster.getAveragePrice13(), 
+								muster.getAveragePrice21(), 
+								muster.getAveragePrice34(),
+								muster.getLowest21(),
+								muster.getLowest34(),
+								muster.getTurnover_rate_f(),
+								muster.getAverage_turnover_rate_f(),
+								muster.getVolume_ratio(),
+								muster.getAverage_volume_ratio(),
+								muster.getTotal_mv(),
+								muster.getCirc_mv(),
+								muster.getTotal_share(),
+								muster.getFloat_share(),
+								muster.getFree_share(),
+								muster.getLowest13(),
+								muster.getLowest8(),
+								muster.getLowest5(),
+								muster.getAmount5(),
+								muster.getPe(),
+								muster.getLatestHighest(), 
+								muster.getLatestLowest(),
+								muster.getAveragePrice5()
+								);
+						
+						entity.setLatestAmount(bar.getAmount()); 
+						entity.setLatestPrice(bar.getClose());
+						entity.setLimited(bar.isLimited());
+						entity.setLatestHighest(bar.getHigh());
+						entity.setLatestLowest(bar.getLow());
+						
+						entities.add(entity);
+					}
+				}
+				musterRepositoryImp.saveMusters(date,entities);
+			}else {
+				System.out.println(" updateMustersWithLatestKdata ERROR: muster's size is small than 4000!!!");
+			}
+		}
+		
+
+		logger.info("\n updateLatestMusters done!");
+		long used = (System.currentTimeMillis() - beginTime)/1000; 
+		logger.info("用时：" + used + "秒");     
+		
+		
 	}
 
 	private void updateMusters(LocalDate date, Map<String,Muster> musters, Set<String> ids) {
 		long beginTime=System.currentTimeMillis(); 
-		logger.info("updateLatestMusters ......");
+		logger.info("updateMusters ......");
 
 		Kbar kbar;
 		List<MusterEntity> entities = new ArrayList<MusterEntity>();
 		MusterEntity entity;
 		int i=1;
 		for(Muster muster : musters.values()) {
-			Progress.show(musters.size(),i++, " updateLatestMusters " + muster.getItemID());
+			Progress.show(musters.size(),i++, " updateMusters " + muster.getItemID());
 			entity = new MusterEntity(
 					muster.getItemID(), 
 					muster.getClose(), 

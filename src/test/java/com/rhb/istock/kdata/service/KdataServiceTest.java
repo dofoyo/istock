@@ -91,10 +91,11 @@ public class KdataServiceTest {
 	
 	@Test
 	public void downClosedDatas() {
-		LocalDate date = LocalDate.parse("2020-11-25");
+		System.out.println("down closed datas");
+		LocalDate date = LocalDate.parse("2020-12-08");
 		try {
-			kdataService.downClosedDatas(date);
-			//kdataService.downFactors(date);
+			//kdataService.downClosedDatas(date);
+			kdataService.downFactors(date);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

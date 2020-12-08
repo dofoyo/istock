@@ -4,21 +4,32 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.rhb.istock.comm.util.HttpClient;
 import com.rhb.istock.comm.util.HttpDownload;
 import com.rhb.istock.comm.util.ParseString;
+import com.rhb.istock.comm.util.Progress;
+import com.rhb.istock.item.ItemService;
+import com.rhb.istock.kdata.Kbar;
 
 
 @Service("kdataRealtimeSpiderImp")
 public class KdataRealtimeSpiderImp implements KdataRealtimeSpider{
+	@Autowired
+	@Qualifier("itemServiceImp")
+	ItemService itemService;
+	
 	@Value("${tushareUrl}")
 	private String url;
 	
@@ -167,6 +178,59 @@ public class KdataRealtimeSpiderImp implements KdataRealtimeSpider{
 		}
 		
 		return false;
+	}
+
+
+	@Override
+	public Set<Kbar> getLatestMarketData() {
+		Set<Kbar> bars = new HashSet<Kbar>();
+		StringBuffer sb = new StringBuffer();
+		List<String> ids = itemService.getItemIDs();
+		for(int i=0, j=200; i<ids.size(); i=i+200) {
+			Progress.show(ids.size(),i, " getLatestMarketData ");
+			j = i + 200;
+			if(j>ids.size()) {
+				j = ids.size();
+			}
+			
+			//System.out.println(i + " - " + j);
+			bars.addAll(this.getLatestMarketDateKbars(ids.subList(i, j)));
+			HttpClient.sleep(5);
+		}
+		return bars;
+	}
+	
+	private Set<Kbar> getLatestMarketDateKbars(List<String> ids) {		
+		Set<Kbar> bars = new HashSet<Kbar>();
+		StringBuffer sb = new StringBuffer();
+		for(String id : ids) {
+			sb.append(id);
+			sb.append(",");
+		}
+		String url = "https://qt.gtimg.cn/q=" + sb.toString();
+		String result = HttpDownload.getResult(url);
+		String[] ss = result.split(";");
+		for(String s : ss) {
+			bars.add(this.getKbar(s));
+		}
+		return bars;
+	}
+	
+	private Kbar getKbar(String str) {
+		Kbar bar = null;
+		String[] ss = str.split("~");
+		if(ss.length>4 && !ss[3].equals("0.00") && ss[30].length()>8) {
+			bar = new Kbar(ss[5],
+					ss[33], 
+					ss[34], 
+					ss[3], 
+					ss[37],
+					ss[6],
+					LocalDate.parse(ss[30].substring(0, 8),DateTimeFormatter.ofPattern("yyyyMMdd")).toString(),
+					"0","0","0","0","0","0","0","0");
+			bar.setId(ss[0].substring(3,11));
+		}
+		return bar;
 	}
 	
 }

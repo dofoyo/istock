@@ -55,7 +55,7 @@ public class HttpDownload {
 	        httpUrl.disconnect();
 		} catch (Exception e) {
 			System.out.println("  ERROR: " + destUrl);
-			//e.printStackTrace();
+			e.printStackTrace();
 		}
         return sb.toString(); 
 	}

@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 public class Kbar {
+	private String id;
 	private BigDecimal open;
 	private BigDecimal high;
 	private BigDecimal low;
@@ -94,6 +95,14 @@ public class Kbar {
 		
 	}
 	
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
 	public BigDecimal getPe() {
 		return pe;
 	}
@@ -224,9 +233,11 @@ public class Kbar {
 
 	@Override
 	public String toString() {
-		return "Kbar [open=" + open + ", high=" + high + ", low=" + low + ", close=" + close + ", quantity=" + quantity
-				+ ", amount=" + amount + ", date=" + date + ", turnover_rate_f=" + turnover_rate_f + ", volume_ratio="
-				+ volume_ratio + "]";
+		return "Kbar [id=" + id + ", open=" + open + ", high=" + high + ", low=" + low + ", close=" + close
+				+ ", quantity=" + quantity + ", amount=" + amount + ", date=" + date + ", turnover_rate_f="
+				+ turnover_rate_f + ", volume_ratio=" + volume_ratio + ", total_mv=" + total_mv + ", circ_mv=" + circ_mv
+				+ ", total_share=" + total_share + ", float_share=" + float_share + ", free_share=" + free_share
+				+ ", pe=" + pe + "]";
 	}
 
 }

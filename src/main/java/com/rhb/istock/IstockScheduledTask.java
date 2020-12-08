@@ -132,23 +132,23 @@ public class IstockScheduledTask {
 			kdataService.downFactors(); // 3. 上一交易日的收盘数据要等开盘前才能下载到, 大约需要15分钟
 			kdataService.downSSEI();
 			kdataService.generateLatestMusters(null);
-			kdataService.updateLatestMusters();
 			turtleOperationService.init();  // 4.
 			indexServiceTushare.init();
+			kdataService.updateLatestMusters();
 		}
 	}
 
-	//@Scheduled(cron="0 45/1 9-14 ? * 1-5")  //周一至周五，每日9:45点，每1分钟刷新一次 
+/*	//@Scheduled(cron="0 45/1 9-14 ? * 1-5")  //周一至周五，每日9:45点，每1分钟刷新一次 
 	public void updateLatestMusters3() throws Exception {
 		System.out.println("run scheduled of '0 45/1 9-14 ? * 1-5'");
 		if(this.isTradeDate()) {
 			kdataService.updateLatestMustersOfFavors();
 		}
-	}
+	}*/
 	
-	@Scheduled(cron="0 0/10 10-14 ? * 1-5")  //周一至周五，每日9:45 - 15点，每10分钟刷新一次 
+	@Scheduled(cron="0 0/2 10-14 ? * 1-5")  //周一至周五，每日10 - 15点，每2分钟刷新一次 
 	public void updateLatestMusters1() throws Exception {
-		System.out.println("run scheduled of '0 0/10 10-14 ? * 1-5'");
+		System.out.println("run scheduled of '0 0/2 10-14 ? * 1-5'");
 		if(this.isTradeDate()) {
 			kdataService.updateLatestMusters();
 		}
@@ -172,9 +172,9 @@ public class IstockScheduledTask {
 		}
 	}*/
 	
-	@Scheduled(cron="0 30 20 ? * 1-5") //周一至周五，每日20点30 执行收盘
+	@Scheduled(cron="0 35 20 ? * 1-5") //周一至周五，每日20点35 执行收盘
 	public void downloadKdatas()  throws Exception{
-		System.out.println("run scheduled of '0 30 21 ? * 1-5'");
+		System.out.println("run scheduled of '0 35 20 ? * 1-5'");
 		long beginTime=System.currentTimeMillis(); 
 
 		if(this.isTradeDate()) {
