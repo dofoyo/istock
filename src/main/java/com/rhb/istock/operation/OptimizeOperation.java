@@ -91,10 +91,17 @@ public class OptimizeOperation implements Operation {
 		for(String itemID: holdItemIDs) {
 			muster = musters.get(itemID);
 			if(muster!=null && !muster.isDownLimited()) {
-				if(muster.isDropAve(21)) { 		//跌破21日均线就卖
+				if(muster.isDropAve(21) && muster.getLatestPrice().compareTo(muster.getClose())==1) { 		//跌破21日均线就卖
 					account.dropWithTax(itemID, "1", muster.getLatestPrice());
 					drops.put(date, itemID, muster.getAveragePrice21());
 				}
+				
+				//高位快速回落超过8%
+				if(account.isFallOrder(itemID, -8)) {
+					account.dropWithTax(itemID, "2", muster.getLatestPrice());
+					drops.put(date, itemID, muster.getAveragePrice21());
+				}
+
 			}
 		}
 		
@@ -107,6 +114,8 @@ public class OptimizeOperation implements Operation {
 			//选择股票
 			List<String> ids = buyList.get(date);
 			if(ids!=null && ids.size()>0) {
+				//logger.info(date.toString());
+				//logger.info(ids.toString());
 				wants.addAll(ids);
 			}
 			
@@ -121,7 +130,7 @@ public class OptimizeOperation implements Operation {
 					id = it.next();
 					if(!holdItemIDs.contains(id)) {
 						muster = musters.get(id); 
-						if(muster!=null && !muster.isUpLimited() && muster.getN21Gap()<=8) {
+						if(muster!=null && !muster.isUpLimited() && muster.getN21Gap()<=8 && muster.isFall() && muster.isAboveAveragePrice(21)) {
 							dds.add(muster);
 							breakers_sb.append(id);
 							breakers_sb.append(",");

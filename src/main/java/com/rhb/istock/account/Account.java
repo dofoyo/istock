@@ -531,6 +531,26 @@ public class Account {
 			this.dropWithTax(itemID, note, price);
 		}
 	}
+
+	public boolean isFallOrder(String itemID,Integer rate) {
+		if(holds.size()==0) return false;
+		
+		BigDecimal price = null;
+
+		for(Order order : holds.values()) {
+			if(order.getItemID().equals(itemID)) {
+				if(order.getFallRate()<=rate){
+					price = order.getLatest();
+					break;
+				}				
+			}
+		}
+		if(price!=null) {
+			return true;
+		}
+		return false;
+	}
+
 	
 	public void dropWinOrder(String itemID,Integer rate, String note) {
 		HoldState hs = states.get(itemID);

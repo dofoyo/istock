@@ -68,7 +68,7 @@ public class NewbDrumFavor implements Producer{
 					}
 				}
 			}
-/*			List<String> drums = drum.getResults(date);
+			List<String> drums = drum.getResults(date);
 			if(drums!=null && drums.size()>0) {
 				for(String id : drums) {
 					if(favors.contains(id) && !results.contains(id)) {
@@ -76,7 +76,7 @@ public class NewbDrumFavor implements Producer{
 						//System.out.println(id);
 					}
 				}	
-			}*/
+			}
 		}
 		return results;
 	}

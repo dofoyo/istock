@@ -994,5 +994,26 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 		return views;	
 	}
 
+	@Override
+	public ItemView getItemView(String itemID, LocalDate date) {
+		List<String> ids = new ArrayList<String>();
+		ids.add(itemID);
+		List<ItemView> views = buildItemViews(ids, false, date);
+		if(views==null || views.size()==0) return null;
+		
+		ItemView view = views.get(0);
+		
+		Map<String,String> finas = fdataServiceTushare.getFinaGrowthRatioInfo(new HashSet<String>(ids));
+		if(finas!=null && finas.get(itemID)!=null) {
+			view.setFina(finas.get(itemID));
+		}
+		
+		Item item = itemService.getItem(view.getItemID());
+		item.setRecommendations(finaService.getRecommendationCount(itemID, date));
+		view.setName(item.getNameWithCAGR());
+		
+		return view;
+	}
+
 	
 }

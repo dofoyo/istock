@@ -566,6 +566,10 @@ public class Muster {
 				averagePrice34.compareTo(averagePrice)==-1;
 	}
 	
+	public boolean isFall() {
+		return latestPrice.compareTo(close)==-1;
+	}
+	
 	public BigDecimal getLatestPrice() {
 		return latestPrice;
 	}

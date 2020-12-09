@@ -33,6 +33,22 @@ public class TurtleApi{
 		return new ResponseContent<List<ItemView>>(ResponseEnum.SUCCESS, powers_views);
 	}
 	
+	@GetMapping("/turtle/{itemid}/{date}")
+	public ResponseContent<ItemView> getItemView(
+			@PathVariable(value="itemid") String itemID,
+			@PathVariable(value="date") String date
+			){
+		LocalDate theDate = null;
+		try{
+			theDate = LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+		}catch(Exception e){
+			System.out.println("the date '" + date + "' is ERROR!");
+		}
+
+		ItemView view = ts.getItemView(itemID, theDate);
+		return new ResponseContent<ItemView>(ResponseEnum.SUCCESS, view);
+	} 
+	
 	@GetMapping("/turtle/potentials/{type}/{date}")
 	public ResponseContent<List<PotentialView>> getPotentials(
 			@PathVariable(value="type") String type,
