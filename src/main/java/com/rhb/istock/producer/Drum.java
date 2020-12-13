@@ -91,23 +91,27 @@ public class Drum implements Producer{
 		return operationsPath + fileName;
 	}
 	
-	private Integer getRatio(List<Map<String,Muster>> musters, String itemID, BigDecimal price) {
-		Integer ratio = 0;
-		BigDecimal lowest=null;
+	private Integer[] getRatio(List<Map<String,Muster>> musters, String itemID, BigDecimal price) {
+		Integer[] ratio = new Integer[] {0,0};
+		BigDecimal lowest=null, begin=null;
 		Muster m;
 		for(Map<String,Muster> ms : musters) {
 			m = ms.get(itemID);
 			if(m!=null) {
 				lowest = (lowest==null || lowest.compareTo(m.getLatestPrice())==1) ? m.getLatestPrice() : lowest;
-				//logger.info(String.format("%s, date=%s, price=%.2f", itemID, m.getDate().toString(), m.getLatestPrice()));
+				//System.out.println(String.format("%s, date=%s, price=%.2f", itemID, m.getDate().toString(), m.getLatestPrice()));
+				if(begin==null) {
+					begin = m.getLatestPrice();
+				}
 			}
 		}
 		
-		if(lowest!=null && lowest.compareTo(BigDecimal.ZERO)>0) {
-			ratio = Functions.growthRate(price, lowest);
+		if(lowest!=null && begin!=null && lowest.compareTo(BigDecimal.ZERO)>0) {
+			ratio[0] = Functions.growthRate(price, begin);
+			ratio[1] = Functions.growthRate(price, lowest);
 		}
 		
-		//logger.info(String.format("%s, lowest=%.2f, price=%.2f, ratio=%d", itemID, lowest, price,ratio));
+		//System.out.println(String.format("%s, begin=%.2f, lowest=%.2f, price=%.2f, ratio[0]=%d, ratio[1]=%d", itemID, begin,lowest, price,ratio[0],ratio[1]));
 
 		return ratio;
 	}
@@ -142,16 +146,17 @@ public class Drum implements Producer{
 			});
 			
 			Muster p;
-			Integer ratio;
+			Integer[] ratio;
 			Integer previous_period  = 13; //历史纪录区间，主要用于后面判断
 			List<Map<String,Muster>> previous = kdataService.getPreviousMusters(previous_period, date);
-			Integer sseiRatio = indexServiceTushare.getSseiGrowthRate(date, 21);
+			Integer[] sseiRatio = indexServiceTushare.getSseiGrowthRate(date, 21);
 			for(Muster m : tmps) {
 				p = previous.get(0).get(m.getItemID());
 				if(m!=null && p!=null) {
 					ratio = this.getRatio(previous,m.getItemID(),m.getLatestPrice());
-					if(ratio>0
-							&& ratio >= sseiRatio   // 强于大盘
+					//System.out.format("%s,%s,sseiRatio[0]=%d, sseiRatio[1]=%d,ratio[0]=%d,ratio[1]=%d\n",date.toString(),m.getItemID(),sseiRatio[0],sseiRatio[1],ratio[0],ratio[1]);
+					if(ratio[0] > 0
+							&& (ratio[0]>=sseiRatio[0] || ratio[1]>=sseiRatio[1])   // 强于大盘
 							//&& m.getHLGap()<=55
 							&& m.isUpAve(21)
 							&& m.getAveragePrice21().compareTo(p.getAveragePrice21())==1  //上升趋势

@@ -53,19 +53,19 @@ public class IndexServiceTushare {
 		return null;
 	}
 	
-	public Integer getSseiGrowthRate(LocalDate endDate, Integer period) {
+	public Integer[] getSseiGrowthRate(LocalDate endDate, Integer period) {
 		String ts_code = "000001.SH";
 		IndexData data = this.getIndexDatas(ts_code, endDate, period);
 		return data.growthRate();
 	}
 	
-	public Integer getGrowthRate(String ts_code,LocalDate endDate, Integer period) {
+	public Integer[] getGrowthRate(String ts_code,LocalDate endDate, Integer period) {
 		//logger.info(String.format("itemID=%s, date=%s", itemID, endDate.toString()));
 		
 		Set<LocalDate> dates = this.getSseiDates(endDate, period);
 		IndexData data = this.getIndexDatas(ts_code, dates);
 		if(data==null) {
-			return -1;
+			return new Integer[] {-1,-1};
 		}else {
 			return data.growthRate();
 		}
@@ -75,8 +75,8 @@ public class IndexServiceTushare {
 		StringBuffer sb = new StringBuffer();
 		LocalDate date = LocalDate.now();
 		//date = LocalDate.parse("2020/03/16",DateTimeFormatter.ofPattern("yyyy/MM/dd"));
-		Integer period = 13, rate;
-		
+		Integer period = 13;
+		Integer[] rate;
 		Set<IndexBasic> basics = indexRepositoryTushare.getIndexBasics();
 		Set<IndexWeight> weights;
 		int i=1;
@@ -85,7 +85,7 @@ public class IndexServiceTushare {
 			weights = indexRepositoryTushare.getIndexWeights(basic.getTs_code());
 			if(weights.size()>0) {
 				rate = this.getGrowthRate(basic.getTs_code(), date, period);
-				if(rate>=0) {
+				if(rate[1]>=0) {
 					sb.append(basic.getTs_code());
 					sb.append(",");
 				}			
@@ -98,15 +98,16 @@ public class IndexServiceTushare {
 		indexRepositoryTushare.saveIndexFile(sb.toString());
 	}
 	
-	public TreeMap<Integer, Set<String>> getGrowthRate(LocalDate endDate, Integer period) {
-		TreeMap<Integer, Set<String>> indexs = new TreeMap<Integer, Set<String>>();
+	public TreeMap<Integer[], Set<String>> getGrowthRate(LocalDate endDate, Integer period) {
+		TreeMap<Integer[], Set<String>> indexs = new TreeMap<Integer[], Set<String>>();
 		String[] allIndexs = indexRepositoryTushare.getTsCodes();
-		Integer ssei = this.getSseiGrowthRate(endDate, period);
-		Integer rate, i=1;
+		Integer[] ssei = this.getSseiGrowthRate(endDate, period);
+		Integer[] rate;
+		Integer i=1;
 		Set<String> tmp;
 		for(String code : allIndexs) {
 			rate = this.getGrowthRate(code, endDate, period);
-			if(rate > ssei) {
+			if(rate[0]>ssei[0] || rate[1]>ssei[1]) {
 				tmp = indexs.get(rate);
 				if(tmp==null) {
 					tmp = new HashSet<String>();
@@ -131,13 +132,13 @@ public class IndexServiceTushare {
 		Map<String,Set<IndexWeight>> members = this.getIndexWeights();
 		Set<IndexWeight> ms;
 		
-		TreeMap<Integer,Set<String>> indexs = this.getGrowthRate(endDate, period);
-		NavigableSet<Integer> keys = indexs.descendingKeySet();
+		TreeMap<Integer[],Set<String>> indexs = this.getGrowthRate(endDate, period);
+		NavigableSet<Integer[]> keys = indexs.descendingKeySet();
 		Set<String> codes;
 		IndexBasic basic;
 		int i = 0 ;
 		StringBuffer sb = new StringBuffer(endDate.toString()+ "\n");
-		for(Integer key : keys) {
+		for(Integer[] key : keys) {
 			if(++i > top) {
 				break;
 			}

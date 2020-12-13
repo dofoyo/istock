@@ -125,7 +125,7 @@ public class KdataSpiderTushare implements KdataSpider {
 		if(!file.exists()) {
 			String result = this.downloadFactors(date);
 			JSONArray items = (new JSONObject(result)).getJSONObject("data").getJSONArray("items");	
-			while(items.length()==0) {
+			while(items.length()<1000) {
 				logger.error("\n factors file is NULL!!!!!!");
 				
 				try {

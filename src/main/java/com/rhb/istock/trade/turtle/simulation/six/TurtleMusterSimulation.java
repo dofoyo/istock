@@ -104,7 +104,8 @@ public class TurtleMusterSimulation {
 		List<Map<String,Muster>> previous = new ArrayList<Map<String,Muster>>();
 		Integer previous_period  = 13; //历史纪录区间，主要用于后面判断
 
-		Integer sseiFlag, sseiRatio, sseiTrend;
+		Integer sseiFlag, sseiTrend;
+		Integer[] sseiRatio;
 		
 		//Map<Integer,Set<String>> year_oks = fdataServiceTushare.getOks();
 		
@@ -137,14 +138,14 @@ public class TurtleMusterSimulation {
 					}
 				}
 
-				hlb.doIt(musters, tmps, previous, date, sseiFlag, sseiRatio, sseiTrend);
-				bdt.doIt(musters, previous, date, sseiFlag, sseiRatio, sseiTrend);
+				hlb.doIt(musters, tmps, previous, date, sseiFlag, sseiRatio[1], sseiTrend);
+				bdt.doIt(musters, previous, date, sseiFlag, sseiRatio[1], sseiTrend);
 
-				avb.doIt(musters, tmps, previous, date, sseiFlag, sseiRatio, sseiTrend);
-				bhl.doIt(musters, previous, date, sseiFlag, sseiRatio, sseiTrend);
+				avb.doIt(musters, tmps, previous, date, sseiFlag, sseiRatio[1], sseiTrend);
+				bhl.doIt(musters, previous, date, sseiFlag, sseiRatio[1], sseiTrend);
 
-				bav.doIt(musters, tmps, previous, date, sseiFlag, sseiRatio, sseiTrend);
-				dtb.doIt(musters, previous, date, sseiFlag, sseiRatio, sseiTrend);
+				bav.doIt(musters, tmps, previous, date, sseiFlag, sseiRatio[1], sseiTrend);
+				dtb.doIt(musters, previous, date, sseiFlag, sseiRatio[1], sseiTrend);
 			}
 		}
 		

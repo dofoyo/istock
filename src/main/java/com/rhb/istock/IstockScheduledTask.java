@@ -118,14 +118,14 @@ public class IstockScheduledTask {
 	}
 	
 	/*
-	 * 每周1至5，9:35,开盘后，
+	 * 每周1至5，9:45,开盘后，
 	 * 1、下载最新股票代码
 	 * 2、下载上一交易日收盘后的K线数据
 	 * 3、初始化: 即把日K线读入内存
 	 */
-	@Scheduled(cron="0 35 9 ? * 1-5") 
+	@Scheduled(cron="0 45 9 ? * 1-5") 
 	public void dailyInit() throws Exception {
-		System.out.println("run scheduled of '0 35 9 ? * 1-5'");
+		System.out.println("run scheduled of '0 45 9 ? * 1-5'");
 		if(this.isTradeDate()) {   //次序很重要
 			itemService.downItems();		// 1. 下载最新股票代码
 			itemService.init();  // 2. 
@@ -172,7 +172,7 @@ public class IstockScheduledTask {
 		}
 	}*/
 	
-	@Scheduled(cron="0 35 20 ? * 1-5") //周一至周五，每日20点35 执行收盘
+	@Scheduled(cron="0 22 22 ? * 1-5") //周一至周五，每日20点35 执行收盘
 	public void downloadKdatas()  throws Exception{
 		System.out.println("run scheduled of '0 35 20 ? * 1-5'");
 		long beginTime=System.currentTimeMillis(); 

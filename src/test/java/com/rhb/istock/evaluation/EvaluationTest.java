@@ -22,7 +22,7 @@ public class EvaluationTest {
 	@Qualifier("evaluation")
 	Evaluation evaluation;
 	
-	@Test
+	//@Test
 	public void getResults() {
 		LocalDate bDate = LocalDate.parse("2020-03-23");
 		LocalDate eDate = LocalDate.parse("2020-11-27");

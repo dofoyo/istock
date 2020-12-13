@@ -84,6 +84,12 @@ public class AggressiveOperation implements Operation {
 				if(muster.isDropAve(21)) { 		//跌破21日均线就卖
 					account.dropWithTax(itemID, "1", muster.getLatestPrice());
 				}
+				
+				//高位回落超过8%
+				if(account.isFallOrder(itemID, -8)) {
+					account.dropWithTax(itemID, "2", muster.getLatestPrice());
+					//dropsKeeper.put(date, itemID, muster.getAveragePrice21());
+				}
 			}
 		}
 		
@@ -102,7 +108,9 @@ public class AggressiveOperation implements Operation {
 					id = ids.get(i);
 					if(!holdItemIDs.contains(id)) {
 						muster = musters.get(id); 
-						if(muster!=null && !muster.isUpLimited()) {
+						if(muster!=null 
+								&& !muster.isUpLimited()
+								) {
 							dds.add(muster);
 							j++;
 							breakers_sb.append(id);

@@ -61,9 +61,9 @@ public class ProducerService {
 		System.out.println("重新生成买入清单");
 		long beginTime=System.currentTimeMillis(); 
 
-		newb.produce(bDate, eDate);
-		newbRecoH21.produce(bDate, eDate);
-		newbPlusL21.produce(bDate, eDate);
+		//newb.produce(bDate, eDate);
+		//newbRecoH21.produce(bDate, eDate);
+		//newbPlusL21.produce(bDate, eDate);
 
 		drum.produce(bDate, eDate);
 		drumRecoH21.produce(bDate, eDate);

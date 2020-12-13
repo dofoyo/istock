@@ -63,7 +63,8 @@ public class Simulation {
 			Future<String> fdtb = dtb.run(beginDate, endDate, initCash, top, isAveValue, quantityType, isEvaluation);
 			
 			while(true) {
-				if(fhlb.isDone() 
+				if(true
+					&& fhlb.isDone() 
 					&& fbdt.isDone()
 					&& favb.isDone()
 					&& fbhl.isDone()

@@ -49,7 +49,7 @@ public class KdataServiceTest {
 		kdataService.updateLatestMusters();
 	}
 	
-	//@Test
+	@Test
 	public void generateMusters() {
 		LocalDate date = LocalDate.parse("2020-01-25");
 		//kdataService.generateMusters(date);
@@ -89,10 +89,10 @@ public class KdataServiceTest {
 		}
 	}
 	
-	@Test
+	//@Test
 	public void downClosedDatas() {
 		System.out.println("down closed datas");
-		LocalDate date = LocalDate.parse("2020-12-08");
+		LocalDate date = LocalDate.parse("2020-12-10");
 		try {
 			//kdataService.downClosedDatas(date);
 			kdataService.downFactors(date);

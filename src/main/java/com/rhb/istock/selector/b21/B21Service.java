@@ -87,8 +87,8 @@ public class B21Service {
 		Integer previous_period = 13;
 		Map<String,Muster> musters = kdataService.getMusters(endDate);
 		List<Map<String,Muster>> previous = kdataService.getPreviousMusters(previous_period, endDate);
-		Integer sseiRatio = indexServiceTushare.getSseiGrowthRate(endDate, previous_period);
-		Integer ratio;
+		Integer[] sseiRatio = indexServiceTushare.getSseiGrowthRate(endDate, previous_period);
+		Integer[] ratio;
 		if(musters!=null && previous!=null) {
 			Muster m, p;
 			String v;
@@ -98,7 +98,7 @@ public class B21Service {
 				v = "0";
 				if(m!=null && p!=null) {
 					ratio = this.getRatio(previous, m.getItemID(), m.getLatestPrice()); 
-					if(m.isDropAve(21) || ratio < sseiRatio) {  // 弱于大盘
+					if(m.isDropAve(21) || ratio[0]<sseiRatio[0]) {  // 弱于大盘
  						v = "-2";
 					}
 
@@ -113,7 +113,8 @@ public class B21Service {
 						v = "1";
 					}else if(m.isUpBreaker()) {  //创新高
 						v = "3";
-					}else if(ratio >= sseiRatio   // 强于大盘
+					}else if(ratio[0] > 0
+							&& (ratio[0]>=sseiRatio[0] || ratio[1]>=sseiRatio[1])   // 强于大盘
 							&& m.isUpAve(21)
 							//&& m.getHLGap()<=55
 							&& m.getAveragePrice21().compareTo(p.getAveragePrice21())==1 ) { //上升趋势
@@ -139,21 +140,25 @@ public class B21Service {
 		return m;
 	}
 	
-	private Integer getRatio(List<Map<String,Muster>> musters, String itemID, BigDecimal price) {
-		Integer ratio = 0;
-		BigDecimal lowest=null;
+	private Integer[] getRatio(List<Map<String,Muster>> musters, String itemID, BigDecimal price) {
+		Integer[] ratio = new Integer[] {0,0};
+		BigDecimal lowest=null, begin=null;
 		Muster m;
 		for(Map<String,Muster> ms : musters) {
 			m = ms.get(itemID);
 			if(m!=null) {
 				lowest = (lowest==null || lowest.compareTo(m.getLatestPrice())==1) ? m.getLatestPrice() : lowest;
+				if(begin==null) {
+					begin = m.getLatestPrice();
+				}
 			}
 		}
 		
 		if(lowest==null || lowest.compareTo(BigDecimal.ZERO)==0) {
 			lowest = price;
 		}
-		ratio = Functions.growthRate(price, lowest);
+		ratio[0] = Functions.growthRate(price, begin);
+		ratio[1] = Functions.growthRate(price, lowest);
 		//logger.info(String.format("%s, lowest=%.2f, highest=%.2f, ratio=%d", itemID, lowest, price,ratio));
 		return ratio;
 	}

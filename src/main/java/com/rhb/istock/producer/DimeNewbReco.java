@@ -108,7 +108,7 @@ public class DimeNewbReco implements Producer{
 		Muster muster;
 		List<String> recommendations;
 		Set<String> dimens;
-		Integer lRatio = 21; //一个板块中，有34%的个股强于大盘，即为强势板块
+		Integer lRatio = 21; //一个板块中，有21%的个股强于大盘，即为强势板块
 		Integer hRatio = 100; //
 
 		musters = kdataService.getMusters(date);

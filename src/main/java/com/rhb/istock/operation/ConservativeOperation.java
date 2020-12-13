@@ -114,7 +114,9 @@ public class ConservativeOperation implements Operation{
 					id = ids.get(i);
 					if(!holdItemIDs.contains(id)) {
 						muster = musters.get(id); 
-						if(muster!=null && !muster.isUpLimited()) {
+						if(muster!=null 
+								&& !muster.isUpLimited()
+								) {
 							dds.add(muster);
 							j++;
 							breakers_sb.append(id);

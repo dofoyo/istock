@@ -76,7 +76,7 @@ public class ProduceTest {
 	@Qualifier("newbRecoH21")
 	Producer newbRecoH21;
 	
-	@Test
+	//@Test
 	public void produce4() {  
 		LocalDate date = LocalDate.parse("2020-04-13");
 		
@@ -85,10 +85,10 @@ public class ProduceTest {
 		System.out.println(results);
 	}
 	
-	//@Test
+	@Test
 	public void produce2() {  //做收盘
-		LocalDate bDate = LocalDate.parse("2010-01-01");
-		LocalDate eDate = LocalDate.parse("2020-11-27");
+		LocalDate bDate = LocalDate.parse("2017-01-01");
+		LocalDate eDate = LocalDate.parse("2020-12-11");
 		
 		producerService.produce(bDate, eDate);
 		System.out.println("收盘 Test");
@@ -104,11 +104,10 @@ public class ProduceTest {
 	
 	//@Test
 	public void produce() {
-		LocalDate bDate = LocalDate.parse("2018-02-16");
-		LocalDate eDate = LocalDate.parse("2020-11-23");
+		LocalDate bDate = LocalDate.parse("2020-12-01");
+		LocalDate eDate = LocalDate.parse("2020-12-11");
 		
-		dimeReco.produce(bDate, eDate);
-		dimeNewbReco.produce(bDate, eDate);
+		drum.produce(bDate, eDate);
 		System.out.println("produce Test");
 	}
 	

@@ -228,10 +228,11 @@ public class A3 {
 	public boolean addTiger(Muster muster, List<Map<String,Muster>> previous, LocalDate date) {
 		boolean flag = false;
 		Muster pmuster = previous.get(0).get(muster.getItemID());
-		Integer sseiRatio = indexServiceTushare.getSseiGrowthRate(date, 21);
+		Integer[] sseiRatio = indexServiceTushare.getSseiGrowthRate(date, 21);
 		if(pmuster!=null && b21s.containsKey(muster.getItemID()) && !tigers.containsKey(muster.getItemID())) {
-			Integer ratio = this.getRatio(previous,muster.getItemID(),muster.getLatestPrice());
-			if(ratio >= sseiRatio   // 强于大盘
+			Integer[] ratio = this.getRatio(previous,muster.getItemID(),muster.getLatestPrice());
+			if(ratio[0] > 0
+					&& (ratio[0]>=sseiRatio[0] || ratio[1]>=sseiRatio[1])   // 强于大盘
 				&& muster.getHLGap()<=55
 				&& muster.isUpAve(21)
 				&& muster.getAveragePrice21().compareTo(pmuster.getAveragePrice21())==1  //上升趋势
@@ -258,21 +259,24 @@ public class A3 {
 		return flag;
 	}
 	
-	private Integer getRatio(List<Map<String,Muster>> musters, String itemID, BigDecimal price) {
-		Integer ratio = 0;
-		BigDecimal lowest=null;
+	private Integer[] getRatio(List<Map<String,Muster>> musters, String itemID, BigDecimal price) {
+		Integer[] ratio = new Integer[] {0,0};
+		BigDecimal lowest=null, begin=null;
 		Muster m;
 		for(Map<String,Muster> ms : musters) {
 			m = ms.get(itemID);
 			if(m!=null) {
 				lowest = (lowest==null || lowest.compareTo(m.getLatestPrice())==1) ? m.getLatestPrice() : lowest;
 				//logger.info(String.format("%s, date=%s, price=%.2f", itemID, m.getDate().toString(), m.getLatestPrice()));
+				if(begin==null) {
+					begin = m.getLatestPrice();
+				}
 			}
-			
 		}
 		
-		if(lowest!=null && lowest.compareTo(BigDecimal.ZERO)>0) {
-			ratio = Functions.growthRate(price, lowest);
+		if(lowest!=null && begin!=null && lowest.compareTo(BigDecimal.ZERO)>0) {
+			ratio[0] = Functions.growthRate(price, begin);
+			ratio[1] = Functions.growthRate(price, lowest);
 		}
 		
 		//logger.info(String.format("%s, lowest=%.2f, price=%.2f, ratio=%d", itemID, lowest, price,ratio));

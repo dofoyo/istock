@@ -45,7 +45,7 @@ public class IndexServiceTushareTest {
 		LocalDate date = LocalDate.parse("2018-05-31");
 		Integer sseiFlag = kdataService.getSseiFlag(date);
 		Integer sseiTrend = kdataService.getSseiTrend(date,13);
-		Integer sseiRatio = indexServiceTushare.getSseiGrowthRate(date, 13);
+		Integer[] sseiRatio = indexServiceTushare.getSseiGrowthRate(date, 13);
 		System.out.println("sseiFlag=" + sseiFlag);
 		System.out.println("sseiTrend=" + sseiTrend);
 		System.out.println("sseiRatio=" + sseiRatio);
@@ -57,7 +57,7 @@ public class IndexServiceTushareTest {
 		String ts_code = "000001.SH";
 		LocalDate endDate = LocalDate.now();
 		Integer period = 13;
-		Integer rate = indexServiceTushare.getGrowthRate(ts_code, endDate, period);
+		Integer[] rate = indexServiceTushare.getGrowthRate(ts_code, endDate, period);
 		System.out.println(rate);
 		long used = (System.currentTimeMillis() - beginTime)/1000; 
 		System.out.println("用时：" + used + "秒");          
@@ -95,13 +95,13 @@ public class IndexServiceTushareTest {
 		Map<String,Set<IndexWeight>> members = indexServiceTushare.getIndexWeights();
 		Set<IndexWeight> ms;
 		
-		TreeMap<Integer,Set<String>> indexs = indexServiceTushare.getGrowthRate(endDate, period);
-		NavigableSet<Integer> keys = indexs.descendingKeySet();
+		TreeMap<Integer[],Set<String>> indexs = indexServiceTushare.getGrowthRate(endDate, period);
+		NavigableSet<Integer[]> keys = indexs.descendingKeySet();
 		Set<String> codes;
 		IndexBasic basic;
 		int i = 0 ;
 		StringBuffer sb = new StringBuffer(endDate.toString() + ", period=" + period + "\n");
-		for(Integer key : keys) {
+		for(Integer[] key : keys) {
 			codes = indexs.get(key);
 			for(String code : codes) {
 				basic = indexServiceTushare.getIndexBasic(code);

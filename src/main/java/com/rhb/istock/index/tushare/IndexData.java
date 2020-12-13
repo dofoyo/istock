@@ -109,18 +109,21 @@ public class IndexData {
 		return lowest;
 	}
 	
-	public Integer growthRate() {
+	public Integer[] growthRate() {
 		BigDecimal lowest = this.getLowest();
 		if(lowest ==null || lowest.compareTo(BigDecimal.ZERO)<1) {
-			return 0;
+			return new Integer[]{0,0};
 		}else {
-			BigDecimal close = bars.lastEntry().getValue().getClose();
-			Integer ratio = Functions.growthRate(close, lowest);
+			BigDecimal begin = bars.firstEntry().getValue().getClose();
+			BigDecimal end = bars.lastEntry().getValue().getClose();
+			Integer ratio2 = Functions.growthRate(end, lowest);   //低点趋势
+			Integer ratio1 = Functions.growthRate(end, begin);  //总趋势
+
 			//System.out.println(close);
 			//System.out.println(lowest);
 			//System.out.println(ratio);
 
-			return ratio;
+			return new Integer[]{ratio1,ratio2};
 		}
 	}
 
