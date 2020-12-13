@@ -11,6 +11,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.rhb.istock.comm.api.ResponseContent;
 import com.rhb.istock.comm.api.ResponseEnum;
+import com.rhb.istock.comm.util.Progress;
 import com.rhb.istock.item.Item;
 import com.rhb.istock.item.ItemService;
 import com.rhb.istock.kdata.Kbar;
@@ -222,9 +224,6 @@ public class ManualApi {
 		
 		//System.out.println(type);
 		//System.out.println(date);
-		Integer lRatio = 21;
-		Integer hRatio = 55;
-		
 		List<ItemView> views = new ArrayList<ItemView>();
 		
 		LocalDate theDate = null;
@@ -234,8 +233,35 @@ public class ManualApi {
 			new ResponseContent<List<ItemView>>(ResponseEnum.ERROR, views);
 		}
 
-		Set<String> holds = this.getHoldIDs(this.generateHolds("manual",theDate));
-
+		List<String> ids = this.getPotentials(type, theDate);
+		if(ids!=null && !ids.isEmpty()) {
+			Item item;
+			Integer recommendationCount;
+			ItemView iv;
+			Set<String> holds = this.getHoldIDs(this.generateHolds("manual",theDate));
+			for(String id : ids) {
+				item = itemService.getItem(id);
+				recommendationCount = finaService.getRecommendationCount(id, theDate);
+				item.setRecommendations(recommendationCount);
+				//if(recommendationCount!=null && recommendationCount>0) {
+					iv = new ItemView(id,item.getNameWithCAGR(),holds.contains(id)? "danger" : "info");
+					if(previous!=null && !previous.contains(id) && !holds.contains(id)) {
+						iv.setType("warning");
+					}
+					views.add(iv);
+				//}
+			}
+		}
+		
+		previous = ids;
+		
+		return new ResponseContent<List<ItemView>>(ResponseEnum.SUCCESS, views);
+	}
+	
+	private List<String> getPotentials(String type, LocalDate theDate){
+		Set<String> holds = new HashSet<String>();
+		Integer lRatio = 21;
+		Integer hRatio = 55;
 		List<String> ids = new ArrayList<String>();
 		if("power".equals(type)) { 
 			List<String> tmp = newbRecoH21.getResults(theDate);
@@ -340,38 +366,7 @@ public class ManualApi {
 			ids = drumService.getDrumsOfTopDimensions(theDate, holds, lRatio, hRatio, true);   //强板块
 		}
 		
-		if(ids!=null && !ids.isEmpty()) {
-			Item item;
-			Integer recommendationCount;
-			ItemView iv;
-			for(String id : ids) {
-				item = itemService.getItem(id);
-				recommendationCount = finaService.getRecommendationCount(id, theDate);
-				item.setRecommendations(recommendationCount);
-				//if(recommendationCount!=null && recommendationCount>0) {
-					iv = new ItemView(id,item.getNameWithCAGR(),holds.contains(id)? "danger" : "info");
-					if(previous!=null && !previous.contains(id) && !holds.contains(id)) {
-						iv.setType("warning");
-					}
-					views.add(iv);
-				//}
-			}
-		}
-		
-		previous = ids;
-		
-/*		Collections.sort(views, new Comparator<ItemView>() {
-
-			@Override
-			public int compare(ItemView o1, ItemView o2) {
-				Integer a = o2.getCagr()==null ? 0 : o2.getCagr();
-				Integer b = o1.getCagr()==null ? 0 : o1.getCagr();
-				return a.compareTo(b);
-			}
-			
-		});*/
-		
-		return new ResponseContent<List<ItemView>>(ResponseEnum.SUCCESS, views);
+		return ids;
 	}
 	
 	private Set<String> getHoldIDs(Set<Hold> holds){
@@ -454,18 +449,21 @@ public class ManualApi {
 		return new ResponseContent<List<SelectView>>(ResponseEnum.SUCCESS, views);
 	}
 	
-	@GetMapping("/turtle/manual/reselect")
-	public ResponseContent<List<SelectView>> getReselect() {
+	@GetMapping("/turtle/manual/reselect/{type}")
+	public ResponseContent<List<SelectView>> getReselect(
+			@PathVariable(value="type") String type
+			) {
 		List<SelectView> views = new ArrayList<SelectView>();
 		
-		Map<LocalDate, List<String>> selects = manualService.getReselect();
-		if(selects != null) {
-			for(Map.Entry<LocalDate, List<String>> entry : selects.entrySet()) {
-				for(String id : entry.getValue()) {
-					views.add(new SelectView(id,itemService.getItem(id).getName(),entry.getKey(),"warning"));
-				}
-			}
-		}		
+		Map<LocalDate, List<String>> selects = new TreeMap<LocalDate, List<String>>();
+		Map<LocalDate, AmountEntity> amounts = turtleSimulationRepository.getAmounts("bav");
+		int i=1;
+		for(LocalDate date : amounts.keySet()) {
+			Progress.show(amounts.size(), i++, date.toString());
+			selects.put(date, this.getPotentials(type, date));
+		}
+
+		manualService.saveReselect(selects);
 		
 		return new ResponseContent<List<SelectView>>(ResponseEnum.SUCCESS, views);
 	}

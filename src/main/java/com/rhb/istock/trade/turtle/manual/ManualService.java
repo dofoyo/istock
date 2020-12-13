@@ -87,6 +87,10 @@ public class ManualService {
 		return ss;
 	}
 	
+	public void saveReselect(Map<LocalDate, List<String>> selects) {
+		this.selects = selects;
+	}
+	
 	public Map<LocalDate, List<String>> getReselect(){
 		this.selects  = turtleSimulationRepository.getBreakers("manual");
 		return this.selects;
