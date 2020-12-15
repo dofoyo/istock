@@ -35,9 +35,18 @@ public class EvaluationTest {
 	
 	//@Test
 	public void evaluate() {
-		LocalDate beginDate = LocalDate.parse("2020-03-23");
-		LocalDate endDate = LocalDate.parse("2020-11-27");
+		LocalDate beginDate = LocalDate.parse("2017-01-01");
+		LocalDate endDate = LocalDate.parse("2020-12-14");
 
 		evaluation.evaluate(beginDate, endDate);
+	}
+	
+	@Test
+	public void getKelliesView() {
+		Map<LocalDate, Kelly> kellies = evaluationService.getKellies("bav",5);
+		for(Map.Entry<LocalDate, Kelly> entry : kellies.entrySet()) {
+			System.out.println(entry.getKey());
+			System.out.println(entry.getValue());
+		}
 	}
 }

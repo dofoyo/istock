@@ -32,7 +32,19 @@ public class EvaluationApi {
 
 		return new ResponseContent<String>(ResponseEnum.SUCCESS, "");
 		
-	}	
+	}
+	
+	@GetMapping("/evaluation/kellies/{bdate}/{edate}")
+	public ResponseContent<KelliesView> getKelliesView(
+			@PathVariable(value="bdate") String bdate,
+			@PathVariable(value="edate") String edate
+			){
+		LocalDate theBeginDate = LocalDate.parse(bdate, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+		LocalDate theEndDate = LocalDate.parse(edate, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+
+		KelliesView view = evaluationService.getKelliesView(5, theBeginDate, theEndDate);
+		return new ResponseContent<KelliesView>(ResponseEnum.SUCCESS, view);
+	}
 	
 	@GetMapping("/evaluation/busi/{type}/{bdate}/{edate}/{isHighest}")
 	public ResponseContent<BusiView> getDailyMeans(
