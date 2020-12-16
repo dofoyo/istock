@@ -4,7 +4,28 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import com.rhb.istock.comm.util.Functions;
+/*
+ * 
+凯利公式有几种形式，其中的一种如下：
 
+f=p/a-q/b
+
+其中：f表示分配的资金比例
+
+p表示获胜的概率
+
+q表示失败的概率
+
+a表示失败损失率，指失败后押注的资金从1变成1-a
+
+b表示获胜增长率，指获胜后押注的资金从1变成1+b
+
+如果f算出来是0，表示这是一个期望收益为0的游戏，最优决策是不参加。
+
+如果f算出来是负数，表示这是一个期望收益为负的游戏，更是不能参加了。
+
+如果f算出来是小于1的正数，就应该按照这个比例下注；如果是个大于1的数，最优的决策是需要借钱来参与这个游戏。
+ */
 public class Kelly {
 	private LocalDate date;
 

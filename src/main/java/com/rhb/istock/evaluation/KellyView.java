@@ -2,24 +2,36 @@ package com.rhb.istock.evaluation;
 
 import java.time.LocalDate;
 
-public class BusiView {
+public class KellyView {
 	private LocalDate date;
+	private Integer win;
 	private Integer winPR;
 	private Integer winRate;
+	private Integer lose;
 	private Integer losePR;
 	private Integer loseRate;
-	private Integer kelly;
+	private Integer score;
 	
-	public BusiView(LocalDate date, Integer winPR, Integer winRate, Integer losePR, Integer loseRate, Integer kelly) {
+	public KellyView(LocalDate date, Integer win, Integer winPR, Integer winRate, Integer lose, Integer losePR, Integer loseRate, Integer score) {
 		super();
 		this.date = date;
+		this.win = win;
 		this.winPR = winPR;
 		this.winRate = winRate;
+		this.lose = lose;
 		this.losePR = losePR;
 		this.loseRate = loseRate;
-		this.kelly = kelly;
+		this.score = score;
 	}
 	
+	public Integer getWin() {
+		return win;
+	}
+
+	public Integer getLose() {
+		return lose;
+	}
+
 	public LocalDate getDate() {
 		return date;
 	}
@@ -36,15 +48,17 @@ public class BusiView {
 	public Integer getLoseRate() {
 		return loseRate;
 	}
-	public Integer getKelly() {
-		return kelly;
-	}
+
 	public String getColor() {
-		return this.kelly>0 ? "red" : "green";
+		return this.score>0 ? "red" : "green";
 	}
 	@Override
 	public String toString() {
-		return "BusiView [date=" + date + ", winPR=" + winPR + ", winRate=" + winRate + ", losePR=" + losePR
-				+ ", loseRate=" + loseRate + ", kelly=" + kelly + "]";
+		return "KellyView [date=" + date + ", winPR=" + winPR + ", winRate=" + winRate + ", losePR=" + losePR
+				+ ", loseRate=" + loseRate + ", score=" + score + "]";
+	}
+
+	public Integer getScore() {
+		return score;
 	}
 }

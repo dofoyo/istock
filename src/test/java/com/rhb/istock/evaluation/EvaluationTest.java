@@ -22,14 +22,19 @@ public class EvaluationTest {
 	@Qualifier("evaluation")
 	Evaluation evaluation;
 	
-	//@Test
+	@Test
 	public void getResults() {
-		LocalDate bDate = LocalDate.parse("2020-03-23");
-		LocalDate eDate = LocalDate.parse("2020-11-27");
-		String type = "hlb";
-		BusiView busi = evaluationService.getBusiView(type, bDate, eDate);
+		Integer period = 5;
+		LocalDate eDate = LocalDate.parse("2020-12-15");
+		String type = "bhl";
 		
-		System.out.println(busi);
+		KelliesView views = evaluationService.getKelliesView(period, eDate);
+		System.out.println(views);
+		System.out.println("**********");
+
+		KellyView vies = evaluationService.getKellyView(type, period, eDate);		
+		System.out.println(vies);
+
 	}
 	
 	
@@ -41,12 +46,13 @@ public class EvaluationTest {
 		evaluation.evaluate(beginDate, endDate);
 	}
 	
-	@Test
+	//@Test
 	public void getKelliesView() {
-		Map<LocalDate, Kelly> kellies = evaluationService.getKellies("bav",5);
+		LocalDate endDate = LocalDate.parse("2020-12-15");
+/*		Map<LocalDate, Kelly> kellies = evaluationService.getKellies("bav",endDate);
 		for(Map.Entry<LocalDate, Kelly> entry : kellies.entrySet()) {
 			System.out.println(entry.getKey());
 			System.out.println(entry.getValue());
 		}
-	}
+*/	}
 }

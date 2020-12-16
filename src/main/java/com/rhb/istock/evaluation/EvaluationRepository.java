@@ -4,9 +4,10 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -15,7 +16,6 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import com.rhb.istock.comm.util.FileTools;
-import com.rhb.istock.trade.turtle.simulation.six.repository.AmountEntity;
 
 @Service("evaluationRepository")
 public class EvaluationRepository {
@@ -28,8 +28,9 @@ public class EvaluationRepository {
 	@Value("${dropDuration}")
 	private String dropDuration;
 	
-	public Set<LocalDate> getDates(LocalDate bDate, LocalDate eDate){
-		Set<LocalDate> dates = new TreeSet<LocalDate>();
+	@Cacheable("busisDates")
+	public List<LocalDate> getDates(boolean desc){
+		TreeSet<LocalDate> dates = new TreeSet<LocalDate>();
 		
 		String theFile = evaluationPath + "/avb_simulation_dailyAmount_"+openDuration+"_"+dropDuration+".csv"; 
 		//System.out.println(theFile);
@@ -40,25 +41,29 @@ public class EvaluationRepository {
 			//System.out.println(line);
 			columns = lines[j].split(",");
 			date = LocalDate.parse(columns[0],DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-			if((date.isAfter(bDate) || date.equals(bDate))
-					&& (date.isBefore(eDate) || date.equals(eDate))
-					) {
-				dates.add(date);
-			}
-		}		
-		return dates;
+			dates.add(date);
+		}
+		
+		if(desc) {
+			return new ArrayList<LocalDate>(dates.descendingSet());
+		}
+		
+		return new ArrayList<LocalDate>(dates);
 	}
 	
 	@Cacheable("busis")
-	public List<Busi> getBusis(String type) {
-		List<Busi> busis = new ArrayList<Busi>();
-
+	public Map<LocalDate, List<Busi>> getBusis(String type) {
+		Map<LocalDate, List<Busi>> results = new HashMap<LocalDate, List<Busi>>();
+		
+		String itemID;
 		LocalDate openDate;
 		BigDecimal openPrice;
-		BigDecimal highestPrice;
+		LocalDate closeDate;
 		BigDecimal closePrice;
+		BigDecimal highestPrice;
 		BigDecimal quantity;
 		Busi busi;
+		List<Busi> busis;
 		
 		String theFile = evaluationPath + "/" + type + "_simulation_detail_"+openDuration+"_"+dropDuration+".csv"; 
 		//System.out.println(theFile);
@@ -68,19 +73,30 @@ public class EvaluationRepository {
 		for(int j=1; j<lines.length; j++) {
 			//System.out.println(line);
 			columns = lines[j].split(",");
+			itemID = columns[1];
 			openDate = LocalDate.parse(columns[3],DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+			openPrice = new BigDecimal(columns[4]);
 			quantity = new BigDecimal(columns[5]);
-			openPrice = new BigDecimal(columns[6]);
-			highestPrice = quantity.multiply(new BigDecimal(columns[16]));
-			closePrice = new BigDecimal(columns[10]);
-			busi = new Busi(openDate, openPrice, highestPrice, closePrice);
+			closeDate = LocalDate.parse(columns[8],DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+			closePrice = new BigDecimal(columns[9]);
+			highestPrice = new BigDecimal(columns[16]);
+			busi = new Busi(itemID, openDate, openPrice, quantity, closeDate, closePrice, highestPrice);
+			
+			busis = results.get(openDate);
+			if(busis==null) {
+				 busis = new ArrayList<Busi>();
+				 results.put(openDate, busis);
+			}
 			busis.add(busi);
 		}		
 		
-		return busis;
+		return results;
 	}
 	
 	@CacheEvict(value="busis",allEntries=true)
 	public void evictBusisCache() {}
+
+	@CacheEvict(value="busisDates",allEntries=true)
+	public void evictBusisDatesCache() {}
 
 }

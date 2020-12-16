@@ -99,7 +99,7 @@ public class TurtleSimulationApi {
 			Kbar latestBar;
 			if(theEndDate.equals(latestDate)) {
 				latestBar = kdataService.getLatestMarketData(itemID);
-				if(bar==null || !bar.getDate().equals(latestBar.getDate())) {
+				if(bar==null || !latestBar.getDate().equals(bar.getDate())) {
 					kdatas.addKdata(theEndDate, latestBar.getOpen(), latestBar.getHigh(), latestBar.getLow(), latestBar.getClose());
 				}
 			}			

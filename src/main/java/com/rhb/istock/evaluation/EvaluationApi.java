@@ -2,6 +2,7 @@ package com.rhb.istock.evaluation;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -34,47 +35,44 @@ public class EvaluationApi {
 		
 	}
 	
-	@GetMapping("/evaluation/kellies/{bdate}/{edate}")
+	@GetMapping("/evaluation/kellies/{period}/{edate}")
 	public ResponseContent<KelliesView> getKelliesView(
-			@PathVariable(value="bdate") String bdate,
+			@PathVariable(value="period") Integer period,
 			@PathVariable(value="edate") String edate
 			){
-		LocalDate theBeginDate = LocalDate.parse(bdate, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 		LocalDate theEndDate = LocalDate.parse(edate, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 
-		KelliesView view = evaluationService.getKelliesView(5, theBeginDate, theEndDate);
+		KelliesView view = evaluationService.getKelliesView(period, theEndDate);
 		return new ResponseContent<KelliesView>(ResponseEnum.SUCCESS, view);
 	}
 	
-	@GetMapping("/evaluation/busi/{type}/{bdate}/{edate}/{isHighest}")
-	public ResponseContent<BusiView> getDailyMeans(
+	@GetMapping("/evaluation/kelly/{type}/{period}/{edate}/{isHighest}")
+	public ResponseContent<KellyView> getKellyView(
 			@PathVariable(value="type") String type,
-			@PathVariable(value="bdate") String bdate,
+			@PathVariable(value="period") Integer period,
 			@PathVariable(value="edate") String edate,
 			@PathVariable(value="isHighest") String isHighest){
 
-		BusiView view = null;
+		KellyView view = null;
 
-		LocalDate theBeginDate = null;
 		LocalDate theEndDate = null;
 		try{
-			theBeginDate = LocalDate.parse(bdate, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 			theEndDate = LocalDate.parse(edate, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 		}catch(Exception e){
-			return new ResponseContent<BusiView>(ResponseEnum.ERROR, view);
+			return new ResponseContent<KellyView>(ResponseEnum.ERROR, view);
 		}
 		
 		//System.out.println(isHighest);
 		
 		if("1".equals(isHighest)) {
 			//System.out.println("isHighest=1");
-			view = evaluationService.getMaxBusiView(type, theBeginDate, theEndDate);
+			view = evaluationService.getMaxKellyView(type, period, theEndDate);
 		}else {
 			//System.out.println("isHighest=0");
-			view = evaluationService.getBusiView(type, theBeginDate, theEndDate);
+			view = evaluationService.getKellyView(type, period, theEndDate);
 		}
 	
-		return new ResponseContent<BusiView>(ResponseEnum.SUCCESS, view);
+		return new ResponseContent<KellyView>(ResponseEnum.SUCCESS, view);
 	}
 
 }

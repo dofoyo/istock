@@ -1,11 +1,13 @@
 package com.rhb.istock.evaluation;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
 
 import org.slf4j.Logger;
@@ -15,9 +17,15 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import com.rhb.istock.kdata.KdataService;
+import com.rhb.istock.kdata.Muster;
+
 @Service("evaluationService")
 public class EvaluationService {
 	protected static final Logger logger = LoggerFactory.getLogger(EvaluationService.class);
+	@Autowired
+	@Qualifier("kdataServiceImp")
+	KdataService kdataService;
 	
 	@Autowired
 	@Qualifier("evaluationRepository")
@@ -32,37 +40,19 @@ public class EvaluationService {
 	@Value("${dropDuration}")
 	private String dropDuration;
 	
-	/*
-	 * 
-凯利公式有几种形式，其中的一种如下：
 
-f=p/a-q/b
-
-其中：f表示分配的资金比例
-
-p表示获胜的概率
-
-q表示失败的概率
-
-a表示失败损失率，指失败后押注的资金从1变成1-a
-
-b表示获胜增长率，指获胜后押注的资金从1变成1+b
-
-如果f算出来是0，表示这是一个期望收益为0的游戏，最优决策是不参加。
-
-如果f算出来是负数，表示这是一个期望收益为负的游戏，更是不能参加了。
-
-如果f算出来是小于1的正数，就应该按照这个比例下注；如果是个大于1的数，最优的决策是需要借钱来参与这个游戏。
-	 */
-	public KelliesView getKelliesView(Integer period, LocalDate bDate, LocalDate eDate) {
+	public KelliesView getKelliesView(Integer period, LocalDate eDate) {
 		KelliesView view = new KelliesView();
-		Set<LocalDate> dates = evaluationRepository.getDates(bDate, eDate);
-		Map<LocalDate, Kelly> avbs = this.getKellies("avb", period);
-		Map<LocalDate, Kelly> bavs = this.getKellies("bav", period);
-		Map<LocalDate, Kelly> bdts = this.getKellies("bdt", period);
-		Map<LocalDate, Kelly> bhls = this.getKellies("bhl", period);
-		Map<LocalDate, Kelly> dtbs = this.getKellies("dtb", period);
-		Map<LocalDate, Kelly> hlbs = this.getKellies("hlb", period);
+		
+		List<LocalDate> dates = this.getDates(89, eDate);
+		Map<String,Muster> musters = kdataService.getMusters(dates.get(dates.size()-1));
+		
+		Map<LocalDate, Kelly> avbs = this.getKellies("avb", period, dates, musters);
+		Map<LocalDate, Kelly> bavs = this.getKellies("bav", period, dates, musters);
+		Map<LocalDate, Kelly> bdts = this.getKellies("bdt", period, dates, musters);
+		Map<LocalDate, Kelly> bhls = this.getKellies("bhl", period, dates, musters);
+		Map<LocalDate, Kelly> dtbs = this.getKellies("dtb", period, dates, musters);
+		Map<LocalDate, Kelly> hlbs = this.getKellies("hlb", period, dates, musters);
 		
 		Integer bhl=0,bav=0,bdt=0,hlb=0,avb=0,dtb=0;
 		for(LocalDate date : dates) {
@@ -91,79 +81,115 @@ b表示获胜增长率，指获胜后押注的资金从1变成1+b
 		return view;
 	}
 	
-	public Map<LocalDate, Kelly> getKellies(String type, Integer period){
+	//
+	private Map<LocalDate, Kelly> getKellies(String type, Integer period, List<LocalDate> dates, Map<String,Muster> musters){
 		Map<LocalDate, Kelly> kellies = new TreeMap<LocalDate, Kelly>();
-		Map<LocalDate, Kelly> tmps = this.getKellies(type);
-		List<Kelly> pres = new ArrayList<Kelly>();
-		Kelly tmp, pre=null, kelly;
-		Kelly total = new Kelly(null);
-		for(Map.Entry<LocalDate, Kelly> entry : tmps.entrySet()) {
-			tmp = entry.getValue();
-			total.add(tmp.getWin(), tmp.getWinOpen(), tmp.getWinClose());
-			total.add(tmp.getLose(), tmp.getLoseOpen(), tmp.getLoseClose());
-			
-			pres.add(tmp);
-			if(pres.size()>period) {
-				pre = pres.get(0);
-				pres.remove(0);
-			}
-			
-			if(pre != null) {
-				total.subtract(pre.getWin(), pre.getWinOpen(), pre.getWinClose());
-				total.subtract(pre.getLose(), pre.getLoseOpen(), pre.getLoseClose());
-			}
-			
-			kelly = new Kelly(entry.getKey());
-			kelly.add(total.getWin(), total.getWinOpen(), total.getWinClose());
-			kelly.add(total.getLose(), total.getLoseOpen(), total.getLoseClose());
-			kellies.put(entry.getKey(), kelly);
-		}
-		return kellies;
-	}
-	
-	public Map<LocalDate, Kelly> getKellies(String type){
-		Map<LocalDate, Kelly> kellies = new TreeMap<LocalDate, Kelly>();
-		List<Busi> orders = evaluationRepository.getBusis(type);
+
+		Map<LocalDate,List<Busi>> busis = evaluationRepository.getBusis(type); //每一单
 		Kelly kelly;
-		for(Busi order : orders) {
-			kelly = kellies.get(order.getOpenDate());
-			if(kelly==null) {
-				kelly = new Kelly(order.getOpenDate());
-				kellies.put(order.getOpenDate(), kelly);
-			}
-			kelly.add(1, order.getOpenPrice(), order.getClosePrice());
+		List<LocalDate> nextDates;
+		for(LocalDate eDate : dates) {
+			nextDates = this.getDates(period, eDate);
+			kelly = this.getKelly(nextDates, busis, musters);
+			kellies.put(eDate, kelly);
 		}
-		
 		return kellies;
 	}
 	
-	
-	public BusiView  getBusiView(String type, LocalDate bDate, LocalDate eDate){
-		List<Busi> orders = evaluationRepository.getBusis(type);
+	//按period合并将busi合并，并计算出kelly
+	private Kelly getKelly(List<LocalDate> dates, Map<LocalDate,List<Busi>> busis, Map<String,Muster> musters){
+		LocalDate eDate = dates.get(dates.size()-1);
 		Kelly kelly = new Kelly(eDate);
-		for(Busi order : orders) {
-			if((order.getOpenDate().isBefore(eDate) || order.getOpenDate().equals(eDate))
-					&& (order.getOpenDate().isAfter(bDate) || order.getOpenDate().equals(bDate))
-					) {
-				kelly.add(1, order.getOpenPrice(), order.getClosePrice());
+		
+		List<Busi> tmps;
+		BigDecimal price;
+		Muster muster;
+		for(LocalDate date : dates) {
+			tmps = busis.get(date);
+			if(tmps!=null) {
+				for(Busi busi : tmps) {
+					//根据eDate对closePrice进行校正
+					if(busi.getCloseDate().isAfter(eDate)) {
+						muster = musters.get(busi.getItemID());
+						if(muster!=null) {
+							price = muster.getLatestPrice();
+						}else {
+							price = busi.getOpenPrice();
+						}
+						busi.setClosePrice(price);
+					}
+					
+					kelly.add(1, busi.getOpenAmount(), busi.getCloseAmount());
+				}			
 			}
 		}
 		
-		return new BusiView(eDate, kelly.getWinPR(),kelly.getWinRate(),kelly.getLosePR(),kelly.getLoseRate(),kelly.getScore());
+		return kelly;
 	}
 	
-	public BusiView  getMaxBusiView(String type, LocalDate bDate, LocalDate eDate){
-		List<Busi> orders = evaluationRepository.getBusis(type);
+	public KellyView getKellyView(String type, Integer period, LocalDate eDate){
+		List<LocalDate> dates = this.getDates(period, eDate);
+		Map<LocalDate,List<Busi>> busis = evaluationRepository.getBusis(type); //每一单
+		Map<String,Muster> musters = kdataService.getMusters(dates.get(dates.size()-1));
+		
+		Kelly kelly = this.getKelly(dates, busis, musters);
+		
+		return new KellyView(eDate, kelly.getWin(), kelly.getWinPR(),kelly.getWinRate(),kelly.getLose(),kelly.getLosePR(),kelly.getLoseRate(),kelly.getScore());
+	}
+	
+	//将busi合并，并计算出kelly
+	private Kelly getMaxKelly(List<LocalDate> dates, Map<LocalDate,List<Busi>> busis){
+		LocalDate eDate = dates.get(dates.size()-1);
 		Kelly kelly = new Kelly(eDate);
-		for(Busi order : orders) {
-			if((order.getOpenDate().isBefore(eDate) || order.getOpenDate().equals(eDate))
-					&& (order.getOpenDate().isAfter(bDate) || order.getOpenDate().equals(bDate))
-					) {
-				
-				kelly.add(1, order.getOpenPrice(), order.getHighestPrice());
+		
+		List<Busi> tmps;
+		for(LocalDate date : dates) {
+			tmps = busis.get(date);
+			if(tmps!=null) {
+				for(Busi busi : tmps) {
+					kelly.add(1, busi.getOpenAmount(), busi.getHighestAmount());
+				}			
 			}
 		}
-		return new BusiView(eDate, kelly.getWinPR(),kelly.getWinRate(),kelly.getLosePR(),kelly.getLoseRate(),kelly.getScore());
+		
+		return kelly;
+	}
+	
+	public KellyView  getMaxKellyView(String type, Integer period, LocalDate eDate){
+		List<LocalDate> dates = this.getDates(period, eDate);
+		Map<LocalDate,List<Busi>> busis = evaluationRepository.getBusis(type); //每一单
+		
+		Kelly kelly = this.getMaxKelly(dates, busis);
+		
+		return new KellyView(eDate, kelly.getWin(), kelly.getWinPR(),kelly.getWinRate(), kelly.getLose(),kelly.getLosePR(),kelly.getLoseRate(),kelly.getScore());
+	}
+	
+	
+	/*
+	 * 采用排序和循环的目的是能满足即使eDate不是交易日的情况，也能正确返回
+	 */
+	private List<LocalDate> getDates(Integer period, LocalDate eDate){
+		List<LocalDate> dates = new ArrayList<LocalDate>();
+		
+		List<LocalDate> tmps = evaluationRepository.getDates(true);
+		for(LocalDate date : tmps) {
+			if((date.isBefore(eDate) || date.equals(eDate)) && dates.size()<=period) {
+				dates.add(date);
+			}
+			if(dates.size()>=period) {
+				break;
+			}
+		}
+		
+		Collections.sort(dates, new Comparator<LocalDate>() {
+			@Override
+			public int compare(LocalDate o1, LocalDate o2) {
+				return o1.compareTo(o2);
+			}
+			
+		});
+		
+		return dates;
 	}
 
 }
