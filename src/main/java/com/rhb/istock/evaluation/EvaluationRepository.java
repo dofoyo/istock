@@ -55,7 +55,7 @@ public class EvaluationRepository {
 	public Map<LocalDate, List<Busi>> getBusis(String type) {
 		Map<LocalDate, List<Busi>> results = new HashMap<LocalDate, List<Busi>>();
 		
-		String itemID;
+		String itemID, itemName;
 		LocalDate openDate;
 		BigDecimal openPrice;
 		LocalDate closeDate;
@@ -74,13 +74,14 @@ public class EvaluationRepository {
 			//System.out.println(line);
 			columns = lines[j].split(",");
 			itemID = columns[1];
+			itemName = columns[2];
 			openDate = LocalDate.parse(columns[3],DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 			openPrice = new BigDecimal(columns[4]);
 			quantity = new BigDecimal(columns[5]);
 			closeDate = LocalDate.parse(columns[8],DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 			closePrice = new BigDecimal(columns[9]);
 			highestPrice = new BigDecimal(columns[16]);
-			busi = new Busi(itemID, openDate, openPrice, quantity, closeDate, closePrice, highestPrice);
+			busi = new Busi(itemID, itemName, openDate, openPrice, quantity, closeDate, closePrice, highestPrice);
 			
 			busis = results.get(openDate);
 			if(busis==null) {

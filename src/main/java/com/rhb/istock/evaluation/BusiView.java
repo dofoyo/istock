@@ -3,7 +3,9 @@ package com.rhb.istock.evaluation;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-public class Busi {
+import com.rhb.istock.comm.util.Functions;
+
+public class BusiView {
 	private String itemID;
 	private String itemName;
 	private LocalDate openDate;
@@ -13,7 +15,7 @@ public class Busi {
 	private BigDecimal closePrice;
 	private BigDecimal highestPrice;
 	
-	public Busi(String itemID, String itemName,LocalDate openDate, BigDecimal openPrice,BigDecimal quantity,LocalDate closeDate, BigDecimal closePrice,BigDecimal highestPrice) {
+	public BusiView(String itemID, String itemName,LocalDate openDate, BigDecimal openPrice,BigDecimal quantity,LocalDate closeDate, BigDecimal closePrice,BigDecimal highestPrice) {
 		super();
 		this.itemID = itemID;
 		this.itemName = itemName;
@@ -29,24 +31,12 @@ public class Busi {
 		return itemName;
 	}
 
-	public void setItemName(String itemName) {
-		this.itemName = itemName;
-	}
-
 	public LocalDate getCloseDate() {
 		return closeDate;
 	}
 
-	public void setCloseDate(LocalDate closeDate) {
-		this.closeDate = closeDate;
-	}
-
 	public String getItemID() {
 		return itemID;
-	}
-
-	public void setItemID(String itemID) {
-		this.itemID = itemID;
 	}
 
 	public BigDecimal getOpenAmount() {
@@ -82,19 +72,16 @@ public class Busi {
 	public BigDecimal getQuantity() {
 		return quantity;
 	}
-	public void setOpenDate(LocalDate openDate) {
-		this.openDate = openDate;
+	
+	public String getColor() {
+		return this.isWin() ? "red" : "green";
 	}
-	public void setOpenPrice(BigDecimal openPrice) {
-		this.openPrice = openPrice;
+	
+	public Integer getRate() {
+		return Functions.growthRate(closePrice, openPrice);
 	}
-	public void setHighestPrice(BigDecimal highestPrice) {
-		this.highestPrice = highestPrice;
-	}
-	public void setClosePrice(BigDecimal closePrice) {
-		this.closePrice = closePrice;
-	}
-	public void setQuantity(BigDecimal quantity) {
-		this.quantity = quantity;
+	
+	public Integer getHighestRate() {
+		return Functions.growthRate(highestPrice, openPrice);
 	}
 }

@@ -3,6 +3,7 @@ package com.rhb.istock.evaluation;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -73,6 +74,18 @@ public class EvaluationApi {
 		}
 	
 		return new ResponseContent<KellyView>(ResponseEnum.SUCCESS, view);
+	}
+	
+	@GetMapping("/evaluation/busis/{type}/{period}/{edate}")
+	public ResponseContent<List<BusiView>> getBusis(
+			@PathVariable(value="type") String type,
+			@PathVariable(value="period") Integer period,
+			@PathVariable(value="edate") String edate
+			){
+
+		List<BusiView> busis = evaluationService.getBusiViews(type, period, LocalDate.parse(edate, DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+	
+		return new ResponseContent<List<BusiView>>(ResponseEnum.SUCCESS, busis);
 	}
 
 }

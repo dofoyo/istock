@@ -404,7 +404,7 @@ public class ManualApi {
 			@PathVariable(value="date") String date
 			) {
 
-		System.out.println(date + "--" + itemID);
+		//System.out.println(date + "--" + itemID);
 		List<ItemView> views = new ArrayList<ItemView>();
 		
 		LocalDate theDate = null;
@@ -459,7 +459,7 @@ public class ManualApi {
 		Map<LocalDate, AmountEntity> amounts = turtleSimulationRepository.getAmounts("bav");
 		int i=1;
 		for(LocalDate date : amounts.keySet()) {
-			Progress.show(amounts.size(), i++, date.toString());
+			Progress.show(amounts.size(), i++, date.toString() + "," + type);
 			selects.put(date, this.getPotentials(type, date));
 		}
 

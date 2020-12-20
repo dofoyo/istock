@@ -127,6 +127,40 @@ public class EvaluationService {
 		return kelly;
 	}
 	
+	public List<BusiView> getBusiViews(String type, Integer period, LocalDate eDate){
+		List<BusiView> result = new ArrayList<BusiView>();
+
+		List<Busi> tmps;
+		BigDecimal price;
+		Muster muster;
+
+		Map<LocalDate,List<Busi>> busis = evaluationRepository.getBusis(type); //每一单
+		List<LocalDate> dates = this.getDates(period, eDate);
+		Map<String,Muster> musters = kdataService.getMusters(dates.get(dates.size()-1));
+		for(LocalDate date : dates) {
+			tmps = busis.get(date);
+			if(tmps!=null) {
+				for(Busi busi : tmps) {
+					//根据eDate对closePrice进行校正
+					if(busi.getCloseDate().isAfter(eDate)) {
+						muster = musters.get(busi.getItemID());
+						if(muster!=null) {
+							price = muster.getLatestPrice();
+						}else {
+							price = busi.getOpenPrice();
+						}
+						busi.setCloseDate(eDate);
+						busi.setClosePrice(price);
+					}
+					
+					result.add(new BusiView(busi.getItemID(),busi.getItemName(),busi.getOpenDate(), busi.getOpenPrice(),busi.getQuantity(), busi.getCloseDate(), busi.getClosePrice(), busi.getHighestPrice()));
+				}			
+			}
+		}		
+		
+		return result;
+	}
+	
 	public KellyView getKellyView(String type, Integer period, LocalDate eDate){
 		List<LocalDate> dates = this.getDates(period, eDate);
 		Map<LocalDate,List<Busi>> busis = evaluationRepository.getBusis(type); //每一单
