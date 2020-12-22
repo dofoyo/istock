@@ -100,7 +100,7 @@ public class FavorOperation implements Operation {
 				}
 				
 				//高位回落超过8%
-				if(account.isFallOrder(itemID, -8)) {
+				if(account.isFallOrder(itemID, -8) && muster.getN21Gap()>8) {
 					account.dropWithTax(itemID, "2", muster.getLatestPrice());
 					dropsKeeper.add(date, itemID);
 					//logger.info("dropsKeeper add " + itemID);

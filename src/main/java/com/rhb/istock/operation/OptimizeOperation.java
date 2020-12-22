@@ -38,9 +38,9 @@ public class OptimizeOperation implements Operation {
 	@Qualifier("kdataServiceImp")
 	KdataService kdataService;
 	
-/*	@Autowired
+	@Autowired
 	@Qualifier("drum")
-	Producer producer;*/
+	Producer producer;
 	
 	private StringBuffer dailyAmount_sb;
 	private StringBuffer breakers_sb;
@@ -113,30 +113,28 @@ public class OptimizeOperation implements Operation {
 		//买入清单
 		Set<Muster> dds = new HashSet<Muster>();  //用set，无重复，表示不可加仓
 		holdItemIDs = account.getItemIDsOfHolds();
-		//List<String> drums = producer.getResults(date);
+		List<String> drums = producer.getResults(date);
 		
-		//Set<String> breaks = breaksKeeper.getIDs(musters, drums);
-		Set<String> breaks = breaksKeeper.getIDs();
+		Set<String> breaks = breaksKeeper.getIDs(musters, drums);
+		//Set<String> breaks = breaksKeeper.getIDs();
 		for(String id : breaks) {
 			if(!holdItemIDs.contains(id)) {
 				muster = musters.get(id); 
-				if(muster!=null && !muster.isUpLimited() && muster.getN21Gap()<=8) {
+				//if(muster!=null && !muster.isUpLimited() && muster.getN21Gap()<=8) {
 					dds.add(muster);
-					breaksKeeper.remove(id);
-				}
+				//}
 			}
 		}
 		
 		
-		//Set<String>  drops = dropsKeeper.getIDs(musters, drums);
-		Set<String>  drops = dropsKeeper.getIDs();
+		Set<String>  drops = dropsKeeper.getIDs(musters, drums);
+		//Set<String>  drops = dropsKeeper.getIDs();
 		for(String id : drops) {
 			if(!holdItemIDs.contains(id)) {
 				muster = musters.get(id); 
-				if(muster!=null && !muster.isUpLimited() && muster.isJustBreaker()) {
+				//if(muster!=null && !muster.isUpLimited() && muster.isJustBreaker()) {
 					dds.add(muster);
-					dropsKeeper.remove(id);
-				}
+				//}
 			}
 		}
 		
@@ -148,8 +146,6 @@ public class OptimizeOperation implements Operation {
 					muster = musters.get(id); 
 					if(muster!=null && !muster.isUpLimited() && muster.getN21Gap()<=8) {
 						dds.add(muster);
-						breaksKeeper.remove(id);
-						dropsKeeper.remove(id);
 					}
 				}
 			}			
@@ -286,14 +282,14 @@ public class OptimizeOperation implements Operation {
 			
 			Set<String> results = new HashSet<String>();
 			Muster muster;
-			for(String id : drums) {
+/*			for(String id : drums) {
 				if(tmp.contains(id)) {
 					muster = musters.get(id);
 					if(muster!=null && !muster.isUpLimited() && muster.getN21Gap()<=8) {
 						results.add(id);
 					}
 				}
-			}
+			}*/
 
 			for(String id : tmp){
 				muster = musters.get(id);
