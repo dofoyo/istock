@@ -364,6 +364,7 @@ public class Account {
 		states.remove(itemID);
 	}
 	
+	//用于调仓
 	public void dropByOrderID(Integer orderID, String note, BigDecimal price) {
 		Order openOrder = holds.get(orderID);
 		Order dropOrder = new Order(openOrder.getOrderID(),openOrder.getItemID(),openOrder.getItemName(),openOrder.getIndustry(), LocalDate.parse(endDate.toString()), price, openOrder.getQuantity());
@@ -381,6 +382,7 @@ public class Account {
 		hs.setHold(false);
 	}
 	
+	//用于正式卖出
 	public void dropWithTaxByOrderID(Integer orderID, String note, BigDecimal price) {
 		Order openOrder = holds.get(orderID);
 		Order dropOrder = new Order(openOrder.getOrderID(),openOrder.getItemID(),openOrder.getItemName(),openOrder.getIndustry(), LocalDate.parse(endDate.toString()), price, openOrder.getQuantity());
@@ -395,8 +397,9 @@ public class Account {
 		holds.remove(orderID);
 		drops.put(dropOrder.getOrderID(), dropOrder);
 		
-		HoldState hs = states.get(openOrder.getItemID());
-		hs.setHold(false);
+		//HoldState hs = states.get(openOrder.getItemID());
+		//hs.setHold(false);
+		states.remove(openOrder.getItemID());
 	}
 
 	public void drop(String itemID, String note, BigDecimal price) {
@@ -535,6 +538,14 @@ public class Account {
 	public boolean isFallOrder(String itemID,Integer rate) {
 		if(holds.size()==0) return false;
 		
+		HoldState hs = states.get(itemID);
+		if(hs!=null && hs.isHold && hs.getFallRate()<=rate) {
+			return true;
+		}
+		
+		return false;
+		
+		/*
 		BigDecimal price = null;
 
 		for(Order order : holds.values()) {
@@ -549,7 +560,7 @@ public class Account {
 			return true;
 		}
 		return false;
-	}
+*/	}
 
 	
 	public void dropWinOrder(String itemID,Integer rate, String note) {

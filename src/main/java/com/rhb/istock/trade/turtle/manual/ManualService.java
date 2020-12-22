@@ -18,6 +18,7 @@ import com.rhb.istock.index.tushare.IndexServiceTushare;
 import com.rhb.istock.kdata.KdataService;
 import com.rhb.istock.operation.AggressiveOperation;
 import com.rhb.istock.operation.ConservativeOperation;
+import com.rhb.istock.operation.FavorOperation;
 import com.rhb.istock.operation.OptimizeOperation;
 import com.rhb.istock.trade.turtle.simulation.six.TurtleMusterSimulation;
 import com.rhb.istock.trade.turtle.simulation.six.repository.AmountEntity;
@@ -51,6 +52,10 @@ public class ManualService {
 	@Qualifier("optimizeOperation")
 	OptimizeOperation optimizeOperation;
 
+	@Autowired
+	@Qualifier("favorOperation")
+	FavorOperation favorOperation;
+	
 	private Map<LocalDate, List<String>> selects = new TreeMap<LocalDate, List<String>>();
 
 	public void addSelects(LocalDate date, String itemID) {
@@ -108,6 +113,8 @@ public class ManualService {
 			operateResult = aggressiveOperation.run(account, this.selects, this.getBeginDate(), this.getEndDate(), label, top, true,0);
 		}else if("conservative".equals(simulateType)) {
 			operateResult = conservativeOperation.run(account, this.selects, this.getBeginDate(), this.getEndDate(), label, top, true,0);
+		}else if("favor".equals(simulateType))  {
+			operateResult = favorOperation.run(account, this.selects, this.getBeginDate(), this.getEndDate(), label, top, true,0);
 		}else {
 			operateResult = optimizeOperation.run(account, this.selects, this.getBeginDate(), this.getEndDate(), label, top, true,0);
 		}

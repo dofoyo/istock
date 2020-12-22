@@ -292,7 +292,8 @@ public class ManualApi {
 				}
 			}
 		}else if("favor".equals(type)) { 
-			List<String> tmp = drumFavor.getResults(theDate);
+			List<String> tmp = null;
+			tmp = drumFavor.getResults(theDate);
 			if(tmp!=null && tmp.size()>0) {
 				ids.addAll(tmp);
 			}

@@ -20,23 +20,22 @@ import com.rhb.istock.account.Account;
 import com.rhb.istock.comm.util.Progress;
 import com.rhb.istock.kdata.KdataService;
 import com.rhb.istock.kdata.Muster;
-import com.rhb.istock.producer.Producer;
-
 
 /*
- * 进取型操作模式　aggressive
+ * Favor操作模式: 向上突破21日均线就买入
  * 
  * 买入：满仓　＋　市值平均　＋　单只股票不加仓
  * 卖出：跌破21日线
  */
 @Scope("prototype")
-@Service("optimizeOperation")
-public class OptimizeOperation implements Operation {
-	protected static final Logger logger = LoggerFactory.getLogger(OptimizeOperation.class);
+@Service("favorOperation")
+public class FavorOperation implements Operation {
+	protected static final Logger logger = LoggerFactory.getLogger(FavorOperation.class);
 
 	@Autowired
 	@Qualifier("kdataServiceImp")
 	KdataService kdataService;
+	
 	
 /*	@Autowired
 	@Qualifier("drum")
@@ -120,9 +119,8 @@ public class OptimizeOperation implements Operation {
 		for(String id : breaks) {
 			if(!holdItemIDs.contains(id)) {
 				muster = musters.get(id); 
-				if(muster!=null && !muster.isUpLimited() && muster.getN21Gap()<=8) {
+				if(muster!=null && !muster.isUpLimited() && muster.isJustBreaker()) {
 					dds.add(muster);
-					breaksKeeper.remove(id);
 				}
 			}
 		}
@@ -135,7 +133,6 @@ public class OptimizeOperation implements Operation {
 				muster = musters.get(id); 
 				if(muster!=null && !muster.isUpLimited() && muster.isJustBreaker()) {
 					dds.add(muster);
-					dropsKeeper.remove(id);
 				}
 			}
 		}
@@ -146,10 +143,8 @@ public class OptimizeOperation implements Operation {
 			for(String id : buyList) {
 				if(!holdItemIDs.contains(id)) {
 					muster = musters.get(id); 
-					if(muster!=null && !muster.isUpLimited() && muster.getN21Gap()<=8) {
+					if(muster!=null && !muster.isUpLimited() && muster.isJustBreaker()) {
 						dds.add(muster);
-						breaksKeeper.remove(id);
-						dropsKeeper.remove(id);
 					}
 				}
 			}			
@@ -159,8 +154,6 @@ public class OptimizeOperation implements Operation {
 		
 		breakers_sb.append(date.toString() + ",");
 		for(Muster m : dds) {
-			//breaksKeeper.remove(m.getItemID());
-			//dropsKeeper.remove(m.getItemID());
 			breakers_sb.append(m.getItemID());
 			breakers_sb.append(",");
 		}				

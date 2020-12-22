@@ -455,13 +455,17 @@ public class DrumService {
 		});	
 		
 		List<String> results = new ArrayList<String>();
+		Item item;
 		for(Muster m : ok_musters) {
-			if(newb) {
-				if(m.isUpBreaker()) {
+			item = itemService.getItem(m.getItemID());
+			if(item!=null && item.getCagr()!=null && item.getCagr()>=13) {
+				if(newb) {
+					if(m.isUpBreaker()) {
+						results.add(m.getItemID());
+					}
+				}else {
 					results.add(m.getItemID());
-				}
-			}else {
-				results.add(m.getItemID());
+				}	
 			}
 		}
 		

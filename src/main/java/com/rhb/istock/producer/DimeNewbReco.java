@@ -18,6 +18,8 @@ import org.springframework.stereotype.Service;
 
 import com.rhb.istock.comm.util.FileTools;
 import com.rhb.istock.comm.util.Progress;
+import com.rhb.istock.item.Item;
+import com.rhb.istock.item.ItemService;
 import com.rhb.istock.kdata.KdataService;
 import com.rhb.istock.kdata.Muster;
 import com.rhb.istock.selector.drum.DrumService;
@@ -40,6 +42,10 @@ public class DimeNewbReco implements Producer{
 	@Qualifier("kdataServiceImp")
 	KdataService kdataService;
 
+	@Autowired
+	@Qualifier("itemServiceImp")
+	ItemService itemService;
+	
 	@Autowired
 	@Qualifier("finaService")
 	FinaService finaService;
@@ -134,10 +140,13 @@ public class DimeNewbReco implements Producer{
 				}
 			});
 			
+			Item item;
 			for(Muster m : ms) {
-				if(m!=null
+				item = itemService.getItem(m.getItemID());
+				if(m!=null 
 						&& m.isUpBreaker() 				//股价创新高
 						&& m.getHLGap()<=55             //涨幅不大
+						&& item!=null && item.getCagr()!=null && item.getCagr()>=13
 						) {
 					breakers.add(m.getItemID());
 				}

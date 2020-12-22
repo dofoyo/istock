@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 import com.rhb.istock.account.Account;
 import com.rhb.istock.operation.AggressiveOperation;
 import com.rhb.istock.operation.ConservativeOperation;
+import com.rhb.istock.operation.FavorOperation;
 import com.rhb.istock.operation.OptimizeOperation;
 import com.rhb.istock.producer.Producer;
 import com.rhb.istock.trade.turtle.simulation.six.repository.TurtleSimulationRepository;
@@ -33,7 +34,11 @@ public class SimulateAVB {
 
 	@Autowired
 	@Qualifier("newbDrumFavor")
-	Producer producer;
+	Producer producer;	
+	
+/*	@Autowired
+	@Qualifier("newbFavor")
+	Producer producer;*/
 /*	
 	@Autowired
 	@Qualifier("aggressiveOperation")
@@ -44,14 +49,14 @@ public class SimulateAVB {
 	ConservativeOperation conservativeOperation;
 */
 	@Autowired
-	@Qualifier("optimizeOperation")
-	OptimizeOperation optimizeOperation;
+	@Qualifier("favorOperation")
+	FavorOperation favorOperation;
 	
 	@Async("taskExecutor")
 	public Future<String> run(LocalDate beginDate, LocalDate endDate, BigDecimal initCash, Integer top, boolean isAveValue, Integer quantityType, boolean isEvaluation) throws Exception {
 		Account account = new Account(initCash);
 		Map<LocalDate, List<String>> operationList = producer.getResults(beginDate, endDate);
-		Map<String, String> operateResult = optimizeOperation.run(account, operationList, beginDate, endDate, "avb", top, isAveValue,quantityType);
+		Map<String, String> operateResult = favorOperation.run(account, operationList, beginDate, endDate, "avb", top, isAveValue,quantityType);
 		turtleSimulationRepository.save("avb", operateResult.get("breakers"), operateResult.get("CSV"), operateResult.get("dailyAmount"), isEvaluation);		
 		return new AsyncResult<String>("avb执行完毕");
 	}

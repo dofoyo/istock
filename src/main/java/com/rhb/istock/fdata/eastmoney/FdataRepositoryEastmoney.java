@@ -251,7 +251,7 @@ public class FdataRepositoryEastmoney {
 				}
 			}
 		}else {
-			System.err.println(fdataFile + " do NOT exist!!");
+			//System.err.println(fdataFile + " do NOT exist!!");
 		}
 		
 		return cagr;

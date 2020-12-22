@@ -85,7 +85,7 @@ public class ProduceTest {
 		System.out.println(results);
 	}
 	
-	@Test
+	//@Test
 	public void produce2() {  //做收盘
 		LocalDate bDate = LocalDate.parse("2017-01-01");
 		LocalDate eDate = LocalDate.parse("2020-12-11");
@@ -102,12 +102,12 @@ public class ProduceTest {
 		System.out.println("收盘 Test");
 	}
 	
-	//@Test
+	@Test
 	public void produce() {
-		LocalDate bDate = LocalDate.parse("2020-12-01");
-		LocalDate eDate = LocalDate.parse("2020-12-11");
+		LocalDate bDate = LocalDate.parse("2017-01-01");
+		LocalDate eDate = LocalDate.parse("2020-12-18");
 		
-		drum.produce(bDate, eDate);
+		dimeNewbReco.produce(bDate, eDate);
 		System.out.println("produce Test");
 	}
 	
