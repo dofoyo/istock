@@ -84,4 +84,14 @@ public class BusiView {
 	public Integer getHighestRate() {
 		return Functions.growthRate(highestPrice, openPrice);
 	}
+
+	@Override
+	public String toString() {
+		return "BusiView [itemID=" + itemID + ", itemName=" + itemName + ", openDate=" + openDate + ", openPrice="
+				+ openPrice + ", quantity=" + quantity + ", closeDate=" + closeDate + ", closePrice=" + closePrice
+				+ ", highestPrice=" + highestPrice + ", isWin()=" + isWin() + ", isGood()=" + isGood() + ", getColor()="
+				+ getColor() + ", getRate()=" + getRate() + ", getHighestRate()=" + getHighestRate() + "]";
+	}
+	
+	
 }

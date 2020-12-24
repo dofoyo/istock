@@ -102,24 +102,24 @@ public class EvaluationService {
 		Kelly kelly = new Kelly(eDate);
 		
 		List<Busi> tmps;
-		BigDecimal price;
+		BigDecimal closePrice;
 		Muster muster;
 		for(LocalDate date : dates) {
 			tmps = busis.get(date);
 			if(tmps!=null) {
 				for(Busi busi : tmps) {
+					closePrice = busi.getClosePrice();
 					//根据eDate对closePrice进行校正
 					if(busi.getCloseDate().isAfter(eDate)) {
 						muster = musters.get(busi.getItemID());
 						if(muster!=null) {
-							price = muster.getLatestPrice();
+							closePrice = muster.getLatestPrice();
 						}else {
-							price = busi.getOpenPrice();
+							closePrice = busi.getOpenPrice();
 						}
-						busi.setClosePrice(price);
 					}
 					
-					kelly.add(1, busi.getOpenAmount(), busi.getCloseAmount());
+					kelly.add(1, busi.getOpenAmount(), busi.getQuantity().multiply(closePrice));
 				}			
 			}
 		}
@@ -131,7 +131,8 @@ public class EvaluationService {
 		List<BusiView> result = new ArrayList<BusiView>();
 
 		List<Busi> tmps;
-		BigDecimal price;
+		BigDecimal closePrice;
+		LocalDate closeDate;
 		Muster muster;
 
 		Map<LocalDate,List<Busi>> busis = evaluationRepository.getBusis(type); //每一单
@@ -141,19 +142,20 @@ public class EvaluationService {
 			tmps = busis.get(date);
 			if(tmps!=null) {
 				for(Busi busi : tmps) {
+					closeDate = busi.getCloseDate();
+					closePrice = busi.getClosePrice();
 					//根据eDate对closePrice进行校正
 					if(busi.getCloseDate().isAfter(eDate)) {
+						closeDate = eDate;
 						muster = musters.get(busi.getItemID());
 						if(muster!=null) {
-							price = muster.getLatestPrice();
+							closePrice = muster.getLatestPrice();
 						}else {
-							price = busi.getOpenPrice();
+							closePrice = busi.getOpenPrice();
 						}
-						busi.setCloseDate(eDate);
-						busi.setClosePrice(price);
 					}
 					
-					result.add(new BusiView(busi.getItemID(),busi.getItemName(),busi.getOpenDate(), busi.getOpenPrice(),busi.getQuantity(), busi.getCloseDate(), busi.getClosePrice(), busi.getHighestPrice()));
+					result.add(new BusiView(busi.getItemID(),busi.getItemName(),busi.getOpenDate(), busi.getOpenPrice(),busi.getQuantity(), closeDate, closePrice, busi.getHighestPrice()));
 				}			
 			}
 		}		

@@ -97,4 +97,12 @@ public class Busi {
 	public void setQuantity(BigDecimal quantity) {
 		this.quantity = quantity;
 	}
+
+	@Override
+	public String toString() {
+		return "Busi [itemID=" + itemID + ", itemName=" + itemName + ", openDate=" + openDate + ", openPrice="
+				+ openPrice + ", quantity=" + quantity + ", closeDate=" + closeDate + ", closePrice=" + closePrice
+				+ ", highestPrice=" + highestPrice + "]";
+	}
+	
 }

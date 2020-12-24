@@ -491,6 +491,7 @@ public class Account {
 		for(Order order : holds.values()) {
 			if(order.getItemID().equals(itemID)) {
 				order.setLatest(price);
+				//logger.info(order.toString());
 			}
 		}
 	}
@@ -899,7 +900,7 @@ public class Account {
 			sb.append(",");
 			sb.append(openOrder.getIndustry());
 			sb.append(",");
-			sb.append(dsOrder.getHighest());
+			sb.append(openOrder.getHighest());
 			sb.append("\n");
 
 		}
@@ -1056,13 +1057,15 @@ public class Account {
 
 		public void setLatest(BigDecimal latest) {
 			this.latest = latest;
-			if(highest.compareTo(latest)==-1) {
-				highest = latest;
+			if(this.highest.compareTo(latest)==-1) {
+				this.highest = latest;
 			}
 		}
 		
 		public void setHighest(BigDecimal highest) {
-			this.highest = highest;
+			if(this.highest.compareTo(latest)==-1) {
+				this.highest = highest;
+			}
 		}
 
 		public BigDecimal getHighest() {

@@ -5,6 +5,8 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,6 +25,8 @@ public class EvaluationApi {
 	@Autowired
 	@Qualifier("evaluation")
 	Evaluation evaluation;
+
+	protected static final Logger logger = LoggerFactory.getLogger(EvaluationApi.class);
 
 	@GetMapping("/evaluation/evaluate")
 	public ResponseContent<String> simulate(){
@@ -85,6 +89,8 @@ public class EvaluationApi {
 
 		List<BusiView> busis = evaluationService.getBusiViews(type, period, LocalDate.parse(edate, DateTimeFormatter.ofPattern("yyyy-MM-dd")));
 	
+		//logger.info(busis.toString());
+		
 		return new ResponseContent<List<BusiView>>(ResponseEnum.SUCCESS, busis);
 	}
 

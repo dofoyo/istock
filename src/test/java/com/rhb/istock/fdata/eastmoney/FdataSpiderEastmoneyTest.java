@@ -27,7 +27,7 @@ public class FdataSpiderEastmoneyTest {
 	@Qualifier("fdataRepositoryEastmoney")
 	FdataRepositoryEastmoney fdataRepositoryEastmoney;
 	
-	@Test
+	//@Test
 	public void getRecommendations() {
 		LocalDate date = LocalDate.parse("2020-10-27");
 		Map<String, Integer> results = fdataRepositoryEastmoney.getRecommendations(date);
@@ -40,7 +40,7 @@ public class FdataSpiderEastmoneyTest {
 		fdataRepositoryEastmoney.generateRecommendation();
 	}
 	
-	//@Test
+	@Test
 	public void downForecast() throws Exception {
 /*		String code = "603345";
 		

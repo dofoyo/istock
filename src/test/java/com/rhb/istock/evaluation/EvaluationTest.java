@@ -1,6 +1,7 @@
 package com.rhb.istock.evaluation;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.Test;
@@ -17,12 +18,28 @@ public class EvaluationTest {
 	@Qualifier("evaluationService")
 	EvaluationService evaluationService;
 
+	@Autowired
+	@Qualifier("evaluationRepository")
+	EvaluationRepository evaluationRepository;
 
 	@Autowired
 	@Qualifier("evaluation")
 	Evaluation evaluation;
 	
 	@Test
+	public void getBusi() {
+		Map<LocalDate, List<Busi>> busis = evaluationRepository.getBusis("avb");
+		LocalDate date = LocalDate.parse("2020-12-24");
+		List<Busi> bs = busis.get(date);
+		//System.out.println(bs);
+		
+		List<BusiView> bsiv = evaluationService.getBusiViews("avb", 21, date);
+		for(BusiView v : bsiv) {
+			System.out.println(v);
+		}
+	}
+	
+	//@Test
 	public void getResults() {
 		Integer period = 5;
 		LocalDate eDate = LocalDate.parse("2020-12-15");

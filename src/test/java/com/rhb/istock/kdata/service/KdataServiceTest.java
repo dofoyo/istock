@@ -49,7 +49,7 @@ public class KdataServiceTest {
 		kdataService.updateLatestMusters();
 	}
 	
-	@Test
+	//@Test
 	public void generateMusters() {
 		LocalDate date = LocalDate.parse("2020-01-25");
 		//kdataService.generateMusters(date);
@@ -57,12 +57,11 @@ public class KdataServiceTest {
 		kdataService.updateLatestMusters();
 	}
 	
-	//@Test
+	@Test
 	public void test() {
-		String itemID = "sh600673";
-		Kbar bar =  kdataService.getLatestMarketData(itemID);
-		System.out.println(bar);
-
+		String itemID = "sh600300";
+		Kdata data =  kdataService.getKdata(itemID, false);
+		System.out.println(data.getLastBar());
 	}
 	
 	
