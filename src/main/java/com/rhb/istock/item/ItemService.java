@@ -7,7 +7,7 @@ import java.util.Set;
 
 public interface ItemService {
 	public void init();
-	public List<Item> getItems();
+	public Map<String, Item> getItems();
 	public List<String> getItemIDs();
 	public Item getItem(String itemID);
 	public void downItems();

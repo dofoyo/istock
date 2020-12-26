@@ -104,6 +104,9 @@ public class ManualApi {
 	@Qualifier("newbFavor")
 	Producer newbFavor;
 
+	@Autowired
+	@Qualifier("newbRup")
+	Producer newbRup;
 	
 	private List<String> previous = null;
 	
@@ -269,7 +272,7 @@ public class ManualApi {
 			if(tmp!=null && tmp.size()>0) {
 				ids.addAll(tmp);
 			}
-			tmp = drumRecoH21.getResults(theDate);
+			/*tmp = drumRecoH21.getResults(theDate);
 			//System.out.println(tmp);
 			if(tmp!=null && tmp.size()>0) {
 				for(String id : tmp) {
@@ -277,7 +280,12 @@ public class ManualApi {
 						ids.add(id);
 					}
 				}
-			}			
+			}*/			
+		}else if("rup".equals(type)) { 
+			List<String> tmp = newbRup.getResults(theDate);
+			if(tmp!=null && tmp.size()>0) {
+				ids.addAll(tmp);
+			}
 		}else if("darker".equals(type)) { 
 			List<String> tmp = drumPlusL21.getResults(theDate);
 			if(tmp!=null && tmp.size()>0) {
@@ -293,10 +301,10 @@ public class ManualApi {
 			}
 		}else if("favor".equals(type)) { 
 			List<String> tmp = null;
-			tmp = drumFavor.getResults(theDate);
+			/*tmp = drumFavor.getResults(theDate);
 			if(tmp!=null && tmp.size()>0) {
 				ids.addAll(tmp);
-			}
+			}*/
 			tmp = newbFavor.getResults(theDate);
 			if(tmp!=null && tmp.size()>0) {
 				for(String id : tmp) {

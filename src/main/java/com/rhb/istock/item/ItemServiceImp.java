@@ -41,8 +41,8 @@ public class ItemServiceImp implements ItemService {
 	protected static final Logger logger = LoggerFactory.getLogger("");
 
 	@Override
-	public List<Item> getItems() {
-		List<Item> items = new ArrayList<Item>();
+	public Map<String, Item> getItems() {
+		Map<String, Item> items = new HashMap<String, Item>();
 		
 		Item item;
 		List<ItemEntity> entities = itemRepository.getItemEntities();
@@ -55,7 +55,7 @@ public class ItemServiceImp implements ItemService {
 			item.setArea(entity.getArea());
 			item.setIpo(entity.getIpo());
 			item.setCagr(entity.getCagr());
-			items.add(item);
+			items.put(entity.getItemId(),item);
 		}
 		return items;
 	}
@@ -117,7 +117,7 @@ public class ItemServiceImp implements ItemService {
 	@Override
 	public List<String> getItemIDs() {
 		List<String> ids = new ArrayList<String>();
-		for(Item item : this.getItems()) {
+		for(Item item : this.getItems().values()) {
 			ids.add(item.getItemID());
 		}
 		return ids;
@@ -133,8 +133,8 @@ public class ItemServiceImp implements ItemService {
 	@Override
 	public Set<String> getIndustrys() {
 		Set<String> industrys = new HashSet<String>();
-		List<Item> items = this.getItems();
-		for(Item item : items) {
+		Map<String,Item> items = this.getItems();
+		for(Item item : items.values()) {
 			industrys.add(item.getIndustry());
 		}
 		
@@ -207,8 +207,8 @@ public class ItemServiceImp implements ItemService {
 		Dimension topic = new Dimension();
 		Dimension average = new Dimension();
 		
-		List<Item> items = this.getItems();
-		for(Item item : items) {
+		Map<String,Item> items = this.getItems();
+		for(Item item : items.values()) {
 			industry.put(item.getIndustry(), item.getItemID(), item.getName());
 			area.put(item.getArea(), item.getItemID(), item.getName());
 			market.put(item.getMarket(), item.getItemID(), item.getName());

@@ -50,7 +50,7 @@ public class Simulation {
 		System.out.println("simulate from " + beginDate + " to " + endDate +" ......");
 		
 		//BigDecimal ic = new BigDecimal(initCash);
-		Integer top = 1;
+		Integer top = 1000;
 		boolean isAveValue = true;
 		Integer quantityType = 0;
 		boolean isEvaluation = false;

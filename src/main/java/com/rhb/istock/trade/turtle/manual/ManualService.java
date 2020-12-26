@@ -16,10 +16,7 @@ import org.springframework.stereotype.Service;
 import com.rhb.istock.account.Account;
 import com.rhb.istock.index.tushare.IndexServiceTushare;
 import com.rhb.istock.kdata.KdataService;
-import com.rhb.istock.operation.AggressiveOperation;
-import com.rhb.istock.operation.ConservativeOperation;
-import com.rhb.istock.operation.FavorOperation;
-import com.rhb.istock.operation.OptimizeOperation;
+import com.rhb.istock.operation.Operation;
 import com.rhb.istock.trade.turtle.simulation.six.TurtleMusterSimulation;
 import com.rhb.istock.trade.turtle.simulation.six.repository.AmountEntity;
 import com.rhb.istock.trade.turtle.simulation.six.repository.TurtleSimulationRepository;
@@ -42,19 +39,23 @@ public class ManualService {
 
 	@Autowired
 	@Qualifier("aggressiveOperation")
-	AggressiveOperation aggressiveOperation;
+	Operation aggressiveOperation;
 	
 	@Autowired
 	@Qualifier("conservativeOperation")
-	ConservativeOperation conservativeOperation;
+	Operation conservativeOperation;
 
 	@Autowired
 	@Qualifier("optimizeOperation")
-	OptimizeOperation optimizeOperation;
+	Operation optimizeOperation;
 
 	@Autowired
 	@Qualifier("favorOperation")
-	FavorOperation favorOperation;
+	Operation favorOperation;
+
+	@Autowired
+	@Qualifier("commOperation")
+	Operation commOperation;
 	
 	private Map<LocalDate, List<String>> selects = new TreeMap<LocalDate, List<String>>();
 
@@ -105,12 +106,12 @@ public class ManualService {
 		long beginTime=System.currentTimeMillis(); 
 		String label = "manual " + simulateType;
 		BigDecimal initCash = new BigDecimal(1000000);
-		Integer top = 100;
+		Integer top = 1000;
 		Account account = new Account(initCash);
 		boolean isEvaluation = false;
 		Map<String, String> operateResult;
-		if("aggressive".equals(simulateType)) {
-			operateResult = aggressiveOperation.run(account, this.selects, this.getBeginDate(), this.getEndDate(), label, top, true,0);
+		if("comm".equals(simulateType)) {
+			operateResult = commOperation.run(account, this.selects, this.getBeginDate(), this.getEndDate(), label, top, true,0);
 		}else if("conservative".equals(simulateType)) {
 			operateResult = conservativeOperation.run(account, this.selects, this.getBeginDate(), this.getEndDate(), label, top, true,0);
 		}else if("favor".equals(simulateType))  {

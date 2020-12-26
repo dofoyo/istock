@@ -2,6 +2,7 @@ package com.rhb.istock.fdata.eastmoney;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -51,12 +52,12 @@ public class FdataSpiderEastmoney {
 	}
 	
 	public void downRecommendations() {
-		List<Item> items = itemService.getItems();
+		Map<String,Item> items = itemService.getItems();
 		//System.out.println(items.size());
 		String year="", fdataFile;
 		JSONArray reports;
 		int i=1;
-		for(Item item : items) {
+		for(Item item : items.values()) {
 			if(item.getIpo()!=null) {
 				year = item.getIpo().substring(0, 4);
 				reports = this.downRecommendations(item.getCode(), Integer.parseInt(year));

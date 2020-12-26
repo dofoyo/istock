@@ -326,9 +326,9 @@ public class KdataServiceImp implements KdataService{
 		Above21 above2155;
 		Above21 above2189;
 		
-		List<Item> items = itemService.getItems();
+		Map<String,Item> items = itemService.getItems();
 		int i=1;
-		for(Item item : items) {
+		for(Item item : items.values()) {
 			Progress.show(items.size(),i++, " generateMusters: " + item.getItemID());//进度条
 			
 			kdata = this.getKdata(item.getItemID(), true);
@@ -489,10 +489,10 @@ public class KdataServiceImp implements KdataService{
 			MusterEntity entity;
 			StringBuffer sb = new StringBuffer();
 			
-			List<Item> items = itemService.getItems();
+			Map<String,Item> items = itemService.getItems();
 			count = items.size();
 			int i=1;
-			for(Item item : items) {
+			for(Item item : items.values()) {
 				Progress.show(items.size(),i++, " generateLatestMusters: " + item.getItemID());//进度条
 				
 				entity = this.getMusterEntity(item.getItemID(), date, false);

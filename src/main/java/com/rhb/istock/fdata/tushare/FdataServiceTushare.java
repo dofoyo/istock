@@ -226,9 +226,9 @@ public class FdataServiceTushare {
 
 		GrowModel model;
 		
-		List<Item> items = itemService.getItems();
+		Map<String,Item> items = itemService.getItems();
 		int i=1;
-		for(Item item : items) {
+		for(Item item : items.values()) {
 			Progress.show(items.size(),i++, " getGrowModels: " + item.getItemID());//进度条
 			model = this.getGrowModel(item.getItemID(),item.getName(), b_date, e_date,n);
 			if(model!=null && model.isOK()) {

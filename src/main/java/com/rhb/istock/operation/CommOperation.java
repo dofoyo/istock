@@ -20,26 +20,25 @@ import com.rhb.istock.account.Account;
 import com.rhb.istock.comm.util.Progress;
 import com.rhb.istock.kdata.KdataService;
 import com.rhb.istock.kdata.Muster;
+import com.rhb.istock.producer.Producer;
+
 
 /*
- * Favor操作模式: 新高后开始跟踪，向上突破21日均线就买入
- * 
- * 买入：满仓　＋　市值平均　＋　单只股票不加仓
- * 卖出：跌破21日线或回落超过8%
+ * 买入：根据传入的buyList清单买入，如果涨停，就在第二天买入。卖出后跟踪21日，如果又向上突破21日线再次买入
+ * 卖出：跌破21日线或买入后跌幅超过8%
  */
 @Scope("prototype")
-@Service("favorOperation")
-public class FavorOperation implements Operation {
-	protected static final Logger logger = LoggerFactory.getLogger(FavorOperation.class);
+@Service("commOperation")
+public class CommOperation implements Operation {
+	protected static final Logger logger = LoggerFactory.getLogger(CommOperation.class);
 
 	@Autowired
 	@Qualifier("kdataServiceImp")
 	KdataService kdataService;
 	
-	
-/*	@Autowired
+	@Autowired
 	@Qualifier("drum")
-	Producer producer;*/
+	Producer producer;
 	
 	private StringBuffer dailyAmount_sb;
 	private StringBuffer breakers_sb;
@@ -98,13 +97,13 @@ public class FavorOperation implements Operation {
 					dropsKeeper.add(date, itemID);
 					//logger.info("dropsKeeper add " + itemID);
 				}
-				
+				/*
 				//高位回落超过8%
-				if(account.isFallOrder(itemID, -8) && muster.getN21Gap()>8) {
+				if(account.isFallOrder(itemID, -8)) {
 					account.dropWithTax(itemID, "2", muster.getLatestPrice());
 					dropsKeeper.add(date, itemID);
 					//logger.info("dropsKeeper add " + itemID);
-				}
+				}*/
 			}
 		}
 		dropsKeeper.dailySet(date);
@@ -119,8 +118,9 @@ public class FavorOperation implements Operation {
 		for(String id : breaks) {
 			if(!holdItemIDs.contains(id)) {
 				muster = musters.get(id); 
-				if(muster!=null && !muster.isUpLimited() && muster.isJustBreaker()) {
+				if(muster!=null && !muster.isUpLimited() && muster.isAboveAveragePrice(21)) {
 					dds.add(muster);
+					breaksKeeper.remove(id);
 				}
 			}
 		}
@@ -133,27 +133,45 @@ public class FavorOperation implements Operation {
 				muster = musters.get(id); 
 				if(muster!=null && !muster.isUpLimited() && muster.isJustBreaker()) {
 					dds.add(muster);
+					dropsKeeper.remove(id);
 				}
 			}
 		}
 		
 
 		if(buyList!=null && buyList.size()>0) {
-			breaksKeeper.addAll(date,new HashSet<String>(buyList));
+			String id;
+			for(int i=0, j=0; i<buyList.size() && j<top; i++) {
+				id = buyList.get(i);
+				if(!holdItemIDs.contains(id)) {
+					muster = musters.get(id); 
+					if(muster!=null && !muster.isUpLimited() && muster.isAboveAveragePrice(21)) {
+						dds.add(muster);
+						j++;
+					}else {
+						breaksKeeper.add(date, id);
+					}
+				}
+			}
+			
+			
+/*			breaksKeeper.addAll(date,new HashSet<String>(buyList));
 			for(String id : buyList) {
 				if(!holdItemIDs.contains(id)) {
 					muster = musters.get(id); 
-					if(muster!=null && !muster.isUpLimited() && muster.isJustBreaker()) {
+					if(muster!=null && !muster.isUpLimited()) {
 						dds.add(muster);
 					}
 				}
 			}			
-		}else{
+*/		}else{
 			breaksKeeper.dailySet(date);
 		}
 		
 		breakers_sb.append(date.toString() + ",");
 		for(Muster m : dds) {
+			//breaksKeeper.remove(m.getItemID());
+			//dropsKeeper.remove(m.getItemID());
 			breakers_sb.append(m.getItemID());
 			breakers_sb.append(",");
 		}				
@@ -279,14 +297,14 @@ public class FavorOperation implements Operation {
 			
 			Set<String> results = new HashSet<String>();
 			Muster muster;
-			for(String id : drums) {
+/*			for(String id : drums) {
 				if(tmp.contains(id)) {
 					muster = musters.get(id);
 					if(muster!=null && !muster.isUpLimited() && muster.getN21Gap()<=8) {
 						results.add(id);
 					}
 				}
-			}
+			}*/
 
 			for(String id : tmp){
 				muster = musters.get(id);

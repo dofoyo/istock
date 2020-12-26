@@ -115,8 +115,8 @@ public class FinaService {
 		List<String> results = new ArrayList<String>();
 		List<Item> tmp = new ArrayList<Item>();
 		
-		List<Item> items = itemService.getItems();
-		for(Item item : items) {
+		Map<String,Item> items = itemService.getItems();
+		for(Item item : items.values()) {
 			if(item.getCagr()!=null && item.getCagr()>20) {
 				tmp.add(item);
 			}

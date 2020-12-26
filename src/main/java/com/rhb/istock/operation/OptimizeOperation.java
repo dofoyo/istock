@@ -100,12 +100,12 @@ public class OptimizeOperation implements Operation {
 					//logger.info("dropsKeeper add " + itemID);
 				}
 				
-				//高位回落超过8%
+/*				//高位回落超过8%
 				if(account.isFallOrder(itemID, -8)) {
 					account.dropWithTax(itemID, "2", muster.getLatestPrice());
 					dropsKeeper.add(date, itemID);
 					//logger.info("dropsKeeper add " + itemID);
-				}
+				}*/
 			}
 		}
 		dropsKeeper.dailySet(date);
@@ -113,33 +113,50 @@ public class OptimizeOperation implements Operation {
 		//买入清单
 		Set<Muster> dds = new HashSet<Muster>();  //用set，无重复，表示不可加仓
 		holdItemIDs = account.getItemIDsOfHolds();
-		List<String> drums = producer.getResults(date);
+		//List<String> drums = producer.getResults(date);
 		
-		Set<String> breaks = breaksKeeper.getIDs(musters, drums);
-		//Set<String> breaks = breaksKeeper.getIDs();
+		//Set<String> breaks = breaksKeeper.getIDs(musters, drums);
+		Set<String> breaks = breaksKeeper.getIDs();
 		for(String id : breaks) {
 			if(!holdItemIDs.contains(id)) {
 				muster = musters.get(id); 
-				//if(muster!=null && !muster.isUpLimited() && muster.getN21Gap()<=8) {
+				if(muster!=null && !muster.isUpLimited() && muster.isAboveAveragePrice(21) && muster.getN21Gap()<=8) {
 					dds.add(muster);
-				//}
+					breaksKeeper.remove(id);
+				}
 			}
 		}
 		
 		
-		Set<String>  drops = dropsKeeper.getIDs(musters, drums);
-		//Set<String>  drops = dropsKeeper.getIDs();
+		//Set<String>  drops = dropsKeeper.getIDs(musters, drums);
+		Set<String>  drops = dropsKeeper.getIDs();
 		for(String id : drops) {
 			if(!holdItemIDs.contains(id)) {
 				muster = musters.get(id); 
-				//if(muster!=null && !muster.isUpLimited() && muster.isJustBreaker()) {
+				if(muster!=null && !muster.isUpLimited() && muster.isJustBreaker()) {
 					dds.add(muster);
-				//}
+					dropsKeeper.remove(id);
+				}
 			}
 		}
 		
 
 		if(buyList!=null && buyList.size()>0) {
+			String id;
+			for(int i=0, j=0; i<buyList.size() && j<top; i++) {
+				id = buyList.get(i);
+				if(!holdItemIDs.contains(id)) {
+					muster = musters.get(id); 
+					if(muster!=null && !muster.isUpLimited() && muster.isAboveAveragePrice(21) && muster.getN21Gap()<=8) {
+						dds.add(muster);
+						j++;
+					}else {
+						breaksKeeper.add(date, id);
+					}
+				}
+			}
+/*
+			
 			breaksKeeper.addAll(date,new HashSet<String>(buyList));
 			for(String id : buyList) {
 				if(!holdItemIDs.contains(id)) {
@@ -149,7 +166,7 @@ public class OptimizeOperation implements Operation {
 					}
 				}
 			}			
-		}else{
+*/		}else{
 			breaksKeeper.dailySet(date);
 		}
 		

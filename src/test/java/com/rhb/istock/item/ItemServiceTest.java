@@ -2,6 +2,7 @@ package com.rhb.istock.item;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -39,8 +40,8 @@ public class ItemServiceTest {
 	
 	//@Test
 	public void getItems() {
-		List<Item> items = itemService.getItems();
-		for(Item item : items) {
+		Map<String,Item> items = itemService.getItems();
+		for(Item item : items.values()) {
 			System.out.println(item.getItemID() + "," + item.getName() + "," + item.getIndustry());
 			
 		}

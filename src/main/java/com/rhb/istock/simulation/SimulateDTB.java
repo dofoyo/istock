@@ -16,8 +16,7 @@ import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Component;
 
 import com.rhb.istock.account.Account;
-import com.rhb.istock.operation.AggressiveOperation;
-import com.rhb.istock.operation.ConservativeOperation;
+import com.rhb.istock.operation.Operation;
 import com.rhb.istock.producer.Producer;
 import com.rhb.istock.trade.turtle.simulation.six.repository.TurtleSimulationRepository;
 
@@ -35,18 +34,14 @@ public class SimulateDTB {
 	Producer producer;
 	
 	@Autowired
-	@Qualifier("aggressiveOperation")
-	AggressiveOperation aggressiveOperation;
-	
-	@Autowired
 	@Qualifier("conservativeOperation")
-	ConservativeOperation conservativeOperation;
+	Operation operation;
 	
 	@Async("taskExecutor")
 	public Future<String> run(LocalDate beginDate, LocalDate endDate, BigDecimal initCash, Integer top, boolean isAveValue, Integer quantityType, boolean isEvaluation)  throws Exception {
 		Account account = new Account(initCash);
 		Map<LocalDate, List<String>> operationList = producer.getResults(beginDate, endDate);
-		Map<String, String> operateResult = conservativeOperation.run(account, operationList, beginDate, endDate,"dtb", top, isAveValue,quantityType);
+		Map<String, String> operateResult = operation.run(account, operationList, beginDate, endDate,"dtb", top, isAveValue,quantityType);
 		turtleSimulationRepository.save("dtb", operateResult.get("breakers"), operateResult.get("CSV"), operateResult.get("dailyAmount"), isEvaluation);
 		return new AsyncResult<String>("dtb执行完毕");
 	}
