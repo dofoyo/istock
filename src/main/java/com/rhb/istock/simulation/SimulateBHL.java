@@ -31,10 +31,12 @@ public class SimulateBHL {
 
 	@Autowired
 	@Qualifier("dimeNewbReco")
+	//@Qualifier("sab89Favor")
 	Producer producer;
 	
 	@Autowired
 	@Qualifier("commOperation")
+	//@Qualifier("huntingOperation")
 	Operation operation;
 	
 	@Async("taskExecutor")

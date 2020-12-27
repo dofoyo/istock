@@ -30,11 +30,13 @@ public class SimulateBDT {
 	TurtleSimulationRepository turtleSimulationRepository;
 
 	@Autowired
-	@Qualifier("newbPlusL21")
+	//@Qualifier("newbPlusL21")
+	@Qualifier("sab21Favor")
 	Producer producer;
 
 	@Autowired
-	@Qualifier("conservativeOperation")
+	//@Qualifier("conservativeOperation")
+	@Qualifier("huntingOperation")
 	Operation operation;
 	
 	@Async("taskExecutor")

@@ -938,6 +938,7 @@ public class Account {
 		}
 
 		public Integer getFallRate() {
+			//logger.info(this.toString());
 			return Functions.growthRate(this.latestPrice,this.highest);
 		}
 		
@@ -999,7 +1000,8 @@ public class Account {
 		@Override
 		public String toString() {
 			return "HoldState [itemID=" + itemID + ", buyPrice=" + buyPrice + ", latestPrice=" + latestPrice
-					+ ", holdsDays=" + holdsDays + ", isHold=" + isHold + "]";
+					+ ", holdsDays=" + holdsDays + ", isHold=" + isHold + ", highest=" + highest + ", isLost()="
+					+ isLost() + "]";
 		}
 
 		

@@ -37,6 +37,14 @@ public class ProducerService {
 	@Qualifier("newb")
 	Producer newb;
 	
+	@Autowired
+	@Qualifier("sab21")
+	Producer sab21;
+
+	@Autowired
+	@Qualifier("sab21Rup")
+	Producer sab21Rup;
+	
 	public void produce(LocalDate date) {
 		System.out.println("收盘后生成买入清单");
 		long beginTime=System.currentTimeMillis(); 
@@ -52,6 +60,9 @@ public class ProducerService {
 		results  = drumPlusL21.produce(date, true);
 
 		results  = dimeNewbReco.produce(date, true);
+		
+		results  = sab21.produce(date, true); 
+		results  = sab21Rup.produce(date, true); 
 		
 		long used = (System.currentTimeMillis() - beginTime)/1000; 
 		System.out.println("执行“收盘后生成买入清单”完成，用时：" + used + "秒");          

@@ -79,6 +79,14 @@ public class ProduceTest {
 	@Autowired
 	@Qualifier("newbRup")
 	Producer newbRup;
+
+	@Autowired
+	@Qualifier("sabRecoH21_21")
+	Producer sabRecoH21;
+	
+	@Autowired
+	@Qualifier("sab21Rup")
+	Producer sab21Rup;
 	
 	//@Test
 	public void produce4() {  
@@ -111,7 +119,7 @@ public class ProduceTest {
 		LocalDate bDate = LocalDate.parse("2017-01-01");
 		LocalDate eDate = LocalDate.parse("2020-12-25");
 		
-		newbRup.produce(bDate, eDate);
+		sab21Rup.produce(bDate, eDate);
 		System.out.println("produce Test");
 	}
 	

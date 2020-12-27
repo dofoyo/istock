@@ -523,7 +523,7 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 	
 	private List<ItemView> buildItemViews(List<String> itemIDs, boolean resort, LocalDate date) {
 		long beginTime=System.currentTimeMillis(); 
-		logger.info("building itemViews ......");
+		//logger.info("building itemViews ......");
 		
 		List<ItemView> views = new ArrayList<ItemView>();
 		
@@ -537,7 +537,7 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 		
 		int i=1;
 		for(String id : itemIDs) {
-			Progress.show(itemIDs.size(),i++,id);
+			//Progress.show(itemIDs.size(),i++,id);
 			
 				item = itemService.getItem(id);
 				if(item == null) {
@@ -573,7 +573,7 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 		}
 		
 		long used = (System.currentTimeMillis() - beginTime)/1000; 
-		logger.info("getting b21 views done! 用时：" + used + "秒");     
+		//logger.info("getting b21 views done! 用时：" + used + "秒");     
 		
 		return views;
 	}

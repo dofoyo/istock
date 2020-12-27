@@ -30,11 +30,13 @@ public class SimulateAVB {
 	TurtleSimulationRepository turtleSimulationRepository;
 
 	@Autowired
-	@Qualifier("newbDrumFavor")
+	@Qualifier("newbFavor")
+	//@Qualifier("sab34Favor")
 	Producer producer;	
 	
 	@Autowired
 	@Qualifier("commOperation")
+	//@Qualifier("huntingOperation")
 	Operation operation;
 	
 	@Async("taskExecutor")

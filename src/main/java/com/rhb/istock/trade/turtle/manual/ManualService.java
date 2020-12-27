@@ -56,6 +56,10 @@ public class ManualService {
 	@Autowired
 	@Qualifier("commOperation")
 	Operation commOperation;
+
+	@Autowired
+	@Qualifier("huntingOperation")
+	Operation huntingOperation;
 	
 	private Map<LocalDate, List<String>> selects = new TreeMap<LocalDate, List<String>>();
 
@@ -112,12 +116,14 @@ public class ManualService {
 		Map<String, String> operateResult;
 		if("comm".equals(simulateType)) {
 			operateResult = commOperation.run(account, this.selects, this.getBeginDate(), this.getEndDate(), label, top, true,0);
-		}else if("conservative".equals(simulateType)) {
-			operateResult = conservativeOperation.run(account, this.selects, this.getBeginDate(), this.getEndDate(), label, top, true,0);
 		}else if("favor".equals(simulateType))  {
 			operateResult = favorOperation.run(account, this.selects, this.getBeginDate(), this.getEndDate(), label, top, true,0);
-		}else {
+		}else if("optimize".equals(simulateType)) {
 			operateResult = optimizeOperation.run(account, this.selects, this.getBeginDate(), this.getEndDate(), label, top, true,0);
+		}else if("sab".equals(simulateType)) {
+			operateResult = huntingOperation.run(account, this.selects, this.getBeginDate(), this.getEndDate(), label, top, true,0);
+		}else {
+			operateResult = conservativeOperation.run(account, this.selects, this.getBeginDate(), this.getEndDate(), label, top, true,0);
 		}
 		turtleSimulationRepository.save("manual", operateResult.get("breakers"), operateResult.get("CSV"), operateResult.get("dailyAmount"), isEvaluation);
 		

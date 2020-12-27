@@ -107,6 +107,14 @@ public class ManualApi {
 	@Autowired
 	@Qualifier("newbRup")
 	Producer newbRup;
+
+	@Autowired
+	@Qualifier("sab21Rup")
+	Producer sab21Rup;
+	
+	@Autowired
+	@Qualifier("sab21Favor")
+	Producer sab21Favor;
 	
 	private List<String> previous = null;
 	
@@ -281,8 +289,13 @@ public class ManualApi {
 					}
 				}
 			}*/			
-		}else if("rup".equals(type)) { 
+		}else if("newbRup".equals(type)) { 
 			List<String> tmp = newbRup.getResults(theDate);
+			if(tmp!=null && tmp.size()>0) {
+				ids.addAll(tmp);
+			}
+		}else if("sabRup".equals(type)) { 
+			List<String> tmp = sab21Rup.getResults(theDate);
 			if(tmp!=null && tmp.size()>0) {
 				ids.addAll(tmp);
 			}
@@ -299,7 +312,7 @@ public class ManualApi {
 					}
 				}
 			}
-		}else if("favor".equals(type)) { 
+		}else if("newbFavor".equals(type)) { 
 			List<String> tmp = null;
 			/*tmp = drumFavor.getResults(theDate);
 			if(tmp!=null && tmp.size()>0) {
@@ -312,6 +325,12 @@ public class ManualApi {
 						ids.add(id);
 					}
 				}
+			}
+		}else if("sabFavor".equals(type)) { 
+			List<String> tmp = null;
+			tmp = sab21Favor.getResults(theDate);
+			if(tmp!=null && tmp.size()>0) {
+				ids.addAll(tmp);
 			}
 		}else if("newb".equals(type)) {  
 			List<String> tmp = newbFavor.getResults(theDate);
