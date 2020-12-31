@@ -15,6 +15,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.rhb.istock.kdata.Muster;
+import com.rhb.istock.comm.util.Functions;
 import com.rhb.istock.item.ItemService;
 import com.rhb.istock.kdata.Kbar;
 import com.rhb.istock.kdata.Kdata;
@@ -57,7 +58,7 @@ public class KdataServiceTest {
 		kdataService.updateLatestMusters();
 	}
 	
-	@Test
+	//@Test
 	public void test() {
 		String itemID = "sh600300";
 		Kdata data =  kdataService.getKdata(itemID, false);
@@ -118,22 +119,14 @@ public class KdataServiceTest {
 		}*/
 	}
 	
-	//@Test
+	@Test
 	public void getMusters() {
-		LocalDate date = LocalDate.parse("2020-01-09");
-		Map<String,Muster> musters = kdataService.getMusters(date);
-		List<Muster> mm = new ArrayList<Muster>(musters.values());
-		Collections.sort(mm, new Comparator<Muster>() {
-			@Override
-			public int compare(Muster o1, Muster o2) {
-				return o1.getTotal_mv().compareTo(o2.getTotal_mv());
-			}});
-		for(Muster muster : mm) {
-			if(muster.getItemID().startsWith("sz300")) {
-				System.out.println(muster);
-			}
-
+		LocalDate endDate = LocalDate.parse("2020-12-29");
+		List<String> mm = kdataService.getPowers(endDate);
+		for(String c : mm) {
+			System.out.println(c);
 		}
+		
 	}
 	
 	//@Test

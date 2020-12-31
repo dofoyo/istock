@@ -34,6 +34,7 @@ public interface TurtleOperationService {
 	public Map<String,IndustryView> getPotentialIndustrys(LocalDate date);
 	public void redoPotentials();
 	public String[] getTopics();
+	public List<ItemView> getHAHs();
 	public List<ItemView> getPowers();
 	public List<ForecastView> getForecastViews();
 	public List<ItemView> getB21Views();

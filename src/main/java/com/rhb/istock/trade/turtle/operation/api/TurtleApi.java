@@ -21,6 +21,12 @@ public class TurtleApi{
 	@Qualifier("turtleOperationServiceImp")
 	TurtleOperationService ts;
 
+	@GetMapping("/turtle/favors")
+	public ResponseContent<List<ItemView>> getFavors() {
+		List<ItemView> favors = ts.getFavors();
+		return new ResponseContent<List<ItemView>>(ResponseEnum.SUCCESS, favors);
+	}
+	
 	@GetMapping("/turtle/topics")
 	public ResponseContent<String[]> getTopics() {
 		String[] topis = ts.getTopics();
@@ -32,6 +38,21 @@ public class TurtleApi{
 		List<ItemView> powers_views = ts.getPowers();
 		return new ResponseContent<List<ItemView>>(ResponseEnum.SUCCESS, powers_views);
 	}
+	
+	@GetMapping("/turtle/hahs")
+	public ResponseContent<List<ItemView>> getHAHs() {
+		List<ItemView> powers_views = ts.getHAHs();
+		return new ResponseContent<List<ItemView>>(ResponseEnum.SUCCESS, powers_views);
+	}
+
+	@GetMapping("/turtle/{itemid}")
+	public ResponseContent<ItemView> getItemView1(
+			@PathVariable(value="itemid") String itemID
+			){
+		ItemView view = ts.getItemView(itemID, null);
+		return new ResponseContent<ItemView>(ResponseEnum.SUCCESS, view);
+	} 
+
 	
 	@GetMapping("/turtle/{itemid}/{date}")
 	public ResponseContent<ItemView> getItemView(
@@ -111,12 +132,6 @@ public class TurtleApi{
 	public ResponseContent<List<TurtleView>> getPotentialsOfBav() {
 		List<TurtleView> views = ts.getPotentials("bav");
 		return new ResponseContent<List<TurtleView>>(ResponseEnum.SUCCESS, views);
-	}
-	
-	@GetMapping("/turtle/favors")
-	public ResponseContent<List<ItemView>> getFavors() {
-		List<ItemView> favors = ts.getFavors();
-		return new ResponseContent<List<ItemView>>(ResponseEnum.SUCCESS, favors);
 	}
 	
 	@GetMapping("/turtle/holds")

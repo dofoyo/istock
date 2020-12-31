@@ -523,7 +523,7 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 	
 	private List<ItemView> buildItemViews(List<String> itemIDs, boolean resort, LocalDate date) {
 		long beginTime=System.currentTimeMillis(); 
-		//logger.info("building itemViews ......");
+		logger.info("building itemViews ......");
 		
 		List<ItemView> views = new ArrayList<ItemView>();
 		
@@ -537,7 +537,7 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 		
 		int i=1;
 		for(String id : itemIDs) {
-			//Progress.show(itemIDs.size(),i++,id);
+			Progress.show(itemIDs.size(),i++,id);
 			
 				item = itemService.getItem(id);
 				if(item == null) {
@@ -819,18 +819,26 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 	}
 
 	@Override
-	public List<ItemView> getPowers() {
-		//List<String> ps = selectorService.getPowerIDs();
-		String b_date = "20161231";
-		String e_date = "20191231";
-		Integer n = 3;
+	public List<ItemView> getHAHs() {
+		List<String> models = new ArrayList<String>();
+		LocalDate date = kdataService.getLatestMarketDate("sh000001");
+		Integer top = 10000;
+		Integer count = 13; //有多少机构推荐买入
+		Integer cagr = 21;  //业绩年增长率
 
-		List<String> models = fdataServiceTushare.getGrowModels(b_date, e_date, n);
+		Map<String,Item> items = itemService.getItems();
+		Item item;
+		List<String> ids = finaService.getHighRecommendations(date, top, count);
+		for(String id : ids) {
+			item = items.get(id);
+			if(item!=null && item.getCagr()!=null && item.getCagr()>=cagr) {
+				models.add(id);
+			}
+		}
 		
-		LocalDate endDate = kdataService.getLatestMarketDate("sh000001");
-		Map<String,String> b21s = b21Service.getStates(models, endDate);
+		Map<String,String> b21s = b21Service.getStates(models, date);
 
-		List<ItemView> views = buildItemViews(models, true, endDate);
+		List<ItemView> views = buildItemViews(models, true, date);
 		for(ItemView view : views) {
 			view.setStatus(b21s.get(view.getItemID()));
 		}
@@ -996,6 +1004,9 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 
 	@Override
 	public ItemView getItemView(String itemID, LocalDate date) {
+		if(date==null) {
+			date = kdataService.getLatestMarketDate("sh000001");
+		}
 		List<String> ids = new ArrayList<String>();
 		ids.add(itemID);
 		List<ItemView> views = buildItemViews(ids, false, date);
@@ -1013,6 +1024,22 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 		view.setName(item.getNameWithCAGR());
 		
 		return view;
+	}
+
+	@Override
+	public List<ItemView> getPowers() {
+		LocalDate endDate = kdataService.getLatestMarketDate("sh000001");
+		
+		List<String> models = kdataService.getPowers(endDate);
+
+		Map<String,String> b21s = b21Service.getStates(models, endDate);
+
+		List<ItemView> views = buildItemViews(models, false, endDate);
+		for(ItemView view : views) {
+			view.setStatus(b21s.get(view.getItemID()));
+		}
+		
+		return views;
 	}
 
 	

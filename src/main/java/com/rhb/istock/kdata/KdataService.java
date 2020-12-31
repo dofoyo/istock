@@ -11,6 +11,8 @@ public interface KdataService {
 	 * 获得的数据是不包含endDate的
 	 */
 	
+	public List<String> getPowers(LocalDate endDate);
+	
 	public void downSSEI();  //下载上证指数
 	public Integer getSseiFlag(LocalDate date); 
 	public Integer getSseiRatio(LocalDate date, Integer period);

@@ -64,7 +64,8 @@ public class KdataAPI {
 	}
 	
 	@GetMapping("/kdatas/{itemID}")
-	public ResponseContent<KdatasView> getKdatas(@PathVariable(value="itemID") String itemID,
+	public ResponseContent<KdatasView> getKdatas(
+			@PathVariable(value="itemID") String itemID,
 			@RequestParam(value="endDate", required=false) String endDate
 			) {
 		
@@ -99,8 +100,10 @@ public class KdataAPI {
 				kdatas.addKdata(latestBar.getDate(), latestBar.getOpen(), latestBar.getHigh(), latestBar.getLow(), latestBar.getClose());
 			}*/
 			
+			LocalDate theLastMarketDate = kdataService.getLatestMarketDate("sh000001");
+			
 			Kbar latestBar;
-			if(!dates.contains(theEndDate)) {
+			if((theEndDate.isAfter(theLastMarketDate) || theEndDate.isEqual(theLastMarketDate)) && !dates.contains(theLastMarketDate)) {
 				latestBar = kdataService.getLatestMarketData(itemID);
 				//if(bar==null || !bar.getDate().equals(latestBar.getDate())) {
 					kdatas.addKdata(latestBar.getDate(), latestBar.getOpen(), latestBar.getHigh(), latestBar.getLow(), latestBar.getClose());
