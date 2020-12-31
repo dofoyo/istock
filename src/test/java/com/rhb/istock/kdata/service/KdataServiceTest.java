@@ -40,13 +40,13 @@ public class KdataServiceTest {
 		System.out.println(kdata.getLastBar().getDate());
 	}
 	
-	//@Test
+	@Test
 	public void doOpen() throws Exception {
 		//itemService.downItems();		// 1. 下载最新股票代码
 		//itemService.init();  // 2. 
-		kdataService.downFactors(); // 3. 上一交易日的收盘数据要等开盘前才能下载到, 大约需要15分钟
-		kdataService.downSSEI();
-		kdataService.generateLatestMusters(null);
+		//kdataService.downFactors(); // 3. 上一交易日的收盘数据要等开盘前才能下载到, 大约需要15分钟
+		//kdataService.downSSEI();
+		//kdataService.generateLatestMusters(null);
 		kdataService.updateLatestMusters();
 	}
 	
@@ -119,7 +119,7 @@ public class KdataServiceTest {
 		}*/
 	}
 	
-	@Test
+	//@Test
 	public void getMusters() {
 		LocalDate endDate = LocalDate.parse("2020-12-29");
 		List<String> mm = kdataService.getPowers(endDate);

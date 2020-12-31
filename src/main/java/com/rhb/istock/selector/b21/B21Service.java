@@ -97,6 +97,7 @@ public class B21Service {
 				p = this.getPreviousMuster(previous, id);
 				v = "0";
 				if(m!=null && p!=null) {
+					
 					ratio = this.getRatio(previous, m.getItemID(), m.getLatestPrice()); 
 					if(m.isDropAve(21) || ratio[0]<sseiRatio[0]) {  // 弱于大盘
  						v = "-2";

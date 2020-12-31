@@ -544,6 +544,7 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 					System.err.println("item of " + id + " is null!!!");
 				}else {
 					muster = musters.get(id);
+					
 					preyMap = new HashMap<String,String>();
 					preyMap.put("itemID", id);
 					preyMap.put("code", (holds!=null && holds.contains(id)) ? "*" + item.getCode() : item.getCode());

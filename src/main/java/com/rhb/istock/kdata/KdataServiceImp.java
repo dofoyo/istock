@@ -492,23 +492,27 @@ public class KdataServiceImp implements KdataService{
 			MusterEntity entity;
 			StringBuffer sb = new StringBuffer();
 			
-			Map<String,Item> items = itemService.getItems();
-			count = items.size();
+			//Map<String,Item> items = itemService.getItems();
+			List<String> ids = itemService.getItemIDs();
+			count = ids.size();
 			int i=1;
-			for(Item item : items.values()) {
-				Progress.show(items.size(),i++, " generateLatestMusters: " + item.getItemID());//进度条
+			//for(Item item : items.values()) {
+			for(String id : ids) {
+				Progress.show(ids.size(),i++, " generateLatestMusters: " + id);//进度条
 				
-				entity = this.getMusterEntity(item.getItemID(), date, false);
+				entity = this.getMusterEntity(id, date, false);
 				if(entity!=null) {
 					sb.append(entity.toText());
-					sb.append("\n");
+					//sb.append("\n");
+					//musterRepositoryImp.saveMuster(date, entity);
 					//System.out.println(entity);
 				}else {
 					nullCount ++;
-					System.out.println(item.getItemID() + "'s entity is null!");
+					logger.info(id + "'s entity is null!");
 				}
-
 			}
+			//logger.info("generate: ");
+			//logger.info(sb.toString());
 			musterRepositoryImp.saveMuster(date, sb.toString());
 		}
 		
@@ -661,12 +665,15 @@ public class KdataServiceImp implements KdataService{
 	
 	private void updateMustersWithLatestKdata() {
 		long beginTime=System.currentTimeMillis(); 
-		logger.info("updateMustersWithLatestKdata ......");
+		logger.info("update Musters With Latest Kdata ......");
 
 		Set<Kbar> bars = kdataRealtimeSpider.getLatestMarketData();
 		if(bars!=null && bars.iterator()!=null && bars.iterator().next()!=null) {
 			LocalDate date = bars.iterator().next().getDate();
 			Map<String,Muster> musters = this.getMusters(date);
+			//System.out.println(date);
+			//System.out.println("there are " + bars.size() + " stocks market data.");
+			//System.out.println("there are " + musters.size() + " musters.");
 			if(musters!=null && musters.size()>4000) {
 				List<MusterEntity> entities = new ArrayList<MusterEntity>();
 				MusterEntity entity;
@@ -720,8 +727,10 @@ public class KdataServiceImp implements KdataService{
 				}
 				musterRepositoryImp.saveMusters(date,entities);
 			}else {
-				System.out.println(" updateMustersWithLatestKdata ERROR: muster's size is small than 4000!!!");
+				System.out.println(" update Musters With Latest Kdata ERROR: muster's size is small than 4000!!!");
 			}
+		}else {
+			System.out.println(" update Musters With Latest Kdata ERROR: BAR IS NULL!");
 		}
 		
 
@@ -1038,9 +1047,9 @@ public class KdataServiceImp implements KdataService{
 				hls.put(m.getItemID(), d, m.getLatestPrice());
 			}
 		}
-
+		
 		Map<String,Muster> endDateMusters = this.getMusters(ds.get(0));
-		Integer top = 55;  //涨幅前21只个股
+		Integer top = 55;  //涨幅前55只个股
 		List<Muster> ms = new ArrayList<Muster>();
 		List<String> ids = hls.getResults(top);
 		Muster muster;

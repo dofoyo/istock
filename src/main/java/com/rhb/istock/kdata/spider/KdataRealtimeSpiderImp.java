@@ -197,6 +197,7 @@ public class KdataRealtimeSpiderImp implements KdataRealtimeSpider{
 			bars.addAll(this.getLatestMarketDateKbars(ids.subList(i, j)));
 			HttpClient.sleep(5);
 		}
+
 		return bars;
 	}
 	
@@ -209,9 +210,15 @@ public class KdataRealtimeSpiderImp implements KdataRealtimeSpider{
 		}
 		String url = "https://qt.gtimg.cn/q=" + sb.toString();
 		String result = HttpDownload.getResult(url);
-		String[] ss = result.split(";");
+		//System.out.println(result);
+		String[] ss = result.split(";\n");
+		Kbar bar;
 		for(String s : ss) {
-			bars.add(this.getKbar(s));
+			//System.out.println(s);
+			bar = this.getKbar(s);
+			if(bar!=null) {
+				bars.add(bar);
+			}
 		}
 		return bars;
 	}
@@ -228,8 +235,10 @@ public class KdataRealtimeSpiderImp implements KdataRealtimeSpider{
 					ss[6],
 					LocalDate.parse(ss[30].substring(0, 8),DateTimeFormatter.ofPattern("yyyyMMdd")).toString(),
 					"0","0","0","0","0","0","0","0");
-			bar.setId(ss[0].substring(3,11));
+			bar.setId(ss[0].substring(2,10));
+			//System.out.print(ss[0]);
 		}
+		//System.out.println(bar);
 		return bar;
 	}
 	

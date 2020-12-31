@@ -15,10 +15,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.rhb.istock.kdata.KdataServiceImp;
+
 
 public class FileTools {
 	private static final String SEP = System.getProperty("line.separator");
-	
+	protected static final Logger logger = LoggerFactory.getLogger(FileTools.class);
+
 	public static List<String> readAsLines(String fileName, String encoding) {
 		List<String> lines = new ArrayList<String>();
 		try {
@@ -135,7 +141,8 @@ public class FileTools {
 			filewriter.write(content);
 			filewriter.close();
 
-			//System.out.println("have saved " + path + ". ");
+			//logger.info("write: ");
+			//logger.info(content);
 		} catch (Exception d) {
 			d.printStackTrace();
 		}
