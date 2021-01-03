@@ -16,9 +16,12 @@ import org.springframework.stereotype.Service;
 
 import com.rhb.istock.account.Account;
 import com.rhb.istock.comm.util.Progress;
+import com.rhb.istock.item.Item;
+import com.rhb.istock.item.ItemService;
 import com.rhb.istock.kdata.KdataService;
 import com.rhb.istock.kdata.Muster;
 import com.rhb.istock.producer.Producer;
+import com.rhb.istock.selector.fina.FinaService;
 
 
 /*
@@ -40,8 +43,17 @@ public class HuntingOperation implements Operation {
 	@Qualifier("drum")
 	Producer producer;
 	
+	@Autowired
+	@Qualifier("finaService")
+	FinaService finaService;
+
+	@Autowired
+	@Qualifier("itemServiceImp")
+	ItemService itemService;
+
 	private StringBuffer dailyAmount_sb;
 	private StringBuffer breakers_sb;
+	private Integer rate = -8;
 	
 	public Map<String,String> run(Account account, Map<LocalDate, List<String>> buyList,LocalDate beginDate, LocalDate endDate, String label, int top, boolean isAveValue, Integer quantityType) {
 		long days = endDate.toEpochDay()- beginDate.toEpochDay();
@@ -78,9 +90,11 @@ public class HuntingOperation implements Operation {
 		for(String itemID: holdItemIDs) {
 			muster = musters.get(itemID);
 			if(muster!=null && !muster.isDownLimited()) {
-				
+				/*if(account.isGain(itemID, 2)){
+					account.dropWithTax(itemID, "1", muster.getLatestPrice());
+				}*/
 				//高位回落超过8%
-				if(account.isFallOrder(itemID, -8) 
+				if(account.isFallOrder(itemID, this.rate) 
 					//&& !account.isLost(itemID)
 					) {
 					account.dropWithTax(itemID, "2", muster.getLatestPrice());
@@ -94,11 +108,19 @@ public class HuntingOperation implements Operation {
 
 		if(buyList!=null && buyList.size()>0) {
 			String id;
+			Integer recommendationCount;
+			Map<String, Item> items = itemService.getItems();
+			Item item;
 			for(int i=0, j=0; i<buyList.size() && j<top; i++) {
 				id = buyList.get(i);
 				if(!holdItemIDs.contains(id)) {
 					muster = musters.get(id); 
-					if(muster!=null && !muster.isUpLimited()) {
+					item = items.get(id);
+					recommendationCount = finaService.getRecommendationCount(id, date);
+					if(muster!=null && !muster.isUpLimited()
+							&& muster.getN21Gap()<=8
+							&& item!=null && item.getCagr()!=null && item.getCagr()>0 && recommendationCount!=null && recommendationCount>0
+							) {
 						dds.add(muster);
 						j++;
 					}
@@ -114,7 +136,7 @@ public class HuntingOperation implements Operation {
 		breakers_sb.deleteCharAt(breakers_sb.length()-1);
 		breakers_sb.append("\n");
 
-		if(dds.size()>0) {
+		if(isAveValue) {
 			Set<Integer> holdOrderIDs;
 			for(String itemID: holdItemIDs) {
 				holdOrderIDs = 	account.getHoldOrderIDs(itemID);

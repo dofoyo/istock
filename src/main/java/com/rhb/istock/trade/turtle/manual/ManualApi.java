@@ -27,6 +27,7 @@ import com.rhb.istock.item.Item;
 import com.rhb.istock.item.ItemService;
 import com.rhb.istock.kdata.Kbar;
 import com.rhb.istock.kdata.KdataService;
+import com.rhb.istock.kdata.Muster;
 import com.rhb.istock.kdata.api.KdatasView;
 import com.rhb.istock.producer.Producer;
 import com.rhb.istock.selector.drum.DrumService;
@@ -115,6 +116,10 @@ public class ManualApi {
 	@Autowired
 	@Qualifier("sab21Favor")
 	Producer sab21Favor;
+
+	@Autowired
+	@Qualifier("power")
+	Producer power;
 	
 	private List<String> previous = null;
 	
@@ -270,36 +275,14 @@ public class ManualApi {
 	}
 	
 	private List<String> getPotentials(String type, LocalDate theDate){
-		Set<String> holds = new HashSet<String>();
-		Integer lRatio = 21;
-		Integer hRatio = 55;
 		List<String> ids = new ArrayList<String>();
-		if("power".equals(type)) { 
-			List<String> tmp = newbRecoH21.getResults(theDate);
-			//System.out.println(tmp);
-			if(tmp!=null && tmp.size()>0) {
-				ids.addAll(tmp);
-			}
-			/*tmp = drumRecoH21.getResults(theDate);
-			//System.out.println(tmp);
-			if(tmp!=null && tmp.size()>0) {
-				for(String id : tmp) {
-					if(!ids.contains(id)) {
-						ids.add(id);
-					}
-				}
-			}*/			
+		if("high".equals(type)) { 
+			ids = newbRecoH21.getResults(theDate);
 		}else if("newbRup".equals(type)) { 
-			List<String> tmp = newbRup.getResults(theDate);
-			if(tmp!=null && tmp.size()>0) {
-				ids.addAll(tmp);
-			}
+			ids = newbRup.getResults(theDate);
 		}else if("sabRup".equals(type)) { 
-			List<String> tmp = sab21Rup.getResults(theDate);
-			if(tmp!=null && tmp.size()>0) {
-				ids.addAll(tmp);
-			}
-		}else if("darker".equals(type)) { 
+			ids = sab21Rup.getResults(theDate);
+		}else if("low".equals(type)) { 
 			List<String> tmp = drumPlusL21.getResults(theDate);
 			if(tmp!=null && tmp.size()>0) {
 				ids.addAll(tmp);
@@ -313,85 +296,26 @@ public class ManualApi {
 				}
 			}
 		}else if("newbFavor".equals(type)) { 
-			List<String> tmp = null;
-			/*tmp = drumFavor.getResults(theDate);
-			if(tmp!=null && tmp.size()>0) {
-				ids.addAll(tmp);
-			}*/
-			tmp = newbFavor.getResults(theDate);
-			if(tmp!=null && tmp.size()>0) {
-				for(String id : tmp) {
-					if(!ids.contains(id)) {
-						ids.add(id);
-					}
-				}
-			}
+			ids = newbFavor.getResults(theDate);
 		}else if("sabFavor".equals(type)) { 
-			List<String> tmp = null;
-			tmp = sab21Favor.getResults(theDate);
-			if(tmp!=null && tmp.size()>0) {
-				ids.addAll(tmp);
-			}
-		}else if("newb".equals(type)) {  
-			List<String> tmp = newbFavor.getResults(theDate);
-			if(tmp!=null && tmp.size()>0) {
-				ids.addAll(tmp);
-			}
-			tmp = newbPlusL21.getResults(theDate);
-			if(tmp!=null && tmp.size()>0) {
-				for(String id : tmp) {
-					if(!ids.contains(id)) {
-						ids.add(id);
-					}
+			ids = sab21Favor.getResults(theDate);
+		}else if("power".equals(type)) {
+			List<String> tmp = power.getResults(theDate);
+			Map<String, Muster> musters = kdataService.getMusters(theDate);
+			Map<String, Item> items = itemService.getItems();
+			Muster muster;
+			Item item;
+			Integer recommendationCount;
+			for(String id : tmp) {
+				muster = musters.get(id);
+				item = items.get(id);
+				recommendationCount = finaService.getRecommendationCount(id, theDate);
+				if(muster!=null && muster.getN21Gap()<=8
+						&& item!=null && item.getCagr()!=null && item.getCagr()>0 && recommendationCount!=null && recommendationCount>0
+						) {
+					ids.add(id);
 				}
 			}
-			tmp = newbRecoH21.getResults(theDate);
-			if(tmp!=null && tmp.size()>0) {
-				for(String id : tmp) {
-					if(!ids.contains(id)) {
-						ids.add(id);
-					}
-				}
-			}
-			tmp = drumService.getDrumsOfTopDimensions(theDate, holds, lRatio, hRatio, true);
-			if(tmp!=null && tmp.size()>0) {
-				for(String id : tmp) {
-					if(!ids.contains(id)) {
-						ids.add(id);
-					}
-				}
-			}
-		}else if("drum".equals(type)) {  
-			List<String> tmp = drumFavor.getResults(theDate);
-			if(tmp!=null && tmp.size()>0) {
-				ids.addAll(tmp);
-			}
-			tmp = drumPlusL21.getResults(theDate);
-			if(tmp!=null && tmp.size()>0) {
-				for(String id : tmp) {
-					if(!ids.contains(id)) {
-						ids.add(id);
-					}
-				}
-			}
-			tmp = drumRecoH21.getResults(theDate);
-			if(tmp!=null && tmp.size()>0) {
-				for(String id : tmp) {
-					if(!ids.contains(id)) {
-						ids.add(id);
-					}
-				}
-			}
-			tmp = drumService.getDrumsOfTopDimensions(theDate, holds, lRatio, hRatio, true);
-			if(tmp!=null && tmp.size()>0) {
-				for(String id : tmp) {
-					if(!ids.contains(id)) {
-						ids.add(id);
-					}
-				}
-			}
-		}else if("dime".equals(type)) {
-			ids = drumService.getDrumsOfTopDimensions(theDate, holds, lRatio, hRatio, true);   //强板块
 		}
 		
 		return ids;

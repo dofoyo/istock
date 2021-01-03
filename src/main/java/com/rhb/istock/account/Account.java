@@ -335,9 +335,9 @@ public class Account {
 		BigDecimal quota = this.fix_amount;
 		for(Muster item : items) {
 			this.prices.put(item.getItemID(), item.getLatestPrice());
-			if(this.cash.compareTo(BigDecimal.ZERO)==1) {
+			//if(this.cash.compareTo(BigDecimal.ZERO)==1) {
 				this.open(item.getItemID(), item.getItemName(), item.getIndustry(), this.getQuantity(quota, item.getLatestPrice()), item.getNote() , item.getLatestPrice());
-			}
+			//}
 		}
 	}
 	
@@ -345,9 +345,9 @@ public class Account {
 		if(items.isEmpty()) return;
 		for(Muster item : items) {
 			this.prices.put(item.getItemID(), item.getLatestPrice());
-			if(this.cash.compareTo(BigDecimal.ZERO)==1) {
+			//if(this.cash.compareTo(BigDecimal.ZERO)==1) {
 				this.open(item.getItemID(), item.getItemName(), item.getIndustry(),this.fix_quantity, item.getNote() , item.getLatestPrice());
-			}
+			//}
 		}
 	}
 	

@@ -26,8 +26,8 @@ public class ProducerService {
 	Producer drumPlusL21;
 	
 	@Autowired
-	@Qualifier("dimeNewbReco")
-	Producer dimeNewbReco;
+	@Qualifier("power")
+	Producer power;
 
 	@Autowired
 	@Qualifier("drum")
@@ -59,7 +59,7 @@ public class ProducerService {
 		results  = drumRecoH21.produce(date, true);
 		results  = drumPlusL21.produce(date, true);
 
-		results  = dimeNewbReco.produce(date, true);
+		results  = power.produce(date, true);
 		
 		results  = sab21.produce(date, true); 
 		results  = sab21Rup.produce(date, true); 
@@ -80,7 +80,7 @@ public class ProducerService {
 		drumRecoH21.produce(bDate, eDate);
 		drumPlusL21.produce(bDate, eDate);
 
-		dimeNewbReco.produce(bDate, eDate);
+		power.produce(bDate, eDate);
 
 		long used = (System.currentTimeMillis() - beginTime)/1000; 
 		System.out.println("执行“重新生成买入清单”完成，用时：" + used + "秒");          

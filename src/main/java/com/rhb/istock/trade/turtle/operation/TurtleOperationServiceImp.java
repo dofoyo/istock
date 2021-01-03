@@ -27,6 +27,7 @@ import com.rhb.istock.kdata.Kdata;
 import com.rhb.istock.kdata.KdataService;
 import com.rhb.istock.kdata.Muster;
 import com.rhb.istock.kdata.api.KdatasView;
+import com.rhb.istock.producer.Producer;
 import com.rhb.istock.selector.SelectorService;
 import com.rhb.istock.selector.b21.B21Service;
 import com.rhb.istock.selector.drum.DrumService;
@@ -78,6 +79,11 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 	@Autowired
 	@Qualifier("drumService")
 	DrumService drumService;
+
+	@Autowired
+	@Qualifier("power")
+	Producer power;
+
 	
 	DecimalFormat df = new DecimalFormat("0.00"); 
 	DecimalFormat df_integer = new DecimalFormat("000"); 
@@ -842,6 +848,10 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 		List<ItemView> views = buildItemViews(models, true, date);
 		for(ItemView view : views) {
 			view.setStatus(b21s.get(view.getItemID()));
+			item = itemService.getItem(view.getItemID());
+			item.setRecommendations(finaService.getRecommendationCount(view.getItemID(), date));
+			
+			view.setName(item.getNameWithCAGR());
 		}
 		
 		return views;
@@ -1031,15 +1041,19 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 	public List<ItemView> getPowers() {
 		LocalDate endDate = kdataService.getLatestMarketDate("sh000001");
 		
-		List<String> models = kdataService.getPowers(endDate);
+		List<String> models = power.getResults(endDate);
 
 		Map<String,String> b21s = b21Service.getStates(models, endDate);
 
 		List<ItemView> views = buildItemViews(models, false, endDate);
+		Item item;
 		for(ItemView view : views) {
 			view.setStatus(b21s.get(view.getItemID()));
+			item = itemService.getItem(view.getItemID());
+			item.setRecommendations(finaService.getRecommendationCount(view.getItemID(), endDate));
+			
+			view.setName(item.getNameWithCAGR());
 		}
-		
 		return views;
 	}
 

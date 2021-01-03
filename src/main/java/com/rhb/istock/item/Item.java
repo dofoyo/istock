@@ -7,8 +7,8 @@ public class Item {
 	private String area;
 	private String industry;
 	private String ipo;
-	private Integer cagr;  //利润年均增长率
-	private Integer recommendations;  //机构推荐买入次数
+	private Integer cagr=0;  //利润年均增长率
+	private Integer recommendations=0;  //机构推荐买入次数
 	
 	public Integer getCagr() {
 		return cagr;

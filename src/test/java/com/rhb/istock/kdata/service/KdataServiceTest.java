@@ -120,16 +120,6 @@ public class KdataServiceTest {
 	}
 	
 	//@Test
-	public void getMusters() {
-		LocalDate endDate = LocalDate.parse("2020-12-29");
-		List<String> mm = kdataService.getPowers(endDate);
-		for(String c : mm) {
-			System.out.println(c);
-		}
-		
-	}
-	
-	//@Test
 	public void testt() {
 		LocalDate endDate = LocalDate.parse("2020-09-12");
 		List<LocalDate> dates = kdataService.getMusterDates(13, endDate);

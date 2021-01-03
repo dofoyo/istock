@@ -30,17 +30,19 @@ public class SimulateBHL {
 	TurtleSimulationRepository turtleSimulationRepository;
 
 	@Autowired
-	@Qualifier("dimeNewbReco")
+	@Qualifier("power")
+	//@Qualifier("dimeNewbReco")
 	//@Qualifier("sab89Favor")
 	Producer producer;
 	
 	@Autowired
-	@Qualifier("commOperation")
-	//@Qualifier("huntingOperation")
+	//@Qualifier("commOperation")
+	@Qualifier("huntingOperation")
 	Operation operation;
 	
 	@Async("taskExecutor")
 	public Future<String> run(LocalDate beginDate, LocalDate endDate, BigDecimal initCash, Integer top, boolean isAveValue, Integer quantityType, boolean isEvaluation)  throws Exception {
+		//top = 1;
 		Account account = new Account(initCash);
 		Map<LocalDate, List<String>> operationList = producer.getResults(beginDate, endDate);
 		Map<String, String> operateResult = operation.run(account, operationList, beginDate, endDate, "bhl", top, isAveValue,quantityType);

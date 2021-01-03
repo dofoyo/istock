@@ -24,7 +24,7 @@ import com.rhb.istock.kdata.Muster;
 import com.rhb.istock.selector.fina.FinaService;
 
 /*
- * newbPlus + 买入评级 + 业绩增涨 + 价格低到高排序
+ * newbPlus + 买入评级 + 业绩增涨 + HLGAP低到高排序
  * 
  */
 
