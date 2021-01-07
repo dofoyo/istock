@@ -103,7 +103,7 @@ public class Power implements Producer{
 		Collections.sort(dates, new Comparator<LocalDate>() {
 			@Override
 			public int compare(LocalDate o1, LocalDate o2) {
-				return o2.compareTo(o1);
+				return o2.compareTo(o1); //倒叙
 			}
 		});
 		
@@ -116,6 +116,13 @@ public class Power implements Producer{
 				//System.out.println(date);
 			}
 		}
+		
+		Collections.sort(ds, new Comparator<LocalDate>() {
+			@Override
+			public int compare(LocalDate o1, LocalDate o2) {
+				return o1.compareTo(o2); //正叙
+			}
+		});
 		
 		HLs hls = new HLs();
 		Map<String,Muster> tmps;
@@ -130,7 +137,7 @@ public class Power implements Producer{
 		}
 		
 		Map<String,Muster> endDateMusters = kdataService.getMusters(ds.get(0));
-		Integer top = 55;  //涨幅前21只个股
+		Integer top = 55;  //涨幅前55只个股
 		List<Muster> ms = new ArrayList<Muster>();
 		List<String> ids = hls.getResults(top);
 		Muster muster;
@@ -144,13 +151,16 @@ public class Power implements Producer{
 		Collections.sort(ms, new Comparator<Muster>() {
 			@Override
 			public int compare(Muster o1, Muster o2) {
-				return o1.getN21Gap().compareTo(o2.getN21Gap());
+				Integer rate1 = Functions.growthRate(o1.getLatestPrice(), o1.getHighest());
+				Integer rate2 = Functions.growthRate(o2.getLatestPrice(), o2.getHighest());
+				return rate1.compareTo(rate2);
 			}
 		});
 		
 		List<String> results = new ArrayList<String>();
 		for(Muster m : ms) {
-			//if(m.getN21Gap()<=8) {
+			//if(Functions.growthRate(m.getLatestPrice(), m.getHighest())<=-8) {
+				//System.out.println(String.format("%s, %d, %.2f, %.2f\n", m.getItemID(), Functions.growthRate(m.getLatestPrice(), m.getHighest()), m.getHighest(), m.getLatestPrice()));
 				results.add(m.getItemID());
 			//}
 		}
@@ -181,7 +191,7 @@ public class Power implements Producer{
 		public List<String> getResults(Integer top){
 			List<String> ids = new ArrayList<String>();
 			List<HL> tmps = new ArrayList<HL>(this.hls.values());
-			Collections.sort(tmps, new Comparator<HL>() {
+/*			Collections.sort(tmps, new Comparator<HL>() {
 				@Override
 				public int compare(HL o1, HL o2) {
 					return o2.getUpRate().compareTo(o1.getUpRate());
@@ -197,8 +207,14 @@ public class Power implements Producer{
 				if(i > top) {
 					break;
 				}
-			}
+			}*/
 			
+			for(HL hl : tmps) {
+				if(hl.isOK()) {
+					//System.out.println(hl.toString());
+					ids.add(hl.getId());
+				}
+			}
 			return ids;
 		}
 		
@@ -243,7 +259,8 @@ public class Power implements Producer{
 			public boolean isOK() {
 				return this.hDate.isAfter(this.lDate)
 						&& this.isBreaker
-						&& this.getDownRate()>=21;
+						&& this.getUpRate()>=21
+						&& this.getDownRate()<=-8;
 			}
 
 			public String getId() {
@@ -263,13 +280,14 @@ public class Power implements Producer{
 			}
 			
 			public Integer getDownRate() {
-				return Functions.growthRate(this.highest, this.price);
+				return Functions.growthRate(this.price, this.highest);
 			}
 
 			@Override
 			public String toString() {
-				return "HL [id=" + id + ", highest=" + highest + ", hDate=" + hDate + ", Lowest=" + Lowest + ", lDate="
-						+ lDate + ", getRate()=" + getUpRate() + "]";
+				return "HL [id=" + id + ", price=" + price + ", highest=" + highest + ", hDate=" + hDate + ", Lowest="
+						+ Lowest + ", lDate=" + lDate + ", isBreaker=" + isBreaker + ", getUpRate()=" + getUpRate()
+						+ ", getDownRate()=" + getDownRate() + "]";
 			}
 		}
 	}

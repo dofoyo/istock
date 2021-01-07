@@ -674,7 +674,7 @@ public class KdataServiceImp implements KdataService{
 			//System.out.println(date);
 			//System.out.println("there are " + bars.size() + " stocks market data.");
 			//System.out.println("there are " + musters.size() + " musters.");
-			if(musters!=null && musters.size()>4000) {
+			if(musters!=null && musters.size()>3000) {
 				List<MusterEntity> entities = new ArrayList<MusterEntity>();
 				MusterEntity entity;
 				Muster muster;

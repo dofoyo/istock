@@ -93,12 +93,12 @@ public class ProduceTest {
 	Producer power;
 	
 	//@Test
-	public void produce4() {  
-		LocalDate date = LocalDate.parse("2020-04-13");
+	public void getResults() {  
+		LocalDate date = LocalDate.parse("2021-01-05");
 		
-		List<String> results = newbFavor.getResults(date);
+		List<String> results = power.getResults(date);
 		System.out.println("there are " + results.size() + " stocks.");
-		System.out.println(results);
+		//System.out.println(results);
 	}
 	
 	//@Test
@@ -121,7 +121,7 @@ public class ProduceTest {
 	@Test
 	public void produce() {
 		LocalDate bDate = LocalDate.parse("2017-01-01");
-		LocalDate eDate = LocalDate.parse("2020-12-31");
+		LocalDate eDate = LocalDate.parse("2021-01-04");
 		
 		power.produce(bDate, eDate);
 		System.out.println("produce Test");

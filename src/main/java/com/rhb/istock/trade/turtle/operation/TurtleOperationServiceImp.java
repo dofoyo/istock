@@ -1041,6 +1041,8 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 	public List<ItemView> getPowers() {
 		LocalDate endDate = kdataService.getLatestMarketDate("sh000001");
 		
+		//System.out.println(endDate);
+		
 		List<String> models = power.getResults(endDate);
 
 		Map<String,String> b21s = b21Service.getStates(models, endDate);

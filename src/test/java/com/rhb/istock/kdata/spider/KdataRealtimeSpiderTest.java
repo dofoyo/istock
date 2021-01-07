@@ -27,15 +27,15 @@ public class KdataRealtimeSpiderTest {
 	}
 	
 	
-	//@Test
+	@Test
 	public void getLatestMarketData() {
-		String id = "sh000001";
+		String id = "sz002564";
 		Map<String,String> data = kdataRealtimeSpider.getLatestMarketData(id);
 		System.out.println(data);
 		
 	}
 	
-	@Test
+	//@Test
 	public void getLatestMarketData_all() {
 		Set<Kbar> bars = kdataRealtimeSpider.getLatestMarketData();
 		System.out.println(bars);

@@ -23,11 +23,11 @@ public class TurtleOperationServiceTest {
 	TurtleOperationService turtleService;
 
 	@Test
-	public void getFavors() {
-		List<ItemView> views = turtleService.getFavors();
-		for(ItemView view : views) {
+	public void getPowers() {
+		List<ItemView> views = turtleService.getPowers();
+		/*for(ItemView view : views) {
 			System.out.print(view);
-		}	
+		}*/	
 	}
 	
 	//@Test

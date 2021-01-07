@@ -146,7 +146,7 @@ public class IstockScheduledTask {
 		}
 	}*/
 	
-	@Scheduled(cron="0 0/2 10-14 ? * 1-5")  //周一至周五，每日10 - 15点，每2分钟刷新一次 
+	@Scheduled(cron="0 0/2 10-14 ? * 1-5")  //周一至周五，每日10 - 14点，每2分钟刷新一次 
 	public void updateLatestMusters1() throws Exception {
 		System.out.println("run scheduled of '0 0/2 10-14 ? * 1-5'");
 		if(this.isTradeDate()) {
@@ -154,7 +154,7 @@ public class IstockScheduledTask {
 		}
 	}
 
-	@Scheduled(cron="0 0 15 ? * 1-5")  //周一至周五，每日15点 
+	@Scheduled(cron="0 38 15 ? * 1-5")  //周一至周五，每日15点 
 	public void updateLatestMusters2() throws Exception {
 		System.out.println("run scheduled of '0 0 15 ? * 1-5'");
 		if(this.isTradeDate()) {
