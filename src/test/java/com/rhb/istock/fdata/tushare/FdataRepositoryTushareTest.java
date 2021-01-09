@@ -32,6 +32,34 @@ public class FdataRepositoryTushareTest {
 	@Qualifier("itemServiceImp")
 	ItemService itemService;
 	
+	@Test
+	public void getFina() {
+		String itemID = "sh600519";
+		String end_date = "20191231";
+		Fina fina = fdataRepositoryTushare.getFina(itemID,end_date);
+		System.out.println(fina);
+	}
+	
+	//@Test
+	public void getBalancesheets() {
+		String itemID = "sh600519";
+		Map<String,FinaBalancesheet> balancesheets = fdataRepositoryTushare.getBalancesheets(itemID);
+		Map<String,FinaIncome> incoms = fdataRepositoryTushare.getIncomes(itemID);
+		FinaBalancesheet balancesheet = balancesheets.get("20191231");
+		FinaIncome income = incoms.get("20191231");
+		System.out.println(balancesheet);
+		System.out.println(income);
+		
+/*		for(Map.Entry<String, FinaBalancesheet> entry : balancesheets.entrySet()) {
+			System.out.println(entry.getKey());
+			System.out.println(entry.getValue());
+
+		}*/
+/*		for(FinaBalancesheet balancesheet : balancesheets.values()) {
+			System.out.println(balancesheet);
+		}*/
+	}
+	
 	//@Test
 	public void getCashflows() {
 		String itemID = "sz300022";
@@ -39,7 +67,6 @@ public class FdataRepositoryTushareTest {
 		for(FinaCashflow cashflow : cashflows.values()) {
 			System.out.println(cashflow);
 		}
-		
 	}
 	
 	
@@ -197,15 +224,6 @@ public class FdataRepositoryTushareTest {
 			}			
 		}
 		return years;
-	}
-	
-	//@Test
-	public void getFina() {
-		String itemID = "sz300022";
-		String end_date = "20191231";
-		Fina fina = fdataRepositoryTushare.getFina(itemID,end_date);
-		System.out.println(fina);
-		
 	}
 	
 	//@Test

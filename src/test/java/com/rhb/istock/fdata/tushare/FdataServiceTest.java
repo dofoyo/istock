@@ -1,5 +1,6 @@
 package com.rhb.istock.fdata.tushare;
 
+import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +26,12 @@ public class FdataServiceTest {
 	@Qualifier("fdataServiceTushare")
 	FdataServiceTushare fdataServiceTushare;
 	
+	@Test
+	public void getAdvReceiptsRates() {
+		String period = "20191231";
+		Map<String, Integer> advReceiptsRates = fdataServiceTushare.getAdvReceiptsRates(period);
+		System.out.println(advReceiptsRates);
+	}
 	
 	//@Test
 	public void testGetFina() {
@@ -97,7 +104,7 @@ public class FdataServiceTest {
 		System.out.println(hs);
 	}
 	
-	@Test
+	//@Test
 	public void getOKs() {
 		Set<String> result = new HashSet<String>();
 		Map<Integer,Set<String>> oks = fdataServiceTushare.getOks();

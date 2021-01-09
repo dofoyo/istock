@@ -44,6 +44,10 @@ public class FdataSpiderTushare {
 		return isExist(itemID,"income");
 	}
 	
+	public boolean isExistBalancesheet(String itemID) {
+		return isExist(itemID,"balancesheet");
+	}
+	
 	private boolean isExist(String itemID, String type) {
 		String fdataFile = fdataPath + "/" + itemID + "_"+type+".json";
 		File file = new File(fdataFile);
@@ -89,6 +93,10 @@ public class FdataSpiderTushare {
 		this.down(itemID, "cashflow");
 	}
 	
+	public void downBalancesheet(String itemID) throws Exception {
+		this.down(itemID, "balancesheet");
+	}
+	
 	public void downIndicator(String itemID) throws Exception {
 		this.down(itemID, "fina_indicator");
 	}
@@ -130,6 +138,7 @@ public class FdataSpiderTushare {
 			this.down(itemID, "cashflow");
 			this.down(itemID, "fina_indicator");
 			this.down(itemID, "forecast");
+			this.down(itemID, "balancesheet");
 			//this.down(itemID, "top10_floatholders");
 			try {
 				Thread.sleep(1000);  //一分钟200个	

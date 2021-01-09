@@ -9,7 +9,14 @@ public class Item {
 	private String ipo;
 	private Integer cagr=0;  //利润年均增长率
 	private Integer recommendations=0;  //机构推荐买入次数
+	private Integer advReceiptsRate = 0; //预收款率
 	
+	public Integer getAdvReceiptsRate() {
+		return advReceiptsRate;
+	}
+	public void setAdvReceiptsRate(Integer advReceiptsRate) {
+		this.advReceiptsRate = advReceiptsRate==null ? 0 : advReceiptsRate;
+	}
 	public Integer getCagr() {
 		return cagr;
 	}

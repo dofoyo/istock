@@ -1,5 +1,6 @@
 package com.rhb.istock.fdata.tushare;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -85,6 +86,20 @@ public class FdataServiceTushare {
 			}			
 		}
 		return years;
+	}
+	
+	public Map<String, Integer> getAdvReceiptsRates(String period){
+		Map<String, Integer> results = new HashMap<String,Integer>();
+		List<String> ids = itemService.getItemIDs();
+		Fina fina;
+		for(String id : ids) {
+			fina = fdataRepositoryTushare.getFina(id, period);
+			if(fina!=null) {
+				results.put(id, fina.getAdvReceiptsRate());
+			}
+			
+		}
+		return results;
 	}
 	
 	public Map<String,Integer[]> getFinaGrowthRate(String itemID){

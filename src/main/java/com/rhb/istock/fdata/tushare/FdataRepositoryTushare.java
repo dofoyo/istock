@@ -21,11 +21,13 @@ public class FdataRepositoryTushare {
 	Map<String,FinaCashflow> cashflows = null;
 	Map<String,FinaIncome> incomes = null;
 	Map<String,FinaIndicator> indicators = null;
+	Map<String,FinaBalancesheet> balancesheets = null;
 	
 	public void init() {
 		this.cashflows = null;
 		this.incomes = null;
 		this.indicators = null;
+		this.balancesheets = null;
 	}
 	
 	public Map<String,Fina> getFinas(String itemID){
@@ -51,28 +53,61 @@ public class FdataRepositoryTushare {
 	}
 	
 	public Fina getFina(String itemID, String end_date) {
-		if(this.cashflows == null) {
+		//if(this.cashflows == null || this.cashflows.size()==0) {
 			this.cashflows = this.getCashflows(itemID);
-		}
-		if(this.incomes == null) {
+		//}
+		//if(this.incomes == null || this.incomes.size()==0) {
 			this.incomes = this.getIncomes(itemID);
-		}
-		if(this.indicators == null) {
+		//}
+		//if(this.indicators == null || this.indicators.size()==0) {
 			this.indicators = this.getIndicators(itemID);
-		}
+		//}
+		//if(this.balancesheets == null || this.balancesheets.size()==0) {
+			this.balancesheets = this.getBalancesheets(itemID);
+		//}
+
 		
 		Fina fina = null;
-		if(this.cashflows!=null && this.incomes!=null && this.indicators!=null) {
+		//if(this.cashflows!=null && this.incomes!=null && this.indicators!=null && this.balancesheets!=null) {
 			FinaCashflow cashflow = this.cashflows.get(end_date);
 			FinaIncome income = this.incomes.get(end_date);
 			FinaIndicator indicator = this.indicators.get(end_date);
-			
-			fina = new Fina(end_date,cashflow,income,indicator);
-		}
+			FinaBalancesheet balancesheet = this.balancesheets.get(end_date);
+			if(cashflow!=null && income!=null && indicator!=null && balancesheet!=null) {
+				fina = new Fina(end_date,cashflow,income,indicator,balancesheet);
+			}
+		//}
+		
+		//System.out.println(itemID);
+		//System.out.println(end_date);
+		//System.out.println(fina);
 		
 		return fina;
 	}
 	
+	public	Map<String,FinaBalancesheet> getBalancesheets(String itemID){
+		Map<String,FinaBalancesheet> balancesheets = new HashMap<String,FinaBalancesheet>();
+		
+		String fdataFile = fdataPath + "/" + itemID + "_balancesheet.json";
+		if(FileTools.isExists(fdataFile)) {
+			JSONObject basicObject = new JSONObject(FileTools.readTextFile(fdataFile));
+			JSONArray items = basicObject.getJSONArray("items");
+			JSONArray fields = basicObject.getJSONArray("fields");
+			if(items.length()>0) {
+				JSONArray item;
+				FinaBalancesheet balancesheet;
+				String end_date;
+				for(int i=0; i<items.length()-1; i++) {
+					item = items.getJSONArray(i);
+					end_date = item.getString(3);
+					balancesheet = new FinaBalancesheet(item, fields);
+					balancesheets.put(end_date, balancesheet);
+				}
+			}
+		}
+		
+		return balancesheets;
+	}
 	
 	public	Map<String,FinaCashflow> getCashflows(String itemID){
 		Map<String,FinaCashflow> cashflows = new HashMap<String,FinaCashflow>();
@@ -102,6 +137,7 @@ public class FdataRepositoryTushare {
 		Map<String,FinaIncome> incomes = new HashMap<String,FinaIncome>();
 		
 		String fdataFile = fdataPath + "/" + itemID + "_income.json";
+		//System.out.println(fdataFile);
 		if(FileTools.isExists(fdataFile)) {
 			JSONObject basicObject = new JSONObject(FileTools.readTextFile(fdataFile));
 			JSONArray items = basicObject.getJSONArray("items");
@@ -116,8 +152,10 @@ public class FdataRepositoryTushare {
 					incomes.put(end_date, income);
 				}
 			}
+		}else {
+			System.out.println("File DO NOT exists! " + fdataFile);
 		}
-		
+		//System.out.println(incomes);
 		return incomes;
 	}
 	

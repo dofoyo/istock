@@ -25,8 +25,8 @@ public class FdataSpiderTushareTest {
 	@Qualifier("itemRepositoryTushare")
 	ItemRepository itemRepository;
 	
-	//@Test
-	public void downIndicators() throws Exception {
+	@Test
+	public void downs() throws Exception {
 		long beginTime=System.currentTimeMillis(); 
 
 		List<ItemEntity> items = itemRepository.getItemEntities();
@@ -34,7 +34,7 @@ public class FdataSpiderTushareTest {
 		for(ItemEntity item : items){
 			Progress.show(items.size(),i++, item.getItemId());
 			try {
-				if(!fdataSpiderTushare.isExistIndicator(item.getItemId())) {
+				/*if(!fdataSpiderTushare.isExistIndicator(item.getItemId())) {
 					fdataSpiderTushare.downIndicator(item.getItemId());
 					Thread.sleep(500); //一分钟200个	
 				}
@@ -45,6 +45,10 @@ public class FdataSpiderTushareTest {
 				if(!fdataSpiderTushare.isExistCashflow(item.getItemId())) {
 					fdataSpiderTushare.downCashflow(item.getItemId());
 					Thread.sleep(500); //一分钟200个	
+				}*/
+				if(!fdataSpiderTushare.isExistBalancesheet(item.getItemId())) {
+					fdataSpiderTushare.downBalancesheet(item.getItemId());
+					Thread.sleep(1000); //一分钟200个	
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -69,7 +73,7 @@ public class FdataSpiderTushareTest {
 		fdataSpiderTushare.downFloatholders(itemID, period);
 	}
 
-	@Test
+	//@Test
 	public void downAll() {
 		//String period = "20200331";
 		fdataSpiderTushare.downAll();

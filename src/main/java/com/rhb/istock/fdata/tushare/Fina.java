@@ -9,12 +9,14 @@ public class Fina {
 	private FinaCashflow cashflow;
 	private FinaIncome income;
 	private FinaIndicator indicator;
+	private FinaBalancesheet balancesheet;
 	
-	public Fina(String end_date,FinaCashflow cashflow, FinaIncome income, FinaIndicator indicator) {
+	public Fina(String end_date,FinaCashflow cashflow, FinaIncome income, FinaIndicator indicator, FinaBalancesheet balancesheet) {
 		this.end_date = end_date;
 		this.cashflow = cashflow;
 		this.income = income;
 		this.indicator = indicator;
+		this.balancesheet = balancesheet;
 	}
 	
 	public boolean isValid() {
@@ -32,6 +34,19 @@ public class Fina {
 				&& this.indicator.getProfit_dedt().compareTo(BigDecimal.ZERO)==1
 				&& this.getOperationMarginRatio()>=13  // 销售100元钱，净利润21元
 				;
+	}
+	
+	//预收账款比率
+	public Integer getAdvReceiptsRate() {
+		if(this.balancesheet!=null && this.income!=null) {
+			BigDecimal advReceipts = this.balancesheet.getAdv_receipts();
+			BigDecimal revenue = this.income.getRevenue();
+			//System.out.format("advReceipts=%.2f, revenue=%.2f\n", advReceipts, revenue);
+			if(advReceipts!=null && revenue!=null && revenue.compareTo(BigDecimal.ZERO)==1) {
+				return Functions.rate(advReceipts, revenue);
+			}
+		}
+		return 0;
 	}
 	
 	//营业利润率
@@ -64,10 +79,18 @@ public class Fina {
 		this.indicator = indicator;
 	}
 
+	public FinaBalancesheet getBalancesheet() {
+		return balancesheet;
+	}
+
+	public void setBalancesheet(FinaBalancesheet balancesheet) {
+		this.balancesheet = balancesheet;
+	}
+
 	@Override
 	public String toString() {
 		return "Fina [end_date=" + end_date + ", cashflow=" + cashflow + ", income=" + income + ", indicator="
-				+ indicator + "]";
+				+ indicator + ", balancesheet=" + balancesheet + "]";
 	}
 
 	
