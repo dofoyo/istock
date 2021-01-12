@@ -107,13 +107,12 @@ public class Power implements Producer{
 			}
 		});
 		
-		Integer period = 13;//13天
+		Integer period = 21;//21天
 		LocalDate date;
 		for(int i=0; i<dates.size() && ds.size()<=period; i++) {
 			date = dates.get(i);
 			if(date.isBefore(endDate) || date.isEqual(endDate)) {
 				ds.add(date);
-				//System.out.println(date);
 			}
 		}
 		
@@ -137,9 +136,8 @@ public class Power implements Producer{
 		}
 		
 		Map<String,Muster> endDateMusters = kdataService.getMusters(ds.get(0));
-		Integer top = 55;  //涨幅前55只个股
 		List<Muster> ms = new ArrayList<Muster>();
-		List<String> ids = hls.getResults(top);
+		List<String> ids = hls.getResults();
 		Muster muster;
 		for(String id : ids) {
 			muster = endDateMusters.get(id);
@@ -159,12 +157,15 @@ public class Power implements Producer{
 		
 		List<String> results = new ArrayList<String>();
 		for(Muster m : ms) {
-			//if(Functions.growthRate(m.getLatestPrice(), m.getHighest())<=-8) {
-				//System.out.println(String.format("%s, %d, %.2f, %.2f\n", m.getItemID(), Functions.growthRate(m.getLatestPrice(), m.getHighest()), m.getHighest(), m.getLatestPrice()));
 				results.add(m.getItemID());
-			//}
 		}
-		
+
+		if(results.size()>0 && write) {
+			Map<LocalDate, List<String>> rs = new TreeMap<LocalDate, List<String>>();
+			rs.put(endDate, results);
+			FileTools.writeMapFile(this.getFileName(), rs, true);
+		}
+
 		return results;
 
 	}
@@ -188,30 +189,11 @@ public class Power implements Producer{
 			}
 		}
 		
-		public List<String> getResults(Integer top){
+		public List<String> getResults(){
 			List<String> ids = new ArrayList<String>();
 			List<HL> tmps = new ArrayList<HL>(this.hls.values());
-/*			Collections.sort(tmps, new Comparator<HL>() {
-				@Override
-				public int compare(HL o1, HL o2) {
-					return o2.getUpRate().compareTo(o1.getUpRate());
-				}
-			});
-			int i=0;
 			for(HL hl : tmps) {
 				if(hl.isOK()) {
-					//System.out.println(hl.toString());
-					ids.add(hl.getId());
-					i++;
-				}
-				if(i > top) {
-					break;
-				}
-			}*/
-			
-			for(HL hl : tmps) {
-				if(hl.isOK()) {
-					//System.out.println(hl.toString());
 					ids.add(hl.getId());
 				}
 			}

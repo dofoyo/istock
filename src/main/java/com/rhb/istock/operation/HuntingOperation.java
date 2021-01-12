@@ -119,6 +119,8 @@ public class HuntingOperation implements Operation {
 					recommendationCount = finaService.getRecommendationCount(id, date);
 					if(muster!=null && !muster.isUpLimited()
 							&& muster.getN21Gap()<=8
+							&& muster.isUp(8)
+							&& muster.isRed()
 							&& item!=null && item.getCagr()!=null && item.getCagr()>0 && recommendationCount!=null && recommendationCount>0
 							) {
 						dds.add(muster);

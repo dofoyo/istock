@@ -373,6 +373,10 @@ public class Muster {
 		this.itemName = itemName;
 	}
 	
+	public boolean isRed() {
+		return this.latestPrice.compareTo(this.close)==1;
+	}
+	
 	public Integer getN21Gap() {
 		return latestPrice.subtract(averagePrice21).divide(averagePrice21,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)).intValue();
 	}
@@ -429,6 +433,9 @@ public class Muster {
 	}
 	
 	public boolean isUp(Integer period) {
+		if(period ==8) {
+			return  latestPrice.compareTo(averagePrice8)==1;
+		}
 		if(period == 21) {
 			return  latestPrice.compareTo(averagePrice8)==1 &&
 					averagePrice8.compareTo(averagePrice13)==1 &&

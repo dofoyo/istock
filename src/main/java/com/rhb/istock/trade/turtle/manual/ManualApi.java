@@ -311,6 +311,8 @@ public class ManualApi {
 				item = items.get(id);
 				recommendationCount = finaService.getRecommendationCount(id, theDate);
 				if(muster!=null && muster.getN21Gap()<=8
+						&& muster.isUp(8)
+						&& muster.isRed()
 						&& item!=null && item.getCagr()!=null && item.getCagr()>0 && recommendationCount!=null && recommendationCount>0
 						) {
 					ids.add(id);

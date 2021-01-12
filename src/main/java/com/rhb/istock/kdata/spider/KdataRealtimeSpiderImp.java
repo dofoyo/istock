@@ -169,7 +169,7 @@ public class KdataRealtimeSpiderImp implements KdataRealtimeSpider{
 		LocalDate theDate;
 		if(items!=null && items.length()>0) {
 			JSONArray item = items.getJSONArray(0);
-			System.out.println(item);
+			//System.out.println(item);
 			isOpen = item.getInt(2);
 			theDate = LocalDate.parse(item.getString(1),DateTimeFormatter.ofPattern("yyyyMMdd"));
 			if(isOpen==1 && theDate.equals(date)) {
@@ -182,8 +182,8 @@ public class KdataRealtimeSpiderImp implements KdataRealtimeSpider{
 
 
 	@Override
-	public Set<Kbar> getLatestMarketData() {
-		Set<Kbar> bars = new HashSet<Kbar>();
+	public Map<String,Kbar> getLatestMarketData() {
+		Map<String,Kbar> bars = new HashMap<String,Kbar>();
 		StringBuffer sb = new StringBuffer();
 		List<String> ids = itemService.getItemIDs();
 		for(int i=0, j=200; i<ids.size(); i=i+200) {
@@ -194,15 +194,15 @@ public class KdataRealtimeSpiderImp implements KdataRealtimeSpider{
 			}
 			
 			//System.out.println(i + " - " + j);
-			bars.addAll(this.getLatestMarketDateKbars(ids.subList(i, j)));
+			bars.putAll(this.getLatestMarketDateKbars(ids.subList(i, j)));
 			HttpClient.sleep(5);
 		}
 
 		return bars;
 	}
 	
-	private Set<Kbar> getLatestMarketDateKbars(List<String> ids) {		
-		Set<Kbar> bars = new HashSet<Kbar>();
+	private Map<String,Kbar> getLatestMarketDateKbars(List<String> ids) {		
+		Map<String,Kbar> bars = new HashMap<String,Kbar>();
 		StringBuffer sb = new StringBuffer();
 		for(String id : ids) {
 			sb.append(id);
@@ -217,7 +217,7 @@ public class KdataRealtimeSpiderImp implements KdataRealtimeSpider{
 			//System.out.println(s);
 			bar = this.getKbar(s);
 			if(bar!=null) {
-				bars.add(bar);
+				bars.put(bar.getId(),bar);
 			}
 		}
 		return bars;

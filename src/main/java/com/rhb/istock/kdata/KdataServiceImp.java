@@ -667,19 +667,18 @@ public class KdataServiceImp implements KdataService{
 		long beginTime=System.currentTimeMillis(); 
 		logger.info("update Musters With Latest Kdata ......");
 
-		Set<Kbar> bars = kdataRealtimeSpider.getLatestMarketData();
-		if(bars!=null && bars.iterator()!=null && bars.iterator().next()!=null) {
-			LocalDate date = bars.iterator().next().getDate();
+		Map<String,Kbar> bars = kdataRealtimeSpider.getLatestMarketData();
+		LocalDate date = this.getLatestMarketDate("sh000001");
+		if(bars!=null && date!=null) {
 			Map<String,Muster> musters = this.getMusters(date);
 			//System.out.println(date);
 			//System.out.println("there are " + bars.size() + " stocks market data.");
 			//System.out.println("there are " + musters.size() + " musters.");
-			if(musters!=null && musters.size()>3000) {
+			if(musters!=null) {
 				List<MusterEntity> entities = new ArrayList<MusterEntity>();
 				MusterEntity entity;
-				Muster muster;
-				for(Kbar bar : bars) {
-					muster = musters.get(bar.getId());
+				Kbar bar;
+				for(Muster muster : musters.values()) {
 					if(muster!=null) {
 						entity = new MusterEntity(
 								muster.getItemID(), 
@@ -716,18 +715,20 @@ public class KdataServiceImp implements KdataService{
 								muster.getAveragePrice5()
 								);
 						
-						entity.setLatestAmount(bar.getAmount()); 
-						entity.setLatestPrice(bar.getClose());
-						entity.setLimited(bar.isLimited());
-						entity.setLatestHighest(bar.getHigh());
-						entity.setLatestLowest(bar.getLow());
-						
+						bar = bars.get(muster.getItemID());
+						if(bar!=null) {
+							entity.setLatestAmount(bar.getAmount()); 
+							entity.setLatestPrice(bar.getClose());
+							entity.setLimited(bar.isLimited());
+							entity.setLatestHighest(bar.getHigh());
+							entity.setLatestLowest(bar.getLow());
+						}
 						entities.add(entity);
 					}
 				}
 				musterRepositoryImp.saveMusters(date,entities);
 			}else {
-				System.out.println(" update Musters With Latest Kdata ERROR: muster's size is small than 4000!!!");
+				System.out.println(" update Musters With Latest Kdata ERROR: musters is NULL!!!");
 			}
 		}else {
 			System.out.println(" update Musters With Latest Kdata ERROR: BAR IS NULL!");

@@ -37,7 +37,7 @@ public class KdataRealtimeSpiderTest {
 	
 	//@Test
 	public void getLatestMarketData_all() {
-		Set<Kbar> bars = kdataRealtimeSpider.getLatestMarketData();
+		Map<String,Kbar> bars = kdataRealtimeSpider.getLatestMarketData();
 		System.out.println(bars);
 	}
 

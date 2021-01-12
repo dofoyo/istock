@@ -10,7 +10,7 @@ import com.rhb.istock.kdata.Kbar;
 public interface KdataRealtimeSpider {
 	public LocalDate getLatestMarketDate(String id); 
 	public Map<String,String> getLatestMarketData(String id);
-	public Set<Kbar> getLatestMarketData();
+	public Map<String,Kbar> getLatestMarketData();
 	public List<String> getLatestDailyTop(Integer top);
 	
 	/*
