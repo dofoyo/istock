@@ -22,7 +22,7 @@ import com.rhb.istock.kdata.KdataService;
 import com.rhb.istock.kdata.Muster;
 
 /*
- * Favor操作模式: 新高后开始跟踪，向上突破21日均线就买入
+ * Favor操作模式: 持续跟踪21个交易日，向上突破21日均线就买入, up21
  * 
  * 买入：满仓　＋　市值平均　＋　单只股票不加仓
  * 卖出：跌破21日线或回落超过8%

@@ -121,6 +121,7 @@ public class HuntingOperation implements Operation {
 							&& muster.getN21Gap()<=8
 							&& muster.isUp(8)
 							&& muster.isRed()
+							//&& muster.isJustBreaker()
 							&& item!=null && item.getCagr()!=null && item.getCagr()>0 && recommendationCount!=null && recommendationCount>0
 							) {
 						dds.add(muster);

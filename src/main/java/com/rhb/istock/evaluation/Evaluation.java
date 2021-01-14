@@ -57,7 +57,7 @@ public class Evaluation {
 	public void evaluate(LocalDate beginDate, LocalDate endDate){
 		long beginTime=System.currentTimeMillis(); 
 		
-		System.out.println("simulate from " + beginDate + " to " + endDate +" ......");
+		System.out.println("evaluate from " + beginDate + " to " + endDate +" ......");
 		
 		//BigDecimal ic = new BigDecimal(initCash);
 		Integer top = 1000;  //买入所有符合的股票

@@ -31,12 +31,12 @@ public class SimulateBDT {
 
 	@Autowired
 	//@Qualifier("newbPlusL21")
-	@Qualifier("sab21Favor")
+	@Qualifier("newbRup")
 	Producer producer;
 
 	@Autowired
 	//@Qualifier("conservativeOperation")
-	@Qualifier("huntingOperation")
+	@Qualifier("favorOperation")
 	Operation operation;
 	
 	@Async("taskExecutor")

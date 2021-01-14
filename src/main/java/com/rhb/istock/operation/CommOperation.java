@@ -25,7 +25,7 @@ import com.rhb.istock.producer.Producer;
 
 /*
  * 买入：根据传入的buyList清单买入，如果涨停，就在第二天买入。卖出后跟踪21日，如果又向上突破21日线再次买入
- * 卖出：跌破21日线或买入后跌幅超过8%
+ * 卖出：跌破21日线
  */
 @Scope("prototype")
 @Service("commOperation")
