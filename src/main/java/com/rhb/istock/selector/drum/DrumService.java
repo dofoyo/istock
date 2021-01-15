@@ -279,7 +279,9 @@ public class DrumService {
 		Set<String> ss = new HashSet<String>();
 		String[] lines = FileTools.readTextFile(dimensionsFile).split("\n");
 		for(String line : lines) {
-			ss.add(line);
+			if(line!=null && line.length()>0) {
+				ss.add(line);
+			}
 		}
 		return ss;
 	}

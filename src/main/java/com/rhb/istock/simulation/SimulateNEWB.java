@@ -21,32 +21,30 @@ import com.rhb.istock.producer.Producer;
 import com.rhb.istock.trade.turtle.simulation.six.repository.TurtleSimulationRepository;
 
 @Scope("prototype")
-@Component("bhl")
-public class SimulateBHL {
-	protected static final Logger logger = LoggerFactory.getLogger(SimulateBHL.class);
+@Component("bnew")
+public class SimulateNEWB {
+	protected static final Logger logger = LoggerFactory.getLogger(SimulateNEWB.class);
 
 	@Autowired
 	@Qualifier("turtleSimulationRepository")
 	TurtleSimulationRepository turtleSimulationRepository;
 
 	@Autowired
-	@Qualifier("power")
-	//@Qualifier("dimeNewbReco")
-	//@Qualifier("sab89Favor")
+	//@Qualifier("newbPlusL21")
+	@Qualifier("newbRup")
 	Producer producer;
-	
+
 	@Autowired
-	//@Qualifier("commOperation")
-	@Qualifier("huntingOperationPlus")
+	//@Qualifier("conservativeOperation")
+	@Qualifier("newbOperation")
 	Operation operation;
 	
 	@Async("taskExecutor")
 	public Future<String> run(LocalDate beginDate, LocalDate endDate, BigDecimal initCash, Integer top, boolean isAveValue, Integer quantityType, boolean isEvaluation)  throws Exception {
-		//top = 1;
 		Account account = new Account(initCash);
 		Map<LocalDate, List<String>> operationList = producer.getResults(beginDate, endDate);
-		Map<String, String> operateResult = operation.run(account, operationList, beginDate, endDate, "bhl", top, isAveValue,quantityType);
-		turtleSimulationRepository.save("bhl", operateResult.get("breakers"), operateResult.get("CSV"), operateResult.get("dailyAmount"), isEvaluation);
-		return new AsyncResult<String>("bhl执行完毕");
+		Map<String, String> operateResult = operation.run(account, operationList, beginDate, endDate, "bdt", top, isAveValue,quantityType);
+		turtleSimulationRepository.save("bnew", operateResult.get("breakers"), operateResult.get("CSV"), operateResult.get("dailyAmount"), isEvaluation);
+		return new AsyncResult<String>("bnew执行完毕");
 	}
 }

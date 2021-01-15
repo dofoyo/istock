@@ -459,15 +459,15 @@ public class Muster {
 	
 	public boolean isDropAve(Integer period) {
 		if(period == 8) {
-			return Functions.growthRate(latestPrice, averagePrice8)<=-1;
+			return Functions.growthRate(latestPrice, averagePrice8)<=-2;
 		}else if(period == 13) {
-			return Functions.growthRate(latestPrice, averagePrice13)<=-1;
+			return Functions.growthRate(latestPrice, averagePrice13)<=-2;
 		}else if(period == 21) {
-			return Functions.growthRate(latestPrice, averagePrice21)<=-1;
+			return Functions.growthRate(latestPrice, averagePrice21)<=-2;
 		}else if(period == 34) {
-			return Functions.growthRate(latestPrice, averagePrice34)<=-1;
+			return Functions.growthRate(latestPrice, averagePrice34)<=-2;
 		}else {
-			return Functions.growthRate(latestPrice, averagePrice)<=-1;
+			return Functions.growthRate(latestPrice, averagePrice)<=-2;
 		}
 	}
 	

@@ -23,13 +23,13 @@ import com.rhb.istock.kdata.Muster;
 
 
 /*
- * 买入：根据传入的buyList清单买入，如果涨停，就在第二天买入。卖出后跟踪21日，如果又向上突破21日线再次买入
+ * 买入：根据传入的buyList清单买入，如果涨停，就在第二天买入。
  * 卖出：跌破21日线
  */
 @Scope("prototype")
-@Service("commOperation")
-public class CommOperation implements Operation {
-	protected static final Logger logger = LoggerFactory.getLogger(CommOperation.class);
+@Service("newbOperation")
+public class NewbOperation implements Operation {
+	protected static final Logger logger = LoggerFactory.getLogger(NewbOperation.class);
 
 	@Autowired
 	@Qualifier("kdataServiceImp")
@@ -113,6 +113,7 @@ public class CommOperation implements Operation {
 		for(String id : breaks) {
 			if(!holdItemIDs.contains(id)) {
 				muster = musters.get(id); 
+				//上次因为涨停没买入,这次只要没跌破21日线,就可买入
 				if(muster!=null && !muster.isUpLimited() && muster.isAboveAveragePrice(21)) {
 					dds.add(muster);
 					breaksKeeper.remove(id);
@@ -122,7 +123,7 @@ public class CommOperation implements Operation {
 		
 		
 		//Set<String>  drops = dropsKeeper.getIDs(musters, drums);
-		Set<String>  drops = dropsKeeper.getIDs();
+		/*Set<String>  drops = dropsKeeper.getIDs();
 		for(String id : drops) {
 			if(!holdItemIDs.contains(id)) {
 				muster = musters.get(id); 
@@ -131,7 +132,7 @@ public class CommOperation implements Operation {
 					dropsKeeper.remove(id);
 				}
 			}
-		}
+		}*/
 		
 
 		if(buyList!=null && buyList.size()>0) {
@@ -140,26 +141,16 @@ public class CommOperation implements Operation {
 				id = buyList.get(i);
 				if(!holdItemIDs.contains(id)) {
 					muster = musters.get(id); 
-					if(muster!=null && !muster.isUpLimited() && muster.isAboveAveragePrice(21)) {
+					if(muster!=null && !muster.isUpLimited()) {
 						dds.add(muster);
 						j++;
 					}else {
-						breaksKeeper.add(date, id);
+						breaksKeeper.add(date, id);  //因为涨停,没买入,保存下来,下次买入
 					}
 				}
 			}
 			
-			
-/*			breaksKeeper.addAll(date,new HashSet<String>(buyList));
-			for(String id : buyList) {
-				if(!holdItemIDs.contains(id)) {
-					muster = musters.get(id); 
-					if(muster!=null && !muster.isUpLimited()) {
-						dds.add(muster);
-					}
-				}
-			}			
-*/		}else{
+		}else{
 			breaksKeeper.dailySet(date);
 		}
 		
@@ -292,14 +283,6 @@ public class CommOperation implements Operation {
 			
 			Set<String> results = new HashSet<String>();
 			Muster muster;
-/*			for(String id : drums) {
-				if(tmp.contains(id)) {
-					muster = musters.get(id);
-					if(muster!=null && !muster.isUpLimited() && muster.getN21Gap()<=8) {
-						results.add(id);
-					}
-				}
-			}*/
 
 			for(String id : tmp){
 				muster = musters.get(id);

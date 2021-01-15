@@ -14,10 +14,13 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.rhb.istock.comm.util.FileTools;
+import com.rhb.istock.kdata.KdataServiceImp;
 import com.rhb.istock.kdata.muster.MusterEntity;
 
 @Service("musterRepositoryImp")
@@ -37,6 +40,8 @@ public class MusterRepositoryImp implements MusterRepository{
 	@Value("${dropDuration}")
 	private String dropDuration;
 	
+	protected static final Logger logger = LoggerFactory.getLogger(MusterRepositoryImp.class);
+
 	@Override
 	public Map<String, MusterEntity> getMusters(LocalDate date) {
 		Map<String, MusterEntity> entities = new HashMap<String, MusterEntity>();
@@ -50,7 +55,7 @@ public class MusterRepositoryImp implements MusterRepository{
 			//System.out.println(source);
 			String[] columns;
 			String[] lines = source.split("\n");
-			for(int i=1; i<lines.length; i++) {
+			for(int i=0; i<lines.length; i++) {
 				if(!lines[i].isEmpty()) {
 					columns = lines[i].split(",");
 					entities.put(columns[0], new MusterEntity(lines[i]));
@@ -107,6 +112,8 @@ public class MusterRepositoryImp implements MusterRepository{
 
 	@Override
 	public void saveMusters(LocalDate date,List<MusterEntity> musterEntities) {
+		logger.info("save "+ musterEntities.size() + " entities");
+
 		String pathAndFile = musterPath + "/" + date.format(DateTimeFormatter.ofPattern("yyyyMMdd")) +  "_" + openDuration+"_" + dropDuration + "_musters.txt";
 		
 		FileUtils.deleteQuietly(new File(pathAndFile));

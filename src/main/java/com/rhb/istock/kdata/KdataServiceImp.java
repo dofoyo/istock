@@ -598,7 +598,7 @@ public class KdataServiceImp implements KdataService{
 		if(date==null) return musters;
 		
 		Map<String, MusterEntity> entities = musterRepositoryImp.getMusters(date);
-		
+		//logger.info(date.toString() + ", entities size = " + entities.size());
 		Muster muster=null;
 		Item item;
 		for(MusterEntity entity : entities.values()) {
@@ -610,7 +610,7 @@ public class KdataServiceImp implements KdataService{
 				muster.setIndustry(item.getIndustry());
 				musters.put(muster.getItemID(),muster);
 			}else {
-				//logger.info(String.format("item of %s is null", entity.getItemID()));
+				logger.info(String.format("item of %s is null", entity.getItemID()));
 			}
 		}
 		
@@ -672,9 +672,10 @@ public class KdataServiceImp implements KdataService{
 		if(bars!=null && date!=null) {
 			Map<String,Muster> musters = this.getMusters(date);
 			//System.out.println(date);
-			//System.out.println("there are " + bars.size() + " stocks market data.");
-			//System.out.println("there are " + musters.size() + " musters.");
+			//logger.info("there are " + bars.size() + " stocks market data.");
+			//logger.info("there are " + musters.size() + " musters.");
 			if(musters!=null) {
+				//logger.info("get "+ musters.size() + " musters");
 				List<MusterEntity> entities = new ArrayList<MusterEntity>();
 				MusterEntity entity;
 				Kbar bar;
@@ -724,14 +725,16 @@ public class KdataServiceImp implements KdataService{
 							entity.setLatestLowest(bar.getLow());
 						}
 						entities.add(entity);
+					}else {
+						logger.info("There is a NULL muster.");
 					}
 				}
 				musterRepositoryImp.saveMusters(date,entities);
 			}else {
-				System.out.println(" update Musters With Latest Kdata ERROR: musters is NULL!!!");
+				logger.info(" update Musters With Latest Kdata ERROR: musters is NULL!!!");
 			}
 		}else {
-			System.out.println(" update Musters With Latest Kdata ERROR: BAR IS NULL!");
+			logger.info(" update Musters With Latest Kdata ERROR: BAR IS NULL!");
 		}
 		
 

@@ -27,13 +27,13 @@ import com.rhb.istock.selector.fina.FinaService;
 /*
  * 低吸高抛
  * 
- * 买入：止跌
+ * 买入：止跌 + 高增长  + 高买入推荐
  * 卖出：买入后的最高价跌幅超过8%
  */
 @Scope("prototype")
-@Service("huntingOperation")
-public class HuntingOperation implements Operation {
-	protected static final Logger logger = LoggerFactory.getLogger(HuntingOperation.class);
+@Service("huntingOperationPlus")
+public class HuntingOperationPlus implements Operation {
+	protected static final Logger logger = LoggerFactory.getLogger(HuntingOperationPlus.class);
 
 	@Autowired
 	@Qualifier("kdataServiceImp")
@@ -121,6 +121,8 @@ public class HuntingOperation implements Operation {
 							&& muster.getN21Gap()<=8
 							&& muster.isUp(8)   //止跌
 							&& muster.isRed()   //止跌
+							//&& muster.isJustBreaker()
+							&& item!=null && item.getCagr()!=null && item.getCagr()>0 && recommendationCount!=null && recommendationCount>0
 							) {
 						dds.add(muster);
 						j++;

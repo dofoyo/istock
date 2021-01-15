@@ -18,6 +18,8 @@ import com.rhb.istock.simulation.SimulateBDT;
 import com.rhb.istock.simulation.SimulateBHL;
 import com.rhb.istock.simulation.SimulateDTB;
 import com.rhb.istock.simulation.SimulateHLB;
+import com.rhb.istock.simulation.SimulateHunt;
+import com.rhb.istock.simulation.SimulateNEWB;
 
 //@Scope("prototype")
 @Service("evaluation")
@@ -50,7 +52,15 @@ public class Evaluation {
 	@Autowired
 	@Qualifier("hlb")
 	SimulateHLB hlb;
-
+	
+	@Autowired
+	@Qualifier("bnew")
+	SimulateNEWB bnew;
+	
+	@Autowired
+	@Qualifier("hunt")
+	SimulateHunt hunt;
+	
 	@Value("${initCash}")
 	private BigDecimal initCash;
 	
@@ -72,6 +82,8 @@ public class Evaluation {
 			Future<String> fbhl = bhl.run(beginDate, endDate, initCash, top, isAveValue, quantityType, isEvaluation);
 			Future<String> fbav = bav.run(beginDate, endDate, initCash, top, isAveValue, quantityType, isEvaluation);
 			Future<String> fdtb = dtb.run(beginDate, endDate, initCash, top, isAveValue, quantityType, isEvaluation);
+			Future<String> fbnew = bnew.run(beginDate, endDate, initCash, top, isAveValue, quantityType, isEvaluation);
+			Future<String> fhunt = hunt.run(beginDate, endDate, initCash, top, isAveValue, quantityType, isEvaluation);
 			
 			while(true) {
 				if(true 
@@ -81,6 +93,8 @@ public class Evaluation {
 					&& fbhl.isDone()
 					&& fbav.isDone()
 					&& fdtb.isDone()
+					&& fbnew.isDone()
+					&& fhunt.isDone()
 						) {
 					break;
 				}

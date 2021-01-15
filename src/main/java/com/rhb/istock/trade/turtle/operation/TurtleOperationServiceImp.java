@@ -1040,8 +1040,9 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 	@Override
 	public List<ItemView> getPowers() {
 		LocalDate endDate = kdataService.getLatestMarketDate("sh000001");
-		
+		Map<String, Muster> musters = kdataService.getMusters(endDate);
 		//System.out.println(endDate);
+		Muster muster;
 		
 		List<String> models = power.getResults(endDate);
 
@@ -1055,6 +1056,19 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 			item.setRecommendations(finaService.getRecommendationCount(view.getItemID(), endDate));
 			
 			view.setName(item.getNameWithCAGR());
+			
+			muster = musters.get(item.getItemID());
+			if(muster!=null
+					&& muster.getN21Gap()<=8
+					&& muster.isUp(8)   //止跌
+					&& muster.isRed()   //止跌
+					) {
+				view.setName("Y " + view.getName());
+				view.setLabel("Y");
+			}else {
+				view.setLabel("");
+			}
+			
 		}
 		return views;
 	}

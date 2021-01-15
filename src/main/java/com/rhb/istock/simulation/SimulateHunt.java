@@ -21,9 +21,9 @@ import com.rhb.istock.producer.Producer;
 import com.rhb.istock.trade.turtle.simulation.six.repository.TurtleSimulationRepository;
 
 @Scope("prototype")
-@Component("bhl")
-public class SimulateBHL {
-	protected static final Logger logger = LoggerFactory.getLogger(SimulateBHL.class);
+@Component("hunt")
+public class SimulateHunt {
+	protected static final Logger logger = LoggerFactory.getLogger(SimulateHunt.class);
 
 	@Autowired
 	@Qualifier("turtleSimulationRepository")
@@ -31,22 +31,18 @@ public class SimulateBHL {
 
 	@Autowired
 	@Qualifier("power")
-	//@Qualifier("dimeNewbReco")
-	//@Qualifier("sab89Favor")
 	Producer producer;
 	
 	@Autowired
-	//@Qualifier("commOperation")
-	@Qualifier("huntingOperationPlus")
+	@Qualifier("huntingOperation")
 	Operation operation;
 	
 	@Async("taskExecutor")
 	public Future<String> run(LocalDate beginDate, LocalDate endDate, BigDecimal initCash, Integer top, boolean isAveValue, Integer quantityType, boolean isEvaluation)  throws Exception {
-		//top = 1;
 		Account account = new Account(initCash);
 		Map<LocalDate, List<String>> operationList = producer.getResults(beginDate, endDate);
 		Map<String, String> operateResult = operation.run(account, operationList, beginDate, endDate, "bhl", top, isAveValue,quantityType);
-		turtleSimulationRepository.save("bhl", operateResult.get("breakers"), operateResult.get("CSV"), operateResult.get("dailyAmount"), isEvaluation);
-		return new AsyncResult<String>("bhl执行完毕");
+		turtleSimulationRepository.save("hunt", operateResult.get("breakers"), operateResult.get("CSV"), operateResult.get("dailyAmount"), isEvaluation);
+		return new AsyncResult<String>("hunt执行完毕");
 	}
 }
