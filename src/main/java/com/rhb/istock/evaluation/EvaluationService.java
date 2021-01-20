@@ -108,18 +108,21 @@ public class EvaluationService {
 			tmps = busis.get(date);
 			if(tmps!=null) {
 				for(Busi busi : tmps) {
-					closePrice = busi.getClosePrice();
-					//根据eDate对closePrice进行校正
-					if(busi.getCloseDate().isAfter(eDate)) {
-						muster = musters.get(busi.getItemID());
-						if(muster!=null) {
-							closePrice = muster.getLatestPrice();
-						}else {
-							closePrice = busi.getOpenPrice();
+					//if(busi.getOpenDate().isBefore(eDate)) {
+						closePrice = busi.getClosePrice();
+						//根据eDate对closePrice进行校正
+						if(busi.getCloseDate().isAfter(eDate)) {
+							muster = musters.get(busi.getItemID());
+							if(muster!=null) {
+								closePrice = muster.getLatestPrice();
+							}else {
+								closePrice = busi.getOpenPrice();
+							}
 						}
-					}
-					
-					kelly.add(1, busi.getOpenAmount(), busi.getQuantity().multiply(closePrice));
+						if(busi.getCloseDate().isAfter(busi.getOpenDate())) {
+							kelly.add(1, busi.getOpenAmount(), busi.getQuantity().multiply(closePrice));
+						}
+					//}
 				}			
 			}
 		}
@@ -142,20 +145,23 @@ public class EvaluationService {
 			tmps = busis.get(date);
 			if(tmps!=null) {
 				for(Busi busi : tmps) {
-					closeDate = busi.getCloseDate();
-					closePrice = busi.getClosePrice();
-					//根据eDate对closePrice进行校正
-					if(busi.getCloseDate().isAfter(eDate)) {
-						closeDate = eDate;
-						muster = musters.get(busi.getItemID());
-						if(muster!=null) {
-							closePrice = muster.getLatestPrice();
-						}else {
-							closePrice = busi.getOpenPrice();
+					//if(busi.getOpenDate().isBefore(eDate)) {
+						closeDate = busi.getCloseDate();
+						closePrice = busi.getClosePrice();
+						//根据eDate对closePrice进行校正
+						if(busi.getCloseDate().isAfter(eDate)) {
+							closeDate = eDate;
+							muster = musters.get(busi.getItemID());
+							if(muster!=null) {
+								closePrice = muster.getLatestPrice();
+							}else {
+								closePrice = busi.getOpenPrice();
+							}
 						}
-					}
-					
-					result.add(new BusiView(busi.getItemID(),busi.getItemName(),busi.getOpenDate(), busi.getOpenPrice(),busi.getQuantity(), closeDate, closePrice, busi.getHighestPrice()));
+						if(busi.getCloseDate().isAfter(busi.getOpenDate())) {
+							result.add(new BusiView(busi.getItemID(),busi.getItemName(),busi.getOpenDate(), busi.getOpenPrice(),busi.getQuantity(), closeDate, closePrice, busi.getHighestPrice()));
+						}
+					//}
 				}			
 			}
 		}		

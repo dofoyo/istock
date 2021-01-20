@@ -82,7 +82,7 @@ public class Evaluation {
 			Future<String> fbhl = bhl.run(beginDate, endDate, initCash, top, isAveValue, quantityType, isEvaluation);
 			Future<String> fbav = bav.run(beginDate, endDate, initCash, top, isAveValue, quantityType, isEvaluation);
 			Future<String> fdtb = dtb.run(beginDate, endDate, initCash, top, isAveValue, quantityType, isEvaluation);
-			Future<String> fbnew = bnew.run(beginDate, endDate, initCash, top, isAveValue, quantityType, isEvaluation);
+			//Future<String> fbnew = bnew.run(beginDate, endDate, initCash, top, isAveValue, quantityType, isEvaluation);
 			Future<String> fhunt = hunt.run(beginDate, endDate, initCash, top, isAveValue, quantityType, isEvaluation);
 			
 			while(true) {
@@ -93,7 +93,7 @@ public class Evaluation {
 					&& fbhl.isDone()
 					&& fbav.isDone()
 					&& fdtb.isDone()
-					&& fbnew.isDone()
+					//&& fbnew.isDone()
 					&& fhunt.isDone()
 						) {
 					break;

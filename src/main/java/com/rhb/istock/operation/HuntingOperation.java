@@ -63,7 +63,7 @@ public class HuntingOperation implements Operation {
 		
 		int i=1;
 		for(LocalDate date = beginDate; (date.isBefore(endDate) || date.equals(endDate)); date = date.plusDays(1)) {
-			Progress.show((int)days, i++," " + label +  " run:" + date.toString());
+			Progress.show((int)days, i++," " + label +  " huntingOperation run:" + date.toString());
 			this.doIt(date, account, buyList.get(date), top, isAveValue,quantityType);
 		}
 		return this.result(account);

@@ -60,13 +60,9 @@ public class EvaluationApi {
 
 		KellyView view = null;
 
-		LocalDate theEndDate = null;
-		try{
-			theEndDate = LocalDate.parse(edate, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-		}catch(Exception e){
-			return new ResponseContent<KellyView>(ResponseEnum.ERROR, view);
-		}
-		
+		LocalDate theEndDate = LocalDate.parse(edate, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+
+		//System.out.println(theEndDate);
 		//System.out.println(isHighest);
 		
 		if("1".equals(isHighest)) {

@@ -176,7 +176,7 @@ public class DrumService {
 	}
 	
 	private Map<String,Taoyans> getThinDimensions(LocalDate endDate){
-		if(endDate.equals(this.tmp_taoyans_date)) {
+		if(endDate.equals(this.tmp_taoyans_date) && this.tmp_taoyans!=null && this.tmp_taoyans.size()!=0) {
 			return this.tmp_taoyans;
 		}
 		

@@ -79,17 +79,22 @@ public class FdataSpiderEastmoney {
 		for(int i = year; i<=end; i++) {
 			//Progress.show(end-year+1, i, "");
 			rs = this.downRecommendations(code, Integer.toString(i));
-			rs.forEach(obj -> reports.put(obj));
+			if(rs!=null) {
+				rs.forEach(obj -> reports.put(obj));
+			}
 		}
 		return reports;
 	}
 	
 	private JSONArray downRecommendations(String code, String year) {
+		JSONArray reports = null;
+		
 		String url = "http://reportapi.eastmoney.com/report/list?cb=datatable8515095&pageNo=1&pageSize=200&code="+code+"&beginTime="+year+"-01-01&endTime="+year+"-12-31&qType=0&_=1603757059836";
-		JSONObject args = new JSONObject();
 		String str = HttpClient.doGet(url);
-		String ss = str.substring(17,str.length()-1);
-		JSONArray reports = (new JSONObject(ss)).getJSONArray("data");
+		if(str!=null && str.length()>17) {
+			String ss = str.substring(17,str.length()-1);
+			reports = (new JSONObject(ss)).getJSONArray("data");
+		}
 
 		return reports;
 	}

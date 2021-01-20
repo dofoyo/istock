@@ -20,7 +20,6 @@ import com.rhb.istock.account.Account;
 import com.rhb.istock.comm.util.Progress;
 import com.rhb.istock.kdata.KdataService;
 import com.rhb.istock.kdata.Muster;
-import com.rhb.istock.producer.Producer;
 
 
 /*
@@ -37,10 +36,6 @@ public class OptimizeOperation implements Operation {
 	@Autowired
 	@Qualifier("kdataServiceImp")
 	KdataService kdataService;
-	
-	@Autowired
-	@Qualifier("drum")
-	Producer producer;
 	
 	private StringBuffer dailyAmount_sb;
 	private StringBuffer breakers_sb;
@@ -60,7 +55,7 @@ public class OptimizeOperation implements Operation {
 		
 		int i=1;
 		for(LocalDate date = beginDate; (date.isBefore(endDate) || date.equals(endDate)); date = date.plusDays(1)) {
-			Progress.show((int)days, i++," " + label +  " run:" + date.toString());
+			Progress.show((int)days, i++," " + label +  " optimizeOperation run:" + date.toString());
 			this.doIt(date, account, buyList.get(date), top, isAveValue,quantityType);
 		}
 		return this.result(account);
