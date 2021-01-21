@@ -1,5 +1,6 @@
 package com.rhb.istock.operation;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -20,6 +21,7 @@ import com.rhb.istock.account.Account;
 import com.rhb.istock.comm.util.Progress;
 import com.rhb.istock.kdata.KdataService;
 import com.rhb.istock.kdata.Muster;
+import com.rhb.istock.selector.SelectorService;
 
 /*
  * Favor操作模式: 持续跟踪21个交易日，向上突破21日均线就买入, up21
@@ -36,6 +38,9 @@ public class FavorOperation implements Operation {
 	@Qualifier("kdataServiceImp")
 	KdataService kdataService;
 	
+/*	@Autowired
+	@Qualifier("selectorServiceImp")
+	SelectorService selectorServiceImp;*/
 	
 /*	@Autowired
 	@Qualifier("drum")
@@ -100,11 +105,11 @@ public class FavorOperation implements Operation {
 				}
 				
 				//高位回落超过8%
-				if(account.isFallOrder(itemID, -8) && muster.getN21Gap()>8) {
+				/*if(account.isFallOrder(itemID, -8) && muster.getN21Gap()>8) {
 					account.dropWithTax(itemID, "2", muster.getLatestPrice());
 					dropsKeeper.add(date, itemID);
 					//logger.info("dropsKeeper add " + itemID);
-				}
+				}*/
 			}
 		}
 		dropsKeeper.dailySet(date);
@@ -116,10 +121,15 @@ public class FavorOperation implements Operation {
 		
 		//Set<String> breaks = breaksKeeper.getIDs(musters, drums);
 		Set<String> breaks = breaksKeeper.getIDs();
+		//BigDecimal macd;
 		for(String id : breaks) {
 			if(!holdItemIDs.contains(id)) {
 				muster = musters.get(id); 
-				if(muster!=null && !muster.isUpLimited() && muster.isJustBreaker()) {
+				//macd = selectorServiceImp.getMACD(id,date, true);
+				if(muster!=null && !muster.isUpLimited() 
+						&& muster.isJustBreaker()
+						//&& macd.compareTo(BigDecimal.ZERO)==1
+						) {
 					dds.add(muster);
 				}
 			}
@@ -131,7 +141,11 @@ public class FavorOperation implements Operation {
 		for(String id : drops) {
 			if(!holdItemIDs.contains(id)) {
 				muster = musters.get(id); 
-				if(muster!=null && !muster.isUpLimited() && muster.isJustBreaker()) {
+				//macd = selectorServiceImp.getMACD(id,date, true);
+				if(muster!=null && !muster.isUpLimited() 
+						&& muster.isJustBreaker()
+						//&& macd.compareTo(BigDecimal.ZERO)==1
+						) {
 					dds.add(muster);
 				}
 			}
@@ -143,7 +157,11 @@ public class FavorOperation implements Operation {
 			for(String id : buyList) {
 				if(!holdItemIDs.contains(id)) {
 					muster = musters.get(id); 
-					if(muster!=null && !muster.isUpLimited() && muster.isJustBreaker()) {
+					//macd = selectorServiceImp.getMACD(id,date, true);
+					if(muster!=null && !muster.isUpLimited() 
+							&& muster.isJustBreaker()
+							//&& macd.compareTo(BigDecimal.ZERO)==1
+							) {
 						dds.add(muster);
 					}
 				}

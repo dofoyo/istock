@@ -130,6 +130,20 @@ public class EvaluationService {
 		return kelly;
 	}
 	
+	public List<String> getOpenIds(String type, LocalDate date){
+		List<String> ids = new ArrayList<String>();
+		Map<LocalDate,List<Busi>> busis = evaluationRepository.getBusis(type); //每一单
+		if(busis!=null) {
+			List<Busi> bs = busis.get(date);
+			if(bs!=null) {
+				for(Busi b : bs) {
+					ids.add(b.getItemID());
+				}
+			}
+		}
+		return ids;
+	}
+	
 	public List<BusiView> getBusiViews(String type, Integer period, LocalDate eDate){
 		List<BusiView> result = new ArrayList<BusiView>();
 
@@ -171,12 +185,16 @@ public class EvaluationService {
 	
 	public KellyView getKellyView(String type, Integer period, LocalDate eDate){
 		List<LocalDate> dates = this.getDates(period, eDate);
-		Map<LocalDate,List<Busi>> busis = evaluationRepository.getBusis(type); //每一单
-		Map<String,Muster> musters = kdataService.getMusters(dates.get(dates.size()-1));
-		
-		Kelly kelly = this.getKelly(dates, busis, musters);
-		
-		return new KellyView(eDate, kelly.getWin(), kelly.getWinPR(),kelly.getWinRate(),kelly.getLose(),kelly.getLosePR(),kelly.getLoseRate(),kelly.getScore());
+		if(dates!=null && dates.size()>0) {
+			Map<LocalDate,List<Busi>> busis = evaluationRepository.getBusis(type); //每一单
+			Map<String,Muster> musters = kdataService.getMusters(dates.get(dates.size()-1));
+			
+			Kelly kelly = this.getKelly(dates, busis, musters);
+			
+			return new KellyView(eDate, kelly.getWin(), kelly.getWinPR(),kelly.getWinRate(),kelly.getLose(),kelly.getLosePR(),kelly.getLoseRate(),kelly.getScore());
+		}else {
+			return null;
+		}
 	}
 	
 	//将busi合并，并计算出kelly

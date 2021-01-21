@@ -110,8 +110,8 @@ public class ManualApi {
 	Producer newbRup;
 
 	@Autowired
-	@Qualifier("sab21Rup")
-	Producer sab21Rup;
+	@Qualifier("eva")
+	Producer eva;
 	
 	@Autowired
 	@Qualifier("sab21Favor")
@@ -280,8 +280,8 @@ public class ManualApi {
 			ids = newbRecoH21.getResults(theDate);
 		}else if("newbRup".equals(type)) { 
 			ids = newbRup.getResults(theDate);
-		}else if("sabRup".equals(type)) { 
-			ids = sab21Rup.getResults(theDate);
+		}else if("eva".equals(type)) { 
+			ids = eva.getResults(theDate);
 		}else if("low".equals(type)) { 
 			List<String> tmp = drumPlusL21.getResults(theDate);
 			if(tmp!=null && tmp.size()>0) {

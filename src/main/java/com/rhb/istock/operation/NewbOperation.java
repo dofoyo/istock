@@ -1,5 +1,6 @@
 package com.rhb.istock.operation;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -20,6 +21,7 @@ import com.rhb.istock.account.Account;
 import com.rhb.istock.comm.util.Progress;
 import com.rhb.istock.kdata.KdataService;
 import com.rhb.istock.kdata.Muster;
+import com.rhb.istock.selector.SelectorService;
 
 
 /*
@@ -34,7 +36,11 @@ public class NewbOperation implements Operation {
 	@Autowired
 	@Qualifier("kdataServiceImp")
 	KdataService kdataService;
-	
+
+/*	@Autowired
+	@Qualifier("selectorServiceImp")
+	SelectorService selectorServiceImp;
+*/	
 	private StringBuffer dailyAmount_sb;
 	private StringBuffer breakers_sb;
 	//private Integer previous_period  = 13; //历史纪录区间，主要用于后面判断
@@ -92,9 +98,9 @@ public class NewbOperation implements Operation {
 					dropsKeeper.add(date, itemID);
 					//logger.info("dropsKeeper add " + itemID);
 				}
-				/*
+				
 				//高位回落超过8%
-				if(account.isFallOrder(itemID, -8)) {
+				/*if(account.isFallOrder(itemID, -8)) {
 					account.dropWithTax(itemID, "2", muster.getLatestPrice());
 					dropsKeeper.add(date, itemID);
 					//logger.info("dropsKeeper add " + itemID);
@@ -110,11 +116,16 @@ public class NewbOperation implements Operation {
 		
 		//Set<String> breaks = breaksKeeper.getIDs(musters, drums);
 		Set<String> breaks = breaksKeeper.getIDs();
+		//BigDecimal macd;
 		for(String id : breaks) {
 			if(!holdItemIDs.contains(id)) {
 				muster = musters.get(id); 
+				//macd = selectorServiceImp.getMACD(id,date, true);
 				//上次因为涨停没买入,这次只要没跌破21日线,就可买入
-				if(muster!=null && !muster.isUpLimited() && muster.isAboveAveragePrice(21)) {
+				if(muster!=null && !muster.isUpLimited() 
+						&& muster.isAboveAveragePrice(21) 
+						//&& macd.compareTo(BigDecimal.ZERO)==1
+						) {
 					dds.add(muster);
 					breaksKeeper.remove(id);
 				}
@@ -134,6 +145,7 @@ public class NewbOperation implements Operation {
 			}
 		}*/
 		
+		
 
 		if(buyList!=null && buyList.size()>0) {
 			String id;
@@ -141,7 +153,10 @@ public class NewbOperation implements Operation {
 				id = buyList.get(i);
 				if(!holdItemIDs.contains(id)) {
 					muster = musters.get(id); 
-					if(muster!=null && !muster.isUpLimited()) {
+					//macd = selectorServiceImp.getMACD(id,date, true);
+					if(muster!=null && !muster.isUpLimited() 
+							//&& macd.compareTo(BigDecimal.ZERO)==1
+							) {
 						dds.add(muster);
 						j++;
 					}else {

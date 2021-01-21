@@ -563,4 +563,14 @@ public class SelectorServiceImp implements SelectorService{
 		return favorService.getFavorsOfB21up();
 	}
 
+	@Override
+	public BigDecimal getMACD(String itemID, LocalDate date, boolean cache) {
+		Map<LocalDate, BigDecimal[]> macds = this.getMACDs(itemID, cache);
+		if(macds!=null && macds.containsKey(date)) {
+			return macds.get(date)[2];
+		}else {
+			return BigDecimal.ZERO;
+		}
+	}
+
 }

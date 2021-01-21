@@ -45,6 +45,7 @@ public interface SelectorService{
 	public Map<LocalDate, BigDecimal> getMCSTs(String itemID, boolean cache);
 	public Map<LocalDate, BigDecimal[]> getBOLLs(String itemID, boolean cache);
 	public Map<LocalDate, BigDecimal[]> getMACDs(String itemID, boolean cache);
+	public BigDecimal getMACD(String itemID, LocalDate date, boolean cache);
 	public BigDecimal getMCST(String itemID, LocalDate endDate, Integer count, BigDecimal ratio);
 
 	public List<LocalDate> getHuaFirst(String itemID, LocalDate beginDate, LocalDate endDate, Integer boll_period, BigDecimal cst_ratio,BigDecimal volume_r);

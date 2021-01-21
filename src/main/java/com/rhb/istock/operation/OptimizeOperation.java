@@ -1,5 +1,6 @@
 package com.rhb.istock.operation;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -20,10 +21,11 @@ import com.rhb.istock.account.Account;
 import com.rhb.istock.comm.util.Progress;
 import com.rhb.istock.kdata.KdataService;
 import com.rhb.istock.kdata.Muster;
+import com.rhb.istock.selector.SelectorService;
 
 
 /*
- * 进取型操作模式　aggressive
+ * 进取型操作模式　
  * 
  * 买入：满仓　＋　市值平均　＋　单只股票不加仓
  * 卖出：跌破21日线
@@ -36,6 +38,10 @@ public class OptimizeOperation implements Operation {
 	@Autowired
 	@Qualifier("kdataServiceImp")
 	KdataService kdataService;
+
+/*	@Autowired
+	@Qualifier("selectorServiceImp")
+	SelectorService selectorServiceImp;*/
 	
 	private StringBuffer dailyAmount_sb;
 	private StringBuffer breakers_sb;
@@ -95,8 +101,8 @@ public class OptimizeOperation implements Operation {
 					//logger.info("dropsKeeper add " + itemID);
 				}
 				
-/*				//高位回落超过8%
-				if(account.isFallOrder(itemID, -8)) {
+				//高位回落超过8%
+				/*if(account.isFallOrder(itemID, -8)) {
 					account.dropWithTax(itemID, "2", muster.getLatestPrice());
 					dropsKeeper.add(date, itemID);
 					//logger.info("dropsKeeper add " + itemID);
@@ -112,10 +118,16 @@ public class OptimizeOperation implements Operation {
 		
 		//Set<String> breaks = breaksKeeper.getIDs(musters, drums);
 		Set<String> breaks = breaksKeeper.getIDs();
+		//BigDecimal macd;
 		for(String id : breaks) {
 			if(!holdItemIDs.contains(id)) {
 				muster = musters.get(id); 
-				if(muster!=null && !muster.isUpLimited() && muster.isAboveAveragePrice(21) && muster.getN21Gap()<=8) {
+				//macd = selectorServiceImp.getMACD(id,date, true);
+				if(muster!=null && !muster.isUpLimited() 
+						&& muster.isAboveAveragePrice(21) 
+						&& muster.getN21Gap()<=8
+						//&& macd.compareTo(BigDecimal.ZERO)==1
+						) {
 					dds.add(muster);
 					breaksKeeper.remove(id);
 				}
@@ -128,7 +140,10 @@ public class OptimizeOperation implements Operation {
 		for(String id : drops) {
 			if(!holdItemIDs.contains(id)) {
 				muster = musters.get(id); 
-				if(muster!=null && !muster.isUpLimited() && muster.isJustBreaker()) {
+				//macd = selectorServiceImp.getMACD(id,date, true);
+				if(muster!=null && !muster.isUpLimited() && muster.isJustBreaker()
+						//&& macd.compareTo(BigDecimal.ZERO)==1
+						) {
 					dds.add(muster);
 					dropsKeeper.remove(id);
 				}
@@ -142,7 +157,12 @@ public class OptimizeOperation implements Operation {
 				id = buyList.get(i);
 				if(!holdItemIDs.contains(id)) {
 					muster = musters.get(id); 
-					if(muster!=null && !muster.isUpLimited() && muster.isAboveAveragePrice(21) && muster.getN21Gap()<=8) {
+					//macd = selectorServiceImp.getMACD(id,date, true);
+					if(muster!=null && !muster.isUpLimited() 
+							&& muster.isAboveAveragePrice(21) 
+							&& muster.getN21Gap()<=8
+							//&& macd.compareTo(BigDecimal.ZERO)==1
+							) {
 						dds.add(muster);
 						j++;
 					}else {

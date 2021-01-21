@@ -54,6 +54,10 @@ public class ManualService {
 	Operation favorOperation;
 
 	@Autowired
+	@Qualifier("newbOperation")
+	Operation newbOperation;
+	
+	@Autowired
 	@Qualifier("commOperation")
 	Operation commOperation;
 
@@ -116,6 +120,8 @@ public class ManualService {
 		Map<String, String> operateResult;
 		if("comm".equals(simulateType)) {
 			operateResult = commOperation.run(account, this.selects, this.getBeginDate(), this.getEndDate(), label, top, true,0);
+		}else if("newb".equals(simulateType))  {
+			operateResult = newbOperation.run(account, this.selects, this.getBeginDate(), this.getEndDate(), label, top, true,0);
 		}else if("favor".equals(simulateType))  {
 			operateResult = favorOperation.run(account, this.selects, this.getBeginDate(), this.getEndDate(), label, top, true,0);
 		}else if("optimize".equals(simulateType)) {
