@@ -124,6 +124,7 @@ public class NewbOperation implements Operation {
 				//上次因为涨停没买入,这次只要没跌破21日线,就可买入
 				if(muster!=null && !muster.isUpLimited() 
 						&& muster.isAboveAveragePrice(21) 
+						&& muster.isAboveAveragePrice(89)
 						//&& macd.compareTo(BigDecimal.ZERO)==1
 						) {
 					dds.add(muster);
@@ -155,6 +156,7 @@ public class NewbOperation implements Operation {
 					muster = musters.get(id); 
 					//macd = selectorServiceImp.getMACD(id,date, true);
 					if(muster!=null && !muster.isUpLimited() 
+							&& muster.isAboveAveragePrice(89)
 							//&& macd.compareTo(BigDecimal.ZERO)==1
 							) {
 						dds.add(muster);

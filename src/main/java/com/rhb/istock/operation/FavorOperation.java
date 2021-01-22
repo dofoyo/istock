@@ -128,6 +128,7 @@ public class FavorOperation implements Operation {
 				//macd = selectorServiceImp.getMACD(id,date, true);
 				if(muster!=null && !muster.isUpLimited() 
 						&& muster.isJustBreaker()
+						&& muster.isAboveAveragePrice(89)
 						//&& macd.compareTo(BigDecimal.ZERO)==1
 						) {
 					dds.add(muster);
@@ -144,6 +145,7 @@ public class FavorOperation implements Operation {
 				//macd = selectorServiceImp.getMACD(id,date, true);
 				if(muster!=null && !muster.isUpLimited() 
 						&& muster.isJustBreaker()
+						&& muster.isAboveAveragePrice(89)
 						//&& macd.compareTo(BigDecimal.ZERO)==1
 						) {
 					dds.add(muster);
@@ -160,6 +162,7 @@ public class FavorOperation implements Operation {
 					//macd = selectorServiceImp.getMACD(id,date, true);
 					if(muster!=null && !muster.isUpLimited() 
 							&& muster.isJustBreaker()
+							&& muster.isAboveAveragePrice(89)
 							//&& macd.compareTo(BigDecimal.ZERO)==1
 							) {
 						dds.add(muster);

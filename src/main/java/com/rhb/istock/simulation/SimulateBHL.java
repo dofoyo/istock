@@ -37,7 +37,7 @@ public class SimulateBHL {
 	Producer producer;
 	
 	@Autowired
-	@Qualifier("commOperation")
+	@Qualifier("fourOperation")
 	//@Qualifier("huntingOperationPlus")
 	Operation operation;
 	
