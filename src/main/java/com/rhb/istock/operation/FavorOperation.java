@@ -123,7 +123,7 @@ public class FavorOperation implements Operation {
 		Set<String> breaks = breaksKeeper.getIDs();
 		//BigDecimal macd;
 		for(String id : breaks) {
-			if(!holdItemIDs.contains(id)) {
+			//if(!holdItemIDs.contains(id)) {
 				muster = musters.get(id); 
 				//macd = selectorServiceImp.getMACD(id,date, true);
 				if(muster!=null && !muster.isUpLimited() 
@@ -132,14 +132,14 @@ public class FavorOperation implements Operation {
 						) {
 					dds.add(muster);
 				}
-			}
+			//}
 		}
 		
 		
 		//Set<String>  drops = dropsKeeper.getIDs(musters, drums);
 		Set<String>  drops = dropsKeeper.getIDs();
 		for(String id : drops) {
-			if(!holdItemIDs.contains(id)) {
+			//if(!holdItemIDs.contains(id)) {
 				muster = musters.get(id); 
 				//macd = selectorServiceImp.getMACD(id,date, true);
 				if(muster!=null && !muster.isUpLimited() 
@@ -148,14 +148,14 @@ public class FavorOperation implements Operation {
 						) {
 					dds.add(muster);
 				}
-			}
+			//}
 		}
 		
 
 		if(buyList!=null && buyList.size()>0) {
 			breaksKeeper.addAll(date,new HashSet<String>(buyList));
 			for(String id : buyList) {
-				if(!holdItemIDs.contains(id)) {
+				//if(!holdItemIDs.contains(id)) {
 					muster = musters.get(id); 
 					//macd = selectorServiceImp.getMACD(id,date, true);
 					if(muster!=null && !muster.isUpLimited() 
@@ -164,7 +164,7 @@ public class FavorOperation implements Operation {
 							) {
 						dds.add(muster);
 					}
-				}
+				//}
 			}			
 		}else{
 			breaksKeeper.dailySet(date);

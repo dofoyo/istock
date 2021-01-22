@@ -118,7 +118,7 @@ public class NewbOperation implements Operation {
 		Set<String> breaks = breaksKeeper.getIDs();
 		//BigDecimal macd;
 		for(String id : breaks) {
-			if(!holdItemIDs.contains(id)) {
+			//if(!holdItemIDs.contains(id)) {
 				muster = musters.get(id); 
 				//macd = selectorServiceImp.getMACD(id,date, true);
 				//上次因为涨停没买入,这次只要没跌破21日线,就可买入
@@ -129,7 +129,7 @@ public class NewbOperation implements Operation {
 					dds.add(muster);
 					breaksKeeper.remove(id);
 				}
-			}
+			//}
 		}
 		
 		
@@ -151,7 +151,7 @@ public class NewbOperation implements Operation {
 			String id;
 			for(int i=0, j=0; i<buyList.size() && j<top; i++) {
 				id = buyList.get(i);
-				if(!holdItemIDs.contains(id)) {
+				//if(!holdItemIDs.contains(id)) {
 					muster = musters.get(id); 
 					//macd = selectorServiceImp.getMACD(id,date, true);
 					if(muster!=null && !muster.isUpLimited() 
@@ -162,7 +162,7 @@ public class NewbOperation implements Operation {
 					}else {
 						breaksKeeper.add(date, id);  //因为涨停,没买入,保存下来,下次买入
 					}
-				}
+				//}
 			}
 			
 		}else{

@@ -120,7 +120,7 @@ public class OptimizeOperation implements Operation {
 		Set<String> breaks = breaksKeeper.getIDs();
 		//BigDecimal macd;
 		for(String id : breaks) {
-			if(!holdItemIDs.contains(id)) {
+			//if(!holdItemIDs.contains(id)) {
 				muster = musters.get(id); 
 				//macd = selectorServiceImp.getMACD(id,date, true);
 				if(muster!=null && !muster.isUpLimited() 
@@ -131,14 +131,14 @@ public class OptimizeOperation implements Operation {
 					dds.add(muster);
 					breaksKeeper.remove(id);
 				}
-			}
+			//}
 		}
 		
 		
 		//Set<String>  drops = dropsKeeper.getIDs(musters, drums);
 		Set<String>  drops = dropsKeeper.getIDs();
 		for(String id : drops) {
-			if(!holdItemIDs.contains(id)) {
+			//if(!holdItemIDs.contains(id)) {
 				muster = musters.get(id); 
 				//macd = selectorServiceImp.getMACD(id,date, true);
 				if(muster!=null && !muster.isUpLimited() && muster.isJustBreaker()
@@ -147,7 +147,7 @@ public class OptimizeOperation implements Operation {
 					dds.add(muster);
 					dropsKeeper.remove(id);
 				}
-			}
+			//}
 		}
 		
 
@@ -155,7 +155,7 @@ public class OptimizeOperation implements Operation {
 			String id;
 			for(int i=0, j=0; i<buyList.size() && j<top; i++) {
 				id = buyList.get(i);
-				if(!holdItemIDs.contains(id)) {
+				//if(!holdItemIDs.contains(id)) {
 					muster = musters.get(id); 
 					//macd = selectorServiceImp.getMACD(id,date, true);
 					if(muster!=null && !muster.isUpLimited() 
@@ -168,7 +168,7 @@ public class OptimizeOperation implements Operation {
 					}else {
 						breaksKeeper.add(date, id);
 					}
-				}
+				//}
 			}
 /*
 			
