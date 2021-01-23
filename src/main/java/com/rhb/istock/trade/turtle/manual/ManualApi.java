@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.rhb.istock.comm.api.ResponseContent;
 import com.rhb.istock.comm.api.ResponseEnum;
 import com.rhb.istock.comm.util.Progress;
+import com.rhb.istock.evaluation.EvaluationRepository;
 import com.rhb.istock.item.Item;
 import com.rhb.istock.item.ItemService;
 import com.rhb.istock.kdata.Kbar;
@@ -120,6 +121,10 @@ public class ManualApi {
 	@Autowired
 	@Qualifier("power")
 	Producer power;
+
+	@Autowired
+	@Qualifier("evaluationRepository")
+	EvaluationRepository evaluationRepository;
 	
 	private List<String> previous = null;
 	
@@ -231,6 +236,61 @@ public class ManualApi {
 	
 		return new ResponseContent<AllAmountView>(ResponseEnum.SUCCESS, view);
 	}
+	
+	@GetMapping("/turtle/manual/buylist/{type}/{date}")
+	public ResponseContent<List<ItemView>> getBuyList(
+			@PathVariable(value="type") String type,
+			@PathVariable(value="date") String date
+			) {
+		List<ItemView> views = new ArrayList<ItemView>();
+		LocalDate theDate = LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+
+		List<String> ids = this.getBuyList(type, theDate);
+		if(ids!=null && !ids.isEmpty()) {
+			Item item;
+			Integer recommendationCount;
+			ItemView iv;
+			Set<String> holds = this.getHoldIDs(this.generateHolds("manual",theDate));
+			for(String id : ids) {
+				item = itemService.getItem(id);
+				recommendationCount = finaService.getRecommendationCount(id, theDate);
+				item.setRecommendations(recommendationCount);
+				//if(recommendationCount!=null && recommendationCount>0) {
+					iv = new ItemView(id,item.getNameWithCAGR(),holds.contains(id)? "danger" : "info");
+					if(previous!=null && !previous.contains(id) && !holds.contains(id)) {
+						iv.setType("warning");
+					}
+					views.add(iv);
+				//}
+			}
+		}
+		
+		previous = ids;
+
+		return new ResponseContent<List<ItemView>>(ResponseEnum.SUCCESS, views);
+	}
+	
+	private List<String> getBuyList(String type, LocalDate theDate){
+		List<String> ids = new ArrayList<String>();
+		
+		String theType = "avb";
+		if(type.equals("buy2")) {
+			theType = "bav";
+		}else if(type.equals("buy3")) {
+			theType = "bdt";
+		}else if(type.equals("buy4")) {
+			theType = "bhl";
+		}
+
+		//System.out.println(theType + "," + theDate.toString());
+
+		Map<LocalDate, List<String>> breakers = evaluationRepository.getBreakers(theType);
+		if(breakers!=null && breakers.get(theDate)!=null) {
+			ids.addAll(breakers.get(theDate));
+		}
+		
+		return ids;
+	}
 
 	@GetMapping("/turtle/manual/potentials/{type}/{date}")
 	public ResponseContent<List<ItemView>> getPotentials(
@@ -242,12 +302,7 @@ public class ManualApi {
 		//System.out.println(date);
 		List<ItemView> views = new ArrayList<ItemView>();
 		
-		LocalDate theDate = null;
-		try{
-			theDate = LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-		}catch(Exception e){
-			new ResponseContent<List<ItemView>>(ResponseEnum.ERROR, views);
-		}
+		LocalDate theDate = LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 
 		List<String> ids = this.getPotentials(type, theDate);
 		if(ids!=null && !ids.isEmpty()) {
@@ -422,7 +477,25 @@ public class ManualApi {
 		return new ResponseContent<List<SelectView>>(ResponseEnum.SUCCESS, views);
 	}
 	
-	
+	@GetMapping("/turtle/manual/buylist/reselect/{type}")
+	public ResponseContent<List<SelectView>> getReselect1(
+			@PathVariable(value="type") String type
+			) {
+		List<SelectView> views = new ArrayList<SelectView>();
+		
+		Map<LocalDate, List<String>> selects = new TreeMap<LocalDate, List<String>>();
+		Map<LocalDate, AmountEntity> amounts = turtleSimulationRepository.getAmounts("bav");
+		int i=1;
+		for(LocalDate date : amounts.keySet()) {
+			Progress.show(amounts.size(), i++, date.toString() + "," + type);
+			selects.put(date, this.getBuyList(type, date));
+		}
+
+		manualService.saveReselect(selects);
+		
+		return new ResponseContent<List<SelectView>>(ResponseEnum.SUCCESS, views);
+	}
+
 	@GetMapping("/turtle/manual/breakers/{type}/{date}")
 	public ResponseContent<List<ItemView>> getBreakers(
 			@PathVariable(value="type") String type,

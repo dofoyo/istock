@@ -51,6 +51,25 @@ public class EvaluationApi {
 		return new ResponseContent<KelliesView>(ResponseEnum.SUCCESS, view);
 	}
 	
+	@GetMapping("/evaluation/kelly/scores/{period}/{edate}")
+	public ResponseContent<Integer[]> getKellyScores(
+			@PathVariable(value="period") Integer period,
+			@PathVariable(value="edate") String edate
+			){
+		LocalDate theEndDate = LocalDate.parse(edate, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+		KellyView avb = evaluationService.getKellyView("avb", period, theEndDate);
+		KellyView bav = evaluationService.getKellyView("bav", period, theEndDate);
+		KellyView bdt = evaluationService.getKellyView("bdt", period, theEndDate);
+		KellyView bhl = evaluationService.getKellyView("bhl", period, theEndDate);
+
+		Integer[] score = new Integer[]{0,0,0,0};
+		score[0] = avb==null ? 0 : avb.getScore();
+		score[1] = bav==null ? 0 : bav.getScore();
+		score[2] = bdt==null ? 0 : bdt.getScore();
+		score[3] = bhl==null ? 0 : bhl.getScore();
+		return new ResponseContent<Integer[]>(ResponseEnum.SUCCESS, score);
+	}
+	
 	@GetMapping("/evaluation/kelly/{type}/{period}/{edate}/{isHighest}")
 	public ResponseContent<KellyView> getKellyView(
 			@PathVariable(value="type") String type,

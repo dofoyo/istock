@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -26,6 +27,32 @@ public class EvaluationRepository {
 	
 	@Value("${dropDuration}")
 	private String dropDuration;
+	
+	
+	public Map<LocalDate, List<String>>  getBreakers(String type){
+		Map<LocalDate, List<String>> breakers = new TreeMap<LocalDate, List<String>>();
+		
+		String theFile = evaluationPath + "/" + type + "_simulation_breakers_"+openDuration+"_"+dropDuration+".csv"; 
+		//System.out.println(theFile);
+		String[] lines = FileTools.readTextFile(theFile).split("\n");
+		String[] columns;
+		LocalDate date;
+		List<String> ids;
+		for(String line : lines) {
+			//System.out.println(line);
+			if(line.length()>0 && line.contains(",")) {
+				columns = line.split(",");
+				date = LocalDate.parse(columns[0],DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+				ids = new ArrayList<String>();
+				for(int i=1; i<columns.length; i++) {
+					ids.add(columns[i]);
+				}
+				breakers.put(date, ids);
+			}
+		}		
+		
+		return breakers;
+	}
 	
 	@Cacheable("busisDates")
 	public List<LocalDate> getDates(boolean desc){
