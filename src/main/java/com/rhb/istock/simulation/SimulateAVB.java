@@ -31,12 +31,10 @@ public class SimulateAVB {
 
 	@Autowired
 	@Qualifier("newbRup")
-	//@Qualifier("sab34Favor")
 	Producer producer;	
 	
 	@Autowired
 	@Qualifier("newbOperation")
-	//@Qualifier("huntingOperation")
 	Operation operation;
 	
 	@Async("taskExecutor")

@@ -66,7 +66,7 @@ public class FourOperation implements Operation {
 		
 		int i=1;
 		for(LocalDate date = beginDate; (date.isBefore(endDate) || date.equals(endDate)); date = date.plusDays(1)) {
-			Progress.show((int)days, i++," " + label +  " favorOperation run:" + date.toString());
+			Progress.show((int)days, i++," " + label +  " fourOperation run:" + date.toString());
 			this.doIt(date, account, buyList.get(date), top, isAveValue,quantityType);
 		}
 		return this.result(account);
@@ -149,16 +149,19 @@ public class FourOperation implements Operation {
 		BigDecimal macd;
 		for(String id : up21s) {
 				muster = musters.get(id); 
-				macd = selectorServiceImp.getMACD(id,date, true);
 				if(muster!=null 
 						&& !muster.isUpLimited() 
-						&& macd.compareTo(BigDecimal.ZERO)==1
 						&& muster.isAboveAveragePrice(21)
 						&& muster.isAboveAveragePrice(89)
+						&& muster.getN21Gap()<=8
 						) {
-					dds.add(muster);
-					up21Keeper.remove(id);
-				}
+					macd = selectorServiceImp.getMACD(id,date, true);
+					if(macd.compareTo(BigDecimal.ZERO)==1
+							) {
+						dds.add(muster);
+						up21Keeper.remove(id);
+					}
+				}				
 		}
 				
 		breakers_sb.append(date.toString() + ",");
