@@ -109,7 +109,7 @@ public class Evaluation {
 			Future<String> favb2 = avb2.run(beginDate, endDate, initCash, top, isAveValue, quantityType, isEvaluation);
 			Future<String> fbav2 = bav2.run(beginDate, endDate, initCash, top, isAveValue, quantityType, isEvaluation);
 			Future<String> fbdt2 = bdt2.run(beginDate, endDate, initCash, top, isAveValue, quantityType, isEvaluation);
-			//Future<String> fbhl2 = bhl2.run(beginDate, endDate, initCash, top, isAveValue, quantityType, isEvaluation);
+			Future<String> fbhl2 = bhl2.run(beginDate, endDate, initCash, top, isAveValue, quantityType, isEvaluation);
 
 			while(true) {
 				if(true 
@@ -124,7 +124,7 @@ public class Evaluation {
 					&& favb2.isDone()
 					&& fbav2.isDone()
 					&& fbdt2.isDone()
-					//&& fbhl2.isDone()
+					&& fbhl2.isDone()
 						) {
 					break;
 				}

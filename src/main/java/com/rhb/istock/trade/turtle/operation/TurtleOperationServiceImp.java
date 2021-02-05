@@ -830,8 +830,8 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 		List<String> models = new ArrayList<String>();
 		LocalDate date = kdataService.getLatestMarketDate("sh000001");
 		Integer top = 10000;
-		Integer count = 13; //有多少机构推荐买入
-		Integer cagr = 21;  //业绩年增长率
+		Integer count = 5; //有多少机构推荐买入
+		Integer cagr = 13;  //业绩年增长率
 
 		Map<String,Item> items = itemService.getItems();
 		Item item;

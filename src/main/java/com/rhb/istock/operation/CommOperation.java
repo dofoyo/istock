@@ -49,7 +49,7 @@ public class CommOperation implements Operation {
 		dailyAmount_sb = new StringBuffer("date,cash,value,total\n");
 		breakers_sb = new StringBuffer();
 		breaksKeeper = new Keeper(55);  //包含所有创新高的股票,因为当天涨停或价格过高不能买入,等待价格回落后买入
-		dropsKeeper = new Keeper(21); //包含所有跌破21日线卖出的票,在21天内如果涨回21日线,说明调整结束,可以再次买入
+		dropsKeeper = new Keeper(55); //包含所有跌破21日线卖出的票,在21天内如果涨回21日线,说明调整结束,可以再次买入
 		
 		int i=1;
 		for(LocalDate date = beginDate; (date.isBefore(endDate) || date.equals(endDate)); date = date.plusDays(1)) {
@@ -114,7 +114,8 @@ public class CommOperation implements Operation {
 			if(!holdItemIDs.contains(id)) {
 				muster = musters.get(id); 
 				if(muster!=null && !muster.isUpLimited() 
-					//&& muster.isAboveAveragePrice(21)
+						&& muster.isAboveAveragePrice(21)
+						&& muster.isAboveAveragePrice(89)
 					) {
 					dds.add(muster);
 					breaksKeeper.remove(id);
@@ -128,7 +129,10 @@ public class CommOperation implements Operation {
 		for(String id : drops) {
 			if(!holdItemIDs.contains(id)) {
 				muster = musters.get(id); 
-				if(muster!=null && !muster.isUpLimited() && muster.isJustBreaker()) {
+				if(muster!=null && !muster.isUpLimited() 
+						&& muster.isJustBreaker()
+						&& muster.isAboveAveragePrice(89)
+						) {
 					dds.add(muster);
 					dropsKeeper.remove(id);
 				}
@@ -143,7 +147,8 @@ public class CommOperation implements Operation {
 				if(!holdItemIDs.contains(id)) {
 					muster = musters.get(id); 
 					if(muster!=null && !muster.isUpLimited() 
-						//&& muster.isAboveAveragePrice(21)
+						&& muster.isAboveAveragePrice(21)
+						&& muster.isAboveAveragePrice(89)
 						) {
 						dds.add(muster);
 						j++;

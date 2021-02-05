@@ -610,7 +610,7 @@ public class KdataServiceImp implements KdataService{
 				muster.setIndustry(item.getIndustry());
 				musters.put(muster.getItemID(),muster);
 			}else {
-				logger.info(String.format("item of %s is null", entity.getItemID()));
+				//logger.info(String.format("item of %s is null", entity.getItemID()));
 			}
 		}
 		

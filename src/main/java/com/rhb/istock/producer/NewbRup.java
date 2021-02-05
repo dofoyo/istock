@@ -24,7 +24,7 @@ import com.rhb.istock.kdata.Muster;
 import com.rhb.istock.selector.fina.FinaService;
 
 /*
- * newbPlus + 买入评级 + 业绩增涨 + HLGAP低到高排序
+ * newbPlus（创新高，89个交易日的涨幅在55%内） + 买入评级 + 业绩增涨 + HLGAP低到高排序
  * 
  */
 
@@ -49,9 +49,11 @@ public class NewbRup implements Producer{
 	
 	private String fileName  = "NewbRup.txt";
 	
-	private Integer cagr = 21;  //业绩年增长率
+	private Integer cagr = 13;  //业绩年增长率
 	
-	private Integer reco = 13;
+	private Integer reco = 5;  //推荐买入的机构数量
+	
+	private Integer hlgap = 55; //最大涨幅
 
 	@Override
 	public Map<LocalDate, List<String>> produce(LocalDate bDate, LocalDate eDate) {
@@ -142,7 +144,7 @@ public class NewbRup implements Producer{
 			for(Muster m : ms) {
 				if(m!=null
 						&& m.isUpBreaker() 				//股价创新高
-						&& m.getHLGap()<=55             //涨幅不大
+						&& m.getHLGap()<=hlgap             //涨幅不大
 						) {
 					breakers.add(m.getItemID());
 				}

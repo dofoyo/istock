@@ -43,7 +43,7 @@ public class SimulateBHL2 {
 	Producer newbRup;	
 	
 	@Autowired
-	@Qualifier("fourOperation")
+	@Qualifier("commOperation")
 	//@Qualifier("huntingOperationPlus")
 	Operation operation;
 	

@@ -122,10 +122,10 @@ public class ManualService {
 			operateResult = commOperation.run(account, this.selects, this.getBeginDate(), this.getEndDate(), label, top, true,0);
 		}else if("newb".equals(simulateType))  {
 			operateResult = newbOperation.run(account, this.selects, this.getBeginDate(), this.getEndDate(), label, top, true,0);
-		}else if("favor".equals(simulateType))  {
-			operateResult = favorOperation.run(account, this.selects, this.getBeginDate(), this.getEndDate(), label, top, true,0);
 		}else if("optimize".equals(simulateType)) {
 			operateResult = optimizeOperation.run(account, this.selects, this.getBeginDate(), this.getEndDate(), label, top, true,0);
+		}else if("favor".equals(simulateType))  {
+			operateResult = favorOperation.run(account, this.selects, this.getBeginDate(), this.getEndDate(), label, top, true,0);
 		}else if("sab".equals(simulateType)) {
 			operateResult = huntingOperation.run(account, this.selects, this.getBeginDate(), this.getEndDate(), label, top, true,0);
 		}else {
