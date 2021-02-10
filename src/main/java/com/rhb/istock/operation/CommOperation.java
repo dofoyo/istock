@@ -20,6 +20,7 @@ import com.rhb.istock.account.Account;
 import com.rhb.istock.comm.util.Progress;
 import com.rhb.istock.kdata.KdataService;
 import com.rhb.istock.kdata.Muster;
+import com.rhb.istock.operation.FavorOperation.Keeper;
 
 
 /*
@@ -40,6 +41,7 @@ public class CommOperation implements Operation {
 	//private Integer previous_period  = 13; //历史纪录区间，主要用于后面判断
 	private Keeper breaksKeeper;  //包含所有创新高的股票,因为当天涨停或价格过高不能买入,等待价格回落后买入
 	private Keeper dropsKeeper; //包含所有跌破21日线卖出的票,在13天内如果涨回21日线,说明调整结束,可以再次买入
+	private Keeper up21Keeper; //包含所有涨回21日线的票
 	
 	public Map<String,String> run(Account account, Map<LocalDate, List<String>> buyList,LocalDate beginDate, LocalDate endDate, String label, int top, boolean isAveValue, Integer quantityType) {
 		long days = endDate.toEpochDay()- beginDate.toEpochDay();
@@ -50,6 +52,7 @@ public class CommOperation implements Operation {
 		breakers_sb = new StringBuffer();
 		breaksKeeper = new Keeper(55);  //包含所有创新高的股票,因为当天涨停或价格过高不能买入,等待价格回落后买入
 		dropsKeeper = new Keeper(55); //包含所有跌破21日线卖出的票,在21天内如果涨回21日线,说明调整结束,可以再次买入
+		up21Keeper = new Keeper(55);  //包含所有创新高的股票,因为当天涨停或价格过高不能买入,等待价格回落后买入
 		
 		int i=1;
 		for(LocalDate date = beginDate; (date.isBefore(endDate) || date.equals(endDate)); date = date.plusDays(1)) {
@@ -103,7 +106,7 @@ public class CommOperation implements Operation {
 		}
 		dropsKeeper.dailySet(date);
 		
-		//买入清单
+/*		//买入清单
 		Set<Muster> dds = new HashSet<Muster>();  //用set，无重复，表示不可加仓
 		holdItemIDs = account.getItemIDsOfHolds();
 		//List<String> drums = producer.getResults(date);
@@ -157,25 +160,57 @@ public class CommOperation implements Operation {
 					}
 				}
 			}
-			
-			
-/*			breaksKeeper.addAll(date,new HashSet<String>(buyList));
-			for(String id : buyList) {
-				if(!holdItemIDs.contains(id)) {
-					muster = musters.get(id); 
-					if(muster!=null && !muster.isUpLimited()) {
-						dds.add(muster);
-					}
-				}
-			}			
-*/		}else{
+		}else{
 			breaksKeeper.dailySet(date);
+		}
+*/		
+		
+		Set<Muster> dds = new HashSet<Muster>();  
+		if(buyList!=null && buyList.size()>0) {
+			breaksKeeper.addAll(date,new HashSet<String>(buyList));
+		}else{
+			breaksKeeper.dailySet(date);
+		}
+		
+		Set<String> breaks = breaksKeeper.getIDs();
+		for(String id : breaks) {
+			muster = musters.get(id); 
+			if(muster!=null 
+					&& !muster.isUpLimited() 
+					&& muster.isAboveAveragePrice(21)
+					&& muster.isAboveAveragePrice(89)
+					) {
+				dds.add(muster);
+				breaksKeeper.remove(id);
+			}
+		}
+		
+		Set<String> drops = dropsKeeper.getIDs();
+		for(String id : drops) {
+			muster = musters.get(id); 
+			if(muster!=null 
+					&& muster.isJustBreaker()
+					) {
+				up21Keeper.add(date, id);
+			}
+		}
+
+		Set<String> ids = up21Keeper.getIDs();
+		for(String id : ids) {
+				muster = musters.get(id); 
+				if(muster!=null 
+						&& !muster.isUpLimited() 
+						&& muster.isAboveAveragePrice(21)
+						&& muster.isAboveAveragePrice(89)
+						) {
+						dds.add(muster);
+						up21Keeper.remove(id);
+						dropsKeeper.remove(id);
+				}				
 		}
 		
 		breakers_sb.append(date.toString() + ",");
 		for(Muster m : dds) {
-			//breaksKeeper.remove(m.getItemID());
-			//dropsKeeper.remove(m.getItemID());
 			breakers_sb.append(m.getItemID());
 			breakers_sb.append(",");
 		}				

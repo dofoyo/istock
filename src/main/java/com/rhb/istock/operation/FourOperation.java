@@ -117,7 +117,6 @@ public class FourOperation implements Operation {
 		dropsKeeper.dailySet(date);
 		
 		//买入清单
-
 		if(buyList!=null && buyList.size()>0) {
 			newbKeeper.addAll(date,new HashSet<String>(buyList));
 		}else{

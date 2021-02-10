@@ -47,7 +47,7 @@ public class OptimizeOperation implements Operation {
 	private StringBuffer breakers_sb;
 	//private Integer previous_period  = 13; //历史纪录区间，主要用于后面判断
 	private Keeper breaksKeeper;  //包含所有创新高的股票,因为当天涨停或价格过高不能买入,等待价格回落后买入
-	private Keeper dropsKeeper; //包含所有跌破21日线卖出的票,在13天内如果涨回21日线,说明调整结束,可以再次买入
+	//private Keeper dropsKeeper; //包含所有跌破21日线卖出的票,在13天内如果涨回21日线,说明调整结束,可以再次买入
 	
 	public Map<String,String> run(Account account, Map<LocalDate, List<String>> buyList,LocalDate beginDate, LocalDate endDate, String label, int top, boolean isAveValue, Integer quantityType) {
 		long days = endDate.toEpochDay()- beginDate.toEpochDay();
@@ -57,7 +57,7 @@ public class OptimizeOperation implements Operation {
 		dailyAmount_sb = new StringBuffer("date,cash,value,total\n");
 		breakers_sb = new StringBuffer();
 		breaksKeeper = new Keeper(55);  //包含所有创新高的股票,因为当天涨停或价格过高不能买入,等待价格回落后买入
-		dropsKeeper = new Keeper(55); //包含所有跌破21日线卖出的票,在21天内如果涨回21日线,说明调整结束,可以再次买入
+		//dropsKeeper = new Keeper(55); //包含所有跌破21日线卖出的票,在21天内如果涨回21日线,说明调整结束,可以再次买入
 		
 		int i=1;
 		for(LocalDate date = beginDate; (date.isBefore(endDate) || date.equals(endDate)); date = date.plusDays(1)) {
@@ -97,7 +97,7 @@ public class OptimizeOperation implements Operation {
 						//&& muster.getLatestPrice().compareTo(muster.getClose())==1
 						) { 		//跌破21日均线就卖
 					account.dropWithTax(itemID, "1", muster.getLatestPrice());
-					dropsKeeper.add(date, itemID);
+					//dropsKeeper.add(date, itemID);
 					//logger.info("dropsKeeper add " + itemID);
 				}
 				
@@ -109,10 +109,10 @@ public class OptimizeOperation implements Operation {
 				}*/
 			}
 		}
-		dropsKeeper.dailySet(date);
+		//dropsKeeper.dailySet(date);
 		
 		//买入清单
-		Set<Muster> dds = new HashSet<Muster>();  //用set，无重复，表示不可加仓
+/*		Set<Muster> dds = new HashSet<Muster>();  //用set，无重复，表示不可加仓
 		holdItemIDs = account.getItemIDsOfHolds();
 		//List<String> drums = producer.getResults(date);
 		
@@ -173,25 +173,35 @@ public class OptimizeOperation implements Operation {
 					}
 				//}
 			}
-/*
-			
+		}else{
+			breaksKeeper.dailySet(date);
+		}*/
+		
+		
+		//买入清单
+		if(buyList!=null && buyList.size()>0) {
 			breaksKeeper.addAll(date,new HashSet<String>(buyList));
-			for(String id : buyList) {
-				if(!holdItemIDs.contains(id)) {
-					muster = musters.get(id); 
-					if(muster!=null && !muster.isUpLimited() && muster.getN21Gap()<=8) {
-						dds.add(muster);
-					}
-				}
-			}			
-*/		}else{
+		}else{
 			breaksKeeper.dailySet(date);
 		}
-		
+
+		Set<Muster> dds = new HashSet<Muster>();  
+		Set<String> ids = breaksKeeper.getIDs();
+		for(String id : ids) {
+				muster = musters.get(id); 
+				if(muster!=null 
+						&& !muster.isUpLimited() 
+						&& muster.isAboveAveragePrice(21)
+ 						&& muster.isAboveAveragePrice(89)
+						&& muster.getN21Gap()<=8
+						) {
+						dds.add(muster);
+						breaksKeeper.remove(id);
+				}				
+		}
+
 		breakers_sb.append(date.toString() + ",");
 		for(Muster m : dds) {
-			//breaksKeeper.remove(m.getItemID());
-			//dropsKeeper.remove(m.getItemID());
 			breakers_sb.append(m.getItemID());
 			breakers_sb.append(",");
 		}				
