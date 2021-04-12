@@ -80,7 +80,7 @@ public class KdataSpiderTest {
 		System.out.println("done!");
 	}
 	
-	@Test
+	//@Test
 	public void testDownKdataByIDFrom163() {
 		String id = "sh000001";
 		try {

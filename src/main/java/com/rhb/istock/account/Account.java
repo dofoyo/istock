@@ -790,6 +790,10 @@ public class Account {
 		return this.cash;
 	}
 	
+	public boolean isAve(Integer num) {
+		return this.getCash().divide(new BigDecimal(num),BigDecimal.ROUND_HALF_UP).compareTo(this.getAveValue())==-1;
+	}
+	
 	public Integer isAboveAveValue(Integer orderID) {
 		if(holds.size()<=1) return 1;
 		Order order = holds.get(orderID);

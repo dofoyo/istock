@@ -34,7 +34,7 @@ public class SimulateHLB {
 	Producer producer;
 
 	@Autowired
-	@Qualifier("commOperation")
+	@Qualifier("commOperation2")
 	Operation operation;
 
 	@Async("taskExecutor")

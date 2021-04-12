@@ -34,7 +34,8 @@ public class SimulateBAV {
 	Producer producer;
 	
 	@Autowired
-	@Qualifier("optimizeOperation")
+	//@Qualifier("optimizeOperation")
+	@Qualifier("commOperation")
 	Operation operation;
 	
 	@Async("taskExecutor")

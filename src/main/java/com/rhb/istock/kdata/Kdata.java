@@ -32,7 +32,7 @@ public class Kdata {
 		this.bars = new TreeMap<LocalDate,Kbar>();
 	}
 	
-	public Integer getRatio() {
+	public Integer getLowestRatio() {
 		if(bars==null || bars.lastEntry()==null || bars.lastEntry().getValue()==null) {
 			return 0;
 		}
@@ -47,6 +47,27 @@ public class Kdata {
 			Integer ratio = Functions.growthRate(p1, lowest);
 			//logger.info("ssei ratio's begin date:" + bars.firstKey() + ", end date: " + bars.lastKey());
 			//logger.info(String.format("ssei, lowest=%.2f, price=%.2f, ratio=%d", lowest, p1,ratio));
+
+			return ratio;
+		}
+	}
+	
+	public Integer getRatio() {
+		if(bars==null || bars.lastEntry()==null || bars.lastEntry().getValue()==null
+				&&  bars.firstEntry()==null || bars.firstEntry().getValue()==null) {
+			return 0;
+		}
+		
+		BigDecimal p1 = bars.lastEntry().getValue().getClose();
+		BigDecimal p2 = bars.firstEntry().getValue().getClose();
+		//logger.info("last date: %tF, %.2f\n",bars.lastEntry().getValue().getDate(),bars.lastEntry().getValue().getClose());
+		//logger.info("first date: %tF, %.2f\n",bars.firstEntry().getValue().getDate(),bars.firstEntry().getValue().getClose());
+		if(highest==null || lowest ==null) {
+			return 0;
+		}else {
+			Integer ratio = Functions.growthRate(p1, p2);
+			//logger.info("ssei ratio's begin date:" + bars.firstKey() + ", end date: " + bars.lastKey());
+			//logger.info(String.format("ssei, p1=%.2f, p2=%.2f, ratio=%d", p1, p2,ratio));
 
 			return ratio;
 		}

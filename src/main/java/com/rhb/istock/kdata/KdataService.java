@@ -13,6 +13,7 @@ public interface KdataService {
 	
 	public void downSSEI();  //下载上证指数
 	public Integer getSseiFlag(LocalDate date); 
+	public Integer getSseiLowestRatio(LocalDate date, Integer period);
 	public Integer getSseiRatio(LocalDate date, Integer period);
 	public Integer getSseiTrend(LocalDate date, Integer period);
 	

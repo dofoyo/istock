@@ -875,13 +875,13 @@ public class KdataServiceImp implements KdataService{
 	}
 	
 	@Override
-	public Integer getSseiRatio(LocalDate date, Integer period) {
+	public Integer getSseiLowestRatio(LocalDate date, Integer period) {
 		Kdata ssei = this.getKdata(sseiID, date.plusDays(1), period, true);
 		if(ssei!=null && ssei.getLastBar()!=null && ssei.getLastBar().getDate()!=null && !ssei.getLastBar().getDate().equals(date)) {
 			ssei.addBar(date, this.getLatestMarketData(sseiID));
 			//ssei.removeFirstBar();
 		}
-		return ssei.getRatio();
+		return ssei.getLowestRatio();
 	}
 
 	@Override
@@ -958,6 +958,7 @@ public class KdataServiceImp implements KdataService{
 
 		kdataSpiderTushare.downKdatas(date);
 		kdataSpiderTushare.downBasics(date);
+		kdataSpiderTushare.downFactors(date);
 		
 		long used = (System.currentTimeMillis() - beginTime)/1000; 
 		System.out.println("用时：" + used + "秒");          
@@ -1020,5 +1021,15 @@ public class KdataServiceImp implements KdataService{
 	@Override
 	public void downFactors(LocalDate date) throws Exception {
 		kdataSpiderTushare.downFactors(date);
+	}
+
+	@Override
+	public Integer getSseiRatio(LocalDate date, Integer period) {
+		Kdata ssei = this.getKdata(sseiID, date.plusDays(1), period, true);
+		if(ssei!=null && ssei.getLastBar()!=null && ssei.getLastBar().getDate()!=null && !ssei.getLastBar().getDate().equals(date)) {
+			ssei.addBar(date, this.getLatestMarketData(sseiID));
+			//ssei.removeFirstBar();
+		}
+		return ssei.getRatio();
 	}
 }

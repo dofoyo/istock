@@ -24,7 +24,8 @@ public class Functions {
 	
 	public static Integer growthRate(BigDecimal a, BigDecimal b) {
 		if(b.compareTo(BigDecimal.ZERO) == 0) return 0;
-		return a.divide(b,BigDecimal.ROUND_HALF_UP).subtract(new BigDecimal(1)).multiply(new BigDecimal(100)).add(new BigDecimal(0.5)).intValue();
+		BigDecimal ratio = a.divide(b,BigDecimal.ROUND_HALF_UP).subtract(new BigDecimal(1)).multiply(new BigDecimal(100));
+		return ratio.setScale(0, BigDecimal.ROUND_HALF_UP).intValue();
 	}
 	
 	// rate = a/b

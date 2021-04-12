@@ -444,14 +444,19 @@ public class ManualApi {
 		//System.out.println(theDate);
 		
 		Map<LocalDate, List<String>> selects = manualService.getSelects(theDate);
+		
 		//System.out.println(selects);
 		if(selects != null) {
 			Set<String> holds = this.getHoldIDs(this.generateHolds("manual",theDate));
 			List<String> ids;
+			Set<String> ids_tmp = new HashSet<String>();
 			for(Map.Entry<LocalDate, List<String>> entry : selects.entrySet()) {
 				ids = entry.getValue();
 				for(String id : ids) {
-					views.add(new SelectView(id,itemService.getItem(id).getName(),entry.getKey(),holds.contains(id)?"danger":""));
+					if(!ids_tmp.contains(id)) {
+						views.add(new SelectView(id,itemService.getItem(id).getName(),entry.getKey(),holds.contains(id)?"danger":""));
+						ids_tmp.add(id);
+					}
 				}
 			}			
 		}

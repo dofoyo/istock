@@ -123,13 +123,13 @@ public class IstockScheduledTask {
 	 * 2、下载上一交易日收盘后的K线数据
 	 * 3、初始化: 即把日K线读入内存
 	 */
-	@Scheduled(cron="0 45 9 ? * 1-5") 
+	@Scheduled(cron="0 35 9 ? * 1-5") 
 	public void dailyInit() throws Exception {
-		System.out.println("run scheduled of '0 45 9 ? * 1-5'");
+		System.out.println("run scheduled of '0 35 9 ? * 1-5'");
 		if(this.isTradeDate()) {   //次序很重要
 			itemService.downItems();		// 1. 下载最新股票代码
 			itemService.init();  // 2. 
-			kdataService.downFactors(); // 3. 上一交易日的收盘数据要等开盘前才能下载到, 大约需要15分钟
+			//kdataService.downFactors(); // 3. 上一交易日的收盘数据要等开盘前才能下载到, 大约需要15分钟
 			kdataService.downSSEI();
 			kdataService.generateLatestMusters(null);
 			turtleOperationService.init();  // 4.
@@ -172,7 +172,7 @@ public class IstockScheduledTask {
 		}
 	}*/
 	
-	@Scheduled(cron="0 50 21 ? * 1-5") //周一至周五，每日21点50执行收盘
+	@Scheduled(cron="0 50 22 ? * 1-5") //周一至周五，每日21点50执行收盘
 	public void downloadKdatas()  throws Exception{
 		System.out.println("run scheduled of '0 50 21 ? * 1-5'");
 		long beginTime=System.currentTimeMillis(); 
@@ -183,7 +183,7 @@ public class IstockScheduledTask {
 			kdataService.downClosedDatas(date);
 			kdataService.generateMusters(LocalDate.parse("2009-01-01"));   //生成muster，需要192分钟，即3个多小时
 			producerService.produce(date);
-			//fdataSpiderTushare.downAll();  //财务报告、预告、股东信息等下载
+			fdataSpiderTushare.downAll();  //财务报告、预告、股东信息等下载
 			indexSpiderTushare.downIndex_Daily("000001.SH");
 			//indexSpiderTushare.downIndex_weight();
 			//indexSpiderTushare.downIndex_basic();

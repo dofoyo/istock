@@ -24,12 +24,14 @@ import com.rhb.istock.kdata.Muster;
 
 /*
  * 买入：根据传入的buyList清单买入，如果涨停，就在第二天买入。卖出后跟踪21日，如果又向上突破21日线再次买入
+ * 当上证指数大跌破21日线,清仓
+ * 
  * 卖出：跌破21日线
  */
 @Scope("prototype")
-@Service("commOperation")
-public class CommOperation implements Operation {
-	protected static final Logger logger = LoggerFactory.getLogger(CommOperation.class);
+@Service("commOperation2")
+public class CommOperation2 implements Operation {
+	protected static final Logger logger = LoggerFactory.getLogger(CommOperation2.class);
 
 	@Autowired
 	@Qualifier("kdataServiceImp")
@@ -37,12 +39,12 @@ public class CommOperation implements Operation {
 	
 	private StringBuffer dailyAmount_sb;
 	private StringBuffer breakers_sb;
-	//private Integer previous_period  = 13; //历史纪录区间，主要用于后面判断
+	private Integer previous_period  = 13; //历史纪录区间，主要用于后面判断
 	private Keeper breaksKeeper;  //包含所有创新高的股票,因为当天涨停或价格过高不能买入,等待价格回落后买入
 	private Keeper dropsKeeper; //包含所有跌破21日线卖出的票,在13天内如果涨回21日线,说明调整结束,可以再次买入
 	private Keeper up21Keeper; //包含所有涨回21日线的票
-	//private boolean bomb;
-	//private Integer previous_sseiFlag;
+	private boolean bomb;
+	private Integer previous_sseiFlag;
 	
 	public Map<String,String> run(Account account, Map<LocalDate, List<String>> buyList,LocalDate beginDate, LocalDate endDate, String label, int top, boolean isAveValue, Integer quantityType) {
 		long days = endDate.toEpochDay()- beginDate.toEpochDay();
@@ -54,8 +56,8 @@ public class CommOperation implements Operation {
 		breaksKeeper = new Keeper(21);  //包含所有创新高的股票,因为当天涨停或价格过高不能买入,等待价格回落后买入
 		dropsKeeper = new Keeper(21); //包含所有跌破21日线卖出的票,在21天内如果涨回21日线,说明调整结束,可以再次买入
 		up21Keeper = new Keeper(21);  //包含所有创新高的股票,因为当天涨停或价格过高不能买入,等待价格回落后买入
-		//bomb = false;
-		//this.previous_sseiFlag = 1;
+		bomb = false;
+		this.previous_sseiFlag = 1;
 		
 		int i=1;
 		for(LocalDate date = beginDate; (date.isBefore(endDate) || date.equals(endDate)); date = date.plusDays(1)) {
@@ -73,17 +75,17 @@ public class CommOperation implements Operation {
 		
 		//System.out.println(breaksKeeper);
 
-		//Integer sseiFlag = kdataService.getSseiFlag(date);
+		Integer sseiFlag = kdataService.getSseiFlag(date);
 		//Integer sseiTrend = kdataService.getSseiTrend(date, previous_period);
-		//Integer sseiRatio = kdataService.getSseiRatio(date, 2);
+		Integer sseiRatio = kdataService.getSseiRatio(date, 2);
 		//logger.info(date.toString() + ", ssei ratio = " + sseiRatio.toString());
 		
-		/*if(sseiFlag!=1 && sseiRatio<=-1) {
+		if(previous_sseiFlag==1 && sseiFlag!=1 && sseiRatio<=-1) {
 			this.bomb = true;
 		}
 		if(sseiFlag==1 && previous_sseiFlag==1) {
 			this.bomb = false;
-		}*/
+		}
 		
 		Muster muster;
 		account.setLatestDate(date);
@@ -125,10 +127,10 @@ public class CommOperation implements Operation {
 					//logger.info("dropsKeeper add " + itemID);
 				}*/
 				
-				/*if(this.bomb && this.previous_sseiFlag!=1 && sseiFlag!=1) {
+				if(this.bomb && this.previous_sseiFlag==1 && sseiFlag!=1) {
 					account.dropWithTax(itemID, "9", muster.getLatestPrice());
 					dropsKeeper.add(date, itemID);
-				}*/
+				}
 			}
 		}
 		/*if(this.bomb && this.previous_sseiFlag!=1 && sseiFlag!=1) {
@@ -155,7 +157,7 @@ public class CommOperation implements Operation {
 				if(muster!=null && !muster.isUpLimited() 
 						//&& sseiFlag==1 
 						//&& sseiTrend==1
-						//&& !this.bomb
+						&& !this.bomb
 						) {
 					dds.add(muster);
 				}else {
@@ -175,15 +177,22 @@ public class CommOperation implements Operation {
 			if(muster!=null && !muster.isUpLimited() 
 					&& muster.isAboveAveragePrice(21)
 					&& muster.isAboveAveragePrice(89)
-					&& muster.getN21Gap()<=8
+					&& muster.getN21Gap()<=5
 					//&& sseiFlag==1 
 					//&& sseiTrend==1
 					&& !drops.contains(id)
 					&& !up21s.contains(id)
-					//&& !this.bomb
+					&& !this.bomb
 
 					) {
 				dds.add(muster);
+				breaksKeeper.remove(id);
+			}
+			
+			if(muster!=null 
+					&& muster.isJustBreaker()
+					) {
+				up21Keeper.add(date, id);
 				breaksKeeper.remove(id);
 			}
 		}
@@ -206,7 +215,7 @@ public class CommOperation implements Operation {
 						&& !muster.isUpLimited() 
 						&& muster.isAboveAveragePrice(21)
 						&& muster.isAboveAveragePrice(89)
-						&& muster.getN21Gap()<=8
+						&& muster.getN21Gap()<=5
 						//&& sseiFlag==1 
 						//&& sseiTrend==1
 						//&& !this.bomb
@@ -258,7 +267,7 @@ public class CommOperation implements Operation {
 			
 		dailyAmount_sb.append(account.getDailyAmount() + "\n");
 		
-		//previous_sseiFlag = sseiFlag;
+		previous_sseiFlag = sseiFlag;
 
 	}
 	

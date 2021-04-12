@@ -503,7 +503,7 @@ public class DrumService {
 					}
 				});*/
 				
-				Integer sseiRatio = kdataService.getSseiRatio(endDate, previous_period);
+				Integer sseiRatio = kdataService.getSseiLowestRatio(endDate, previous_period);
 				Integer ratio;
 				Muster m,p,b;
 				for(int i=0; i<ms.size(); i++) {

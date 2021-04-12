@@ -70,7 +70,7 @@ public class KdataRepositoryTushare implements KdataRepository{
 			
 			LocalDate date;
 			BigDecimal open,high,low,close,amount,quantity;
-			BigDecimal nowFactor = null;
+			BigDecimal nowFactor = null, preFactor = null;
 			JSONObject data = new JSONObject(FileTools.readTextFile(kdataFile));
 			items = data.getJSONArray("items");
 			if(items.length()>0) {
@@ -81,6 +81,9 @@ public class KdataRepositoryTushare implements KdataRepository{
 					
 					date = LocalDate.parse(item.getString(1),DateTimeFormatter.ofPattern("yyyyMMdd"));
 					nowFactor = factors.get(date);
+					if(nowFactor == null) {
+						nowFactor = preFactor;
+					}
 					
 					//System.out.println("date=" + date + ", nowFactor=" + nowFactor);
 					//if(preFactor==null) preFactor = nowFactor;
@@ -106,13 +109,9 @@ public class KdataRepositoryTushare implements KdataRepository{
 						kdata.addBar(date,open,high,low,close,amount,quantity,turnover_rate_f,volume_ratio,total_mv,circ_mv,total_share,float_share,free_share,pe);
 					}
 					
-/*					if(nowFactor==null){
-						logger.error("The nowFactor of " + itemID + " on " + date.toString() + " is NULL.");
-					}
-
-					if(roof==null){
-						logger.error("The roof of " + itemID + " is NULL.");
-					}*/
+					preFactor = nowFactor;
+					
+					
 				}
 			}
 		}

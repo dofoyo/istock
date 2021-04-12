@@ -30,10 +30,8 @@ public class SimulateBHL {
 	TurtleSimulationRepository turtleSimulationRepository;
 
 	@Autowired
-	@Qualifier("newbRup")
-	//@Qualifier("power")
-	//@Qualifier("dimeNewbReco")
-	//@Qualifier("sab89Favor")
+	//@Qualifier("newbRup")
+	@Qualifier("newbRecoH21")
 	Producer producer;
 	
 	@Autowired

@@ -48,8 +48,28 @@ public class IstockApplicationTests {
 	@Qualifier("evaluation")
 	Evaluation evaluation;
 
-	//执行收盘
+	//执行开盘
 	@Test
+	public void doOpen() throws Exception{
+		//System.out.println("run scheduled of '0 45 9 ? * 1-5'");
+		long beginTime=System.currentTimeMillis(); 
+		
+		
+		//LocalDate date = LocalDate.parse("2020-02-18");
+		//itemService.downItems();		// 1. 下载最新股票代码
+		//itemService.init();  // 2. 
+		kdataService.downSSEI();
+		kdataService.generateLatestMusters(null);
+		kdataService.updateLatestMusters();
+		
+		
+		long used = (System.currentTimeMillis() - beginTime)/1000; 
+		System.out.println("执行开盘完成，用时：" + used + "秒");          
+	}
+	
+	
+	//执行收盘
+	//@Test
 	public void doClose() {
 		System.out.println("doClose .....");
 		long beginTime=System.currentTimeMillis(); 
@@ -71,6 +91,7 @@ public class IstockApplicationTests {
 			//indexServiceTushare.generateIndex();
 			//fdataSpiderEastmoney.downProfitForecasts();
 			//fdataSpiderEastmoney.downRecommendations();
+			//kdataService.downFactors(); // 3. 上一交易日的收盘数据要等开盘前才能下载到, 大约需要15分钟
 			itemService.downTopics();
 			//drumService.generateDimensions();
 			
