@@ -49,7 +49,7 @@ public class Evaluation {
 	@Qualifier("bhl")
 	SimulateBHL bhl;
 
-	@Autowired
+/*	@Autowired
 	@Qualifier("dtb")
 	SimulateDTB dtb;
 
@@ -63,7 +63,7 @@ public class Evaluation {
 	
 	@Autowired
 	@Qualifier("hunt")
-	SimulateHunt hunt;
+	SimulateHunt hunt;*/
 
 	@Autowired
 	@Qualifier("avb2")
@@ -101,10 +101,10 @@ public class Evaluation {
 			Future<String> fbav = bav.run(beginDate, endDate, initCash, top, isAveValue, quantityType, isEvaluation);
 			Future<String> fbdt = bdt.run(beginDate, endDate, initCash, top, isAveValue, quantityType, isEvaluation);
 			Future<String> fbhl = bhl.run(beginDate, endDate, initCash, top, isAveValue, quantityType, isEvaluation);
-			Future<String> fhlb = hlb.run(beginDate, endDate, initCash, top, isAveValue, quantityType, isEvaluation);
-			Future<String> fdtb = dtb.run(beginDate, endDate, initCash, top, isAveValue, quantityType, isEvaluation);
+			//Future<String> fhlb = hlb.run(beginDate, endDate, initCash, top, isAveValue, quantityType, isEvaluation);
+			//Future<String> fdtb = dtb.run(beginDate, endDate, initCash, top, isAveValue, quantityType, isEvaluation);
 			//Future<String> fbnew = bnew.run(beginDate, endDate, initCash, top, isAveValue, quantityType, isEvaluation);
-			Future<String> fhunt = hunt.run(beginDate, endDate, initCash, top, isAveValue, quantityType, isEvaluation);
+			//Future<String> fhunt = hunt.run(beginDate, endDate, initCash, top, isAveValue, quantityType, isEvaluation);
 
 			Future<String> favb2 = avb2.run(beginDate, endDate, initCash, top, isAveValue, quantityType, isEvaluation);
 			Future<String> fbav2 = bav2.run(beginDate, endDate, initCash, top, isAveValue, quantityType, isEvaluation);
@@ -117,10 +117,10 @@ public class Evaluation {
 					&& fbav.isDone()
 					&& fbdt.isDone()
 					&& fbhl.isDone()
-					&& fhlb.isDone() 
-					&& fdtb.isDone()
+					//&& fhlb.isDone() 
+					//&& fdtb.isDone()
 					//&& fbnew.isDone()
-					&& fhunt.isDone()
+					//&& fhunt.isDone()
 					&& favb2.isDone()
 					&& fbav2.isDone()
 					&& fbdt2.isDone()

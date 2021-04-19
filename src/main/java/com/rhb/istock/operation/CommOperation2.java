@@ -23,10 +23,10 @@ import com.rhb.istock.kdata.Muster;
 
 
 /*
+ * 买1+2+3+* 模式
  * 买入：根据传入的buyList清单买入，如果涨停，就在第二天买入。卖出后跟踪21日，如果又向上突破21日线再次买入
- * 当上证指数大跌破21日线,清仓
- * 
- * 卖出：跌破21日线
+ *
+ * 卖出：跌破21日线；  市值跌幅超过8%,清仓, 从头再来
  */
 @Scope("prototype")
 @Service("commOperation2")
@@ -39,12 +39,12 @@ public class CommOperation2 implements Operation {
 	
 	private StringBuffer dailyAmount_sb;
 	private StringBuffer breakers_sb;
-	private Integer previous_period  = 13; //历史纪录区间，主要用于后面判断
+	//private Integer previous_period  = 13; //历史纪录区间，主要用于后面判断
 	private Keeper breaksKeeper;  //包含所有创新高的股票,因为当天涨停或价格过高不能买入,等待价格回落后买入
 	private Keeper dropsKeeper; //包含所有跌破21日线卖出的票,在13天内如果涨回21日线,说明调整结束,可以再次买入
 	private Keeper up21Keeper; //包含所有涨回21日线的票
-	private boolean bomb;
-	private Integer previous_sseiFlag;
+	//private boolean bomb;
+	//private Integer previous_sseiFlag;
 	
 	public Map<String,String> run(Account account, Map<LocalDate, List<String>> buyList,LocalDate beginDate, LocalDate endDate, String label, int top, boolean isAveValue, Integer quantityType) {
 		long days = endDate.toEpochDay()- beginDate.toEpochDay();
@@ -56,8 +56,8 @@ public class CommOperation2 implements Operation {
 		breaksKeeper = new Keeper(21);  //包含所有创新高的股票,因为当天涨停或价格过高不能买入,等待价格回落后买入
 		dropsKeeper = new Keeper(21); //包含所有跌破21日线卖出的票,在21天内如果涨回21日线,说明调整结束,可以再次买入
 		up21Keeper = new Keeper(21);  //包含所有创新高的股票,因为当天涨停或价格过高不能买入,等待价格回落后买入
-		bomb = false;
-		this.previous_sseiFlag = 1;
+		//bomb = false;
+		//this.previous_sseiFlag = 1;
 		
 		int i=1;
 		for(LocalDate date = beginDate; (date.isBefore(endDate) || date.equals(endDate)); date = date.plusDays(1)) {
@@ -73,20 +73,6 @@ public class CommOperation2 implements Operation {
 		Map<String,Muster> musters = kdataService.getMusters(date);
 		if(musters==null || musters.size()==0) return;
 		
-		//System.out.println(breaksKeeper);
-
-		Integer sseiFlag = kdataService.getSseiFlag(date);
-		//Integer sseiTrend = kdataService.getSseiTrend(date, previous_period);
-		Integer sseiRatio = kdataService.getSseiRatio(date, 2);
-		//logger.info(date.toString() + ", ssei ratio = " + sseiRatio.toString());
-		
-		if(previous_sseiFlag==1 && sseiFlag!=1 && sseiRatio<=-1) {
-			this.bomb = true;
-		}
-		if(sseiFlag==1 && previous_sseiFlag==1) {
-			this.bomb = false;
-		}
-		
 		Muster muster;
 		account.setLatestDate(date);
 		
@@ -98,8 +84,10 @@ public class CommOperation2 implements Operation {
 			}
 		}
 		
+		account.refreshHighestAmount();
+		
 		//logger.info("sseiFlag =  " + sseiFlag.toString());
-
+		boolean bomb = account.getAmountRatio()<=-8 ? true : false;
 		
 		//卖出
 		for(String itemID: holdItemIDs) {
@@ -127,17 +115,18 @@ public class CommOperation2 implements Operation {
 					//logger.info("dropsKeeper add " + itemID);
 				}*/
 				
-				if(this.bomb && this.previous_sseiFlag==1 && sseiFlag!=1) {
+				if(bomb) {
 					account.dropWithTax(itemID, "9", muster.getLatestPrice());
 					dropsKeeper.add(date, itemID);
 				}
 			}
 		}
-		/*if(this.bomb && this.previous_sseiFlag!=1 && sseiFlag!=1) {
+		if(bomb) {
+			account.reSetHighestAmount();
 			breaksKeeper.removeAll();
 			dropsKeeper.removeAll();
 			up21Keeper.removeAll();
-		}	*/	
+		}		
 		
 		//logger.info(date.toString() + ", bomb = " + (this.bomb ? " Y " : ""));
 		//logger.info(date.toString() + ", sseiFlag = " + sseiFlag.toString());
@@ -155,9 +144,6 @@ public class CommOperation2 implements Operation {
 			for(String id : buyList) {
 				muster = musters.get(id); 
 				if(muster!=null && !muster.isUpLimited() 
-						//&& sseiFlag==1 
-						//&& sseiTrend==1
-						&& !this.bomb
 						) {
 					dds.add(muster);
 				}else {
@@ -178,12 +164,8 @@ public class CommOperation2 implements Operation {
 					&& muster.isAboveAveragePrice(21)
 					&& muster.isAboveAveragePrice(89)
 					&& muster.getN21Gap()<=5
-					//&& sseiFlag==1 
-					//&& sseiTrend==1
 					&& !drops.contains(id)
 					&& !up21s.contains(id)
-					&& !this.bomb
-
 					) {
 				dds.add(muster);
 				breaksKeeper.remove(id);
@@ -267,8 +249,6 @@ public class CommOperation2 implements Operation {
 			
 		dailyAmount_sb.append(account.getDailyAmount() + "\n");
 		
-		previous_sseiFlag = sseiFlag;
-
 	}
 	
 	private Map<String,String> result(Account account) {

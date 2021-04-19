@@ -30,7 +30,8 @@ public class Functions {
 	
 	// rate = a/b
 	public static Integer rate(BigDecimal a, BigDecimal b) {
-		return a.divide(b,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)).add(new BigDecimal(0.5)).intValue();
+		BigDecimal rate = a.divide(b,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100));
+		return rate.setScale(0, BigDecimal.ROUND_HALF_UP).intValue();
 	}
 	
 	public static boolean between(BigDecimal value, Integer a, Integer b) {

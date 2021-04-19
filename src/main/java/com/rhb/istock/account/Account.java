@@ -28,6 +28,7 @@ public class Account {
 
 	private BigDecimal cash = null;
 	private BigDecimal value = null;
+	private BigDecimal highestAmount = null;
 
 	private Map<String,HoldState> states = null;   //itemID
 	private TreeMap<Integer,Order> holds = null;
@@ -44,6 +45,7 @@ public class Account {
 	
 	public Account(BigDecimal cash) {
 		this.initCash = cash;
+		this.highestAmount = cash;
 		
 		this.cash = cash;
 		this.value = new BigDecimal(0);
@@ -473,6 +475,19 @@ public class Account {
 	
 	public LocalDate getEndDate() {
 		return this.endDate;
+	}
+	
+	public Integer getAmountRatio() {
+		return Functions.growthRate(this.getTotal(), this.highestAmount);
+	}
+	
+	public void reSetHighestAmount() {
+		this.highestAmount = this.getTotal();
+	}
+	
+	public void refreshHighestAmount() {
+		BigDecimal amount = this.getTotal();
+		this.highestAmount = amount.compareTo(this.highestAmount)==1 ? amount : this.highestAmount;
 	}
 	
 	public void setLatestDate(LocalDate date) {

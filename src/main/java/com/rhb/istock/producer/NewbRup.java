@@ -49,7 +49,7 @@ public class NewbRup implements Producer{
 	
 	private String fileName  = "NewbRup.txt";
 	
-	private Integer cagr = 13;  //业绩年增长率
+	private Integer cagr = 21;  //业绩年增长率
 	
 	private Integer reco = 5;  //推荐买入的机构数量
 	

@@ -34,12 +34,12 @@ public class Simulation {
 	SimulateBHL bhl;
 
 	@Autowired
-	@Qualifier("dtb")
-	SimulateDTB dtb;
-
-	@Autowired
 	@Qualifier("hlb")
 	SimulateHLB hlb;
+	
+	@Autowired
+	@Qualifier("dtb")
+	SimulateDTB dtb;
 
 	@Value("${initCash}")
 	private BigDecimal initCash;

@@ -23,6 +23,8 @@ import com.rhb.istock.kdata.Muster;
 
 
 /*
+ * 买1+2+3模式
+ * 
  * 买入：根据传入的buyList清单买入，如果涨停，就在第二天买入。卖出后跟踪21日，如果又向上突破21日线再次买入
  * 卖出：跌破21日线
  */
@@ -175,7 +177,7 @@ public class CommOperation implements Operation {
 			if(muster!=null && !muster.isUpLimited() 
 					&& muster.isAboveAveragePrice(21)
 					&& muster.isAboveAveragePrice(89)
-					&& muster.getN21Gap()<=8
+					&& muster.getN21Gap()<=5
 					//&& sseiFlag==1 
 					//&& sseiTrend==1
 					&& !drops.contains(id)
@@ -206,7 +208,7 @@ public class CommOperation implements Operation {
 						&& !muster.isUpLimited() 
 						&& muster.isAboveAveragePrice(21)
 						&& muster.isAboveAveragePrice(89)
-						&& muster.getN21Gap()<=8
+						&& muster.getN21Gap()<=5
 						//&& sseiFlag==1 
 						//&& sseiTrend==1
 						//&& !this.bomb

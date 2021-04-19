@@ -25,7 +25,7 @@ import com.rhb.istock.selector.SelectorService;
 
 
 /*
- * 进取型操作模式　
+ * 买二操作模式　
  * 
  * 买入：满仓　＋　市值平均　＋　单只股票不加仓
  * 卖出：跌破21日线
@@ -112,73 +112,6 @@ public class OptimizeOperation implements Operation {
 		//dropsKeeper.dailySet(date);
 		
 		//买入清单
-/*		Set<Muster> dds = new HashSet<Muster>();  //用set，无重复，表示不可加仓
-		holdItemIDs = account.getItemIDsOfHolds();
-		//List<String> drums = producer.getResults(date);
-		
-		//Set<String> breaks = breaksKeeper.getIDs(musters, drums);
-		Set<String> breaks = breaksKeeper.getIDs();
-		//BigDecimal macd;
-		for(String id : breaks) {
-			//if(!holdItemIDs.contains(id)) {
-				muster = musters.get(id); 
-				//macd = selectorServiceImp.getMACD(id,date, true);
-				if(muster!=null && !muster.isUpLimited() 
-						&& muster.isAboveAveragePrice(21) 
-						&& muster.getN21Gap()<=8
-						&& muster.isAboveAveragePrice(89)
-						//&& macd.compareTo(BigDecimal.ZERO)==1
-						) {
-					dds.add(muster);
-					breaksKeeper.remove(id);
-				}
-			//}
-		}
-		
-		
-		//Set<String>  drops = dropsKeeper.getIDs(musters, drums);
-		Set<String>  drops = dropsKeeper.getIDs();
-		for(String id : drops) {
-			//if(!holdItemIDs.contains(id)) {
-				muster = musters.get(id); 
-				//macd = selectorServiceImp.getMACD(id,date, true);
-				if(muster!=null && !muster.isUpLimited() && muster.isJustBreaker()
-						//&& macd.compareTo(BigDecimal.ZERO)==1
-						&& muster.isAboveAveragePrice(89)
-						) {
-					dds.add(muster);
-					dropsKeeper.remove(id);
-				}
-			//}
-		}
-		
-
-		if(buyList!=null && buyList.size()>0) {
-			String id;
-			for(int i=0, j=0; i<buyList.size() && j<top; i++) {
-				id = buyList.get(i);
-				//if(!holdItemIDs.contains(id)) {
-					muster = musters.get(id); 
-					//macd = selectorServiceImp.getMACD(id,date, true);
-					if(muster!=null && !muster.isUpLimited() 
-							&& muster.isAboveAveragePrice(21) 
-							&& muster.getN21Gap()<=8
-							//&& macd.compareTo(BigDecimal.ZERO)==1
-							&& muster.isAboveAveragePrice(89)
-							) {
-						dds.add(muster);
-						j++;
-					}else {
-						breaksKeeper.add(date, id);
-					}
-				//}
-			}
-		}else{
-			breaksKeeper.dailySet(date);
-		}*/
-		
-		
-		//买入清单
 		if(buyList!=null && buyList.size()>0) {
 			breaksKeeper.addAll(date,new HashSet<String>(buyList));
 		}else{
@@ -193,7 +126,7 @@ public class OptimizeOperation implements Operation {
 						&& !muster.isUpLimited() 
 						&& muster.isAboveAveragePrice(21)
  						&& muster.isAboveAveragePrice(89)
-						&& muster.getN21Gap()<=8
+						&& muster.getN21Gap()<=5
 						) {
 						dds.add(muster);
 						breaksKeeper.remove(id);
@@ -209,7 +142,8 @@ public class OptimizeOperation implements Operation {
 		breakers_sb.append("\n");
 
 		//logger.info("dds before ave " + dds.size());
-		if(isAveValue) {
+		if(dds.size()>0 && account.isAve(dds.size())) {
+		//if(isAveValue) {
 			Set<Integer> holdOrderIDs;
 			for(String itemID: holdItemIDs) {
 				holdOrderIDs = 	account.getHoldOrderIDs(itemID);

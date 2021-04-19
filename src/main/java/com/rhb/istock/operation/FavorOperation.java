@@ -24,6 +24,8 @@ import com.rhb.istock.kdata.Muster;
 import com.rhb.istock.selector.SelectorService;
 
 /*
+ * 买三操作模式：
+ * 
  * Favor操作模式: 持续跟踪21个交易日，向上突破21日均线就买入, up21
  * 
  * 买入：满仓　＋　市值平均　＋　单只股票不加仓
@@ -61,7 +63,7 @@ public class FavorOperation implements Operation {
 		dailyAmount_sb = new StringBuffer("date,cash,value,total\n");
 		breakers_sb = new StringBuffer();
 		breaksKeeper = new Keeper(55);  //包含所有创新高的股票,因为当天涨停或价格过高不能买入,等待价格回落后买入
-		up21Keeper = new Keeper(55);  //包含所有创新高的股票,因为当天涨停或价格过高不能买入,等待价格回落后买入
+		up21Keeper = new Keeper(55);  //包含所有突破21线的股票,因为当天涨停或价格过高不能买入,等待价格回落后买入
 		//dropsKeeper = new Keeper(55); //包含所有跌破21日线卖出的票,在21天内如果涨回21日线,说明调整结束,可以再次买入
 		
 		
@@ -118,65 +120,6 @@ public class FavorOperation implements Operation {
 		//dropsKeeper.dailySet(date);
 		
 		//买入清单
-/*		Set<Muster> dds = new HashSet<Muster>();  //用set，无重复，表示不可加仓
-		holdItemIDs = account.getItemIDsOfHolds();
-		//List<String> drums = producer.getResults(date);
-		
-		//Set<String> breaks = breaksKeeper.getIDs(musters, drums);
-		Set<String> breaks = breaksKeeper.getIDs();
-		//BigDecimal macd;
-		for(String id : breaks) {
-			//if(!holdItemIDs.contains(id)) {
-				muster = musters.get(id); 
-				//macd = selectorServiceImp.getMACD(id,date, true);
-				if(muster!=null && !muster.isUpLimited() 
-						&& muster.isJustBreaker()
-						&& muster.isAboveAveragePrice(89)
-						//&& macd.compareTo(BigDecimal.ZERO)==1
-						) {
-					dds.add(muster);
-				}
-			//}
-		}
-		
-		
-		//Set<String>  drops = dropsKeeper.getIDs(musters, drums);
-		Set<String>  drops = dropsKeeper.getIDs();
-		for(String id : drops) {
-			//if(!holdItemIDs.contains(id)) {
-				muster = musters.get(id); 
-				//macd = selectorServiceImp.getMACD(id,date, true);
-				if(muster!=null && !muster.isUpLimited() 
-						&& muster.isJustBreaker()
-						&& muster.isAboveAveragePrice(89)
-						//&& macd.compareTo(BigDecimal.ZERO)==1
-						) {
-					dds.add(muster);
-				}
-			//}
-		}
-		
-
-		if(buyList!=null && buyList.size()>0) {
-			breaksKeeper.addAll(date,new HashSet<String>(buyList));
-			for(String id : buyList) {
-				//if(!holdItemIDs.contains(id)) {
-					muster = musters.get(id); 
-					//macd = selectorServiceImp.getMACD(id,date, true);
-					if(muster!=null && !muster.isUpLimited() 
-							&& muster.isJustBreaker()
-							&& muster.isAboveAveragePrice(89)
-							//&& macd.compareTo(BigDecimal.ZERO)==1
-							) {
-						dds.add(muster);
-					}
-				//}
-			}			
-		}else{
-			breaksKeeper.dailySet(date);
-		}*/
-		
-		//买入清单
 		if(buyList!=null && buyList.size()>0) {
 			breaksKeeper.addAll(date,new HashSet<String>(buyList));
 		}else{
@@ -203,10 +146,11 @@ public class FavorOperation implements Operation {
 						&& muster.isAboveAveragePrice(89)
 						) {
 						dds.add(muster);
-						breaksKeeper.remove(id);
+						//breaksKeeper.remove(id);
 						up21Keeper.remove(id);
 				}				
 		}
+		//logger.info(date.toString() + up21Keeper.getIDs().toString());
 
 		
 		breakers_sb.append(date.toString() + ",");
@@ -218,7 +162,8 @@ public class FavorOperation implements Operation {
 		breakers_sb.append("\n");
 
 		//logger.info("dds before ave " + dds.size());
-		if(isAveValue) {
+		if(dds.size()>0 && account.isAve(dds.size())) {
+//		if(isAveValue) {
 			Set<Integer> holdOrderIDs;
 			for(String itemID: holdItemIDs) {
 				holdOrderIDs = 	account.getHoldOrderIDs(itemID);
@@ -243,6 +188,7 @@ public class FavorOperation implements Operation {
 		}
 			
 		dailyAmount_sb.append(account.getDailyAmount() + "\n");
+		
 
 	}
 	

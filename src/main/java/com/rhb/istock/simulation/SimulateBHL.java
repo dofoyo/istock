@@ -30,13 +30,11 @@ public class SimulateBHL {
 	TurtleSimulationRepository turtleSimulationRepository;
 
 	@Autowired
-	//@Qualifier("newbRup")
-	@Qualifier("newbRecoH21")
+	@Qualifier("newbRup")
 	Producer producer;
 	
 	@Autowired
-	@Qualifier("commOperation")
-	//@Qualifier("huntingOperationPlus")
+	@Qualifier("commOperation3")
 	Operation operation;
 	
 	@Async("taskExecutor")

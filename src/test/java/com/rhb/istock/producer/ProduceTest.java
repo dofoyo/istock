@@ -125,7 +125,7 @@ public class ProduceTest {
 	@Test
 	public void produce() {
 		LocalDate bDate = LocalDate.parse("2017-01-01");
-		LocalDate eDate = LocalDate.parse("2021-01-27");
+		LocalDate eDate = LocalDate.parse("2021-04-09");
 		
 		newbRup.produce(bDate, eDate);
 		System.out.println("produce Test");

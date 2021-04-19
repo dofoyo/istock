@@ -151,7 +151,9 @@ public class EvaluationService {
 		BigDecimal closePrice;
 		LocalDate closeDate;
 		Muster muster;
-
+		
+		int max = 233;
+		
 		Map<LocalDate,List<Busi>> busis = evaluationRepository.getBusis(type); //每一单
 		List<LocalDate> dates = this.getDates(period, eDate);
 		Map<String,Muster> musters = kdataService.getMusters(dates.get(dates.size()-1));
@@ -175,8 +177,12 @@ public class EvaluationService {
 						if(busi.getCloseDate().isAfter(busi.getOpenDate())) {
 							result.add(new BusiView(busi.getItemID(),busi.getItemName(),busi.getOpenDate(), busi.getOpenPrice(),busi.getQuantity(), closeDate, closePrice, busi.getHighestPrice()));
 						}
+						
 					//}
-				}			
+				}
+				if(result.size() > max) {
+					break;
+				}
 			}
 		}		
 		
