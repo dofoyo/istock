@@ -61,7 +61,7 @@ public class CommOperation2 implements Operation {
 		
 		int i=1;
 		for(LocalDate date = beginDate; (date.isBefore(endDate) || date.equals(endDate)); date = date.plusDays(1)) {
-			Progress.show((int)days, i++," " + label +  " commOperation run:" + date.toString());
+			Progress.show((int)days, i++," " + label +  " commOperation2 run:" + date.toString());
 			this.doIt(date, account, buyList.get(date), top, isAveValue,quantityType);
 		}
 		return this.result(account);
@@ -223,7 +223,8 @@ public class CommOperation2 implements Operation {
 		
 		
 		//if(isAveValue) {
-		if(dds.size()>0 && account.isAve(dds.size())) {
+		//if(dds.size()>0 && account.isAve(dds.size())) {
+		if(isAveValue && dds.size()>0 && account.isAve(dds.size())) {
 			Set<Integer> holdOrderIDs;
 			for(String itemID: holdItemIDs) {
 				holdOrderIDs = 	account.getHoldOrderIDs(itemID);

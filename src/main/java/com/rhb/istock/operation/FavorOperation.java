@@ -53,7 +53,7 @@ public class FavorOperation implements Operation {
 	//private Integer previous_period  = 13; //历史纪录区间，主要用于后面判断
 	private Keeper breaksKeeper;  //包含所有创新高的股票,因为当天涨停或价格过高不能买入,等待价格回落后买入
 	//private Keeper dropsKeeper; //包含所有跌破21日线卖出的票,在13天内如果涨回21日线,说明调整结束,可以再次买入
-	private Keeper up21Keeper; //包含所有涨回21日线的票
+	//private Keeper up21Keeper; //包含所有涨回21日线的票
 	
 	public Map<String,String> run(Account account, Map<LocalDate, List<String>> buyList,LocalDate beginDate, LocalDate endDate, String label, int top, boolean isAveValue, Integer quantityType) {
 		long days = endDate.toEpochDay()- beginDate.toEpochDay();
@@ -63,7 +63,7 @@ public class FavorOperation implements Operation {
 		dailyAmount_sb = new StringBuffer("date,cash,value,total\n");
 		breakers_sb = new StringBuffer();
 		breaksKeeper = new Keeper(55);  //包含所有创新高的股票,因为当天涨停或价格过高不能买入,等待价格回落后买入
-		up21Keeper = new Keeper(55);  //包含所有突破21线的股票,因为当天涨停或价格过高不能买入,等待价格回落后买入
+		//up21Keeper = new Keeper(55);  //包含所有突破21线的股票,因为当天涨停或价格过高不能买入,等待价格回落后买入
 		//dropsKeeper = new Keeper(55); //包含所有跌破21日线卖出的票,在21天内如果涨回21日线,说明调整结束,可以再次买入
 		
 		
@@ -127,31 +127,19 @@ public class FavorOperation implements Operation {
 		}
 		
 		Set<String> breaks = breaksKeeper.getIDs();
+		Set<Muster> dds = new HashSet<Muster>();  
 		for(String id : breaks) {
 			muster = musters.get(id); 
 			if(muster!=null 
 					&& muster.isJustBreaker()
+					&& muster.isAboveAveragePrice(21)
+					&& muster.isAboveAveragePrice(89)
 					) {
-				up21Keeper.add(date, id);
+					dds.add(muster);
 			}
 		}
 
-		Set<Muster> dds = new HashSet<Muster>();  
-		Set<String> ids = up21Keeper.getIDs();
-		for(String id : ids) {
-				muster = musters.get(id); 
-				if(muster!=null 
-						&& !muster.isUpLimited() 
-						&& muster.isAboveAveragePrice(21)
-						&& muster.isAboveAveragePrice(89)
-						) {
-						dds.add(muster);
-						//breaksKeeper.remove(id);
-						up21Keeper.remove(id);
-				}				
-		}
 		//logger.info(date.toString() + up21Keeper.getIDs().toString());
-
 		
 		breakers_sb.append(date.toString() + ",");
 		for(Muster m : dds) {
@@ -162,8 +150,9 @@ public class FavorOperation implements Operation {
 		breakers_sb.append("\n");
 
 		//logger.info("dds before ave " + dds.size());
-		if(dds.size()>0 && account.isAve(dds.size())) {
-//		if(isAveValue) {
+		if(isAveValue && dds.size()>0 && account.isAve(dds.size())) {
+		//if(dds.size()>0 && account.isAve(dds.size())) {
+		//if(isAveValue) {
 			Set<Integer> holdOrderIDs;
 			for(String itemID: holdItemIDs) {
 				holdOrderIDs = 	account.getHoldOrderIDs(itemID);

@@ -110,7 +110,7 @@ public class KdataServiceImp implements KdataService{
 						bar.getClose(), bar.getAmount(), bar.getQuantity(), 
 						bar.getTurnover_rate_f(), bar.getVolume_ratio(),
 						bar.getTotal_mv(),bar.getCirc_mv(),
-						bar.getTotal_share(),bar.getFloat_share(),bar.getFree_share(),bar.getPe());
+						bar.getTotal_share(),bar.getFloat_share(),bar.getFree_share(),bar.getPe(),bar.getPe_ttm());
 		}
 		
 		return kdata;
@@ -135,7 +135,7 @@ public class KdataServiceImp implements KdataService{
 						bar.getQuantity(), bar.getTurnover_rate_f(),
 						bar.getVolume_ratio(),
 						bar.getTotal_mv(),bar.getCirc_mv(),
-						bar.getTotal_share(),bar.getFloat_share(),bar.getFree_share(),bar.getPe());
+						bar.getTotal_share(),bar.getFloat_share(),bar.getFree_share(),bar.getPe(),bar.getPe_ttm());
 				i++;
 			}
 			date = date.minusDays(1);
@@ -157,7 +157,7 @@ public class KdataServiceImp implements KdataService{
 				map.get("amount"),
 				map.get("quantity"),
 				map.get("dateTime"),
-				"0","0","0","0","0","0","0","0");
+				"0","0","0","0","0","0","0","0","0");
 		
 		return bar;
 	}
@@ -234,7 +234,9 @@ public class KdataServiceImp implements KdataService{
 					bar.getTotal_share(),
 					bar.getFloat_share(),
 					bar.getFree_share(),
-					bar.getPe());
+					bar.getPe(),
+					bar.getPe_ttm()
+					);
 		}else {
 			//System.out.println(" kbar is null");
 			//System.out.println(entity);
@@ -277,7 +279,7 @@ public class KdataServiceImp implements KdataService{
 							bar.getAmount(), bar.getQuantity(), 
 							bar.getTurnover_rate_f(), bar.getVolume_ratio(),
 							bar.getTotal_mv(),bar.getCirc_mv(),
-							bar.getTotal_share(),bar.getFloat_share(),bar.getFree_share(),bar.getPe());
+							bar.getTotal_share(),bar.getFloat_share(),bar.getFree_share(),bar.getPe(),bar.getPe_ttm());
 				}
 		}
 		
@@ -306,7 +308,7 @@ public class KdataServiceImp implements KdataService{
 			bar = entity.getBar(date);
 			if(bar!=null) {
 				kdata.addBar(date, bar.getOpen(), bar.getHigh(), bar.getLow(), bar.getClose(), bar.getAmount(), bar.getQuantity(), bar.getTurnover_rate_f(), bar.getVolume_ratio(),bar.getTotal_mv(),bar.getCirc_mv(),
-						bar.getTotal_share(),bar.getFloat_share(),bar.getFree_share(),bar.getPe());
+						bar.getTotal_share(),bar.getFloat_share(),bar.getFree_share(),bar.getPe(),bar.getPe_ttm());
 				i++;
 			}
 			date = date.minusDays(1);
@@ -910,7 +912,7 @@ public class KdataServiceImp implements KdataService{
 			bar = entity.getBar(date);
 			if(bar!=null) {
 				kdata.addBar(date, bar.getOpen(), bar.getHigh(), bar.getLow(), bar.getClose(), bar.getAmount(), bar.getQuantity(), bar.getTurnover_rate_f(), bar.getVolume_ratio(),bar.getTotal_mv(),bar.getCirc_mv(),
-						bar.getTotal_share(),bar.getFloat_share(),bar.getFree_share(),bar.getPe());
+						bar.getTotal_share(),bar.getFloat_share(),bar.getFree_share(),bar.getPe(),bar.getPe_ttm());
 			}
 		}
 		

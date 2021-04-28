@@ -25,13 +25,15 @@ import com.rhb.istock.selector.SelectorService;
 
 
 /*
+ * 买一模式：
+ * 
  * 买入：根据传入的buyList清单买入，如果涨停，就在第二天买入。
  * 卖出：跌破21日线
  */
 @Scope("prototype")
-@Service("newbOperation2")
-public class NewbOperation2 implements Operation {
-	protected static final Logger logger = LoggerFactory.getLogger(NewbOperation2.class);
+@Service("newbOperation3")
+public class NewbOperation3 implements Operation {
+	protected static final Logger logger = LoggerFactory.getLogger(NewbOperation3.class);
 
 	@Autowired
 	@Qualifier("kdataServiceImp")
@@ -59,7 +61,7 @@ public class NewbOperation2 implements Operation {
 		
 		int i=1;
 		for(LocalDate date = beginDate; (date.isBefore(endDate) || date.equals(endDate)); date = date.plusDays(1)) {
-			Progress.show((int)days, i++," " + label +  " newbOperation2 run:" + date.toString());
+			Progress.show((int)days, i++," " + label +  " newbOperation3 run:" + date.toString());
 			this.doIt(date, account, buyList.get(date), top, isAveValue,quantityType);
 		}
 		return this.result(account);
@@ -86,41 +88,47 @@ public class NewbOperation2 implements Operation {
 				account.refreshHoldsPrice(itemID, muster.getLatestPrice(), muster.getLatestHighest());
 			}
 		}
-
 		account.refreshHighestAmount();
-		
-		//logger.info("sseiFlag =  " + sseiFlag.toString());
 		boolean bomb = account.getAmountRatio()<=-8 ? true : false;
-		if(bomb) {
-			account.reSetHighestAmount();
-		}
+		//String str = date.toString() + " highest amount =  " + account.getHighestAmount().intValue() + " amount =  " + account.getTotal().intValue() + ", bomb=" + bomb;
 		
 		//卖出
 		for(String itemID: holdItemIDs) {
 			muster = musters.get(itemID);
 			if(muster!=null && !muster.isDownLimited()) {
-				if(muster.isDropAve(21) 
+				if(account.isGain(itemID, 5)) {  //有2%的盈利就跑
+					account.dropWithTax(itemID, "3", muster.getLatestPrice());
+				}
+				
+				if(bomb) {
+					account.dropWithTax(itemID, "9", muster.getLatestPrice());
+					//str = str + ", drop " + itemID;
+				}
+
+/*				if(muster.isDropAve(21) 
 						//&& muster.getLatestPrice().compareTo(muster.getClose())==1
 						) { 		//跌破21日均线就卖
 					account.dropWithTax(itemID, "1", muster.getLatestPrice());
 					//dropsKeeper.add(date, itemID);
 					//logger.info("dropsKeeper add " + itemID);
 				}
-				
+*/				
 				//高位回落超过8%
 				/*if(account.isFallOrder(itemID, -8)) {
 					account.dropWithTax(itemID, "2", muster.getLatestPrice());
 					dropsKeeper.add(date, itemID);
 					//logger.info("dropsKeeper add " + itemID);
 				}*/
-				
-				if(bomb) {
-					account.dropWithTax(itemID, "9", muster.getLatestPrice());
-				}
 			}
 		}
 		//dropsKeeper.dailySet(date);
 		
+		//logger.info(str);
+		
+		if(bomb) {
+			account.reSetHighestAmount();
+			breaksKeeper.removeAll();
+		}	
 		
 		//买入清单
 		if(buyList!=null && buyList.size()>0) {
@@ -153,7 +161,8 @@ public class NewbOperation2 implements Operation {
 
 		//logger.info("dds before ave " + dds.size());
 		//if(isAveValue) {
-		if(dds.size()>0 && account.isAve(dds.size())) {
+		if(isAveValue && dds.size()>0 && account.isAve(dds.size())) {
+		//if(dds.size()>0 && account.isAve(dds.size())) {
 			Set<Integer> holdOrderIDs;
 			for(String itemID: holdItemIDs) {
 				holdOrderIDs = 	account.getHoldOrderIDs(itemID);
@@ -211,7 +220,12 @@ public class NewbOperation2 implements Operation {
 				this.add(date, null);
 			}
 		}
-		
+		public void removeAll() {
+			Iterator<String> it;
+			for(Map.Entry<LocalDate, Set<String>> entry : items.entrySet()) {
+				entry.setValue(new HashSet<String>());
+			}
+		}
 		public void remove(String id) {
 			Iterator<String> it;
 			String str;

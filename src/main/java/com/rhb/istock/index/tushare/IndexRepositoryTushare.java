@@ -179,7 +179,7 @@ public class IndexRepositoryTushare {
 					//pre_close = item.getBigDecimal(6);
 					quantity = item.getBigDecimal(8);
 					amount = item.getBigDecimal(10);
-					kdata.addBar(date,open,high,low,close,amount,quantity,zero,zero,zero,zero,zero,zero,zero,zero);
+					kdata.addBar(date,open,high,low,close,amount,quantity,zero,zero,zero,zero,zero,zero,zero,zero,zero);
 						
 					//kdata.addBar(date,close, open, high, low, pre_close, vol, amount);
 				}

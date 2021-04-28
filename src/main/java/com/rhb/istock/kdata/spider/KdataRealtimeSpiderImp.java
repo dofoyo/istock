@@ -234,7 +234,7 @@ public class KdataRealtimeSpiderImp implements KdataRealtimeSpider{
 					ss[37],
 					ss[6],
 					LocalDate.parse(ss[30].substring(0, 8),DateTimeFormatter.ofPattern("yyyyMMdd")).toString(),
-					"0","0","0","0","0","0","0","0");
+					"0","0","0","0","0","0","0","0","0");
 			bar.setId(ss[0].substring(2,10));
 			//System.out.print(ss[0]);
 		}

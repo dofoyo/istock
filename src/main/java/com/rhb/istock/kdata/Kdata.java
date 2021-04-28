@@ -261,10 +261,11 @@ public class Kdata {
 			BigDecimal total_share,
 			BigDecimal float_share,
 			BigDecimal free_share,
-			BigDecimal pe
+			BigDecimal pe,
+			BigDecimal pe_ttm
 			) {
 		this.bars.put(date, new Kbar(open, high, low, close, amount, quantity,date, 
-				turnover_rate_f, volume_ratio,total_mv,circ_mv,total_share,float_share,free_share,pe));
+				turnover_rate_f, volume_ratio,total_mv,circ_mv,total_share,float_share,free_share,pe,pe_ttm));
 		this.highest = (this.highest==null || this.highest.compareTo(close)==-1) ? close : this.highest;
 		this.lowest = (this.lowest==null || this.lowest.compareTo(close)==1) ? close : this.lowest;
 		

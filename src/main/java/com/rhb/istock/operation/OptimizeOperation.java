@@ -142,7 +142,8 @@ public class OptimizeOperation implements Operation {
 		breakers_sb.append("\n");
 
 		//logger.info("dds before ave " + dds.size());
-		if(dds.size()>0 && account.isAve(dds.size())) {
+		if(isAveValue && dds.size()>0 && account.isAve(dds.size())) {
+		//if(dds.size()>0 && account.isAve(dds.size())) {
 		//if(isAveValue) {
 			Set<Integer> holdOrderIDs;
 			for(String itemID: holdItemIDs) {

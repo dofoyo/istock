@@ -34,7 +34,10 @@ public class SimulateBHL {
 	Producer producer;
 	
 	@Autowired
+	//@Qualifier("favorOperation")
 	@Qualifier("commOperation3")
+	//@Qualifier("optimizeOperation3")
+	
 	Operation operation;
 	
 	@Async("taskExecutor")

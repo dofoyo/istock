@@ -34,7 +34,7 @@ public class SimulateBDT {
 	Producer producer;
 
 	@Autowired
-	@Qualifier("favorOperation")
+	@Qualifier("favorOperation2")
 	Operation operation;
 	
 	@Async("taskExecutor")

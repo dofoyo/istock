@@ -490,6 +490,10 @@ public class Account {
 		this.highestAmount = amount.compareTo(this.highestAmount)==1 ? amount : this.highestAmount;
 	}
 	
+	public BigDecimal getHighestAmount() {
+		return this.highestAmount;
+	}
+	
 	public void setLatestDate(LocalDate date) {
 		if(this.beginDate==null) this.beginDate = date;
 		this.endDate = date;

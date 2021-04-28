@@ -75,7 +75,7 @@ public class KdataRepositoryTushare implements KdataRepository{
 			items = data.getJSONArray("items");
 			if(items.length()>0) {
 				JSONArray item;
-				BigDecimal turnover_rate_f,volume_ratio,total_mv,circ_mv,total_share,float_share,free_share,pe;
+				BigDecimal turnover_rate_f,volume_ratio,total_mv,circ_mv,total_share,float_share,free_share,pe,pe_ttm;
 				for(int i=0; i<items.length(); i++) {
 					item = items.getJSONArray(i);
 					
@@ -105,8 +105,9 @@ public class KdataRepositoryTushare implements KdataRepository{
 						float_share = basic==null ? new BigDecimal(0) : basic.getFloat_share();
 						free_share = basic==null ? new BigDecimal(0) : basic.getFree_share();
 						pe = basic==null ? new BigDecimal(0) : basic.getPe();
+						pe_ttm = basic==null ? new BigDecimal(0) : basic.getPe_ttm();
 						
-						kdata.addBar(date,open,high,low,close,amount,quantity,turnover_rate_f,volume_ratio,total_mv,circ_mv,total_share,float_share,free_share,pe);
+						kdata.addBar(date,open,high,low,close,amount,quantity,turnover_rate_f,volume_ratio,total_mv,circ_mv,total_share,float_share,free_share,pe,pe_ttm);
 					}
 					
 					preFactor = nowFactor;

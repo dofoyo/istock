@@ -95,7 +95,7 @@ public class Evaluation {
 		boolean isAveValue = false;  //买入前不做市值平均
 		//Integer quantityType = 3;  //按固定数量买入
 		Integer quantityType = 1;  //按固定金额买入
-		boolean isEvaluation = true;
+		boolean isEvaluation = true; //不是模拟，是评估
 		try {
 			Future<String> favb = avb.run(beginDate, endDate, initCash, top, isAveValue, quantityType, isEvaluation);
 			Future<String> fbav = bav.run(beginDate, endDate, initCash, top, isAveValue, quantityType, isEvaluation);

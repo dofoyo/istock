@@ -17,6 +17,7 @@ public class KbarEntity {
 	private BigDecimal float_share;
 	private BigDecimal free_share;	
 	private BigDecimal pe;
+	private BigDecimal pe_ttm;
 
 	public KbarEntity(BigDecimal open, 
 				BigDecimal high, 
@@ -31,7 +32,8 @@ public class KbarEntity {
 				BigDecimal total_share,
 				BigDecimal float_share,
 				BigDecimal free_share,
-				BigDecimal pe
+				BigDecimal pe,
+				BigDecimal pe_tmm				
 				) {
 		this.open = open;
 		this.high = high;
@@ -47,8 +49,17 @@ public class KbarEntity {
 		this.float_share = float_share;
 		this.free_share = free_share;
 		this.pe = pe;
+		this.pe_ttm = pe_ttm;
 	}
 	
+	public BigDecimal getPe_ttm() {
+		return pe_ttm;
+	}
+
+	public void setPe_ttm(BigDecimal pe_ttm) {
+		this.pe_ttm = pe_ttm;
+	}
+
 	public BigDecimal getPe() {
 		return pe;
 	}

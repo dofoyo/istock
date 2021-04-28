@@ -172,7 +172,8 @@ public class FourOperation implements Operation {
 		breakers_sb.append("\n");
 
 		//logger.info("dds before ave " + dds.size());
-		if(isAveValue) {
+		//if(isAveValue) {
+		if(dds.size()>0 && account.isAve(dds.size())) {
 			holdItemIDs = account.getItemIDsOfHolds();
 			Set<Integer> holdOrderIDs;
 			for(String itemID: holdItemIDs) {

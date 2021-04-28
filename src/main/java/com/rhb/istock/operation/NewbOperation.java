@@ -111,68 +111,7 @@ public class NewbOperation implements Operation {
 		}
 		//dropsKeeper.dailySet(date);
 		
-/*		//买入清单
-		Set<Muster> dds = new HashSet<Muster>();  //用set，无重复，表示不可加仓
-		holdItemIDs = account.getItemIDsOfHolds();
-		//List<String> drums = producer.getResults(date);
-		
-		//Set<String> breaks = breaksKeeper.getIDs(musters, drums);
-		Set<String> breaks = breaksKeeper.getIDs();
-		//BigDecimal macd;
-		for(String id : breaks) {
-			//if(!holdItemIDs.contains(id)) {
-				muster = musters.get(id); 
-				//macd = selectorServiceImp.getMACD(id,date, true);
-				//上次因为涨停没买入,这次只要没跌破21日线,就可买入
-				if(muster!=null && !muster.isUpLimited() 
-						&& muster.isAboveAveragePrice(21) 
-						&& muster.isAboveAveragePrice(89)
-						//&& macd.compareTo(BigDecimal.ZERO)==1
-						) {
-					dds.add(muster);
-					breaksKeeper.remove(id);
-				}
-			//}
-		}
-		
-		
-		//Set<String>  drops = dropsKeeper.getIDs(musters, drums);
-		Set<String>  drops = dropsKeeper.getIDs();
-		for(String id : drops) {
-			if(!holdItemIDs.contains(id)) {
-				muster = musters.get(id); 
-				if(muster!=null && !muster.isUpLimited() && muster.isJustBreaker()) {
-					dds.add(muster);
-					dropsKeeper.remove(id);
-				}
-			}
-		}
-		
-		
 
-		if(buyList!=null && buyList.size()>0) {
-			String id;
-			for(int i=0, j=0; i<buyList.size() && j<top; i++) {
-				id = buyList.get(i);
-				//if(!holdItemIDs.contains(id)) {
-					muster = musters.get(id); 
-					//macd = selectorServiceImp.getMACD(id,date, true);
-					if(muster!=null && !muster.isUpLimited() 
-							&& muster.isAboveAveragePrice(21) 
-							&& muster.isAboveAveragePrice(89)
-							//&& macd.compareTo(BigDecimal.ZERO)==1
-							) {
-						dds.add(muster);
-						j++;
-					}else {
-						breaksKeeper.add(date, id);  //因为涨停,没买入,保存下来,下次买入
-					}
-				//}
-			}
-			
-		}else{
-			breaksKeeper.dailySet(date);
-		}*/
 		
 		//买入清单
 		if(buyList!=null && buyList.size()>0) {
@@ -204,7 +143,9 @@ public class NewbOperation implements Operation {
 		breakers_sb.append("\n");
 
 		//logger.info("dds before ave " + dds.size());
-		if(isAveValue) {
+		//if(isAveValue) {
+		if(isAveValue && dds.size()>0 && account.isAve(dds.size())) {
+		//if(dds.size()>0 && account.isAve(dds.size())) {
 			Set<Integer> holdOrderIDs;
 			for(String itemID: holdItemIDs) {
 				holdOrderIDs = 	account.getHoldOrderIDs(itemID);

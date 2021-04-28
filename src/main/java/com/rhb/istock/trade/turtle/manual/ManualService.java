@@ -50,6 +50,10 @@ public class ManualService {
 	Operation optimizeOperation;
 
 	@Autowired
+	@Qualifier("optimizeOperation3")
+	Operation optimizeOperation3;
+	
+	@Autowired
 	@Qualifier("favorOperation")
 	Operation favorOperation;
 
@@ -64,6 +68,18 @@ public class ManualService {
 	@Autowired
 	@Qualifier("huntingOperation")
 	Operation huntingOperation;
+	
+	@Autowired
+	@Qualifier("favorOperation2")
+	Operation favorOperation2;
+	
+	@Autowired
+	@Qualifier("commOperation3")
+	Operation commOperation3;
+
+	@Autowired
+	@Qualifier("commOperation2")
+	Operation commOperation2;
 	
 	private Map<LocalDate, List<String>> selects = new TreeMap<LocalDate, List<String>>();
 
@@ -118,17 +134,18 @@ public class ManualService {
 		Account account = new Account(initCash);
 		boolean isEvaluation = false;
 		Map<String, String> operateResult;
-		if("comm".equals(simulateType)) {
-			operateResult = commOperation.run(account, this.selects, this.getBeginDate(), this.getEndDate(), label, top, true,0);
-		}else if("newb".equals(simulateType))  {
+		if("comm".equals(simulateType)) {  //买1+3
+			operateResult = commOperation3.run(account, this.selects, this.getBeginDate(), this.getEndDate(), label, top, true,0);
+		}else if("newb".equals(simulateType))  { //买一
 			operateResult = newbOperation.run(account, this.selects, this.getBeginDate(), this.getEndDate(), label, top, true,0);
-		}else if("optimize".equals(simulateType)) {
-			operateResult = optimizeOperation.run(account, this.selects, this.getBeginDate(), this.getEndDate(), label, top, true,0);
-		}else if("favor".equals(simulateType))  {
-			operateResult = favorOperation.run(account, this.selects, this.getBeginDate(), this.getEndDate(), label, top, true,0);
-		}else if("sab".equals(simulateType)) {
-			operateResult = huntingOperation.run(account, this.selects, this.getBeginDate(), this.getEndDate(), label, top, true,0);
-		}else {
+		}else if("optimize".equals(simulateType)) { //买二
+			operateResult = optimizeOperation3.run(account, this.selects, this.getBeginDate(), this.getEndDate(), label, top, true,0);
+		}else if("favor".equals(simulateType))  {  //买三
+			operateResult = favorOperation2.run(account, this.selects, this.getBeginDate(), this.getEndDate(), label, top, true,0);
+		}else if("sab".equals(simulateType)) {  //高价
+			//operateResult = huntingOperation.run(account, this.selects, this.getBeginDate(), this.getEndDate(), label, top, true,0);
+			operateResult = commOperation2.run(account, this.selects, this.getBeginDate(), this.getEndDate(), label, top, true,0);
+		}else {   //低价
 			operateResult = conservativeOperation.run(account, this.selects, this.getBeginDate(), this.getEndDate(), label, top, true,0);
 		}
 		turtleSimulationRepository.save("manual", operateResult.get("breakers"), operateResult.get("CSV"), operateResult.get("dailyAmount"), isEvaluation);

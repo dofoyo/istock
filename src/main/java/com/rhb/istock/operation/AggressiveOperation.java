@@ -127,7 +127,8 @@ public class AggressiveOperation implements Operation {
 				//|| (sseiFlag==1 && sseiTrend>=0 && account.getHLRatio()>=21)  //行情好
 				//|| account.getHLRatio()>=34 //市值差异大
 				//) {  
-			if(isAveValue) {
+			//if(isAveValue) {
+			if(dds.size()>0 && account.isAve(dds.size())) {
 				Set<Integer> holdOrderIDs;
 				for(String itemID: holdItemIDs) {
 					holdOrderIDs = 	account.getHoldOrderIDs(itemID);

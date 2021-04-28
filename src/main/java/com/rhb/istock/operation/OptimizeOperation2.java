@@ -62,7 +62,7 @@ public class OptimizeOperation2 implements Operation {
 		
 		int i=1;
 		for(LocalDate date = beginDate; (date.isBefore(endDate) || date.equals(endDate)); date = date.plusDays(1)) {
-			Progress.show((int)days, i++," " + label +  " optimizeOperation run:" + date.toString());
+			Progress.show((int)days, i++," " + label +  " optimizeOperation2 run:" + date.toString());
 			this.doIt(date, account, buyList.get(date), top, isAveValue,quantityType);
 		}
 		return this.result(account);

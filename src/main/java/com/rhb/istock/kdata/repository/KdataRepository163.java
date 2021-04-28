@@ -53,7 +53,7 @@ public class KdataRepository163 implements KdataRepository {
 			quantity = ParseString.toBigDecimal(columns[10]);
 			amount = ParseString.toBigDecimal(columns[11]);
 			
-			kdata.addBar(date,open,high,low,close,amount,quantity,zero,zero,zero,zero,zero,zero,zero,zero);
+			kdata.addBar(date,open,high,low,close,amount,quantity,zero,zero,zero,zero,zero,zero,zero,zero,zero);
 
 		}
 

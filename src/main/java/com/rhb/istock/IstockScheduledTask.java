@@ -125,7 +125,7 @@ public class IstockScheduledTask {
 	 */
 	@Scheduled(cron="0 35 9 ? * 1-5") 
 	public void dailyInit() throws Exception {
-		System.out.println("run scheduled of '0 35 9 ? * 1-5'");
+		logger.info("run scheduled of '0 35 9 ? * 1-5'");
 		if(this.isTradeDate()) {   //次序很重要
 			itemService.downItems();		// 1. 下载最新股票代码
 			itemService.init();  // 2. 
@@ -135,7 +135,7 @@ public class IstockScheduledTask {
 			turtleOperationService.init();  // 4.
 			indexServiceTushare.init();
 			kdataService.updateLatestMusters();
-			System.out.println("开盘初始化, OK!");
+			logger.info("开盘初始化, OK!");
 		}
 	}
 
@@ -173,9 +173,9 @@ public class IstockScheduledTask {
 		}
 	}*/
 	
-	@Scheduled(cron="0 50 21 ? * 1-5") //周一至周五，每日21点50执行收盘
+	@Scheduled(cron="0 37 22 ? * 1-5") //周一至周五，每日21点50执行收盘
 	public void downloadKdatas()  throws Exception{
-		System.out.println("run scheduled of '0 50 21 ? * 1-5'");
+		logger.info("run scheduled of '0 50 21 ? * 1-5'");
 		long beginTime=System.currentTimeMillis(); 
 
 		if(this.isTradeDate()) {
@@ -199,7 +199,7 @@ public class IstockScheduledTask {
 		}
 
 		long used = (System.currentTimeMillis() - beginTime)/1000; 
-		System.out.println("执行收盘完成，用时：" + used + "秒");          
+		logger.info("执行收盘完成，用时：" + used + "秒");          
 	}
 
 }

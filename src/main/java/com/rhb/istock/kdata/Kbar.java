@@ -21,6 +21,7 @@ public class Kbar {
 	private BigDecimal float_share;
 	private BigDecimal free_share;
 	private BigDecimal pe;
+	private BigDecimal pe_ttm;
 
 	public Kbar(BigDecimal open, 
 			BigDecimal high, 
@@ -36,7 +37,8 @@ public class Kbar {
 			BigDecimal total_share,
 			BigDecimal float_share,
 			BigDecimal free_share,
-			BigDecimal pe
+			BigDecimal pe,
+			BigDecimal pe_ttm
 			) {
 		this.open = open;
 		this.high = high;
@@ -53,6 +55,7 @@ public class Kbar {
 		this.float_share = float_share;
 		this.free_share = free_share;
 		this.pe = pe;
+		this.pe_ttm = pe_ttm;
 	}
 
 	public Kbar(String open, 
@@ -69,7 +72,8 @@ public class Kbar {
 			String total_share,
 			String float_share,
 			String free_share,
-			String pe
+			String pe,
+			String pe_ttm
 			) {
 		this.open = new BigDecimal(open);
 		this.high = new BigDecimal(high);
@@ -92,6 +96,7 @@ public class Kbar {
 		this.float_share = new BigDecimal(float_share);
 		this.free_share = new BigDecimal(free_share);
 		this.pe = new BigDecimal(pe);
+		this.pe_ttm = new BigDecimal(pe_ttm);
 		
 	}
 	
@@ -101,6 +106,14 @@ public class Kbar {
 
 	public void setId(String id) {
 		this.id = id;
+	}
+
+	public BigDecimal getPe_ttm() {
+		return pe_ttm;
+	}
+
+	public void setPe_ttm(BigDecimal pe_ttm) {
+		this.pe_ttm = pe_ttm;
 	}
 
 	public BigDecimal getPe() {
