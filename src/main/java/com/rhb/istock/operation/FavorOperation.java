@@ -136,6 +136,7 @@ public class FavorOperation implements Operation {
 					&& muster.isAboveAveragePrice(89)
 					) {
 					dds.add(muster);
+					breaksKeeper.remove(id);
 			}
 		}
 

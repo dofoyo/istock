@@ -46,15 +46,15 @@ public class KdataServiceTest {
 		//itemService.init();  // 2. 
 		//kdataService.downFactors(); // 3. 上一交易日的收盘数据要等开盘前才能下载到, 大约需要15分钟
 		//kdataService.downSSEI();
-		kdataService.generateLatestMusters(null);
+		kdataService.generateLatestMusters(null, false);
 		kdataService.updateLatestMusters();
 	}
 	
-	@Test
+	//@Test
 	public void generateMusters() {
 		//LocalDate date = LocalDate.parse("2017-01-25");
 		//kdataService.generateMusters(date);
-		kdataService.generateLatestMusters(null);
+		kdataService.generateLatestMusters(null, false);
 		kdataService.updateLatestMusters();
 	}
 	
@@ -89,13 +89,13 @@ public class KdataServiceTest {
 		}
 	}
 	
-	//@Test
+	@Test
 	public void downClosedDatas() {
 		System.out.println("down closed datas");
-		LocalDate date = LocalDate.parse("2021-01-05");
+		LocalDate date = LocalDate.parse("2021-04-30");
 		try {
-			kdataService.downClosedDatas(date);
-			//kdataService.downFactors(date);
+			//kdataService.downClosedDatas(date);
+			kdataService.downFactors(date);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

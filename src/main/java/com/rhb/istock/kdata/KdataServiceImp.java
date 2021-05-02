@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,8 @@ import com.rhb.istock.kdata.repository.KdataRepository;
 import com.rhb.istock.kdata.spider.KdataRealtimeSpider;
 import com.rhb.istock.kdata.spider.KdataSpider;
 import com.rhb.istock.selector.favor.FavorService;
+
+import ch.qos.logback.core.util.FileUtil;
 
 @Service("kdataServiceImp")
 public class KdataServiceImp implements KdataService{
@@ -211,7 +214,7 @@ public class KdataServiceImp implements KdataService{
 			kdataSpider163.downKdatas(sseiID);
 			evictKDataCache();
 			
-			this.generateLatestMusters(null); //此方法每天开盘时执行一次
+			this.generateLatestMusters(null, false); //此方法每天开盘时执行一次
 		}
 	}
 
@@ -478,11 +481,15 @@ public class KdataServiceImp implements KdataService{
 
 
 	@Override
-	public void generateLatestMusters(LocalDate date) {
+	public void generateLatestMusters(LocalDate date, boolean redo) {
 		long beginTime=System.currentTimeMillis(); 
 		
 		if(date == null) {
 			date = kdataRealtimeSpider.getLatestMarketDate("sh000001");
+		}
+		
+		if(redo) {
+			musterRepositoryImp.deleteMusters(date);
 		}
 
 		//LocalDate date = kdataRepository.getLastDate();
@@ -866,8 +873,8 @@ public class KdataServiceImp implements KdataService{
 		Kdata ssei = this.getKdata(sseiID, date, true);
 		Kdata ssei_p = this.getKdata(sseiID, date.minusDays(period), true);
 		
-		Integer a = ssei.getAveragePrices().get("a34").intValue();
-		Integer p = ssei_p.getAveragePrices().get("a34").intValue();
+		Integer a = ssei.getAveragePrices().get("a21").intValue();
+		Integer p = ssei_p.getAveragePrices().get("a21").intValue();
 		
 		//System.out.println(date + ":" + a);
 		//System.out.println(date.minusDays(period) + ":" + p);
@@ -960,7 +967,7 @@ public class KdataServiceImp implements KdataService{
 
 		kdataSpiderTushare.downKdatas(date);
 		kdataSpiderTushare.downBasics(date);
-		kdataSpiderTushare.downFactors(date);
+		//kdataSpiderTushare.downFactors(date);
 		
 		long used = (System.currentTimeMillis() - beginTime)/1000; 
 		System.out.println("用时：" + used + "秒");          

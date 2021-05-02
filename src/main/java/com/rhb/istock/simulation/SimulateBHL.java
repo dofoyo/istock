@@ -34,9 +34,8 @@ public class SimulateBHL {
 	Producer producer;
 	
 	@Autowired
-	//@Qualifier("favorOperation")
-	@Qualifier("commOperation3")
-	//@Qualifier("optimizeOperation3")
+	//@Qualifier("commOperation3")
+	@Qualifier("optimizeOperation4")
 	
 	Operation operation;
 	

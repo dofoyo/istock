@@ -41,11 +41,11 @@ public class CommOperation3 implements Operation {
 	
 	private StringBuffer dailyAmount_sb;
 	private StringBuffer breakers_sb;
-	//private Integer previous_period  = 13; //历史纪录区间，主要用于后面判断
+	private Integer previous_period  = 13; //历史纪录区间，主要用于后面判断
 	private Keeper breaksKeeper;  //包含所有创新高的股票,因为当天涨停或价格过高不能买入,等待价格回落后买入
 	private Keeper dropsKeeper; //包含所有跌破21日线卖出的票,在13天内如果涨回21日线,说明调整结束,可以再次买入
 	private Keeper up21Keeper; //包含所有涨回21日线的票
-	//private boolean bomb;
+	private boolean bombing = false;
 	//private Integer previous_sseiFlag;
 	
 	public Map<String,String> run(Account account, Map<LocalDate, List<String>> buyList,LocalDate beginDate, LocalDate endDate, String label, int top, boolean isAveValue, Integer quantityType) {
@@ -74,6 +74,15 @@ public class CommOperation3 implements Operation {
 
 		Map<String,Muster> musters = kdataService.getMusters(date);
 		if(musters==null || musters.size()==0) return;
+
+		Integer sseiFlag = kdataService.getSseiFlag(date);
+		Integer sseiTrend = kdataService.getSseiTrend(date, previous_period);
+		if(bombing && sseiFlag==1 
+				//&& sseiTrend==1
+				) {
+			bombing = false;
+		}
+		Integer hlGap = bombing ? 34 : 55;
 		
 		Muster muster;
 		account.setLatestDate(date);
@@ -90,6 +99,9 @@ public class CommOperation3 implements Operation {
 		
 		//logger.info("sseiFlag =  " + sseiFlag.toString());
 		boolean bomb = account.getAmountRatio()<=-8 ? true : false;
+		if(bomb) {
+			bombing = true;
+		}
 		
 		//卖出
 		for(String itemID: holdItemIDs) {
@@ -170,6 +182,7 @@ public class CommOperation3 implements Operation {
 					&& muster.getN21Gap()<=5
 					&& !drops.contains(id)
 					&& !up21s.contains(id)
+					&& muster.getHLGap()<=hlGap
 					) {
 				dds.add(muster);
 				breaksKeeper.remove(id);
@@ -177,6 +190,7 @@ public class CommOperation3 implements Operation {
 			
 			if(muster!=null 
 					&& muster.isJustBreaker()
+					&& muster.getHLGap()<=hlGap
 					) {
 				up21Keeper.add(date, id);
 				breaksKeeper.remove(id);
@@ -188,6 +202,7 @@ public class CommOperation3 implements Operation {
 			muster = musters.get(id); 
 			if(muster!=null 
 					&& muster.isJustBreaker()
+					&& muster.getHLGap()<=hlGap
 					) {
 				up21Keeper.add(date, id);
 				dropsKeeper.remove(id);
@@ -205,7 +220,6 @@ public class CommOperation3 implements Operation {
 						//&& sseiFlag==1 
 						//&& sseiTrend==1
 						//&& !this.bomb
-
 						) {
 						dds.add(muster);
 						up21Keeper.remove(id);

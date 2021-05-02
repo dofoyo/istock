@@ -105,7 +105,7 @@ public class FavorOperation2 implements Operation {
 		for(String itemID: holdItemIDs) {
 			muster = musters.get(itemID);
 			if(muster!=null && !muster.isDownLimited()) {
-				if(account.isGain(itemID, 5)) {  //有2%的盈利就跑
+				if(account.isGain(itemID, 2)) {  //有2%的盈利就跑
 					account.dropWithTax(itemID, "3", muster.getLatestPrice());
 				}
 				
@@ -117,8 +117,8 @@ public class FavorOperation2 implements Operation {
 					//logger.info("dropsKeeper add " + itemID);
 				}*/
 				
-				/*//高位回落超过8%
-				if(account.isFallOrder(itemID, -8) 
+				//高位回落超过8%
+				/*if(account.isFallOrder(itemID, -8) 
 						//&& muster.getN21Gap()>8
 						) {
 					account.dropWithTax(itemID, "2", muster.getLatestPrice());
@@ -155,6 +155,7 @@ public class FavorOperation2 implements Operation {
 					&& muster.isAboveAveragePrice(89)
 					) {
 				dds.add(muster);
+				breaksKeeper.remove(id);
 			}
 		}
 
@@ -169,7 +170,7 @@ public class FavorOperation2 implements Operation {
 		breakers_sb.append("\n");
 
 		//logger.info("dds before ave " + dds.size());
-		if(dds.size()>0 && account.isAve(dds.size())) {
+		if(isAveValue && dds.size()>0 && account.isAve(dds.size())) {
 //		if(isAveValue) {
 			Set<Integer> holdOrderIDs;
 			for(String itemID: holdItemIDs) {

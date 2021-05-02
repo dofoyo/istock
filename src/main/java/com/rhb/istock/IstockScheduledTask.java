@@ -131,8 +131,8 @@ public class IstockScheduledTask {
 			itemService.init();  // 2. 
 			//kdataService.downFactors(); // 3. 上一交易日的收盘数据要等开盘前才能下载到, 大约需要15分钟
 			kdataService.downSSEI();
-			kdataService.generateLatestMusters(null);
-			turtleOperationService.init();  // 4.
+			kdataService.generateLatestMusters(null, true);
+			//turtleOperationService.init();  // 4.
 			indexServiceTushare.init();
 			kdataService.updateLatestMusters();
 			logger.info("开盘初始化, OK!");
@@ -172,6 +172,23 @@ public class IstockScheduledTask {
 			kdataService.generateMusters();   //生成muster，需要192分，即3个多小时
 		}
 	}*/
+	
+	@Scheduled(cron="0 0 12 ? * 1-5") //周一至周五，每日12点下载除权因子
+	public void downFactors()  throws Exception{
+		logger.info("run scheduled of '0 0 12 ? * 1-5', downFactors");
+		long beginTime=System.currentTimeMillis(); 
+
+		if(this.isTradeDate()) {
+			//LocalDate date = LocalDate.parse("2020-11-12");
+			LocalDate date = LocalDate.now();
+			kdataService.downFactors(date);
+			kdataService.generateLatestMusters(null, true);
+			kdataService.updateLatestMusters();
+		}
+
+		long used = (System.currentTimeMillis() - beginTime)/1000; 
+		logger.info("下载除权因子完成，用时：" + used + "秒");          
+	}
 	
 	@Scheduled(cron="0 37 22 ? * 1-5") //周一至周五，每日21点50执行收盘
 	public void downloadKdatas()  throws Exception{

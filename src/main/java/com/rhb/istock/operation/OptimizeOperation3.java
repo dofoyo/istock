@@ -28,10 +28,10 @@ import com.rhb.istock.selector.SelectorService;
 
 
 /*
- * 买二操作模式　+ 有盈利2%就跑 + 个股跌幅超过8%割肉 + 市值跌幅超过8%清仓  + 买入价格最低的前3支票
+ * 买二操作模式
  * 
- * 买入：满仓　＋　市值平均　＋　单只股票不加仓
- * 卖出：跌破21日线
+ * 买入：满仓　＋　市值平均　＋　单只股票不加仓 + 只买入前三只票
+ * 卖出：有5%盈利就走，个股跌幅超过8%割肉，市值跌幅8%清仓
  */
 @Scope("prototype")
 @Service("optimizeOperation3")
@@ -101,7 +101,7 @@ public class OptimizeOperation3 implements Operation {
 		for(String itemID: holdItemIDs) {
 			muster = musters.get(itemID);
 			if(muster!=null && !muster.isDownLimited()) {
-				if(account.isGain(itemID, 2)) {  //有2%的盈利就跑
+				if(account.isGain(itemID, 5)) {  //有2%的盈利就跑
 					account.dropWithTax(itemID, "3", muster.getLatestPrice());
 				}
 				
@@ -116,8 +116,9 @@ public class OptimizeOperation3 implements Operation {
 					//logger.info("dropsKeeper add " + itemID);
 				}*/
 				
-				//高位回落超过8%
+				//回落超过8%
 				if(account.isFallOrder(itemID, -8) 
+						//&& muster.getN21Gap()>5
 						//&& muster.isDropAve(21) 
 						) {
 					account.dropWithTax(itemID, "2", muster.getLatestPrice());

@@ -59,7 +59,7 @@ public class IstockApplicationTests {
 		//itemService.downItems();		// 1. 下载最新股票代码
 		//itemService.init();  // 2. 
 		kdataService.downSSEI();
-		kdataService.generateLatestMusters(null);
+		kdataService.generateLatestMusters(null, false);
 		kdataService.updateLatestMusters();
 		
 		

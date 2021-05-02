@@ -14,6 +14,7 @@ public interface MusterRepository {
 	public void saveTmpMuster(LocalDate date, MusterEntity entity);
 	
 	public boolean isMustersExist(LocalDate date);
+	public void deleteMusters(LocalDate date);
 	
 	public Map<String,MusterEntity> getMusters(LocalDate date);
 	

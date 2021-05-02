@@ -85,6 +85,12 @@ public class MusterRepositoryImp implements MusterRepository{
 		File file = new File(pathAndFile);
 		return file.exists();
 	}
+	
+	@Override
+	public void deleteMusters(LocalDate date) {
+		String pathAndFile = musterPath + "/" + date.format(DateTimeFormatter.ofPattern("yyyyMMdd")) +  "_" + openDuration+"_" + dropDuration + "_musters.txt";
+		FileUtils.deleteQuietly(new File(pathAndFile));
+	}
 
 	@Override
 	public void cleanTmpMusters() {
