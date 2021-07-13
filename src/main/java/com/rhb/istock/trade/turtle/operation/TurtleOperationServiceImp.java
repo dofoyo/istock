@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -84,6 +85,18 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 	@Qualifier("power")
 	Producer power;
 
+	@Autowired
+	@Qualifier("newb")
+	Producer newb;
+
+	@Autowired
+	@Qualifier("horizon")
+	Producer horizon;
+
+	@Autowired
+	@Qualifier("oks")
+	Producer oks;
+	
 	
 	DecimalFormat df = new DecimalFormat("0.00"); 
 	DecimalFormat df_integer = new DecimalFormat("000"); 
@@ -1059,7 +1072,8 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 			
 			muster = musters.get(item.getItemID());
 			if(muster!=null
-					&& muster.getN21Gap()<=8
+					&& muster.getN21Gap()<=5
+					&& muster.getN21Gap()>=0
 					&& muster.isUp(8)   //止跌
 					&& muster.isRed()   //止跌
 					) {
@@ -1071,6 +1085,82 @@ public class TurtleOperationServiceImp implements TurtleOperationService {
 			
 		}
 		return views;
+	}
+
+	@Override
+	public List<ItemView> getHorizons() {
+		LocalDate endDate = kdataService.getLatestMarketDate("sh000001");
+		Map<String, Muster> musters = kdataService.getMusters(endDate);
+		//System.out.println(endDate);
+		Muster muster;
+		
+		List<String> models = horizon.getResults(endDate);
+
+		Map<String,String> b21s = b21Service.getStates(models, endDate);
+
+		List<ItemView> views = buildItemViews(models, false, endDate);
+		Item item;
+		for(ItemView view : views) {
+			view.setStatus(b21s.get(view.getItemID()));
+			item = itemService.getItem(view.getItemID());
+			item.setRecommendations(finaService.getRecommendationCount(view.getItemID(), endDate));
+			
+			view.setName(item.getNameWithCAGR());
+			
+/*			muster = musters.get(item.getItemID());
+			if(muster!=null
+					&& muster.getN21Gap()<=5
+					&& muster.getN21Gap()>=0
+					&& muster.isUp(8)   //止跌
+					&& muster.isRed()   //止跌
+					) {
+				view.setName("Y " + view.getName());
+				view.setLabel("Y");
+			}else {
+				view.setLabel("");
+			}*/
+			
+		}
+		return views;
+	}
+
+	@Override
+	public List<ItemView> getOks() {
+		
+		LocalDate eDate = LocalDate.now();
+		Integer bYear = eDate.getYear();
+		if(eDate.getMonthValue()<5) {
+			bYear = bYear - 1;
+		}
+		LocalDate bDate = LocalDate.of(bYear, 1, 1);
+		Map<LocalDate, List<String>> results = oks.getResults(bDate, eDate);
+		String theID;
+		List<String> models = new LinkedList<String>();
+		for(Map.Entry<LocalDate, List<String>> entry : results.entrySet()) {
+			for(String id : entry.getValue()) {
+				theID = id.substring(0, 8);
+				if(id.endsWith("S")) {
+					models.remove(theID);
+				}else if(id.endsWith("B")){
+					models.add(theID);
+				}
+			}
+		}
+		
+		Map<String,String> b21s = b21Service.getStates(models, eDate);
+
+		List<ItemView> views = buildItemViews(models, true, eDate);
+		Item item;
+		for(ItemView view : views) {
+			view.setStatus(b21s.get(view.getItemID()));
+			item = itemService.getItem(view.getItemID());
+			item.setRecommendations(finaService.getRecommendationCount(view.getItemID(), eDate));
+			
+			view.setName(item.getNameWithCAGR());
+			
+		}
+		return views;
+		
 	}
 
 	

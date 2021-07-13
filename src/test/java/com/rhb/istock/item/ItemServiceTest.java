@@ -40,14 +40,14 @@ public class ItemServiceTest {
 		System.out.println(topic);
 	}
 	
-	//@Test
+	@Test
 	public void getItem() {
-		String itemID = "sz000858";
+		String itemID = "sz000032";
 		Item item = itemService.getItem(itemID);
 		System.out.println(item);
 	}
 	
-	@Test
+	//@Test
 	public void getItems() {
 		String period1 = "20191231";
 		Map<String, Integer> advReceiptsRates1 = fdataServiceTushare.getAdvReceiptsRates(period1);

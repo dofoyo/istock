@@ -51,14 +51,16 @@ public class HuntingOperationPlus implements Operation {
 	@Qualifier("itemServiceImp")
 	ItemService itemService;
 
+	private StringBuffer dailyHolds_sb;
 	private StringBuffer dailyAmount_sb;
 	private StringBuffer breakers_sb;
 	private Integer rate = -8;
 	
-	public Map<String,String> run(Account account, Map<LocalDate, List<String>> buyList,LocalDate beginDate, LocalDate endDate, String label, int top, boolean isAveValue, Integer quantityType) {
+	public Map<String,String> run(Account account, Map<LocalDate, List<String>> buyList,Map<LocalDate, List<String>> sellList,LocalDate beginDate, LocalDate endDate, String label, int top, boolean isAveValue, Integer quantityType) {
 		long days = endDate.toEpochDay()- beginDate.toEpochDay();
 		
 		dailyAmount_sb = new StringBuffer("date,cash,value,total\n");
+		dailyHolds_sb = new StringBuffer("date,itemID,itemName,open,close,quantity,profit,days\n");
 		breakers_sb = new StringBuffer();
 		
 		int i=1;
@@ -85,6 +87,7 @@ public class HuntingOperationPlus implements Operation {
 				account.refreshHoldsPrice(itemID, muster.getLatestPrice(), muster.getLatestHighest());
 			}
 		}
+		dailyHolds_sb.append(account.getHoldStateString());
 		
 		//卖出
 		for(String itemID: holdItemIDs) {
@@ -118,7 +121,8 @@ public class HuntingOperationPlus implements Operation {
 					item = items.get(id);
 					recommendationCount = finaService.getRecommendationCount(id, date);
 					if(muster!=null && !muster.isUpLimited()
-							&& muster.getN21Gap()<=8
+							&& muster.getN21Gap()<=5
+							&& muster.getN21Gap()>=0
 							&& muster.isUp(8)   //止跌
 							&& muster.isRed()   //止跌
 							//&& muster.isJustBreaker()
@@ -162,7 +166,6 @@ public class HuntingOperationPlus implements Operation {
 		}
 			
 		dailyAmount_sb.append(account.getDailyAmount() + "\n");
-
 	}
 	
 	private Map<String,String> result(Account account) {
@@ -180,6 +183,7 @@ public class HuntingOperationPlus implements Operation {
 		result.put("breakers", breakers_sb.toString());
 		result.put("lostIndustrys", account.getLostIndustrys());
 		result.put("winIndustrys", account.getWinIndustrys());
+		result.put("dailyHolds", dailyHolds_sb.toString());
 		return result;
 	}
 	

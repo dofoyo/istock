@@ -49,7 +49,7 @@ public class IstockApplicationTests {
 	Evaluation evaluation;
 
 	//执行开盘
-	@Test
+	//@Test
 	public void doOpen() throws Exception{
 		//System.out.println("run scheduled of '0 45 9 ? * 1-5'");
 		long beginTime=System.currentTimeMillis(); 
@@ -74,10 +74,10 @@ public class IstockApplicationTests {
 		System.out.println("doClose .....");
 		long beginTime=System.currentTimeMillis(); 
 
-			LocalDate date = LocalDate.parse("2020-11-15");
+			LocalDate date = LocalDate.parse("2021-07-09");
 			//LocalDate date = LocalDate.now();
 			try {
-				//kdataService.downClosedDatas(date);
+				kdataService.downClosedDatas(date);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -92,7 +92,7 @@ public class IstockApplicationTests {
 			//fdataSpiderEastmoney.downProfitForecasts();
 			//fdataSpiderEastmoney.downRecommendations();
 			//kdataService.downFactors(); // 3. 上一交易日的收盘数据要等开盘前才能下载到, 大约需要15分钟
-			itemService.downTopics();
+			//itemService.downTopics();
 			//drumService.generateDimensions();
 			
 			//evaluation.evaluate(LocalDate.parse("2017-01-01"), date);

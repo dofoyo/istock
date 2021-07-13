@@ -4,7 +4,10 @@ import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.time.LocalDate;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.rhb.istock.comm.util.Functions;
+import com.rhb.istock.operation.CommOperation2;
 
 public class Muster {
 	private String itemID;
@@ -49,6 +52,7 @@ public class Muster {
 	private Integer above2134=0;
 	private Integer above2155=0;
 	private Integer above2189=0;
+	protected static final Logger logger = LoggerFactory.getLogger(Muster.class);
 	
 	public BigDecimal getCloseRateOf21() {
 		return this.latestPrice.divide(this.averagePrice21,BigDecimal.ROUND_HALF_UP);
@@ -390,7 +394,7 @@ public class Muster {
 	}
 	
 	public boolean isUpLimited() {
-		return limited==1 || latestPrice.subtract(close).divide(close,BigDecimal.ROUND_HALF_UP).compareTo(new BigDecimal(0.095))>=0;
+		return limited==1 || latestPrice.subtract(close).divide(close,BigDecimal.ROUND_HALF_UP).compareTo(new BigDecimal(0.099))>=0;
 		//return latestPrice.subtract(close).divide(close,BigDecimal.ROUND_HALF_UP).compareTo(new BigDecimal(0.095))>=0;
 	}
 
@@ -406,12 +410,13 @@ public class Muster {
 	
 	public boolean isJustBreaker() {
 		//Integer r = Functions.growthRate(this.averagePrice21, this.averagePrice);
-		return //this.latestPrice.compareTo(this.close)==1 &&
-				(this.close.compareTo(this.averagePrice21)<=0 
-				&& this.latestPrice.compareTo(this.averagePrice21)>=0)
-				
-				//&& r<=ratio && r>0
-				;
+		boolean flag = this.close.compareTo(this.averagePrice21)<0 
+				&& this.latestPrice.compareTo(this.averagePrice21)>0;
+		/*if(flag) {
+			String str = String.format("%s,close=%.2f, latestPrice=%.2f, avp=%.2f", this.itemID,this.close, this.latestPrice,this.averagePrice21);
+			logger.info(str);
+		}*/
+		return flag;
 	}
 	
 	public boolean isBreaker(Integer ratio) {

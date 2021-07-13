@@ -81,6 +81,14 @@ public class ProduceTest {
 	Producer newbRup;
 
 	@Autowired
+	@Qualifier("newbRupStart")
+	Producer newbRupStart;
+	
+	@Autowired
+	@Qualifier("horizon")
+	Producer horizon;
+	
+	@Autowired
 	@Qualifier("sabRecoH21_21")
 	Producer sabRecoH21;
 	
@@ -96,13 +104,26 @@ public class ProduceTest {
 	@Qualifier("eva")
 	Producer eva;
 	
+	@Autowired
+	@Qualifier("oks")
+	Producer oks;
+	
 	//@Test
 	public void getResults() {  
-		LocalDate date = LocalDate.parse("2021-01-05");
+		LocalDate date = LocalDate.parse("2021-05-07");
 		
-		List<String> results = power.getResults(date);
+		List<String> results = oks.getResults(date);
 		System.out.println("there are " + results.size() + " stocks.");
-		//System.out.println(results);
+		System.out.println(results);
+		
+		for(String id : results) {
+			if(id.endsWith("S")) {
+				System.out.println(id.substring(0, 8));
+			}else {
+				System.out.println(id.substring(0,8));
+			}
+		}
+	
 	}
 	
 	//@Test
@@ -125,10 +146,10 @@ public class ProduceTest {
 	@Test
 	public void produce() {
 		LocalDate bDate = LocalDate.parse("2017-01-01");
-		LocalDate eDate = LocalDate.parse("2021-04-09");
+		LocalDate eDate = LocalDate.parse("2021-07-12");
 		
-		newbRup.produce(bDate, eDate);
-		System.out.println("produce Test");
+		newbRupStart.produce(bDate, eDate);
+		System.out.println("produce Test DONE!");
 	}
 	
 	//@Test

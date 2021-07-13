@@ -43,8 +43,8 @@ public class SimulateNEWB {
 	public Future<String> run(LocalDate beginDate, LocalDate endDate, BigDecimal initCash, Integer top, boolean isAveValue, Integer quantityType, boolean isEvaluation)  throws Exception {
 		Account account = new Account(initCash);
 		Map<LocalDate, List<String>> operationList = producer.getResults(beginDate, endDate);
-		Map<String, String> operateResult = operation.run(account, operationList, beginDate, endDate, "bdt", top, isAveValue,quantityType);
-		turtleSimulationRepository.save("bnew", operateResult.get("breakers"), operateResult.get("CSV"), operateResult.get("dailyAmount"), isEvaluation);
+		Map<String, String> operateResult = operation.run(account, operationList,null, beginDate, endDate, "bdt", top, isAveValue,quantityType);
+		turtleSimulationRepository.save("bnew", operateResult.get("breakers"), operateResult.get("CSV"), operateResult.get("dailyAmount"), operateResult.get("dailyHolds"), isEvaluation);
 		return new AsyncResult<String>("bnew执行完毕");
 	}
 }

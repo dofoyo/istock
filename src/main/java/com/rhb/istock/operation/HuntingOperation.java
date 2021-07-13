@@ -3,6 +3,7 @@ package com.rhb.istock.operation;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -27,8 +28,8 @@ import com.rhb.istock.selector.fina.FinaService;
 /*
  * 低吸高抛
  * 
- * 买入：止跌
- * 卖出：买入后的最高价跌幅超过8%
+ * 买入：跌破最点
+ * 卖出：跌破21日线,且有盈利
  */
 @Scope("prototype")
 @Service("huntingOperation")
@@ -40,10 +41,6 @@ public class HuntingOperation implements Operation {
 	KdataService kdataService;
 	
 	@Autowired
-	@Qualifier("drum")
-	Producer producer;
-	
-	@Autowired
 	@Qualifier("finaService")
 	FinaService finaService;
 
@@ -52,14 +49,18 @@ public class HuntingOperation implements Operation {
 	ItemService itemService;
 
 	private StringBuffer dailyAmount_sb;
+	private StringBuffer dailyHolds_sb;
 	private StringBuffer breakers_sb;
-	private Integer rate = -8;
+	//private Integer rate = -8;
+	private Set<String> up21s;
 	
-	public Map<String,String> run(Account account, Map<LocalDate, List<String>> buyList,LocalDate beginDate, LocalDate endDate, String label, int top, boolean isAveValue, Integer quantityType) {
+	public Map<String,String> run(Account account, Map<LocalDate, List<String>> buyList,Map<LocalDate, List<String>> sellList,LocalDate beginDate, LocalDate endDate, String label, int top, boolean isAveValue, Integer quantityType) {
 		long days = endDate.toEpochDay()- beginDate.toEpochDay();
 		
 		dailyAmount_sb = new StringBuffer("date,cash,value,total\n");
+		dailyHolds_sb = new StringBuffer("date,itemID,itemName,open,close,quantity,profit,days\n");
 		breakers_sb = new StringBuffer();
+		up21s = new HashSet<String>();
 		
 		int i=1;
 		for(LocalDate date = beginDate; (date.isBefore(endDate) || date.equals(endDate)); date = date.plusDays(1)) {
@@ -85,19 +86,27 @@ public class HuntingOperation implements Operation {
 				account.refreshHoldsPrice(itemID, muster.getLatestPrice(), muster.getLatestHighest());
 			}
 		}
+		dailyHolds_sb.append(account.getHoldStateString());
 		
 		//卖出
 		for(String itemID: holdItemIDs) {
 			muster = musters.get(itemID);
+			if(muster!=null && muster.isJustBreaker()) {
+				up21s.add(itemID);
+			}
+		
+		}
+		Iterator<String> iterator = up21s.iterator();
+		String theid;
+		while(iterator.hasNext()) {
+			theid = iterator.next();
+			muster = musters.get(theid);
 			if(muster!=null && !muster.isDownLimited()) {
-				/*if(account.isGain(itemID, 2)){
-					account.dropWithTax(itemID, "1", muster.getLatestPrice());
-				}*/
-				//高位回落超过8%
-				if(account.isFallOrder(itemID, this.rate) 
-					//&& !account.isLost(itemID)
-					) {
-					account.dropWithTax(itemID, "2", muster.getLatestPrice());
+				if(muster.isDropAve(21)   //跌破21日均线且有盈利
+						&& account.isGain(theid, 8)//有盈利
+						) { 		
+					account.dropWithTax(theid, "1", muster.getLatestPrice());
+					iterator.remove();
 				}
 			}
 		}
@@ -108,22 +117,13 @@ public class HuntingOperation implements Operation {
 
 		if(buyList!=null && buyList.size()>0) {
 			String id;
-			Integer recommendationCount;
-			Map<String, Item> items = itemService.getItems();
-			Item item;
 			for(int i=0, j=0; i<buyList.size() && j<top; i++) {
 				id = buyList.get(i);
 				if(!holdItemIDs.contains(id)) {
 					muster = musters.get(id); 
-					item = items.get(id);
-					recommendationCount = finaService.getRecommendationCount(id, date);
-					if(muster!=null && !muster.isUpLimited()
-							&& muster.getN21Gap()<=8
-							&& muster.isUp(8)   //止跌
-							&& muster.isRed()   //止跌
+					if(muster!=null
 							) {
 						dds.add(muster);
-						j++;
 					}
 				}
 			}
@@ -137,7 +137,7 @@ public class HuntingOperation implements Operation {
 		breakers_sb.deleteCharAt(breakers_sb.length()-1);
 		breakers_sb.append("\n");
 
-		if(isAveValue) {
+		if(isAveValue && dds.size()>0 && account.isAve(dds.size())) {
 			Set<Integer> holdOrderIDs;
 			for(String itemID: holdItemIDs) {
 				holdOrderIDs = 	account.getHoldOrderIDs(itemID);
@@ -160,7 +160,6 @@ public class HuntingOperation implements Operation {
 		}
 			
 		dailyAmount_sb.append(account.getDailyAmount() + "\n");
-
 	}
 	
 	private Map<String,String> result(Account account) {
@@ -178,6 +177,7 @@ public class HuntingOperation implements Operation {
 		result.put("breakers", breakers_sb.toString());
 		result.put("lostIndustrys", account.getLostIndustrys());
 		result.put("winIndustrys", account.getWinIndustrys());
+		result.put("dailyHolds", dailyHolds_sb.toString());
 		return result;
 	}
 	

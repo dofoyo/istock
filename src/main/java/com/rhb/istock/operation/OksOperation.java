@@ -2,9 +2,6 @@ package com.rhb.istock.operation;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -28,16 +25,15 @@ import com.rhb.istock.selector.SelectorService;
 
 
 /*
- * 买二操作模式
+ * 买一模式：
  * 
- * 买入：满仓　＋　市值平均　＋　单只股票不加仓 + 只买入前三只票
- * 卖出：有5%盈利就走，个股跌幅超过8%割肉，市值跌幅8%清仓
- * 根据大盘调整各指标
+ * 买入：根据传入的buyList清单买入，如果涨停，就在第二天买入。
+ * 卖出：跌破21日线
  */
 @Scope("prototype")
-@Service("optimizeOperation4")
-public class OptimizeOperation4 implements Operation {
-	protected static final Logger logger = LoggerFactory.getLogger(OptimizeOperation4.class);
+@Service("oksOperation")
+public class OksOperation implements Operation {
+	protected static final Logger logger = LoggerFactory.getLogger(OksOperation.class);
 
 	@Autowired
 	@Qualifier("kdataServiceImp")
@@ -45,28 +41,32 @@ public class OptimizeOperation4 implements Operation {
 
 /*	@Autowired
 	@Qualifier("selectorServiceImp")
-	SelectorService selectorServiceImp;*/
-	
+	SelectorService selectorServiceImp;
+*/	
+	private StringBuffer dailyHolds_sb;
 	private StringBuffer dailyAmount_sb;
 	private StringBuffer breakers_sb;
-	private Integer previous_period  = 21; //历史纪录区间，主要用于后面判断
-	private Keeper breaksKeeper;  //包含所有创新高的股票,因为当天涨停或价格过高不能买入,等待价格回落后买入
+	//private Integer previous_period  = 13; //历史纪录区间，主要用于后面判断
+	//private Keeper breaksKeeper;  //包含所有创新高的股票,因为当天涨停或价格过高不能买入,等待价格回落后买入
 	//private Keeper dropsKeeper; //包含所有跌破21日线卖出的票,在13天内如果涨回21日线,说明调整结束,可以再次买入
-	private boolean bombing = false;
+	Set<String> sells = new HashSet<String>();
+	Set<String> buys = new HashSet<String>();
+	Set<String> drops = new HashSet<String>();
 	
-	public Map<String,String> run(Account account, Map<LocalDate, List<String>> buyList,LocalDate beginDate, LocalDate endDate, String label, int top, boolean isAveValue, Integer quantityType) {
+	public Map<String,String> run(Account account, Map<LocalDate, List<String>> buyList,Map<LocalDate, List<String>> sellList,LocalDate beginDate, LocalDate endDate, String label, int top, boolean isAveValue, Integer quantityType) {
 		long days = endDate.toEpochDay()- beginDate.toEpochDay();
 		
 		//logger.info(buyList.toString());
 		
 		dailyAmount_sb = new StringBuffer("date,cash,value,total\n");
+		dailyHolds_sb = new StringBuffer("date,itemID,itemName,open,close,quantity,profit,days\n");
 		breakers_sb = new StringBuffer();
-		breaksKeeper = new Keeper(55);  //包含所有创新高的股票,因为当天涨停或价格过高不能买入,等待价格回落后买入
+		//breaksKeeper = new Keeper(13);  //包含所有创新高的股票,因为当天涨停或价格过高不能买入,等待价格回落后买入
 		//dropsKeeper = new Keeper(55); //包含所有跌破21日线卖出的票,在21天内如果涨回21日线,说明调整结束,可以再次买入
 		
 		int i=1;
 		for(LocalDate date = beginDate; (date.isBefore(endDate) || date.equals(endDate)); date = date.plusDays(1)) {
-			Progress.show((int)days, i++," " + label +  " optimizeOperation3 run:" + date.toString());
+			Progress.show((int)days, i++," " + label +  " oksOperation run:" + date.toString());
 			this.doIt(date, account, buyList.get(date), top, isAveValue,quantityType);
 		}
 		return this.result(account);
@@ -74,21 +74,31 @@ public class OptimizeOperation4 implements Operation {
 	
 	private void doIt(LocalDate date,Account account, List<String> buyList, int top, boolean isAveValue, Integer quantityType) {
 		//logger.info(date.toString());
-
+		//logger.info(buyList==null ? "" : buyList.toString());
+		
 		Map<String,Muster> musters = kdataService.getMusters(date);
 		if(musters==null || musters.size()==0) return;
-		
+
 		//System.out.println(breaksKeeper);
 
-		Integer sseiFlag = kdataService.getSseiFlag(date);
-		Integer sseiTrend = kdataService.getSseiTrend(date, previous_period);
-		if(bombing && sseiFlag==1 && sseiTrend==1
-				) {
-			bombing = false;
+		//Integer sseiFlag = kdataService.getSseiFlag(date);
+		//Integer sseiTrend = kdataService.getSseiTrend(date, previous_period);
+
+		if(buyList!=null) {
+			String theID;
+			for(String id : buyList) {
+				theID = id.substring(0, 8);
+				if(id.endsWith("S")) {
+					sells.add(theID);
+					drops.remove(theID);
+				}
+				if(id.endsWith("B") && !sells.contains(theID)){
+					buys.add(theID);
+					drops.remove(theID);
+				}
+			}
 		}
-		Integer gain = bombing ? 2 : 5;
-		Integer n21Gap = bombing ? 3 : 5;
-		//logger.info(date.toString() + ", hlGap=" + hlGap + ",gain=" + gain + ", n21Gap" + n21Gap);
+
 		
 		Muster muster;
 		account.setLatestDate(date);
@@ -100,104 +110,68 @@ public class OptimizeOperation4 implements Operation {
 				account.refreshHoldsPrice(itemID, muster.getLatestPrice(), muster.getLatestHighest());
 			}
 		}
+		dailyHolds_sb.append(account.getHoldStateString());
 		
-		account.refreshHighestAmount();
-		
-		//logger.info("sseiFlag =  " + sseiFlag.toString());
-		boolean bomb = account.getAmountRatio()<=-8 ? true : false;
-		if(bomb) {
-			bombing = true;
-		}
-	
 		//卖出
 		for(String itemID: holdItemIDs) {
-			muster = musters.get(itemID);
-			if(muster!=null && !muster.isDownLimited()) {
-				if(account.isGain(itemID, gain)) {  //有2%的盈利就跑
-					account.dropWithTax(itemID, "3", muster.getLatestPrice());
-				}
-				
-				if(bomb) {
-					account.dropWithTax(itemID, "9", muster.getLatestPrice());
-				}
-				/*if(muster.isDropAve(21) 
-						//&& muster.getLatestPrice().compareTo(muster.getClose())==1
-						) { 		//跌破21日均线就卖
+			if(sells.contains(itemID)) {
+				muster = musters.get(itemID);
+				if(muster!=null && !muster.isDownLimited() && muster.isDownAve(21)) {
 					account.dropWithTax(itemID, "1", muster.getLatestPrice());
-					//dropsKeeper.add(date, itemID);
-					//logger.info("dropsKeeper add " + itemID);
-				}*/
-				
-				//高位回落超过8%
-				if(account.isFallOrder(itemID, -8) 
-						//&& muster.isDropAve(21) 
-						) {
-					account.dropWithTax(itemID, "2", muster.getLatestPrice());
-					//dropsKeeper.add(date, itemID);
-					//logger.info("dropsKeeper add " + itemID);
+					sells.remove(itemID);
 				}
 			}
-		}
-		//dropsKeeper.dailySet(date);
+
+/*			muster = musters.get(itemID);
+			if(muster!=null && !muster.isDownLimited() && muster.isDownAve(21)) {
+				account.dropWithTax(itemID, "1", muster.getLatestPrice());
+				if(sells.contains(itemID)) {
+					sells.remove(itemID);
+				}else {
+					drops.add(itemID);
+				}
+			}
+*/		}
 		
-		if(bomb) {
-			account.reSetHighestAmount();
-			//breaksKeeper.removeAll();
-		}	
+
 		
 		//买入清单
-		if(buyList!=null && buyList.size()>0) {
-			breaksKeeper.addAll(date,new HashSet<String>(buyList));
-		}else{
-			breaksKeeper.dailySet(date);
-		}
-
-		Set<String> ids = breaksKeeper.getIDs();
-		List<Muster> xx = new ArrayList<Muster>();
-		for(String id: ids) {
-			muster = musters.get(id); 
+		Set<Muster> dds = new HashSet<Muster>();  
+		Iterator<String> it = buys.iterator();
+		while(it.hasNext()) {
+			muster = musters.get(it.next()); 
 			if(muster!=null 
 					&& !muster.isUpLimited() 
-					&& muster.isAboveAveragePrice(21)
-					&& muster.isAboveAveragePrice(89)
-					&& muster.getN21Gap()<=n21Gap
-					//&& muster.getPe().intValue()<=89
-					//&& muster.getPe().intValue()>=21
+					//&& muster.isAboveAveragePrice(21)
+					//&& muster.isAboveAveragePrice(89)
+					&& muster.getN21Gap()<=5
+					&& muster.getPe().compareTo(new BigDecimal(21))==1
+					&& muster.getPe().compareTo(new BigDecimal(55))==-1
+					&& muster.getHLGap()<=55
 					) {
-					xx.add(muster);
-			}				
-		}
-		
-		Collections.sort(xx, new Comparator<Muster>() {
-			@Override
-			public int compare(Muster o1, Muster o2) {
-				return o1.getLatestPrice().compareTo(o2.getLatestPrice());  //1-21%,3-96%
-				//return o1.getN21Gap().compareTo(o2.getN21Gap());//1-49%, 3-46%
-				//return o1.getPe().compareTo(o2.getPe());//1-54%, 3-69%
-			}
-		});
-		
-		Set<Muster> dds = new HashSet<Muster>();  
-		for(int i=0, t=3; i<xx.size() && i<t; i++) {
-			dds.add(xx.get(i));
-			breaksKeeper.remove(xx.get(i).getItemID());
+					dds.add(muster);
+					it.remove();
+			}			
 		}
 
-		/*for(String id : ids) {
-				muster = musters.get(id); 
-				if(muster!=null 
-						&& !muster.isUpLimited() 
-						&& muster.isAboveAveragePrice(21)
- 						//&& muster.isAboveAveragePrice(89)
-						&& muster.getN21Gap()<=5
-						//&& muster.getPe().intValue()<=89
-						//&& muster.getPe().intValue()>=21
-						) {
-						dds.add(muster);
-						breaksKeeper.remove(id);
-				}				
-		}*/
-
+		it = drops.iterator();
+		while(it.hasNext()) {
+			muster = musters.get(it.next()); 
+			if(muster!=null 
+					&& !muster.isUpLimited() 
+					//&& muster.isAboveAveragePrice(21)
+					//&& muster.isAboveAveragePrice(89)
+					&& muster.getN21Gap()<=5
+					&& muster.getPe().compareTo(new BigDecimal(21))==1
+					&& muster.getPe().compareTo(new BigDecimal(55))==-1
+					&& muster.getHLGap()<=55
+					) {
+					//dds.add(muster);
+					it.remove();
+			}			
+		}
+		//logger.info(sb.toString());
+		
 		breakers_sb.append(date.toString() + ",");
 		for(Muster m : dds) {
 			breakers_sb.append(m.getItemID());
@@ -207,9 +181,9 @@ public class OptimizeOperation4 implements Operation {
 		breakers_sb.append("\n");
 
 		//logger.info("dds before ave " + dds.size());
+		//if(isAveValue) {
 		if(isAveValue && dds.size()>0 && account.isAve(dds.size())) {
 		//if(dds.size()>0 && account.isAve(dds.size())) {
-		//if(isAveValue) {
 			Set<Integer> holdOrderIDs;
 			for(String itemID: holdItemIDs) {
 				holdOrderIDs = 	account.getHoldOrderIDs(itemID);
@@ -234,7 +208,6 @@ public class OptimizeOperation4 implements Operation {
 		}
 			
 		dailyAmount_sb.append(account.getDailyAmount() + "\n");
-
 	}
 	
 	private Map<String,String> result(Account account) {
@@ -252,12 +225,15 @@ public class OptimizeOperation4 implements Operation {
 		result.put("breakers", breakers_sb.toString());
 		result.put("lostIndustrys", account.getLostIndustrys());
 		result.put("winIndustrys", account.getWinIndustrys());
+		result.put("dailyHolds", dailyHolds_sb.toString());
 		return result;
 	}
 	
 	class Keeper{
 		private TreeMap<LocalDate,Set<String>> items = new TreeMap<LocalDate,Set<String>>();
 		private Integer top;
+		//Set<String> hist = new HashSet<String>();
+		
 		public Keeper(Integer top) {
 			this.top = top;
 		}
@@ -281,16 +257,10 @@ public class OptimizeOperation4 implements Operation {
 				}
 			}
 		}
-		public void removeAll() {
-			Iterator<String> it;
-			for(Map.Entry<LocalDate, Set<String>> entry : items.entrySet()) {
-				entry.setValue(new HashSet<String>());
-			}
-		}
+		
 		public void addAll(LocalDate date, Set<String> ids) {
-			items.put(date, ids);
-			if(items.size()>top) {
-				items.remove(items.firstKey());
+			for(String id : ids) {
+				this.add(date, id);
 			}
 		}
 		
@@ -299,7 +269,10 @@ public class OptimizeOperation4 implements Operation {
 			if(ids==null) {
 				ids = new HashSet<String>();
 			}
-			if(id!=null) {
+			if(id!=null 
+					//&& !hist.contains(id)
+					) {
+				//hist.add(id);
 				ids.add(id);
 			}
 			items.put(date, ids);
@@ -332,14 +305,6 @@ public class OptimizeOperation4 implements Operation {
 			
 			Set<String> results = new HashSet<String>();
 			Muster muster;
-/*			for(String id : drums) {
-				if(tmp.contains(id)) {
-					muster = musters.get(id);
-					if(muster!=null && !muster.isUpLimited() && muster.getN21Gap()<=8) {
-						results.add(id);
-					}
-				}
-			}*/
 
 			for(String id : tmp){
 				muster = musters.get(id);

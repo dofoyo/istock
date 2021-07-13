@@ -16,6 +16,8 @@ import com.rhb.istock.comm.util.Functions;
 public class Kdata {
 	private String itemID;
 	private TreeMap<LocalDate,Kbar> bars;
+	private LocalDate hDate;
+	private LocalDate lDate;
 	private BigDecimal highest;
 	private BigDecimal lowest;
 
@@ -266,8 +268,16 @@ public class Kdata {
 			) {
 		this.bars.put(date, new Kbar(open, high, low, close, amount, quantity,date, 
 				turnover_rate_f, volume_ratio,total_mv,circ_mv,total_share,float_share,free_share,pe,pe_ttm));
-		this.highest = (this.highest==null || this.highest.compareTo(close)==-1) ? close : this.highest;
-		this.lowest = (this.lowest==null || this.lowest.compareTo(close)==1) ? close : this.lowest;
+		if(this.highest==null || this.highest.compareTo(close)==-1) {
+			this.highest = close;
+			this.hDate = date;
+		}
+		if(this.lowest==null || this.lowest.compareTo(close)==1) {
+			this.lowest = close;
+			this.lDate = date;
+		}
+		//this.highest = (this.highest==null || this.highest.compareTo(close)==-1) ? close : this.highest;
+		//this.lowest = (this.lowest==null || this.lowest.compareTo(close)==1) ? close : this.lowest;
 		
 	}
 	
@@ -289,6 +299,15 @@ public class Kdata {
 
 	public void setItemID(String itemID) {
 		this.itemID = itemID;
+	}
+	public LocalDate gethDate() {
+		return hDate;
+	}
+	public LocalDate getlDate() {
+		return lDate;
+	}
+	public BigDecimal getHighest() {
+		return highest;
 	}
 	
 }

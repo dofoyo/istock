@@ -34,6 +34,8 @@ import com.rhb.istock.producer.Producer;
 import com.rhb.istock.selector.drum.DrumService;
 import com.rhb.istock.selector.fina.FinaService;
 import com.rhb.istock.selector.newb.NewbService;
+import com.rhb.istock.simulation.Hold;
+import com.rhb.istock.simulation.SimulationService;
 import com.rhb.istock.trade.turtle.simulation.six.TurtleMusterSimulation;
 import com.rhb.istock.trade.turtle.simulation.six.TurtleMusterSimulation_avb_plus;
 import com.rhb.istock.trade.turtle.simulation.six.TurtleMusterSimulation_hua;
@@ -42,6 +44,10 @@ import com.rhb.istock.trade.turtle.simulation.six.repository.TurtleSimulationRep
 
 @RestController
 public class ManualApi {
+	@Autowired
+	@Qualifier("simulationService")
+	SimulationService simulationService;
+	
 	@Autowired
 	@Qualifier("turtleSimulationRepository")
 	TurtleSimulationRepository turtleSimulationRepository;
@@ -110,6 +116,14 @@ public class ManualApi {
 	@Qualifier("newbRup")
 	Producer newbRup;
 
+	@Autowired
+	@Qualifier("newbRupStart")
+	Producer newbRupStart;
+	
+	@Autowired
+	@Qualifier("horizon")
+	Producer horizon;
+	
 	@Autowired
 	@Qualifier("eva")
 	Producer eva;
@@ -194,6 +208,7 @@ public class ManualApi {
 		turtleSimulationRepository.evictBreakersCache();
 		turtleSimulationRepository.evictBuysCache();
 		turtleSimulationRepository.evictSellsCache();
+		turtleSimulationRepository.evictHoldsCache();
 
 		manualService.simulate(simulateType, theEndDate); 
 		
@@ -202,6 +217,7 @@ public class ManualApi {
 		turtleSimulationRepository.evictBreakersCache();
 		turtleSimulationRepository.evictBuysCache();
 		turtleSimulationRepository.evictSellsCache();
+		turtleSimulationRepository.evictHoldsCache();
 
 		return new ResponseContent<String>(ResponseEnum.SUCCESS, "");
 		
@@ -335,8 +351,10 @@ public class ManualApi {
 			ids = newbRecoH21.getResults(theDate);
 		}else if("newbRup".equals(type)) { 
 			ids = newbRup.getResults(theDate);
+		}else if("newbRupStart".equals(type)) { 
+			ids = newbRupStart.getResults(theDate);
 		}else if("eva".equals(type)) { 
-			ids = eva.getResults(theDate);
+			ids = horizon.getResults(theDate);
 		}else if("low".equals(type)) { 
 			List<String> tmp = drumPlusL21.getResults(theDate);
 			if(tmp!=null && tmp.size()>0) {
@@ -365,7 +383,7 @@ public class ManualApi {
 				muster = musters.get(id);
 				item = items.get(id);
 				recommendationCount = finaService.getRecommendationCount(id, theDate);
-				if(muster!=null && muster.getN21Gap()<=8
+				if(muster!=null && muster.getN21Gap()<=8 && muster.getN21Gap()>=0
 						&& muster.isUp(8)
 						&& muster.isRed()
 						&& item!=null && item.getCagr()!=null && item.getCagr()>0 && recommendationCount!=null && recommendationCount>0
@@ -385,8 +403,152 @@ public class ManualApi {
 		}
 		return ids;
 	}
+//---- buys	
+	@GetMapping("/turtle/manual/buys/add/{date}/{itemID}")
+	public ResponseContent<List<ItemView>> addBuys(
+			@PathVariable(value="itemID") String itemID,
+			@PathVariable(value="date") String date
+			) {
+
+		//System.out.println(date + "--" + itemID);
+		List<ItemView> views = new ArrayList<ItemView>();
+		
+		LocalDate theDate = null;
+		try{
+			theDate = LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+		}catch(Exception e){
+			new ResponseContent<List<ItemView>>(ResponseEnum.ERROR, views);
+		}
+		
+		manualService.addBuys(theDate, itemID);		
+		
+		return new ResponseContent<List<ItemView>>(ResponseEnum.SUCCESS, views);
+	}
 	
-	@GetMapping("/turtle/manual/selected/{date}/{itemID}")
+	@GetMapping("/turtle/manual/buys/delete/{date}/{itemID}")
+	public ResponseContent<List<ItemView>> deleteBuys(
+			@PathVariable(value="itemID") String itemID,
+			@PathVariable(value="date") String date
+			) {
+
+		//System.out.println(date + "--" + itemID);
+		List<ItemView> views = new ArrayList<ItemView>();
+		
+		LocalDate theDate = null;
+		try{
+			theDate = LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+		}catch(Exception e){
+			new ResponseContent<List<ItemView>>(ResponseEnum.ERROR, views);
+		}
+		
+		manualService.deleteBuys(theDate,itemID);
+
+		return new ResponseContent<List<ItemView>>(ResponseEnum.SUCCESS, views);
+	}
+	
+	@GetMapping("/turtle/manual/buys/{date}")
+	public ResponseContent<List<SelectView>> getBuys(
+			@PathVariable(value="date") String date
+			) {
+		List<SelectView> views = new ArrayList<SelectView>();
+
+		LocalDate theDate = null;
+		try{
+			theDate = LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+		}catch(Exception e){
+			new ResponseContent<List<SelectView>>(ResponseEnum.ERROR, views);
+		}
+		
+		//System.out.println(theDate);
+		
+		Map<LocalDate, List<String>> selects = manualService.getBuys(theDate);
+		
+		//System.out.println(selects);
+		if(selects != null) {
+			List<String> ids;
+			for(Map.Entry<LocalDate, List<String>> entry : selects.entrySet()) {
+				ids = entry.getValue();
+				for(String id : ids) {
+					views.add(new SelectView(id,itemService.getItem(id).getName(),entry.getKey(),theDate.equals(entry.getKey())?"danger":"info"));
+				}
+			}			
+		}
+		return new ResponseContent<List<SelectView>>(ResponseEnum.SUCCESS, views);
+	}
+//----------- sells
+	@GetMapping("/turtle/manual/sells/add/{date}/{itemID}")
+	public ResponseContent<List<ItemView>> addSells(
+			@PathVariable(value="itemID") String itemID,
+			@PathVariable(value="date") String date
+			) {
+
+		//System.out.println(date + "--" + itemID);
+		List<ItemView> views = new ArrayList<ItemView>();
+		
+		LocalDate theDate = null;
+		try{
+			theDate = LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+		}catch(Exception e){
+			new ResponseContent<List<ItemView>>(ResponseEnum.ERROR, views);
+		}
+		
+		manualService.addSells(theDate, itemID);		
+		
+		return new ResponseContent<List<ItemView>>(ResponseEnum.SUCCESS, views);
+	}
+	
+	@GetMapping("/turtle/manual/sells/delete/{date}/{itemID}")
+	public ResponseContent<List<ItemView>> deleteSells(
+			@PathVariable(value="itemID") String itemID,
+			@PathVariable(value="date") String date
+			) {
+
+		//System.out.println(date + "--" + itemID);
+		List<ItemView> views = new ArrayList<ItemView>();
+		
+		LocalDate theDate = null;
+		try{
+			theDate = LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+		}catch(Exception e){
+			new ResponseContent<List<ItemView>>(ResponseEnum.ERROR, views);
+		}
+		
+		manualService.deleteSells(theDate,itemID);
+
+		return new ResponseContent<List<ItemView>>(ResponseEnum.SUCCESS, views);
+	}
+	
+	@GetMapping("/turtle/manual/sells/{date}")
+	public ResponseContent<List<SelectView>> getSells(
+			@PathVariable(value="date") String date
+			) {
+		List<SelectView> views = new ArrayList<SelectView>();
+
+		LocalDate theDate = null;
+		try{
+			theDate = LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+		}catch(Exception e){
+			new ResponseContent<List<SelectView>>(ResponseEnum.ERROR, views);
+		}
+		
+		//System.out.println(theDate);
+		
+		Map<LocalDate, List<String>> selects = manualService.getSells(theDate);
+		
+		//System.out.println(selects);
+		if(selects != null) {
+			List<String> ids;
+			for(Map.Entry<LocalDate, List<String>> entry : selects.entrySet()) {
+				ids = entry.getValue();
+				for(String id : ids) {
+					views.add(new SelectView(id,itemService.getItem(id).getName(),entry.getKey(),theDate.equals(entry.getKey())?"danger":"info"));
+				}
+			}			
+		}
+		return new ResponseContent<List<SelectView>>(ResponseEnum.SUCCESS, views);
+	}
+	//----------------------
+	@GetMapping("/turtle/manual/selects/add/{date}/{itemID}")
 	public ResponseContent<List<ItemView>> doSelects(
 			@PathVariable(value="itemID") String itemID,
 			@PathVariable(value="date") String date
@@ -407,7 +569,7 @@ public class ManualApi {
 		return new ResponseContent<List<ItemView>>(ResponseEnum.SUCCESS, views);
 	}
 	
-	@GetMapping("/turtle/manual/selected/delete/{date}/{itemID}")
+	@GetMapping("/turtle/manual/selects/delete/{date}/{itemID}")
 	public ResponseContent<List<ItemView>> deleteSelects(
 			@PathVariable(value="itemID") String itemID,
 			@PathVariable(value="date") String date
@@ -519,12 +681,11 @@ public class ManualApi {
 		}
 		
 		Map<LocalDate,List<String>> breakers = turtleSimulationRepository.getBreakers(type);
-		
-		List<String> ids = breakers.get(theDate);
+		List<String> breaker_ids = breakers.get(theDate);
 		Item item;
-		if(ids!=null && !ids.isEmpty()) {
+		if(breaker_ids!=null && !breaker_ids.isEmpty()) {
 			Set<String> holds = this.getHoldIDs(this.generateHolds("manual",theDate));
-			for(String id : ids) {
+			for(String id : breaker_ids) {
 				item = itemService.getItem(id);
 				views.add(new ItemView(id,item.getName(),holds.contains(id)? "danger" : "warning"));
 			}
@@ -548,7 +709,8 @@ public class ManualApi {
 		}
 
 		
-		Set<Hold> holds = this.generateHolds(type,theDate);
+		//Set<Hold> holds = this.generateHolds(type,theDate);
+		Set<Hold> holds = simulationService.getHolds(type, theDate, false);
 		if(holds!=null && !holds.isEmpty()) {
 			for(Hold hold : holds) {
 				views.add(new HoldView(hold.getItemID(),hold.getItemName(),hold.getProfit().intValue(),hold.getDate()));
@@ -678,64 +840,4 @@ public class ManualApi {
 			return ids;
 		}		
 	}
-	class Hold{
-		private String itemID;
-		private String itemName;
-		private Integer count;
-		private BigDecimal profit;
-		private LocalDate date;
-		
-		public Hold(String str) {
-			String[] ss = str.split(",");
-			this.itemID = ss[0];
-			this.itemName = ss[1];
-			this.profit = new BigDecimal(ss[2]);
-			this.date = LocalDate.parse(ss[3],DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-			this.count = 1;
-		}
-		
-		public LocalDate getDate() {
-			return date;
-		}
-
-		public void setDate(LocalDate date) {
-			this.date = date;
-		}
-
-		public void update(String str) {
-			String[] ss = str.split(",");
-			this.profit = this.profit.add(new BigDecimal(ss[2]));
-			this.count++;
-		}
-		
-		public boolean isHold() {
-			return count==0 ? false : true;
-		}
-		
-		public String getItemID() {
-			return itemID;
-		}
-		public void setItemID(String itemID) {
-			this.itemID = itemID;
-		}
-		public String getItemName() {
-			return itemName;
-		}
-		public void setItemName(String itemName) {
-			this.itemName = itemName;
-		}
-		public Integer getCount() {
-			return count;
-		}
-		public void deCount() {
-			this.count--;
-		}
-		public BigDecimal getProfit() {
-			return profit;
-		}
-		public void setProfit(BigDecimal profit) {
-			this.profit = profit;
-		}
-	}
-
 }

@@ -49,8 +49,8 @@ public class SimulateBDT2 {
 	public Future<String> run(LocalDate beginDate, LocalDate endDate, BigDecimal initCash, Integer top, boolean isAveValue, Integer quantityType, boolean isEvaluation)  throws Exception {
 		Account account = new Account(initCash);
 		Map<LocalDate, List<String>> operationList = this.getOperationList(beginDate, endDate);
-		Map<String, String> operateResult = operation.run(account, operationList, beginDate, endDate, "bdt2", top, isAveValue,quantityType);
-		turtleSimulationRepository.save("bdt2", operateResult.get("breakers"), operateResult.get("CSV"), operateResult.get("dailyAmount"), isEvaluation);
+		Map<String, String> operateResult = operation.run(account, operationList,null, beginDate, endDate, "bdt2", top, isAveValue,quantityType);
+		turtleSimulationRepository.save("bdt2", operateResult.get("breakers"), operateResult.get("CSV"), operateResult.get("dailyAmount"), operateResult.get("dailyHolds"), isEvaluation);
 		return new AsyncResult<String>("bdt执行完毕");
 	}
 	

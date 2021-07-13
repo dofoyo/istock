@@ -33,12 +33,18 @@ public class FdataSpiderEastmoney {
 	//数据来自页面：http://f10.eastmoney.com/ProfitForecast/Index?type=web&code=SH601633#
 	public void downProfitForecast(String itemID) {
 		String url = "http://f10.eastmoney.com/ProfitForecast/ProfitForecastAjax?code=" + itemID;
-		JSONObject args = new JSONObject();
-		String str = HttpClient.doPostJson(url, args.toString());
-		
-		String fdataFile = eastmoneyFataPath + "/" + itemID + ".json";
-		FileTools.writeTextFile(fdataFile, str, false);		
+		try {
+			JSONObject args = new JSONObject();
+			String str = HttpClient.doPostJson(url, args.toString());
 
+			JSONObject profitForecast = new JSONObject(str).getJSONObject("yctj");
+			if(profitForecast!=null) {
+				String fdataFile = eastmoneyFataPath + "/" + itemID + ".json";
+				FileTools.writeTextFile(fdataFile, str, false);		
+			}
+		}catch(Exception e) {
+			logger.error("downProfitForecast " + url + "  ERROR!!!");
+		}
 	}
 	
 	public void downProfitForecasts() {

@@ -54,7 +54,7 @@ public class FdataSpiderEastmoneyTest {
 		System.out.println(str);
 		System.out.println(str.length());
 */
-		fdataSpiderEastmoney.downRecommendations();
+		fdataSpiderEastmoney.downProfitForecasts();
 	
 	}
 

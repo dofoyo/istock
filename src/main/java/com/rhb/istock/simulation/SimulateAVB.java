@@ -34,15 +34,16 @@ public class SimulateAVB {
 	Producer producer;	
 	
 	@Autowired
-	@Qualifier("newbOperation")
+	@Qualifier("newbOperation")  
+	//@Qualifier("favorOperation")  //测试
 	Operation operation;
 	
 	@Async("taskExecutor")
 	public Future<String> run(LocalDate beginDate, LocalDate endDate, BigDecimal initCash, Integer top, boolean isAveValue, Integer quantityType, boolean isEvaluation) throws Exception {
 		Account account = new Account(initCash);
 		Map<LocalDate, List<String>> operationList = producer.getResults(beginDate, endDate);
-		Map<String, String> operateResult = operation.run(account, operationList, beginDate, endDate, "avb", top, isAveValue,quantityType);
-		turtleSimulationRepository.save("avb", operateResult.get("breakers"), operateResult.get("CSV"), operateResult.get("dailyAmount"), isEvaluation);		
+		Map<String, String> operateResult = operation.run(account, operationList,null, beginDate, endDate, "avb", top, isAveValue,quantityType);
+		turtleSimulationRepository.save("avb", operateResult.get("breakers"), operateResult.get("CSV"), operateResult.get("dailyAmount"), operateResult.get("dailyHolds"), isEvaluation);		
 		return new AsyncResult<String>("avb执行完毕");
 	}
 

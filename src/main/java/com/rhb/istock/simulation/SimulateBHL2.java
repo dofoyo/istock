@@ -52,8 +52,8 @@ public class SimulateBHL2 {
 		//top = 1;
 		Account account = new Account(initCash);
 		Map<LocalDate, List<String>> operationList = this.getOperationList(beginDate, endDate);
-		Map<String, String> operateResult = operation.run(account, operationList, beginDate, endDate, "bhl2", top, isAveValue,quantityType);
-		turtleSimulationRepository.save("bhl2", operateResult.get("breakers"), operateResult.get("CSV"), operateResult.get("dailyAmount"), isEvaluation);
+		Map<String, String> operateResult = operation.run(account, operationList,null, beginDate, endDate, "bhl2", top, isAveValue,quantityType);
+		turtleSimulationRepository.save("bhl2", operateResult.get("breakers"), operateResult.get("CSV"), operateResult.get("dailyAmount"), operateResult.get("dailyHolds"), isEvaluation);
 		return new AsyncResult<String>("bhl执行完毕");
 	}
 	

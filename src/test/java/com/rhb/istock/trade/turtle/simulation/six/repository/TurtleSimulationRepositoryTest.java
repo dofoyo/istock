@@ -25,4 +25,9 @@ public class TurtleSimulationRepositoryTest {
 	public void getAmounts() {
 		System.out.println(turtleSimulationRepository.getAmounts("av"));
 	}
+
+	@Test
+	public void getHolds() {
+		System.out.println(turtleSimulationRepository.getHolds("hlb"));
+	}
 }

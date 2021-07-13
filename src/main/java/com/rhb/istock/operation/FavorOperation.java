@@ -48,6 +48,7 @@ public class FavorOperation implements Operation {
 	@Qualifier("drum")
 	Producer producer;*/
 	
+	private StringBuffer dailyHolds_sb;
 	private StringBuffer dailyAmount_sb;
 	private StringBuffer breakers_sb;
 	//private Integer previous_period  = 13; //历史纪录区间，主要用于后面判断
@@ -55,12 +56,13 @@ public class FavorOperation implements Operation {
 	//private Keeper dropsKeeper; //包含所有跌破21日线卖出的票,在13天内如果涨回21日线,说明调整结束,可以再次买入
 	//private Keeper up21Keeper; //包含所有涨回21日线的票
 	
-	public Map<String,String> run(Account account, Map<LocalDate, List<String>> buyList,LocalDate beginDate, LocalDate endDate, String label, int top, boolean isAveValue, Integer quantityType) {
+	public Map<String,String> run(Account account, Map<LocalDate, List<String>> buyList,Map<LocalDate, List<String>> sellList,LocalDate beginDate, LocalDate endDate, String label, int top, boolean isAveValue, Integer quantityType) {
 		long days = endDate.toEpochDay()- beginDate.toEpochDay();
 		
 		//logger.info(buyList.toString());
 		
 		dailyAmount_sb = new StringBuffer("date,cash,value,total\n");
+		dailyHolds_sb = new StringBuffer("date,itemID,itemName,open,close,quantity,profit,days\n");
 		breakers_sb = new StringBuffer();
 		breaksKeeper = new Keeper(55);  //包含所有创新高的股票,因为当天涨停或价格过高不能买入,等待价格回落后买入
 		//up21Keeper = new Keeper(55);  //包含所有突破21线的股票,因为当天涨停或价格过高不能买入,等待价格回落后买入
@@ -96,6 +98,7 @@ public class FavorOperation implements Operation {
 				account.refreshHoldsPrice(itemID, muster.getLatestPrice(), muster.getLatestHighest());
 			}
 		}
+		dailyHolds_sb.append(account.getHoldStateString());
 		
 		//卖出
 		for(String itemID: holdItemIDs) {
@@ -109,10 +112,10 @@ public class FavorOperation implements Operation {
 					//logger.info("dropsKeeper add " + itemID);
 				}
 				
-				//高位回落超过8%
-				/*if(account.isFallOrder(itemID, -8) && muster.getN21Gap()>8) {
+/*				//高位快速回落超过8%，止盈
+				if(account.isFallOrder(itemID, -8) && muster.getN21Gap()>8) {
 					account.dropWithTax(itemID, "2", muster.getLatestPrice());
-					dropsKeeper.add(date, itemID);
+					//dropsKeeper.add(date, itemID);
 					//logger.info("dropsKeeper add " + itemID);
 				}*/
 			}
@@ -178,8 +181,6 @@ public class FavorOperation implements Operation {
 		}
 			
 		dailyAmount_sb.append(account.getDailyAmount() + "\n");
-		
-
 	}
 	
 	private Map<String,String> result(Account account) {
@@ -197,6 +198,7 @@ public class FavorOperation implements Operation {
 		result.put("breakers", breakers_sb.toString());
 		result.put("lostIndustrys", account.getLostIndustrys());
 		result.put("winIndustrys", account.getWinIndustrys());
+		result.put("dailyHolds", dailyHolds_sb.toString());
 		return result;
 	}
 	
@@ -275,7 +277,7 @@ public class FavorOperation implements Operation {
 			for(String id : drums) {
 				if(tmp.contains(id)) {
 					muster = musters.get(id);
-					if(muster!=null && !muster.isUpLimited() && muster.getN21Gap()<=8) {
+					if(muster!=null && !muster.isUpLimited() && muster.getN21Gap()<=5 && muster.getN21Gap()>=0) {
 						results.add(id);
 					}
 				}

@@ -157,13 +157,13 @@ public class TurtleMusterSimulation {
 		Map<String, String> avbResult = avb.result();
 		Map<String, String> hlbResult = hlb.result();
 		
-		turtleSimulationRepository.save("bav", bavResult.get("breakers"), bavResult.get("CSV"), bavResult.get("dailyAmount"), isEvaluation);
-		turtleSimulationRepository.save("bhl", bhlResult.get("breakers"), bhlResult.get("CSV"), bhlResult.get("dailyAmount"), isEvaluation);
-		turtleSimulationRepository.save("bdt", bdtResult.get("breakers"), bdtResult.get("CSV"), bdtResult.get("dailyAmount"), isEvaluation);
+		turtleSimulationRepository.save("bav", bavResult.get("breakers"), bavResult.get("CSV"), bavResult.get("dailyAmount"), bavResult.get("dailyHolds"), isEvaluation);
+		turtleSimulationRepository.save("bhl", bhlResult.get("breakers"), bhlResult.get("CSV"), bhlResult.get("dailyAmount"), bhlResult.get("dailyHolds"), isEvaluation);
+		turtleSimulationRepository.save("bdt", bdtResult.get("breakers"), bdtResult.get("CSV"), bdtResult.get("dailyAmount"), bdtResult.get("dailyHolds"), isEvaluation);
 		
-		turtleSimulationRepository.save("dtb", dtbResult.get("breakers"), dtbResult.get("CSV"), dtbResult.get("dailyAmount"), isEvaluation);
-		turtleSimulationRepository.save("hlb", hlbResult.get("breakers"), hlbResult.get("CSV"), hlbResult.get("dailyAmount"), isEvaluation);
-		turtleSimulationRepository.save("avb", avbResult.get("breakers"), avbResult.get("CSV"), avbResult.get("dailyAmount"), isEvaluation);
+		turtleSimulationRepository.save("dtb", dtbResult.get("breakers"), dtbResult.get("CSV"), dtbResult.get("dailyAmount"), dtbResult.get("dailyHolds"), isEvaluation);
+		turtleSimulationRepository.save("hlb", hlbResult.get("breakers"), hlbResult.get("CSV"), hlbResult.get("dailyAmount"), hlbResult.get("dailyHolds"), isEvaluation);
+		turtleSimulationRepository.save("avb", avbResult.get("breakers"), avbResult.get("CSV"), avbResult.get("dailyAmount"), avbResult.get("dailyHolds"), isEvaluation);
 		
 		long used = (System.currentTimeMillis() - beginTime)/1000; 
 		System.out.println("simulate 用时：" + used + "秒");          

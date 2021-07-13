@@ -3,6 +3,7 @@ package com.rhb.istock.fdata.tushare;
 import java.math.BigDecimal;
 
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 public class FinaIndicator {
 	private String itemID;
@@ -16,11 +17,14 @@ public class FinaIndicator {
 	private BigDecimal dt_netprofit_yoy; 	//归属母公司股东的净利润-扣除非经常损益同比增长率(%)
 	private BigDecimal or_yoy; 				//营业收入同比增长率(%)
 	private BigDecimal ocfps;				//每股经营活动产生的现金流量净额
+	private BigDecimal roe;				//净资产收益率
+	private BigDecimal debt_to_assets;    //资产负债率
 	
 	public boolean isValid() {
 		return this.profit_dedt!=null && !this.profit_dedt.equals(BigDecimal.ZERO);
 	}
-	public FinaIndicator(JSONArray item) {
+	public FinaIndicator(String itemID,JSONArray item) {
+		this.itemID = itemID;
 		this.ann_date = item.get(1).toString();
 		this.end_date  = item.getString(2);
 		this.profit_dedt  = item.get(11).toString().equals("null") ? BigDecimal.ZERO : item.getBigDecimal(11);
@@ -31,17 +35,37 @@ public class FinaIndicator {
 		this.netprofit_yoy  = item.get(96).toString().equals("null") ? BigDecimal.ZERO : item.getBigDecimal(96);
 		this.dt_netprofit_yoy  = item.get(97).toString().equals("null") ? BigDecimal.ZERO : item.getBigDecimal(97);
 		this.or_yoy  = item.get(104).toString().equals("null") ? BigDecimal.ZERO : item.getBigDecimal(104);
+		this.roe  = item.get(54).toString().equals("null") ? BigDecimal.ZERO : item.getBigDecimal(54);
+		this.debt_to_assets  = item.get(62).toString().equals("null") ? BigDecimal.ZERO : item.getBigDecimal(62);
 	}
 	
 	public boolean isOK() {
-		return this.profit_dedt.compareTo(BigDecimal.ZERO)==1   //扣除非经常性损益后的净利润
-				&& this.grossprofit_margin.compareTo(BigDecimal.ZERO)==1   //销售毛利率
-				&& this.or_yoy.compareTo(BigDecimal.ZERO)==1    //营业收入同比增长率(%)
-				&& this.dt_netprofit_yoy.compareTo(BigDecimal.ZERO)==1  //归属母公司股东的净利润-扣除非经常损益同比增长率(%)
-				//&& this.ocfps.compareTo(BigDecimal.ZERO)==1  //每股经营活动产生的现金流量净额
+		return this.profit_dedt.compareTo(new BigDecimal(1000000000))==1   //扣除非经常性损益后的净利润
+				//&& this.grossprofit_margin.compareTo(BigDecimal.ZERO)==1   //销售毛利率
+				&& this.or_yoy.compareTo(new BigDecimal(13))==1    //营业收入同比增长率(%)
+				&& this.dt_netprofit_yoy.compareTo(new BigDecimal(13))==1  //归属母公司股东的净利润-扣除非经常损益同比增长率(%)
+				&& this.ocfps.compareTo(BigDecimal.ZERO)==1  //每股经营活动产生的现金流量净额
+				&& this.roe.compareTo(new BigDecimal(13))==1  //净资产收益率
+				//&& this.debt_to_assets.compareTo(new BigDecimal(55))==-1  //净资产收益率
 				;
 	}
 	
+	public boolean isGood() {
+		return //this.profit_dedt.compareTo(new BigDecimal(100000000))==1   //扣除非经常性损益后的净利润
+				//&& this.grossprofit_margin.compareTo(BigDecimal.ZERO)==1   //销售毛利率
+				this.or_yoy.compareTo(BigDecimal.ZERO)==1    //营业收入同比增长率(%)
+				&& this.dt_netprofit_yoy.compareTo(BigDecimal.ZERO)==1  //归属母公司股东的净利润-扣除非经常损益同比增长率(%)
+				//&& this.ocfps.compareTo(BigDecimal.ZERO)==1  //每股经营活动产生的现金流量净额
+				//&& this.roe.compareTo(new BigDecimal(13))==1  //净资产收益率
+				;
+	}
+	
+	public BigDecimal getDebt_to_assets() {
+		return debt_to_assets;
+	}
+	public void setDebt_to_assets(BigDecimal debt_to_assets) {
+		this.debt_to_assets = debt_to_assets;
+	}
 	public BigDecimal getOcfps() {
 		return ocfps;
 	}
@@ -112,11 +136,20 @@ public class FinaIndicator {
 	public void setGrossprofit_margin(BigDecimal grossprofit_margin) {
 		this.grossprofit_margin = grossprofit_margin;
 	}
+	
+	public BigDecimal getRoe() {
+		return roe;
+	}
+	public void setRoe(BigDecimal roe) {
+		this.roe = roe;
+	}
 	@Override
 	public String toString() {
-		return "FinaIndicator [ann_date=" + ann_date + ", profit_dedt=" + profit_dedt + ", grossprofit_margin="
-				+ grossprofit_margin + ", op_yoy=" + op_yoy + ", ebt_yoy=" + ebt_yoy + ", netprofit_yoy="
-				+ netprofit_yoy + ", dt_netprofit_yoy=" + dt_netprofit_yoy + ", or_yoy=" + or_yoy + "]";
+		return "FinaIndicator [itemID=" + itemID + ", ann_date=" + ann_date + ", end_date=" + end_date
+				+ ", profit_dedt=" + profit_dedt + ", grossprofit_margin=" + grossprofit_margin + ", op_yoy=" + op_yoy
+				+ ", ebt_yoy=" + ebt_yoy + ", netprofit_yoy=" + netprofit_yoy + ", dt_netprofit_yoy=" + dt_netprofit_yoy
+				+ ", or_yoy=" + or_yoy + ", ocfps=" + ocfps + ", roe=" + roe + ", debt_to_assets=" + debt_to_assets
+				+ ", isValid()=" + isValid() + ", isOK()=" + isOK() + ", isGood()=" + isGood() + "]";
 	}
 
 }

@@ -30,19 +30,21 @@ public class SimulateDTB {
 	TurtleSimulationRepository turtleSimulationRepository;
 	
 	@Autowired
-	@Qualifier("drumPlusL21")
+	//@Qualifier("drumPlusL21")
+	@Qualifier("oks")  //测试
 	Producer producer;
 	
 	@Autowired
-	@Qualifier("conservativeOperation")
+	//@Qualifier("conservativeOperation")
+	@Qualifier("oksOperation2") //测试
 	Operation operation;
 	
 	@Async("taskExecutor")
 	public Future<String> run(LocalDate beginDate, LocalDate endDate, BigDecimal initCash, Integer top, boolean isAveValue, Integer quantityType, boolean isEvaluation)  throws Exception {
 		Account account = new Account(initCash);
 		Map<LocalDate, List<String>> operationList = producer.getResults(beginDate, endDate);
-		Map<String, String> operateResult = operation.run(account, operationList, beginDate, endDate,"dtb", top, isAveValue,quantityType);
-		turtleSimulationRepository.save("dtb", operateResult.get("breakers"), operateResult.get("CSV"), operateResult.get("dailyAmount"), isEvaluation);
+		Map<String, String> operateResult = operation.run(account, operationList,null, beginDate, endDate,"dtb", top, isAveValue,quantityType);
+		turtleSimulationRepository.save("dtb", operateResult.get("breakers"), operateResult.get("CSV"), operateResult.get("dailyAmount"), operateResult.get("dailyHolds"), isEvaluation);
 		return new AsyncResult<String>("dtb执行完毕");
 	}
 }

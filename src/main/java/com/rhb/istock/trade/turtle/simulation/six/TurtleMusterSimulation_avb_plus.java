@@ -88,7 +88,7 @@ public class TurtleMusterSimulation_avb_plus {
 		
 		Map<String, String> dtbResult = bdt.result();
 		
-		turtleSimulationRepository.save("bdt", dtbResult.get("breakers"), dtbResult.get("CSV"), dtbResult.get("dailyAmount"), isEvaluation);
+		turtleSimulationRepository.save("bdt", dtbResult.get("breakers"), dtbResult.get("CSV"), dtbResult.get("dailyAmount"), dtbResult.get("dailyHolds"), isEvaluation);
 
 		long used = (System.currentTimeMillis() - beginTime)/1000; 
 		System.out.println("用时：" + used + "秒");          

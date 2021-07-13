@@ -64,11 +64,11 @@ public class Simulation {
 			
 			while(true) {
 				if(true
-					&& fhlb.isDone() 
-					&& fbdt.isDone()
 					&& favb.isDone()
-					&& fbhl.isDone()
 					&& fbav.isDone()
+					&& fbdt.isDone()
+					&& fbhl.isDone()
+					&& fhlb.isDone() 
 					&& fdtb.isDone()
 						) {
 					break;

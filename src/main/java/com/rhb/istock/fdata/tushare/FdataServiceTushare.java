@@ -41,10 +41,10 @@ public class FdataServiceTushare {
 	
 	protected static final Logger logger = LoggerFactory.getLogger(FdataServiceTushare.class);
 
-	public Map<Integer,Set<String>> getOks() {
-		if(oks!=null) {
+	public Map<Integer,Set<String>> getOks(LocalDate date) {
+		/*if(oks!=null) {
 			return oks;
-		}
+		}*/
 		oks = new HashMap<Integer,Set<String>>();
 		List<String> ids = itemService.getItemIDs();
 		int i=1;
@@ -52,7 +52,7 @@ public class FdataServiceTushare {
 		Set<String> okIDs;
 		for(String id : ids) {
 			Progress.show(ids.size(), i++, id);
-			years = this.getOKs(id);
+			years = this.getOKs(id, date);
 			for(Integer year : years) {
 				okIDs = oks.get(year);
 				if(okIDs == null) {
@@ -66,9 +66,16 @@ public class FdataServiceTushare {
 		return oks;
 	}
 
-	private Set<Integer> getOKs(String itemID){
+	private Set<Integer> getOKs(String itemID,LocalDate date){
 		Set<Integer> years = new HashSet<Integer>();
-		Map<String,FinaIndicator> indicators = fdataRepositoryTushare.getIndicators(itemID);
+		Map<String,FinaIndicator> indicators = fdataRepositoryTushare.getIndicators(itemID, date);
+		for(FinaIndicator fi : indicators.values()) {
+			if(fi.isOK()) {
+				years.add(Integer.parseInt(fi.getEnd_date().substring(0, 4)));
+			}
+		}
+		
+/*		
 		FinaIndicator i1,i2,i3;
 		for(int year=2020; year>=2009; year--) {
 			String date1 = Integer.toString(year-3) + "1231";
@@ -84,7 +91,7 @@ public class FdataServiceTushare {
 					) {
 				years.add(year);
 			}			
-		}
+		}*/
 		return years;
 	}
 	
@@ -190,7 +197,7 @@ public class FdataServiceTushare {
 		FinaForecast forecast;
 		
 		for(String id : ids) {
-			indicators = fdataRepositoryTushare.getIndicators(id);
+			indicators = fdataRepositoryTushare.getIndicators(id, LocalDate.now());
 			indicator = indicators.get(endDate[0]);
 			if(indicator!=null) {
 				info.put(id, indicator.getInfo());

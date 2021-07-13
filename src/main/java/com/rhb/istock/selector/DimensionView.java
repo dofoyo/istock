@@ -19,6 +19,11 @@ public class DimensionView {
 		boards = new HashMap<String,Board>();
 	}
 	
+	@Override
+	public String toString() {
+		return "DimensionView [code=" + code + ", name=" + name + ", boards=" + boards + "]";
+	}
+
 	public String getCode() {
 		return code;
 	}
@@ -103,6 +108,12 @@ public class DimensionView {
 				return "plain";
 			}
 		}
+
+		@Override
+		public String toString() {
+			return "Board [code=" + code + ", name=" + name + ", ratio=" + ratio + ", status=" + status + ", items="
+					+ items + "]";
+		}
 		
 	}
 	
@@ -126,5 +137,10 @@ public class DimensionView {
 		public String getStatus() {
 			return status;
 		}
+		@Override
+		public String toString() {
+			return "Item [code=" + code + ", name=" + name + ", status=" + status + "]";
+		}
+		
 	}
 }

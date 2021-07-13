@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -50,11 +51,11 @@ public class KdataServiceTest {
 		kdataService.updateLatestMusters();
 	}
 	
-	//@Test
+	@Test
 	public void generateMusters() {
-		//LocalDate date = LocalDate.parse("2017-01-25");
+		LocalDate date = LocalDate.parse("2017-01-25");
 		//kdataService.generateMusters(date);
-		kdataService.generateLatestMusters(null, false);
+		kdataService.generateLatestMusters(null, true);
 		kdataService.updateLatestMusters();
 	}
 	
@@ -89,13 +90,13 @@ public class KdataServiceTest {
 		}
 	}
 	
-	@Test
+	//@Test
 	public void downClosedDatas() {
 		System.out.println("down closed datas");
-		LocalDate date = LocalDate.parse("2021-04-30");
+		LocalDate date = LocalDate.parse("2021-06-04");
 		try {
-			//kdataService.downClosedDatas(date);
-			kdataService.downFactors(date);
+			kdataService.downClosedDatas(date);
+			//kdataService.downFactors(date);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -123,6 +124,12 @@ public class KdataServiceTest {
 	public void testt() {
 		LocalDate endDate = LocalDate.parse("2020-09-12");
 		List<LocalDate> dates = kdataService.getMusterDates(13, endDate);
+		System.out.println(dates);
+	}
+	
+	//@Test
+	public void getBombingDates() {
+		Set<LocalDate> dates = kdataService.getBombingDates();
 		System.out.println(dates);
 	}
 }

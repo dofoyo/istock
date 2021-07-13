@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -18,6 +19,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import com.rhb.istock.comm.util.FileTools;
 import com.rhb.istock.comm.util.Functions;
 import com.rhb.istock.comm.util.HttpClient;
 import com.rhb.istock.comm.util.Progress;
@@ -78,6 +80,9 @@ public class KdataServiceImp implements KdataService{
 	
 	@Value("${dropDuration}")
 	private Integer dropDuration;
+	
+	@Value("${bombingDatesFile}")
+	private String bombingDatesFile;
 	
 	private String sseiID = "sh000001"; //上证指数
 	private String ssei_code = "000001.SH";
@@ -674,7 +679,7 @@ public class KdataServiceImp implements KdataService{
 	
 	private void updateMustersWithLatestKdata() {
 		long beginTime=System.currentTimeMillis(); 
-		logger.info("update Musters With Latest Kdata ......");
+		System.out.println("update Musters With Latest Kdata ......");
 
 		Map<String,Kbar> bars = kdataRealtimeSpider.getLatestMarketData();
 		LocalDate date = this.getLatestMarketDate("sh000001");
@@ -735,28 +740,28 @@ public class KdataServiceImp implements KdataService{
 						}
 						entities.add(entity);
 					}else {
-						logger.info("There is a NULL muster.");
+						System.out.println("There is a NULL muster.");
 					}
 				}
 				musterRepositoryImp.saveMusters(date,entities);
 			}else {
-				logger.info(" update Musters With Latest Kdata ERROR: musters is NULL!!!");
+				System.out.println(" update Musters With Latest Kdata ERROR: musters is NULL!!!");
 			}
 		}else {
-			logger.info(" update Musters With Latest Kdata ERROR: BAR IS NULL!");
+			System.out.println(" update Musters With Latest Kdata ERROR: BAR IS NULL!");
 		}
 		
 
-		logger.info("\n updateLatestMusters done!");
+		System.out.println("\n updateLatestMusters done!");
 		long used = (System.currentTimeMillis() - beginTime)/1000; 
-		logger.info("用时：" + used + "秒");     
+		System.out.println("用时：" + used + "秒");     
 		
 		
 	}
 
 	private void updateMusters(LocalDate date, Map<String,Muster> musters, Set<String> ids) {
 		long beginTime=System.currentTimeMillis(); 
-		logger.info("updateMusters ......");
+		System.out.println("updateMusters ......");
 
 		Kbar kbar;
 		List<MusterEntity> entities = new ArrayList<MusterEntity>();
@@ -814,9 +819,9 @@ public class KdataServiceImp implements KdataService{
 		}
 		musterRepositoryImp.saveMusters(date,entities);
 
-		logger.info("\n updateLatestMusters done!");
+		System.out.println("\n updateLatestMusters done!");
 		long used = (System.currentTimeMillis() - beginTime)/1000; 
-		logger.info("用时：" + used + "秒");     
+		System.out.println("用时：" + used + "秒");     
 	}
 	
 	@Override
@@ -966,8 +971,8 @@ public class KdataServiceImp implements KdataService{
 		this.downSSEI();
 
 		kdataSpiderTushare.downKdatas(date);
-		kdataSpiderTushare.downBasics(date);
-		//kdataSpiderTushare.downFactors(date);
+		//kdataSpiderTushare.downBasics(date); //没有用处了
+		//kdataSpiderTushare.downFactors(date);//该为每天中午下载了
 		
 		long used = (System.currentTimeMillis() - beginTime)/1000; 
 		System.out.println("用时：" + used + "秒");          
@@ -1040,5 +1045,19 @@ public class KdataServiceImp implements KdataService{
 			//ssei.removeFirstBar();
 		}
 		return ssei.getRatio();
+	}
+
+	@Override
+	public Set<LocalDate> getBombingDates() {
+		Set<LocalDate> dates = new HashSet<LocalDate>();
+		String str = FileTools.readTextFile(bombingDatesFile);
+		String[] ss = str.split(",");
+		for(String s : ss) {
+			if(s.length()>5) {
+				//System.out.println(s);
+				dates.add(LocalDate.parse(s));
+			}
+		}
+		return dates;
 	}
 }

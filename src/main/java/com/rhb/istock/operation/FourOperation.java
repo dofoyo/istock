@@ -45,6 +45,7 @@ public class FourOperation implements Operation {
 /*	@Autowired
 	@Qualifier("drum")
 	Producer producer;*/
+	private StringBuffer dailyHolds_sb;
 	
 	private StringBuffer dailyAmount_sb;
 	private StringBuffer breakers_sb;
@@ -53,12 +54,13 @@ public class FourOperation implements Operation {
 	private Keeper newbKeeper;  //包含所有创新高的股票,因为当天涨停或价格过高不能买入,等待价格回落后买入
 	private Keeper dropsKeeper; //包含所有跌破21日线卖出的票,在13天内如果涨回21日线,说明调整结束,可以再次买入
 	
-	public Map<String,String> run(Account account, Map<LocalDate, List<String>> buyList,LocalDate beginDate, LocalDate endDate, String label, int top, boolean isAveValue, Integer quantityType) {
+	public Map<String,String> run(Account account, Map<LocalDate, List<String>> buyList,Map<LocalDate, List<String>> sellList,LocalDate beginDate, LocalDate endDate, String label, int top, boolean isAveValue, Integer quantityType) {
 		long days = endDate.toEpochDay()- beginDate.toEpochDay();
 		
 		//logger.info(buyList.toString());
 		
 		dailyAmount_sb = new StringBuffer("date,cash,value,total\n");
+		dailyHolds_sb = new StringBuffer("date,itemID,itemName,open,close,quantity,profit,days\n");
 		breakers_sb = new StringBuffer();
 		up21Keeper = new Keeper(21);  //涨回21日线，等待macd为正买入
 		newbKeeper = new Keeper(55);  //包含所有创新高的股票,因为当天涨停或价格过高不能买入,等待价格回落后买入
@@ -93,6 +95,7 @@ public class FourOperation implements Operation {
 				account.refreshHoldsPrice(itemID, muster.getLatestPrice(), muster.getLatestHighest());
 			}
 		}
+		dailyHolds_sb.append(account.getHoldStateString());
 		
 		//卖出
 		for(String itemID: holdItemIDs) {
@@ -152,7 +155,8 @@ public class FourOperation implements Operation {
 						&& !muster.isUpLimited() 
 						&& muster.isAboveAveragePrice(21)
 						&& muster.isAboveAveragePrice(89)
-						&& muster.getN21Gap()<=8
+						&& muster.getN21Gap()<=5
+						&& muster.getN21Gap()>=0
 						) {
 					macd = selectorServiceImp.getMACD(id,date, true);
 					if(macd.compareTo(BigDecimal.ZERO)==1
@@ -217,6 +221,7 @@ public class FourOperation implements Operation {
 		result.put("breakers", breakers_sb.toString());
 		result.put("lostIndustrys", account.getLostIndustrys());
 		result.put("winIndustrys", account.getWinIndustrys());
+		result.put("dailyHolds", dailyHolds_sb.toString());
 		return result;
 	}
 	
@@ -295,7 +300,7 @@ public class FourOperation implements Operation {
 			for(String id : drums) {
 				if(tmp.contains(id)) {
 					muster = musters.get(id);
-					if(muster!=null && !muster.isUpLimited() && muster.getN21Gap()<=8) {
+					if(muster!=null && !muster.isUpLimited() && muster.getN21Gap()<=5 && muster.getN21Gap()>=0)  {
 						results.add(id);
 					}
 				}

@@ -306,6 +306,7 @@ public class TurtleStaticSimulation implements TurtleSimulation{
 		turtleSimulationRepository.evictBreakersCache();
 		turtleSimulationRepository.evictBuysCache();
 		turtleSimulationRepository.evictSellsCache();
+		turtleSimulationRepository.evictHoldsCache();
 	}
 
 }

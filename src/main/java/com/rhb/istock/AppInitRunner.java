@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
+import com.rhb.istock.fdata.eastmoney.FdataSpiderEastmoney;
 import com.rhb.istock.item.ItemService;
 import com.rhb.istock.trade.turtle.operation.TurtleOperationService;
 
@@ -17,6 +18,10 @@ public class AppInitRunner implements CommandLineRunner {
 	@Autowired
 	@Qualifier("turtleOperationServiceImp")
 	TurtleOperationService turtleOperationService;
+	
+	@Autowired
+	@Qualifier("fdataSpiderEastmoney")
+	FdataSpiderEastmoney fdataSpiderEastmoney;
 	
 /*	@Autowired
 	@Qualifier("kdataServiceImp")
@@ -46,6 +51,8 @@ public class AppInitRunner implements CommandLineRunner {
 		}
 */
     	turtleOperationService.init();
+		//fdataSpiderEastmoney.downProfitForecasts();
+		//fdataSpiderEastmoney.downRecommendations();
 
 /*    	logger.info("AppInitRunner done!");
 		long used = (System.currentTimeMillis() - beginTime)/1000; 

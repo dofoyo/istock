@@ -24,6 +24,7 @@ public interface TurtleOperationService {
 	/*
 	 * 对holds.txt中的股票进行提示：止损价(stopPrice)、平仓价(dropPrice)、加仓价(reopenPrice)
 	 */
+	public List<ItemView> getOks();
 	public List<HoldView> getHolds();
 	public List<ItemView> getFavors();
 	public List<ItemView> getNewbs();
@@ -36,6 +37,7 @@ public interface TurtleOperationService {
 	public String[] getTopics();
 	public List<ItemView> getHAHs();
 	public List<ItemView> getPowers();
+	public List<ItemView> getHorizons();
 	public List<ForecastView> getForecastViews();
 	public List<ItemView> getB21Views();
 	public List<ItemView> getB21upViews();

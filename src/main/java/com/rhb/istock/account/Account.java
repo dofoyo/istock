@@ -242,6 +242,10 @@ public class Account {
 		sb.append(this.getValue().toString());
 		sb.append(",");
 		sb.append(this.getTotal().toString());
+		/*sb.append(",");
+		for(Order order : holds.values()) {
+			sb.append(order.getItemID() + "(" + order.getValue().intValue() + ")~");
+		}*/
 		return sb.toString();
 	}
 	
@@ -276,7 +280,7 @@ public class Account {
 		opens.put(order.getOrderID(), order);
 		
 		if(!states.containsKey(itemID)) {
-			states.put(itemID, new HoldState(itemID,price));
+			states.put(itemID, new HoldState(itemID,itemName,price, order.getQuantity()));
 		}else {
 			HoldState hs = states.get(itemID);
 			hs.setHold(true);
@@ -497,6 +501,11 @@ public class Account {
 	public void setLatestDate(LocalDate date) {
 		if(this.beginDate==null) this.beginDate = date;
 		this.endDate = date;
+		for(HoldState state : this.states.values()) {
+			if(state.isHold) {
+				state.setQuantity(this.getHoldsQuantity(state.getItemID()));
+			}
+		}
 	}
 	
 	public void refreshHoldsPrice(String itemID, BigDecimal price, BigDecimal highest) {
@@ -711,12 +720,34 @@ public class Account {
 		return sb.toString();
 	}
 	
+	//"date,itemID,itemName,open,close,quantity,profit,holdDays"
 	public String getHoldStateString() {
 		StringBuffer sb = new StringBuffer();
+		//Integer quantity = 0;
 		for(HoldState hs : states.values()) {
-			sb.append(hs.toString()+"\n");
+			if(hs.isHold) {
+				//quantity = this.getHoldsQuantity(hs.getItemID());
+				sb.append(this.endDate.toString() + ",");
+				sb.append(hs.getItemID() + ",");
+				sb.append(hs.getItemName() + ",");
+				sb.append(hs.getPreviousPrice() +",");
+				sb.append(hs.getLatestPrice() + ",");
+				sb.append(hs.getQuantity() + ",");
+				sb.append(hs.getProfit() + ",");
+				sb.append(hs.getHoldsDays() + "\n");
+			}
 		}
 		return sb.toString();
+	}
+	
+	public Integer getHoldsQuantity(String id) {
+		Integer quantity = 0;
+		for(Order order : holds.values()) {
+			if(order.getItemID().equals(id)) {
+				quantity = quantity + order.getQuantity();
+			}
+		}
+		return quantity;
 	}
 	
 	public Integer getLots(String itemID) {
@@ -941,21 +972,48 @@ public class Account {
 	
 	class HoldState{
 		private String itemID;
+		private String itemName;
 		private BigDecimal buyPrice;
 		private BigDecimal latestPrice;
+		private BigDecimal previousPrice;
+		private Integer quantity;
 		private Integer holdsDays;
 		private boolean isHold;
 		private BigDecimal highest;
 		
-		public HoldState(String itemID, BigDecimal buyPrice) {
+		public HoldState(String itemID, String itemName, BigDecimal buyPrice, Integer quantity) {
 			this.itemID = itemID;
+			this.itemName = itemName;
 			this.buyPrice = buyPrice;
 			this.latestPrice = buyPrice;
+			this.previousPrice = buyPrice;
 			this.highest = buyPrice;
-			this.holdsDays = 1;
+			this.holdsDays = 0;
 			this.isHold = true;
+			this.quantity = quantity;
 		}
 		
+		public String getItemName() {
+			return itemName;
+		}
+
+		public BigDecimal getProfit() {
+			return this.latestPrice.subtract(this.previousPrice).multiply(new BigDecimal(this.quantity));
+		}
+		
+		public Integer getQuantity() {
+			return quantity;
+		}
+
+		public void setQuantity(Integer quantity) {
+			this.quantity = quantity;
+		}
+
+		public BigDecimal getPreviousPrice() {
+			return previousPrice;
+		}
+
+
 		public BigDecimal getHighest() {
 			return highest;
 		}
@@ -1002,6 +1060,7 @@ public class Account {
 		}
 		public void setLatestPrice(BigDecimal latestPrice) {
 			if(isHold) {
+				this.previousPrice = this.latestPrice;
 				this.latestPrice = latestPrice;
 				this.holdsDays = this.holdsDays + 1;
 			}

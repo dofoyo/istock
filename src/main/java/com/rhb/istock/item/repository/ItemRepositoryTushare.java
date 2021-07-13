@@ -57,7 +57,7 @@ public class ItemRepositoryTushare implements ItemRepository{
 			}
 		} catch (Exception e) {
 			System.err.println(item);
-			//e.printStackTrace();
+			e.printStackTrace();
 		}
 		
 		Collections.sort(entities, new Comparator<ItemEntity>() {

@@ -30,21 +30,21 @@ public class SimulateBDT {
 	TurtleSimulationRepository turtleSimulationRepository;
 
 	@Autowired
+	//@Qualifier("newbRupStart")  //test
 	@Qualifier("newbRup")
 	Producer producer;
 
 	@Autowired
-	//@Qualifier("favorOperation4")
-	@Qualifier("optimizeOperation3")
-	
+	//@Qualifier("commOperation2") //test
+	@Qualifier("favorOperation") 
 	Operation operation;
 	
 	@Async("taskExecutor")
 	public Future<String> run(LocalDate beginDate, LocalDate endDate, BigDecimal initCash, Integer top, boolean isAveValue, Integer quantityType, boolean isEvaluation)  throws Exception {
 		Account account = new Account(initCash);
 		Map<LocalDate, List<String>> operationList = producer.getResults(beginDate, endDate);
-		Map<String, String> operateResult = operation.run(account, operationList, beginDate, endDate, "bdt", top, isAveValue,quantityType);
-		turtleSimulationRepository.save("bdt", operateResult.get("breakers"), operateResult.get("CSV"), operateResult.get("dailyAmount"), isEvaluation);
+		Map<String, String> operateResult = operation.run(account, operationList,null, beginDate, endDate, "bdt", top, isAveValue,quantityType);
+		turtleSimulationRepository.save("bdt", operateResult.get("breakers"), operateResult.get("CSV"), operateResult.get("dailyAmount"), operateResult.get("dailyHolds"), isEvaluation);
 		return new AsyncResult<String>("bdt执行完毕");
 	}
 }

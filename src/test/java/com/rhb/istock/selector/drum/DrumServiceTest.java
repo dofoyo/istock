@@ -1,6 +1,7 @@
 package com.rhb.istock.selector.drum;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -15,6 +16,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import com.rhb.istock.comm.util.Progress;
 import com.rhb.istock.item.ItemService;
 import com.rhb.istock.kdata.KdataService;
+import com.rhb.istock.selector.DimensionView;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest
@@ -31,7 +33,7 @@ public class DrumServiceTest {
 	@Qualifier("kdataServiceImp")
 	KdataService kdataService;
 	
-	@Test
+	//@Test
 	public void test() {
 		LocalDate date = LocalDate.parse("2020-11-20");
 		String itemID = "sh600189";
@@ -77,8 +79,18 @@ public class DrumServiceTest {
 	
 	//@Test
 	public void getDimensions() {
-		String name = "HIT电池";
+		String name = "可降解塑料";
 		Map<LocalDate, Integer> result = drumService.getDimension(name);
 		System.out.println(result);
+	}
+	
+	@Test
+	public void getDimensionViews() {
+		//String name = "可降解塑料";
+		LocalDate date = LocalDate.parse("2021-05-10");
+		List<DimensionView> views = drumService.getDimensionView(date, new HashSet<String>(), 55);
+		for(DimensionView view : views) {
+			System.out.println(view);
+		}
 	}
 }

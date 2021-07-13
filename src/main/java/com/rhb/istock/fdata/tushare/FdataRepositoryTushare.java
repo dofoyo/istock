@@ -1,5 +1,7 @@
 package com.rhb.istock.fdata.tushare;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -60,7 +62,7 @@ public class FdataRepositoryTushare {
 			this.incomes = this.getIncomes(itemID);
 		//}
 		//if(this.indicators == null || this.indicators.size()==0) {
-			this.indicators = this.getIndicators(itemID);
+			this.indicators = this.getIndicators(itemID, LocalDate.now());
 		//}
 		//if(this.balancesheets == null || this.balancesheets.size()==0) {
 			this.balancesheets = this.getBalancesheets(itemID);
@@ -159,8 +161,8 @@ public class FdataRepositoryTushare {
 		return incomes;
 	}
 	
-	public	Map<String,FinaIndicator> getIndicators(String itemID){
-		Map<String,FinaIndicator> indicators = new HashMap<String,FinaIndicator>();
+	public	Map<String,FinaIndicator> getIndicators(String itemID,LocalDate date){
+		Map<String,FinaIndicator> indicators = new TreeMap<String,FinaIndicator>();
 		
 		String fdataFile = fdataPath + "/" + itemID + "_fina_indicator.json";
 		if(FileTools.isExists(fdataFile)) {
@@ -169,12 +171,21 @@ public class FdataRepositoryTushare {
 			if(items.length()>0) {
 				JSONArray item;
 				String end_date;
+				LocalDate ann_date;
 				FinaIndicator indicator;
 				for(int i=0; i<items.length()-1; i++) {
 					item = items.getJSONArray(i);
 					end_date = item.getString(2);
-					indicator = new FinaIndicator(item);
-					indicators.put(end_date, indicator);
+					//if(end_date.endsWith("1231") && !"null".equals(item.get(1).toString())) {
+					if(!"null".equals(item.get(1).toString())) {
+						//System.out.println(item);
+						//System.out.println(item.get(1));
+						ann_date = LocalDate.parse(item.get(1).toString(),DateTimeFormatter.ofPattern("yyyyMMdd"));
+						if(ann_date.equals(date) || ann_date.isBefore(date)) {
+							indicator = new FinaIndicator(itemID,item);
+							indicators.put(end_date, indicator);
+						}
+					}
 				}
 			}
 		}

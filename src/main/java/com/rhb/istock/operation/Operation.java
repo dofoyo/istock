@@ -12,5 +12,5 @@ public interface Operation {
 	 * isAveValue: 买入时，是否做市值平均
 	 * quantityType: 0--市值平均，1--固定金额， 2--固定数量
 	 */
-	public Map<String,String> run(Account account, Map<LocalDate, List<String>> buyList,LocalDate beginDate, LocalDate endDate, String label, int top, boolean isAveValue, Integer quantityType);
+	public Map<String,String> run(Account account, Map<LocalDate, List<String>> buyList,Map<LocalDate, List<String>> sellList,LocalDate beginDate, LocalDate endDate, String label, int top, boolean isAveValue, Integer quantityType);
 }

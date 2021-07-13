@@ -1,5 +1,7 @@
 package com.rhb.istock.fdata.tushare;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -32,7 +34,7 @@ public class FdataRepositoryTushareTest {
 	@Qualifier("itemServiceImp")
 	ItemService itemService;
 	
-	@Test
+	//@Test
 	public void getFina() {
 		String itemID = "sh600519";
 		String end_date = "20191231";
@@ -72,17 +74,17 @@ public class FdataRepositoryTushareTest {
 	
 	//@Test
 	public void getIncomes() {
-		String itemID = "sz300022";
+		String itemID = "sz300770";
 		Map<String,FinaIncome> incomes = fdataRepositoryTushare.getIncomes(itemID);
 		for(FinaIncome income : incomes.values()) {
 			System.out.println(income);
 		}
 	}
 	
-	//@Test
+	@Test
 	public void getIndicators() {
-		String itemID = "sz300022";
-		Map<String,FinaIndicator> indicators = fdataRepositoryTushare.getIndicators(itemID);
+		String itemID = "sh600901";
+		Map<String,FinaIndicator> indicators = fdataRepositoryTushare.getIndicators(itemID, LocalDate.now());
 		for(Map.Entry<String, FinaIndicator> entry : indicators.entrySet()) {
 			System.out.println(entry.getKey() +": "+ entry.getValue());
 		}
@@ -93,12 +95,12 @@ public class FdataRepositoryTushareTest {
 		List<String> ids = itemService.getItemIDs();
 		Map<String,FinaIndicator> indicators;
 		FinaIndicator indicator;
-		String date = "20181231";
+		String date = "20201231";
 		List<FinaIndicator> fis = new ArrayList<FinaIndicator>();
 		int i=1;
 		for(String id : ids) {
 			Progress.show(ids.size(), i++, id);
-			indicators = fdataRepositoryTushare.getIndicators(id);
+			indicators = fdataRepositoryTushare.getIndicators(id, LocalDate.now());
 			indicator = indicators.get(date);
 			if(indicator!=null) {
 				indicator.setItemID(id);
@@ -109,20 +111,32 @@ public class FdataRepositoryTushareTest {
 		Collections.sort(fis, new Comparator<FinaIndicator>() {
 			@Override
 			public int compare(FinaIndicator o1, FinaIndicator o2) {
-				return o2.getGrossprofit_margin().compareTo(o1.getGrossprofit_margin());
+				return o2.getRoe().compareTo(o1.getRoe());
 			}
 			
 		});
 		
 		System.out.println(fis.size());
 		
-		System.out.format("id,date,Grossprofit_margin,profit_dedt,dt_netprofit_yoy,or_yoy,ocfps\n");
+		System.out.format("id,date,roe,profit_dedt,dt_netprofit_yoy,or_yoy,ocfps\n");
 		for(FinaIndicator fi : fis) {
 			//if(fi.getGrossprofit_margin().compareTo(BigDecimal.ZERO)==1) {
-				System.out.format("%s, %s, %.2f, %.2f, %.2f, %.2f, %.3f\n", fi.getItemID(), fi.getEnd_date(), fi.getGrossprofit_margin(),fi.getProfit_dedt(),fi.getDt_netprofit_yoy(), fi.getOr_yoy(),fi.getOcfps());
+				System.out.format("%s, %s, %.2f, %.2f, %.2f, %.2f, %.3f\n", fi.getItemID(), fi.getEnd_date(), fi.getRoe(),fi.getProfit_dedt(),fi.getDt_netprofit_yoy(), fi.getOr_yoy(),fi.getOcfps());
 			//}
 		}
 	}
+	
+	/*
+	 * 	private BigDecimal profit_dedt;			//扣除非经常性损益后的净利润
+	private BigDecimal grossprofit_margin;  //销售毛利率
+	private BigDecimal op_yoy;  			//营业利润同比增长率(%)
+	private BigDecimal ebt_yoy;  			//利润总额同比增长率(%)
+	private BigDecimal netprofit_yoy; 		//归属母公司股东的净利润同比增长率(%)  -- 业绩预告
+	private BigDecimal dt_netprofit_yoy; 	//归属母公司股东的净利润-扣除非经常损益同比增长率(%)
+	private BigDecimal or_yoy; 				//营业收入同比增长率(%)
+	private BigDecimal ocfps;				//每股经营活动产生的现金流量净额
+	private BigDecimal roe;				//净资产收益率
+	 */
 	
 	//@Test
 	public void getIndicators2() {
@@ -136,7 +150,7 @@ public class FdataRepositoryTushareTest {
 		int i=1;
 		for(String id : ids) {
 			Progress.show(ids.size(), i++, id);
-			indicators = fdataRepositoryTushare.getIndicators(id);
+			indicators = fdataRepositoryTushare.getIndicators(id, LocalDate.now());
 			i1 = indicators.get(date1);
 			i2 = indicators.get(date2);
 			i3 = indicators.get(date3);
@@ -167,7 +181,7 @@ public class FdataRepositoryTushareTest {
 		}
 	}
 	
-	@Test
+	//@Test
 	public void getIndicators3() {
 		Map<Integer,Set<String>> results = new HashMap<Integer,Set<String>>();
 		List<String> ids = itemService.getItemIDs();
@@ -206,7 +220,7 @@ public class FdataRepositoryTushareTest {
 	
 	private Set<Integer> getOKs(String itemID){
 		Set<Integer> years = new HashSet<Integer>();
-		Map<String,FinaIndicator> indicators = fdataRepositoryTushare.getIndicators(itemID);
+		Map<String,FinaIndicator> indicators = fdataRepositoryTushare.getIndicators(itemID, LocalDate.now());
 		FinaIndicator i1,i2,i3;
 		for(int year=2020; year>=2009; year--) {
 			String date1 = Integer.toString(year-3) + "1231";

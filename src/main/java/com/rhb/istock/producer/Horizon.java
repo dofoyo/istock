@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.rhb.istock.comm.util.FileTools;
+import com.rhb.istock.comm.util.Functions;
 import com.rhb.istock.comm.util.Progress;
 import com.rhb.istock.item.Item;
 import com.rhb.istock.item.ItemService;
@@ -28,9 +29,9 @@ import com.rhb.istock.selector.fina.FinaService;
  * 
  */
 
-@Service("newbRup")
-public class NewbRup implements Producer{
-	protected static final Logger logger = LoggerFactory.getLogger(NewbRup.class);
+@Service("horizon")
+public class Horizon implements Producer{
+	protected static final Logger logger = LoggerFactory.getLogger(Horizon.class);
 	
 	@Autowired
 	@Qualifier("kdataServiceImp")
@@ -47,11 +48,11 @@ public class NewbRup implements Producer{
 	@Value("${operationsPath}")
 	private String operationsPath;
 	
-	private String fileName  = "NewbRup.txt";
+	private String fileName  = "Horizon.txt";
 	
 	private Integer cagr = 21;  //业绩年增长率
 	
-	private Integer reco = 3;  //推荐买入的机构数量
+	private Integer reco = 5;  //推荐买入的机构数量
 	
 	private Integer hlgap = 55; //最大涨幅
 
@@ -112,12 +113,18 @@ public class NewbRup implements Producer{
 		
 		List<Muster> ms;
 		Muster muster;
+		Muster previous;
 		List<String> recommendations;
 		Item item;
 
 		Map<String,Muster> musters = kdataService.getMusters(date);
+		List<LocalDate> dates = kdataService.getMusterDates(89, date);
+		Map<String,Muster> previous_musters = kdataService.getMusters(dates.get(0));
+		
 		Map<String,Item> items = itemService.getItems();
-		if(musters!=null && musters.size()>0) {
+		if(musters!=null && musters.size()>0
+				//&& previous_musters!=null && previous_musters.size()>0
+				) {
 			recommendations = finaService.getHighRecommendations(date, 10000, reco); //推荐买入
 			ms = new ArrayList<Muster>();
 			for(String id : recommendations) {
@@ -131,22 +138,36 @@ public class NewbRup implements Producer{
 			Collections.sort(ms, new Comparator<Muster>() {
 				@Override
 				public int compare(Muster o1, Muster o2) {
-					if(o1.getHLGap().compareTo(o2.getHLGap())==0){            //横盘波动
-						return o1.getN21Gap().compareTo(o2.getN21Gap());
-					}else {
+					if(o1.getN21Gap().compareTo(o2.getN21Gap())==0){            //横盘波动
 						return o1.getHLGap().compareTo(o2.getHLGap());
+					}else {
+						return o1.getN21Gap().compareTo(o2.getN21Gap());
 					}
 					//return o1.getLatestPrice().compareTo(o2.getLatestPrice());
 					//return o2.getTotal_mv().compareTo(o1.getTotal_mv());
 				}
 			});
 			
+			String s;
+			Integer ratio;
 			for(Muster m : ms) {
-				if(m!=null
-						&& m.isUpBreaker() 				//股价创新高
-						&& m.getHLGap()<=hlgap             //涨幅不大
+				previous = previous_musters.get(m.getItemID());
+				if(m!=null 
+						&& previous!=null
 						) {
-					breakers.add(m.getItemID());
+					ratio = Functions.growthRate(m.getAveragePrice21(), previous.getAveragePrice21());
+					if(ratio>-8 && ratio<=8
+							//&& m.isDownBreaker()
+							) {
+/*						s = String.format("%s, %s, p21=%.2f, m21=%.2f, rate=%d", 
+								date.toString(),
+								m.getItemID(),
+								previous.getAveragePrice21(),
+								m.getAveragePrice21(),
+								ratio);
+						logger.info(s);*/
+						breakers.add(m.getItemID());
+					}
 				}
 			}
 			

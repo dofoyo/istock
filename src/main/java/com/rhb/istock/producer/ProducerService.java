@@ -47,7 +47,19 @@ public class ProducerService {
 	
 	@Autowired
 	@Qualifier("newbRup")
-	Producer newbRup;
+	Producer newbRup;	
+
+	@Autowired
+	@Qualifier("newbRupStart")
+	Producer newbRupStart;	
+
+	@Autowired
+	@Qualifier("horizon")
+	Producer horizon;
+
+	@Autowired
+	@Qualifier("oks")
+	Producer oks;
 	
 	public void produce(LocalDate date) {
 		System.out.println("收盘后生成买入清单");
@@ -69,6 +81,11 @@ public class ProducerService {
 		results  = sab21Rup.produce(date, true); 
 		
 		results  = newbRup.produce(date, true);
+		results  = newbRupStart.produce(date, true);
+		
+		results  = horizon.produce(date, true);
+		
+		results  = oks.produce(date, true);
 		
 		long used = (System.currentTimeMillis() - beginTime)/1000; 
 		System.out.println("执行“收盘后生成买入清单”完成，用时：" + used + "秒");          

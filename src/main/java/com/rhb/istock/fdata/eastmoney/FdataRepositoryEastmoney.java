@@ -202,9 +202,14 @@ public class FdataRepositoryEastmoney {
 		if(FileTools.isExists(fdataFile)) {
 			String charset = FileTools.getCharset(fdataFile);
 			//JSONArray items = (new JSONObject(FileTools.readTextFile(fdataFile))).getJSONObject("yctj").getJSONArray("data");
-			JSONArray items = (new JSONObject(FileTools.read(fdataFile,charset))).getJSONObject("yctj").getJSONArray("data");
+			JSONArray items = null;
+			try {
+				items = (new JSONObject(FileTools.read(fdataFile,charset))).getJSONObject("yctj").getJSONArray("data");
+			}catch(Exception e) {
+				logger.error(fdataFile + "    ERROR!!!");
+			}
 			//System.out.println(items);
-			if(items.length()>0) {
+			if(items!=null && items.length()>0) {
 				JSONObject item;
 				String rq, yylr;
 				Integer p = null, count=0;
@@ -251,7 +256,7 @@ public class FdataRepositoryEastmoney {
 				}
 			}
 		}else {
-			//System.err.println(fdataFile + " do NOT exist!!");
+			System.err.println(fdataFile + " do NOT exist!!");
 		}
 		
 		return cagr;

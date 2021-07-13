@@ -19,6 +19,7 @@ import com.rhb.istock.comm.util.FileTools;
 import com.rhb.istock.comm.util.Progress;
 import com.rhb.istock.item.Item;
 import com.rhb.istock.item.ItemService;
+import com.rhb.istock.kdata.Kdata;
 import com.rhb.istock.kdata.KdataService;
 import com.rhb.istock.kdata.Muster;
 import com.rhb.istock.selector.fina.FinaService;
@@ -28,9 +29,9 @@ import com.rhb.istock.selector.fina.FinaService;
  * 
  */
 
-@Service("newbRup")
-public class NewbRup implements Producer{
-	protected static final Logger logger = LoggerFactory.getLogger(NewbRup.class);
+@Service("newbRupStart")
+public class NewbRupStart implements Producer{
+	protected static final Logger logger = LoggerFactory.getLogger(NewbRupStart.class);
 	
 	@Autowired
 	@Qualifier("kdataServiceImp")
@@ -47,7 +48,7 @@ public class NewbRup implements Producer{
 	@Value("${operationsPath}")
 	private String operationsPath;
 	
-	private String fileName  = "NewbRup.txt";
+	private String fileName  = "NewbRupStart.txt";
 	
 	private Integer cagr = 21;  //业绩年增长率
 	
@@ -141,12 +142,18 @@ public class NewbRup implements Producer{
 				}
 			});
 			
+			Kdata kdata;
 			for(Muster m : ms) {
 				if(m!=null
 						&& m.isUpBreaker() 				//股价创新高
-						&& m.getHLGap()<=hlgap             //涨幅不大
+						//&& m.getHLGap()<=hlgap             //涨幅不大
 						) {
-					breakers.add(m.getItemID());
+					kdata = kdataService.getKdata(m.getItemID(), date, 610, false);
+					//if(kdata.getHighest().compareTo(m.getHighest())==1 && kdata.getLowestRatio()<55) {
+					if(kdata.getLowestRatio()<55) {
+						breakers.add(m.getItemID());
+						//System.out.println("breakers.size(): " + breakers.size());
+					}
 				}
 			}
 			

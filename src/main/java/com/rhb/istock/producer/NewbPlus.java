@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import com.rhb.istock.comm.util.FileTools;
 import com.rhb.istock.comm.util.Progress;
+import com.rhb.istock.kdata.Kdata;
 import com.rhb.istock.kdata.KdataService;
 import com.rhb.istock.kdata.Muster;
 import com.rhb.istock.selector.fina.FinaService;
@@ -115,12 +116,18 @@ public class NewbPlus implements Producer{
 				}
 			});
 			
+			Kdata kdata;
+			
 			for(Muster m : ms) {
 				if(m!=null
 						&& m.isUpBreaker() 				//股价创新高
-						&& m.getHLGap()<=55             //涨幅不大
+						&& m.getLNGap()<=55
 						) {
-					breakers.add(m.getItemID());
+					
+					kdata = kdataService.getKdata(m.getItemID(), date, 610, false);
+					if(kdata.getLowestRatio()<55) {
+						breakers.add(m.getItemID());
+					}
 				}
 			}
 			

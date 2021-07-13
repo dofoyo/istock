@@ -171,7 +171,7 @@ public class FinaService {
 	public QuarterCompare buildQuarterCompare(String itemID, String date){
 		QuarterCompare qc = null;
 		fdataRepositoryTushare.init();
-		Map<String,FinaIndicator> indicators = fdataRepositoryTushare.getIndicators(itemID);
+		Map<String,FinaIndicator> indicators = fdataRepositoryTushare.getIndicators(itemID, LocalDate.now());
 		FinaIndicator indicator = indicators.get(date);
 		if(indicator!=null) {
 			qc = new QuarterCompare();
@@ -322,7 +322,7 @@ public class FinaService {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}*/
-		Map<String,FinaIndicator> indicators = fdataRepositoryTushare.getIndicators(itemID);
+		Map<String,FinaIndicator> indicators = fdataRepositoryTushare.getIndicators(itemID, LocalDate.now());
 		if(indicators.containsKey(date)) {
 			return indicators.get(date);
 		}else {

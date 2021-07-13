@@ -27,8 +27,9 @@ import com.rhb.istock.item.ItemService;
 import com.rhb.istock.kdata.Kbar;
 import com.rhb.istock.kdata.KdataService;
 import com.rhb.istock.kdata.api.KdatasView;
+import com.rhb.istock.simulation.Hold;
 import com.rhb.istock.simulation.Simulation;
-import com.rhb.istock.trade.turtle.simulation.six.TurtleMusterSimulation;
+import com.rhb.istock.simulation.SimulationService;
 import com.rhb.istock.trade.turtle.simulation.six.TurtleMusterSimulation_avb_plus;
 import com.rhb.istock.trade.turtle.simulation.six.TurtleMusterSimulation_hua;
 import com.rhb.istock.trade.turtle.simulation.six.repository.AmountEntity;
@@ -44,6 +45,10 @@ public class TurtleSimulationApi {
 	@Qualifier("simulation")
 	Simulation simulation;
 
+	@Autowired
+	@Qualifier("simulationService")
+	SimulationService simulationService;
+	
 	@Autowired
 	@Qualifier("turtleMusterSimulation_hua")
 	TurtleMusterSimulation_hua turtleMusterSimulation_hua;
@@ -131,6 +136,7 @@ public class TurtleSimulationApi {
 		turtleSimulationRepository.evictBreakersCache();
 		turtleSimulationRepository.evictBuysCache();
 		turtleSimulationRepository.evictSellsCache();
+		turtleSimulationRepository.evictHoldsCache();
 
 		
 		simulation.simulate(theBeginDate, theEndDate);
@@ -141,6 +147,7 @@ public class TurtleSimulationApi {
 		turtleSimulationRepository.evictBreakersCache();
 		turtleSimulationRepository.evictBuysCache();
 		turtleSimulationRepository.evictSellsCache();
+		turtleSimulationRepository.evictHoldsCache();
 
 		return new ResponseContent<String>(ResponseEnum.SUCCESS, "");
 		
@@ -255,7 +262,9 @@ public class TurtleSimulationApi {
 		}
 
 		
-		Set<Hold> holds = this.generateHolds(type,theDate);
+		//Set<Hold> holds = this.generateHolds(type,theDate);
+		Set<Hold> holds = simulationService.getHolds(type, theDate, false);
+		//System.out.println(holds);
 		if(holds!=null && !holds.isEmpty()) {
 			for(Hold hold : holds) {
 				views.add(new HoldView(hold.getItemID(),hold.getItemName(),hold.getProfit().intValue(),hold.getDate()));
@@ -321,9 +330,9 @@ public class TurtleSimulationApi {
 			
 		});
 		
-		
 		return new ResponseContent<List<String>>(ResponseEnum.SUCCESS, dates);
 	}
+	
 	
 	private Set<Hold> generateHolds(String type, LocalDate date){
 		Holds holds = new Holds();
@@ -383,64 +392,4 @@ public class TurtleSimulationApi {
 			return ids;
 		}		
 	}
-	class Hold{
-		private String itemID;
-		private String itemName;
-		private Integer count;
-		private BigDecimal profit;
-		private LocalDate date;
-		
-		public Hold(String str) {
-			String[] ss = str.split(",");
-			this.itemID = ss[0];
-			this.itemName = ss[1];
-			this.profit = new BigDecimal(ss[2]);
-			this.date = LocalDate.parse(ss[3],DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-			this.count = 1;
-		}
-		
-		public LocalDate getDate() {
-			return date;
-		}
-
-		public void setDate(LocalDate date) {
-			this.date = date;
-		}
-
-		public void update(String str) {
-			String[] ss = str.split(",");
-			this.profit = this.profit.add(new BigDecimal(ss[2]));
-			this.count++;
-		}
-		
-		public boolean isHold() {
-			return count==0 ? false : true;
-		}
-		
-		public String getItemID() {
-			return itemID;
-		}
-		public void setItemID(String itemID) {
-			this.itemID = itemID;
-		}
-		public String getItemName() {
-			return itemName;
-		}
-		public void setItemName(String itemName) {
-			this.itemName = itemName;
-		}
-		public Integer getCount() {
-			return count;
-		}
-		public void deCount() {
-			this.count--;
-		}
-		public BigDecimal getProfit() {
-			return profit;
-		}
-		public void setProfit(BigDecimal profit) {
-			this.profit = profit;
-		}
-	}
-
 }

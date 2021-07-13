@@ -37,6 +37,7 @@ public class CommOperation implements Operation {
 	@Qualifier("kdataServiceImp")
 	KdataService kdataService;
 	
+	private StringBuffer dailyHolds_sb;
 	private StringBuffer dailyAmount_sb;
 	private StringBuffer breakers_sb;
 	//private Integer previous_period  = 13; //历史纪录区间，主要用于后面判断
@@ -46,12 +47,13 @@ public class CommOperation implements Operation {
 	//private boolean bomb;
 	//private Integer previous_sseiFlag;
 	
-	public Map<String,String> run(Account account, Map<LocalDate, List<String>> buyList,LocalDate beginDate, LocalDate endDate, String label, int top, boolean isAveValue, Integer quantityType) {
+	public Map<String,String> run(Account account, Map<LocalDate, List<String>> buyList,Map<LocalDate, List<String>> sellList,LocalDate beginDate, LocalDate endDate, String label, int top, boolean isAveValue, Integer quantityType) {
 		long days = endDate.toEpochDay()- beginDate.toEpochDay();
 		
 		//logger.info(buyList.toString());
 		
 		dailyAmount_sb = new StringBuffer("date,cash,value,total\n");
+		dailyHolds_sb = new StringBuffer("date,itemID,itemName,open,close,quantity,profit,days\n");
 		breakers_sb = new StringBuffer();
 		breaksKeeper = new Keeper(21);  //包含所有创新高的股票,因为当天涨停或价格过高不能买入,等待价格回落后买入
 		dropsKeeper = new Keeper(21); //包含所有跌破21日线卖出的票,在21天内如果涨回21日线,说明调整结束,可以再次买入
@@ -97,6 +99,7 @@ public class CommOperation implements Operation {
 				account.refreshHoldsPrice(itemID, muster.getLatestPrice(), muster.getLatestHighest());
 			}
 		}
+		dailyHolds_sb.append(account.getHoldStateString());
 		
 		//logger.info("sseiFlag =  " + sseiFlag.toString());
 
@@ -178,6 +181,7 @@ public class CommOperation implements Operation {
 					&& muster.isAboveAveragePrice(21)
 					&& muster.isAboveAveragePrice(89)
 					&& muster.getN21Gap()<=5
+					&& muster.getN21Gap()>=0
 					//&& sseiFlag==1 
 					//&& sseiTrend==1
 					&& !drops.contains(id)
@@ -209,6 +213,7 @@ public class CommOperation implements Operation {
 						&& muster.isAboveAveragePrice(21)
 						&& muster.isAboveAveragePrice(89)
 						&& muster.getN21Gap()<=5
+						&& muster.getN21Gap()>=0
 						//&& sseiFlag==1 
 						//&& sseiTrend==1
 						//&& !this.bomb
@@ -259,7 +264,6 @@ public class CommOperation implements Operation {
 		}
 			
 		dailyAmount_sb.append(account.getDailyAmount() + "\n");
-		
 		//previous_sseiFlag = sseiFlag;
 
 	}
@@ -279,6 +283,7 @@ public class CommOperation implements Operation {
 		result.put("breakers", breakers_sb.toString());
 		result.put("lostIndustrys", account.getLostIndustrys());
 		result.put("winIndustrys", account.getWinIndustrys());
+		result.put("dailyHolds", dailyHolds_sb.toString());
 		return result;
 	}
 	

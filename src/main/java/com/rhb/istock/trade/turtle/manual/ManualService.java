@@ -50,8 +50,8 @@ public class ManualService {
 	Operation optimizeOperation;
 
 	@Autowired
-	@Qualifier("optimizeOperation3")
-	Operation optimizeOperation3;
+	@Qualifier("optimizeOperation2")
+	Operation optimizeOperation2;
 	
 	@Autowired
 	@Qualifier("favorOperation")
@@ -70,8 +70,8 @@ public class ManualService {
 	Operation huntingOperation;
 	
 	@Autowired
-	@Qualifier("favorOperation2")
-	Operation favorOperation2;
+	@Qualifier("favorOperation3")
+	Operation favorOperation3;
 	
 	@Autowired
 	@Qualifier("commOperation3")
@@ -81,8 +81,84 @@ public class ManualService {
 	@Qualifier("commOperation2")
 	Operation commOperation2;
 	
+	@Autowired
+	@Qualifier("manualOperation")
+	Operation manualOperation;
+	
 	private Map<LocalDate, List<String>> selects = new TreeMap<LocalDate, List<String>>();
+	private Map<LocalDate, List<String>> sells = new TreeMap<LocalDate, List<String>>();
+	private Map<LocalDate, List<String>> buys = new TreeMap<LocalDate, List<String>>();
 
+	public void addBuys(LocalDate date, String itemID) {
+		List<String> ids = this.buys.get(date);
+		if(ids==null) {
+			ids = new ArrayList<String>();
+			ids.add(itemID);
+			this.buys.put(date, ids);
+		}else if(ids!=null && !ids.contains(itemID)) {
+			ids .add(itemID);
+		}
+		//System.out.println(" buys: " + this.buys);
+	}
+	
+	public void deleteBuys(LocalDate date, String itemID) {
+		List<String> ids = buys.get(date);
+		if(ids!=null && ids.contains(itemID)) {
+			ids.remove(itemID);
+		}
+	}
+
+
+	public Map<LocalDate, List<String>> getBuys(LocalDate date){
+		Map<LocalDate, List<String>> ss = new TreeMap<LocalDate, List<String>>();
+		List<String> ids;
+		for(Map.Entry<LocalDate, List<String>> entry : this.buys.entrySet()) {
+			if(entry.getKey().isBefore(date) || entry.getKey().isEqual(date)) {
+				ids = entry.getValue();
+				if(ids!=null && ids.size()>0) {
+					ss.put(entry.getKey(), ids);
+				}
+			}
+		}
+		
+		return ss;
+	}
+	
+	public void addSells(LocalDate date, String itemID) {
+		List<String> ids = this.sells.get(date);
+		if(ids==null) {
+			ids = new ArrayList<String>();
+			ids.add(itemID);
+			this.sells.put(date, ids);
+		}else if(ids!=null && !ids.contains(itemID)) {
+			ids .add(itemID);
+		}
+		//System.out.println(" sells: " + this.sells);
+	}
+	
+	public void deleteSells(LocalDate date, String itemID) {
+		List<String> ids = sells.get(date);
+		if(ids!=null && ids.contains(itemID)) {
+			ids.remove(itemID);
+		}
+	}
+
+
+	public Map<LocalDate, List<String>> getSells(LocalDate date){
+		Map<LocalDate, List<String>> ss = new TreeMap<LocalDate, List<String>>();
+		List<String> ids;
+		for(Map.Entry<LocalDate, List<String>> entry : this.sells.entrySet()) {
+			if(entry.getKey().isBefore(date) || entry.getKey().isEqual(date)) {
+				ids = entry.getValue();
+				if(ids!=null && ids.size()>0) {
+					ss.put(entry.getKey(), ids);
+				}
+			}
+		}
+		
+		return ss;
+	}
+	
 	public void addSelects(LocalDate date, String itemID) {
 		List<String> ids = this.selects.get(date);
 		if(ids==null) {
@@ -134,21 +210,25 @@ public class ManualService {
 		Account account = new Account(initCash);
 		boolean isEvaluation = false;
 		Map<String, String> operateResult;
-		if("comm".equals(simulateType)) {  //买1+3
-			operateResult = commOperation3.run(account, this.selects, this.getBeginDate(), this.getEndDate(), label, top, true,0);
+		if("comm".equals(simulateType)) {  //买2+3
+			operateResult = commOperation3.run(account, this.selects,null, this.getBeginDate(), this.getEndDate(), label, top, true,0);
 		}else if("newb".equals(simulateType))  { //买一
-			operateResult = newbOperation.run(account, this.selects, this.getBeginDate(), this.getEndDate(), label, top, true,0);
+			operateResult = newbOperation.run(account, this.selects,null, this.getBeginDate(), this.getEndDate(), label, top, true,0);
 		}else if("optimize".equals(simulateType)) { //买二
-			operateResult = optimizeOperation3.run(account, this.selects, this.getBeginDate(), this.getEndDate(), label, top, true,0);
+			operateResult = optimizeOperation2.run(account, this.selects,null, this.getBeginDate(), this.getEndDate(), label, top, true,0);
 		}else if("favor".equals(simulateType))  {  //买三
-			operateResult = favorOperation2.run(account, this.selects, this.getBeginDate(), this.getEndDate(), label, top, true,0);
+			operateResult = favorOperation3.run(account, this.selects,null, this.getBeginDate(), this.getEndDate(), label, top, true,0);
 		}else if("sab".equals(simulateType)) {  //高价
 			//operateResult = huntingOperation.run(account, this.selects, this.getBeginDate(), this.getEndDate(), label, top, true,0);
-			operateResult = commOperation2.run(account, this.selects, this.getBeginDate(), this.getEndDate(), label, top, true,0);
-		}else {   //低价
-			operateResult = conservativeOperation.run(account, this.selects, this.getBeginDate(), this.getEndDate(), label, top, true,0);
+			operateResult = commOperation2.run(account, this.selects,null, this.getBeginDate(), this.getEndDate(), label, top, true,0);
+		}else  if("conservative".equals(simulateType)){   //低价
+			operateResult = conservativeOperation.run(account, this.selects,null, this.getBeginDate(), this.getEndDate(), label, top, true,0);
+		}else {
+			//System.out.println(" buys: " + this.buys);
+			//System.out.println(" sells: " + this.sells);
+			operateResult = manualOperation.run(account, this.buys,this.sells, this.getBeginDate(), this.getEndDate(), label, top, true,0);
 		}
-		turtleSimulationRepository.save("manual", operateResult.get("breakers"), operateResult.get("CSV"), operateResult.get("dailyAmount"), isEvaluation);
+		turtleSimulationRepository.save("manual", operateResult.get("breakers"), operateResult.get("CSV"), operateResult.get("dailyAmount"), operateResult.get("dailyHolds"), isEvaluation);
 		
 		long used = (System.currentTimeMillis() - beginTime)/1000; 
 		System.out.println("manual simulate 用时：" + used + "秒");          

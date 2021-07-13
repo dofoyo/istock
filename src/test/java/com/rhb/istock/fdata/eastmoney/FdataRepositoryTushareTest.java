@@ -23,7 +23,7 @@ public class FdataRepositoryTushareTest {
 	@Qualifier("itemServiceImp")
 	ItemService itemService;
 	
-	@Test
+	//@Test
 	public void getCashflows() {
 		String itemID = "sz002610";
 		Map<String,String[]> forcasts = fdataRepositoryEastmoney.getForcasts(itemID);
@@ -36,4 +36,10 @@ public class FdataRepositoryTushareTest {
 		}
 	}
 	
+	@Test
+	public void getCAGR() {
+		String itemID = "sz002245";
+		Integer forcasts = fdataRepositoryEastmoney.getCAGR(itemID);
+			System.out.println(forcasts );
+	}
 }

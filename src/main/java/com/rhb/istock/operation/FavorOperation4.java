@@ -29,9 +29,8 @@ import com.rhb.istock.selector.SelectorService;
 /*
  * 买三操作模式：
  * 
- * Favor操作模式: 持续跟踪21个交易日，向上突破21日均线就买入, up21
  * 
- * 买入：满仓　＋　市值平均　＋　单只股票不加仓
+ * 买入：跌破21日超过5%，再次突破21日线
  * 卖出：跌破21日线或回落超过8%
  */
 @Scope("prototype")
@@ -51,18 +50,21 @@ public class FavorOperation4 implements Operation {
 	@Qualifier("drum")
 	Producer producer;*/
 	
+	private StringBuffer dailyHolds_sb;
 	private StringBuffer dailyAmount_sb;
 	private StringBuffer breakers_sb;
-	//private Integer previous_period  = 13; //历史纪录区间，主要用于后面判断
+	private Integer previous_period  = 21; //历史纪录区间，主要用于后面判断
 	private Keeper breaksKeeper;  //包含所有创新高的股票,因为当天涨停或价格过高不能买入,等待价格回落后买入
 	//private Keeper dropsKeeper; //包含所有跌破21日线卖出的票,在13天内如果涨回21日线,说明调整结束,可以再次买入
 	private Keeper down21Keeper; //包含创新高后跌回21日线的票
+	private boolean bombing = false;
 	
-	public Map<String,String> run(Account account, Map<LocalDate, List<String>> buyList,LocalDate beginDate, LocalDate endDate, String label, int top, boolean isAveValue, Integer quantityType) {
+	public Map<String,String> run(Account account, Map<LocalDate, List<String>> buyList,Map<LocalDate, List<String>> sellList,LocalDate beginDate, LocalDate endDate, String label, int top, boolean isAveValue, Integer quantityType) {
 		long days = endDate.toEpochDay()- beginDate.toEpochDay();
 		
 		//logger.info(buyList.toString());
 		
+		dailyHolds_sb = new StringBuffer("date,itemID,itemName,open,close,quantity,profit,days\n");
 		dailyAmount_sb = new StringBuffer("date,cash,value,total\n");
 		breakers_sb = new StringBuffer();
 		breaksKeeper = new Keeper(55);  //包含所有创新高的股票,因为当天涨停或价格过高不能买入,等待价格回落后买入
@@ -86,8 +88,13 @@ public class FavorOperation4 implements Operation {
 		
 		//System.out.println(breaksKeeper);
 
-		//Integer sseiFlag = kdataService.getSseiFlag(date);
-		//Integer sseiTrend = kdataService.getSseiTrend(date, previous_period);
+		Integer sseiFlag = kdataService.getSseiFlag(date);
+		Integer sseiTrend = kdataService.getSseiTrend(date, previous_period);
+		if(bombing && sseiFlag==1 
+				&& sseiTrend==1
+				) {
+			bombing = false;
+		}
 		
 		Muster muster;
 		account.setLatestDate(date);
@@ -99,6 +106,14 @@ public class FavorOperation4 implements Operation {
 				account.refreshHoldsPrice(itemID, muster.getLatestPrice(), muster.getLatestHighest());
 			}
 		}
+		account.refreshHighestAmount();
+		dailyHolds_sb.append(account.getHoldStateString());
+		
+		//logger.info("sseiFlag =  " + sseiFlag.toString());
+		boolean bomb = account.getAmountRatio()<=-8 ? true : false;
+		if(bomb) {
+			bombing = true;
+		}
 		
 		//卖出
 		for(String itemID: holdItemIDs) {
@@ -108,25 +123,33 @@ public class FavorOperation4 implements Operation {
 					account.dropWithTax(itemID, "3", muster.getLatestPrice());
 				}*/
 				
-				/*if(muster.isDropAve(21) 
+				if(muster.isDropAve(21) 
 						//&& muster.getLatestPrice().compareTo(muster.getClose())==1
 						) { 		//跌破21日均线就卖
 					account.dropWithTax(itemID, "1", muster.getLatestPrice());
 					//dropsKeeper.add(date, itemID);
 					//logger.info("dropsKeeper add " + itemID);
-				}*/
+				}
 				
-				//高位回落超过5%
+				//高位回落超过5%， 止盈
 				if(account.isFallOrder(itemID, -8) 
-						//&& muster.getN21Gap()>5  //快速
+						&& muster.getN21Gap()>5  //快速
 						) {
 					account.dropWithTax(itemID, "2", muster.getLatestPrice());
 					//dropsKeeper.add(date, itemID);
 					//logger.info("dropsKeeper add " + itemID);
 				}
+				if(bomb) {
+					account.dropWithTax(itemID, "9", muster.getLatestPrice());
+				}
 			}
 		}
 		//dropsKeeper.dailySet(date);
+		if(bomb) {
+			account.reSetHighestAmount();
+			breaksKeeper.removeAll();
+			//up21Keeper.removeAll();
+		}		
 		
 		//买入清单
 		if(buyList!=null && buyList.size()>0) {
@@ -140,6 +163,7 @@ public class FavorOperation4 implements Operation {
 			muster = musters.get(id); 
 			if(muster!=null 
 					&& muster.getN21Gap()<=-5
+					&& muster.getN21Gap()>=0
 					) {
 				down21Keeper.add(date, id);
 				breaksKeeper.remove(id);
@@ -155,6 +179,7 @@ public class FavorOperation4 implements Operation {
 					&& muster.isJustBreaker()
 					//&& muster.isAboveAveragePrice(21)
 					//&& muster.isAboveAveragePrice(89)
+					&& !bombing
 					) {
 					xx.add(muster);
 					down21Keeper.remove(id);
@@ -227,8 +252,6 @@ public class FavorOperation4 implements Operation {
 		}
 			
 		dailyAmount_sb.append(account.getDailyAmount() + "\n");
-		
-
 	}
 	
 	private Map<String,String> result(Account account) {
@@ -246,6 +269,7 @@ public class FavorOperation4 implements Operation {
 		result.put("breakers", breakers_sb.toString());
 		result.put("lostIndustrys", account.getLostIndustrys());
 		result.put("winIndustrys", account.getWinIndustrys());
+		result.put("dailyHolds", dailyHolds_sb.toString());
 		return result;
 	}
 	
@@ -273,6 +297,13 @@ public class FavorOperation4 implements Operation {
 						it.remove();
 					}
 				}
+			}
+		}
+
+		public void removeAll() {
+			Iterator<String> it;
+			for(Map.Entry<LocalDate, Set<String>> entry : items.entrySet()) {
+				entry.setValue(new HashSet<String>());
 			}
 		}
 		
@@ -324,7 +355,7 @@ public class FavorOperation4 implements Operation {
 			for(String id : drums) {
 				if(tmp.contains(id)) {
 					muster = musters.get(id);
-					if(muster!=null && !muster.isUpLimited() && muster.getN21Gap()<=8) {
+					if(muster!=null && !muster.isUpLimited() && muster.getN21Gap()<=5 && muster.getN21Gap()>=0) {
 						results.add(id);
 					}
 				}

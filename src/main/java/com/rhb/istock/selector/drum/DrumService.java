@@ -283,6 +283,7 @@ public class DrumService {
 				ss.add(line);
 			}
 		}
+		//System.out.println(ss);
 		return ss;
 	}
 	

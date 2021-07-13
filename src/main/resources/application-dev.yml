@@ -39,6 +39,7 @@ tushareUrl: http://api.waditu.com
 dimensionsFile: D:/dev/istock-data/dimensions.txt
 operationsFile: D:/dev/istock-data/operations.txt
 operationsPath: D:/dev/istock-data/operations/
+bombingDatesFile: D:/dev/istock-data/bombingDates.txt
 openDuration: 89
 dropDuration: 21
 initCash: 1000000

@@ -38,6 +38,18 @@ public class TurtleApi{
 		List<ItemView> powers_views = ts.getPowers();
 		return new ResponseContent<List<ItemView>>(ResponseEnum.SUCCESS, powers_views);
 	}
+
+	@GetMapping("/turtle/horizons")
+	public ResponseContent<List<ItemView>> getHorizons() {
+		List<ItemView> powers_views = ts.getHorizons();
+		return new ResponseContent<List<ItemView>>(ResponseEnum.SUCCESS, powers_views);
+	}
+	
+	@GetMapping("/turtle/oks")
+	public ResponseContent<List<ItemView>> getOks() {
+		List<ItemView> favors = ts.getOks();
+		return new ResponseContent<List<ItemView>>(ResponseEnum.SUCCESS, favors);
+	}
 	
 	@GetMapping("/turtle/hahs")
 	public ResponseContent<List<ItemView>> getHAHs() {

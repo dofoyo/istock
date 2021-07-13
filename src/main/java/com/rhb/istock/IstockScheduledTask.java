@@ -125,14 +125,14 @@ public class IstockScheduledTask {
 	 */
 	@Scheduled(cron="0 35 9 ? * 1-5") 
 	public void dailyInit() throws Exception {
-		logger.info("run scheduled of '0 35 9 ? * 1-5'");
+		logger.info("开盘初始化, run scheduled of '0 35 9 ? * 1-5'");
 		if(this.isTradeDate()) {   //次序很重要
 			itemService.downItems();		// 1. 下载最新股票代码
 			itemService.init();  // 2. 
 			//kdataService.downFactors(); // 3. 上一交易日的收盘数据要等开盘前才能下载到, 大约需要15分钟
 			kdataService.downSSEI();
 			kdataService.generateLatestMusters(null, true);
-			//turtleOperationService.init();  // 4.
+			turtleOperationService.init();  // 4.
 			indexServiceTushare.init();
 			kdataService.updateLatestMusters();
 			logger.info("开盘初始化, OK!");
@@ -155,7 +155,7 @@ public class IstockScheduledTask {
 		}
 	}
 
-	@Scheduled(cron="0 38 15 ? * 1-5")  //周一至周五，每日15点 
+	@Scheduled(cron="0 0 15 ? * 1-5")  //周一至周五，每日15点 
 	public void updateLatestMusters2() throws Exception {
 		System.out.println("run scheduled of '0 0 15 ? * 1-5'");
 		if(this.isTradeDate()) {
@@ -175,7 +175,7 @@ public class IstockScheduledTask {
 	
 	@Scheduled(cron="0 0 12 ? * 1-5") //周一至周五，每日12点下载除权因子
 	public void downFactors()  throws Exception{
-		logger.info("run scheduled of '0 0 12 ? * 1-5', downFactors");
+		logger.info("下载除权因子, run scheduled of '0 0 12 ? * 1-5', downFactors");
 		long beginTime=System.currentTimeMillis(); 
 
 		if(this.isTradeDate()) {
@@ -190,9 +190,9 @@ public class IstockScheduledTask {
 		logger.info("下载除权因子完成，用时：" + used + "秒");          
 	}
 	
-	@Scheduled(cron="0 37 22 ? * 1-5") //周一至周五，每日21点50执行收盘
+	@Scheduled(cron="0 0 21 ? * 1-5") //周一至周五，每日21点0执行收盘
 	public void downloadKdatas()  throws Exception{
-		logger.info("run scheduled of '0 50 21 ? * 1-5'");
+		logger.info("执行收盘, run scheduled of '0 0 21 ? * 1-5'");
 		long beginTime=System.currentTimeMillis(); 
 
 		if(this.isTradeDate()) {
@@ -206,7 +206,7 @@ public class IstockScheduledTask {
 			//indexSpiderTushare.downIndex_weight();
 			//indexSpiderTushare.downIndex_basic();
 			//indexServiceTushare.generateIndex();
-			//fdataSpiderEastmoney.downProfitForecasts();
+			fdataSpiderEastmoney.downProfitForecasts();
 			fdataSpiderEastmoney.downRecommendations();
 			itemService.downTopics();
 			drumService.generateDimensions();

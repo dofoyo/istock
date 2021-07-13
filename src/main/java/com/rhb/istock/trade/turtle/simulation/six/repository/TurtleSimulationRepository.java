@@ -75,12 +75,13 @@ public class TurtleSimulationRepository {
 		FileTools.writeTextFile(dailyMeansFile, sb.toString(), false);
 	}
 	
-	public void save(String type, String breakers, String details, String dailyAmounts, boolean isEvaluation) {
+	public void save(String type, String breakers, String details, String dailyAmounts, String dailyHolds, boolean isEvaluation) {
 		String path = isEvaluation ? evaluationPath : simulationPath;
 		
 		FileTools.writeTextFile(path + "/" + type + "_simulation_breakers_"+openDuration+"_"+dropDuration+".csv", breakers, false);
 		FileTools.writeTextFile(path + "/" + type + "_simulation_detail_"+openDuration+"_"+dropDuration+".csv", details, false);
 		FileTools.writeTextFile(path + "/" + type + "_simulation_dailyAmount_"+openDuration+"_"+dropDuration+".csv", dailyAmounts, false);
+		FileTools.writeTextFile(path + "/" + type + "_simulation_dailyHolds_"+openDuration+"_"+dropDuration+".csv", dailyHolds, false);
 	}
 	
 	@Cacheable("breakers")
@@ -186,6 +187,33 @@ public class TurtleSimulationRepository {
 		}		
 		return sells;
 	}
+
+	@Cacheable("holds")
+	public TreeMap<LocalDate, List<String>>  getHolds(String type){
+		TreeMap<LocalDate, List<String>> holds = new TreeMap<LocalDate, List<String>>();
+		
+		String theFile = simulationPath + "/" + type + "_simulation_dailyHolds_"+openDuration+"_"+dropDuration+".csv"; 
+		//System.out.println(theFile);
+		String[] lines = FileTools.readTextFile(theFile).split("\n");
+		String[] columns;
+		LocalDate date;
+		List<String> hold ;
+		for(int j=1; j<lines.length; j++) {
+			//System.out.println(line);
+			columns = lines[j].split(",");
+			date = LocalDate.parse(columns[0],DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+			if(holds.containsKey(date)) {
+				hold = holds.get(date);
+			}else {
+				hold = new ArrayList<String>(); 
+				holds.put(date, hold);
+			}
+			hold.add(columns[0] + "," + columns[1] + "," + columns[2] + "," + columns[3] + "," + columns[4] + "," + columns[5] + "," + columns[6] + "," + columns[7]);
+		}		
+		
+		return holds;
+	}
+
 	
 	@Cacheable("buys")
 	public TreeMap<LocalDate, List<String>>  getBuys(String type){
@@ -270,5 +298,8 @@ public class TurtleSimulationRepository {
 
 	@CacheEvict(value="breakers",allEntries=true)
 	public void evictBreakersCache() {}
+	
+	@CacheEvict(value="holds",allEntries=true)
+	public void evictHoldsCache() {}
 	
 }

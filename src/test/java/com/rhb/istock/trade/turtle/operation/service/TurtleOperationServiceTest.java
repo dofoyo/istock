@@ -24,10 +24,10 @@ public class TurtleOperationServiceTest {
 
 	@Test
 	public void getPowers() {
-		List<ItemView> views = turtleService.getPowers();
-		/*for(ItemView view : views) {
+		List<ItemView> views = turtleService.getOks();
+		for(ItemView view : views) {
 			System.out.print(view);
-		}*/	
+		}	
 	}
 	
 	//@Test

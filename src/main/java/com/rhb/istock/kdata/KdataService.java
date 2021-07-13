@@ -11,6 +11,7 @@ public interface KdataService {
 	 * 获得的数据是不包含endDate的
 	 */
 	
+	public Set<LocalDate> getBombingDates();
 	public void downSSEI();  //下载上证指数
 	public Integer getSseiFlag(LocalDate date); 
 	public Integer getSseiLowestRatio(LocalDate date, Integer period);
