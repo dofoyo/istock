@@ -22,7 +22,7 @@ import com.rhb.istock.trade.turtle.simulation.six.repository.TurtleSimulationRep
 
 @Scope("prototype")
 @Component("bhl")
-public class SimulateBHL {
+public class SimulateBHL  implements Simulate{
 	protected static final Logger logger = LoggerFactory.getLogger(SimulateBHL.class);
 
 	@Autowired

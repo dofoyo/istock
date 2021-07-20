@@ -22,7 +22,7 @@ import com.rhb.istock.trade.turtle.simulation.six.repository.TurtleSimulationRep
 
 @Scope("prototype")
 @Component("avb")
-public class SimulateAVB {
+public class SimulateAVB implements Simulate{
 	protected static final Logger logger = LoggerFactory.getLogger(SimulateAVB.class);
 
 	@Autowired
@@ -39,7 +39,7 @@ public class SimulateAVB {
 	Operation operation;
 	
 	@Async("taskExecutor")
-	public Future<String> run(LocalDate beginDate, LocalDate endDate, BigDecimal initCash, Integer top, boolean isAveValue, Integer quantityType, boolean isEvaluation) throws Exception {
+	public Future<String> run(LocalDate beginDate, LocalDate endDate, BigDecimal initCash, Integer top, boolean isAveValue, Integer quantityType, boolean isEvaluation) throws Exception{
 		Account account = new Account(initCash);
 		Map<LocalDate, List<String>> operationList = producer.getResults(beginDate, endDate);
 		Map<String, String> operateResult = operation.run(account, operationList,null, beginDate, endDate, "avb", top, isAveValue,quantityType);

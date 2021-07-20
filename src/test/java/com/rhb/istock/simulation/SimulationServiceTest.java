@@ -21,8 +21,8 @@ public class SimulationServiceTest {
 	public void simulate() {
 		LocalDate date = LocalDate.parse("2021-06-01");
 
-		Set<Hold> holds = simulationService.getHolds("hlb", date, true);
-		for(Hold hold : holds) {
+		Set<Brief> holds = simulationService.getHolds("hlb", date, true);
+		for(Brief hold : holds) {
 			System.out.println(hold);
 		}
 	}

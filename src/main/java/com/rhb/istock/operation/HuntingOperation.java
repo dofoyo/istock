@@ -54,7 +54,7 @@ public class HuntingOperation implements Operation {
 	//private Integer rate = -8;
 	private Set<String> up21s;
 	
-	public Map<String,String> run(Account account, Map<LocalDate, List<String>> buyList,Map<LocalDate, List<String>> sellList,LocalDate beginDate, LocalDate endDate, String label, int top, boolean isAveValue, Integer quantityType) {
+	public Map<String,String> run(Account account, Map<LocalDate, List<String>> buyList,Map<LocalDate, List<String>> sellList,LocalDate beginDate, LocalDate endDate, String label, int top, boolean isAveValue, Integer quantityType) throws Exception{
 		long days = endDate.toEpochDay()- beginDate.toEpochDay();
 		
 		dailyAmount_sb = new StringBuffer("date,cash,value,total\n");

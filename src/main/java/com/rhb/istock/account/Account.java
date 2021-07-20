@@ -611,7 +611,11 @@ public class Account {
 	public boolean isGain(String itemID, Integer ratio) {
 		HoldState hs = states.get(itemID);
 		if(hs!=null && hs.isHold) {
-			return hs.getWinRate().compareTo(ratio)==1;
+			if(ratio==0) {
+				return hs.isWin();
+			}else {
+				return hs.getWinRate().compareTo(ratio)==1;
+			}
 		}else {
 			return false;
 		}		
@@ -1037,6 +1041,10 @@ public class Account {
 
 		public boolean isLost() {
 			return latestPrice.compareTo(buyPrice)==-1;
+		}
+
+		public boolean isWin() {
+			return latestPrice.compareTo(buyPrice)==1;
 		}
 		
 		public boolean isLost(Integer days) {

@@ -249,7 +249,7 @@ public class TurtleStaticSimulation implements TurtleSimulation{
 			for(String id : ids) {
 				for(HoldView view : views) {
 					if(view.getItemID().equals(id)) {
-						view.setStatus(-1);
+						view.setProfit(-1);
 					}
 				}
 			}

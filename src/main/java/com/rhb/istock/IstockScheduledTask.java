@@ -123,7 +123,7 @@ public class IstockScheduledTask {
 	 * 2、下载上一交易日收盘后的K线数据
 	 * 3、初始化: 即把日K线读入内存
 	 */
-	@Scheduled(cron="0 35 9 ? * 1-5") 
+	@Scheduled(cron="0 39 9 ? * 1-5") 
 	public void dailyInit() throws Exception {
 		logger.info("开盘初始化, run scheduled of '0 35 9 ? * 1-5'");
 		if(this.isTradeDate()) {   //次序很重要

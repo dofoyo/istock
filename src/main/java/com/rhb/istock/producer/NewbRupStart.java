@@ -55,6 +55,8 @@ public class NewbRupStart implements Producer{
 	private Integer reco = 3;  //推荐买入的机构数量
 	
 	private Integer hlgap = 55; //最大涨幅
+	
+	private Integer period = 610;
 
 	@Override
 	public Map<LocalDate, List<String>> produce(LocalDate bDate, LocalDate eDate) {
@@ -148,9 +150,11 @@ public class NewbRupStart implements Producer{
 						&& m.isUpBreaker() 				//股价创新高
 						//&& m.getHLGap()<=hlgap             //涨幅不大
 						) {
-					kdata = kdataService.getKdata(m.getItemID(), date, 610, false);
+					kdata = kdataService.getKdata(m.getItemID(), date, period, false);
 					//if(kdata.getHighest().compareTo(m.getHighest())==1 && kdata.getLowestRatio()<55) {
-					if(kdata.getLowestRatio()<55) {
+					if(kdata.getLowestRatio()<hlgap 
+							//&& kdata.getSize()>=period
+							) {
 						breakers.add(m.getItemID());
 						//System.out.println("breakers.size(): " + breakers.size());
 					}

@@ -24,7 +24,7 @@ import com.rhb.istock.trade.turtle.simulation.six.repository.TurtleSimulationRep
 
 @Scope("prototype")
 @Component("bav2")
-public class SimulateBAV2 {
+public class SimulateBAV2  implements Simulate{
 	protected static final Logger logger = LoggerFactory.getLogger(SimulateBAV2.class);
 
 	@Autowired

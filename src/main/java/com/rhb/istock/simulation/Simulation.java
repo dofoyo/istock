@@ -19,27 +19,27 @@ public class Simulation {
 
 	@Autowired
 	@Qualifier("avb")
-	SimulateAVB avb;
+	Simulate avb;
 
 	@Autowired
 	@Qualifier("bav")
-	SimulateBAV bav;
+	Simulate bav;
 
 	@Autowired
 	@Qualifier("bdt")
-	SimulateBDT bdt;
+	Simulate bdt;
 
 	@Autowired
 	@Qualifier("bhl")
-	SimulateBHL bhl;
+	Simulate bhl;
 
 	@Autowired
 	@Qualifier("hlb")
-	SimulateHLB hlb;
+	Simulate hlb;
 	
 	@Autowired
 	@Qualifier("dtb")
-	SimulateDTB dtb;
+	Simulate dtb;
 
 	@Value("${initCash}")
 	private BigDecimal initCash;
@@ -50,7 +50,7 @@ public class Simulation {
 		System.out.println("simulate from " + beginDate + " to " + endDate +" ......");
 		
 		//BigDecimal ic = new BigDecimal(initCash);
-		Integer top = 1000;
+		Integer top = 3;
 		boolean isAveValue = true;  //作市值平均
 		Integer quantityType = 0;
 		boolean isEvaluation = false;  //是模拟，不是评估

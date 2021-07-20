@@ -24,7 +24,7 @@ import com.rhb.istock.trade.turtle.simulation.six.repository.TurtleSimulationRep
 
 @Scope("prototype")
 @Component("avb2")
-public class SimulateAVB2 {
+public class SimulateAVB2  implements Simulate{
 	protected static final Logger logger = LoggerFactory.getLogger(SimulateAVB2.class);
 
 	@Autowired
@@ -44,7 +44,7 @@ public class SimulateAVB2 {
 	Operation operation;
 	
 	@Async("taskExecutor")
-	public Future<String> run(LocalDate beginDate, LocalDate endDate, BigDecimal initCash, Integer top, boolean isAveValue, Integer quantityType, boolean isEvaluation) throws Exception {
+	public Future<String> run(LocalDate beginDate, LocalDate endDate, BigDecimal initCash, Integer top, boolean isAveValue, Integer quantityType, boolean isEvaluation) throws Exception{
 		Account account = new Account(initCash);
 		Map<LocalDate, List<String>> operationList = this.getOperationList(beginDate, endDate);
 		Map<String, String> operateResult = operation.run(account, operationList,null, beginDate, endDate, "avb2", top, isAveValue,quantityType);

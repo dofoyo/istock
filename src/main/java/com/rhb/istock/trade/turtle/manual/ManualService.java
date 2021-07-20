@@ -202,7 +202,7 @@ public class ManualService {
 		return this.selects;
 	}
 	
-	public void simulate(String simulateType, LocalDate date) {
+	public void simulate(String simulateType, LocalDate date) throws Exception{
 		long beginTime=System.currentTimeMillis(); 
 		String label = "manual " + simulateType;
 		BigDecimal initCash = new BigDecimal(1000000);

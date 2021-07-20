@@ -27,7 +27,7 @@ import com.rhb.istock.item.ItemService;
 import com.rhb.istock.kdata.Kbar;
 import com.rhb.istock.kdata.KdataService;
 import com.rhb.istock.kdata.api.KdatasView;
-import com.rhb.istock.simulation.Hold;
+import com.rhb.istock.simulation.Brief;
 import com.rhb.istock.simulation.Simulation;
 import com.rhb.istock.simulation.SimulationService;
 import com.rhb.istock.trade.turtle.simulation.six.TurtleMusterSimulation_avb_plus;
@@ -262,11 +262,9 @@ public class TurtleSimulationApi {
 		}
 
 		
-		//Set<Hold> holds = this.generateHolds(type,theDate);
-		Set<Hold> holds = simulationService.getHolds(type, theDate, false);
-		//System.out.println(holds);
+		Set<Brief> holds = simulationService.getHolds(type, theDate, false);
 		if(holds!=null && !holds.isEmpty()) {
-			for(Hold hold : holds) {
+			for(Brief hold : holds) {
 				views.add(new HoldView(hold.getItemID(),hold.getItemName(),hold.getProfit().intValue(),hold.getDate()));
 			}
 		}
@@ -275,7 +273,7 @@ public class TurtleSimulationApi {
 			@Override
 			public int compare(HoldView o1, HoldView o2) {
 				if(o1.getDate().compareTo(o2.getDate()) == 0) {
-					return o2.getStatus().compareTo(o1.getStatus());
+					return o2.getProfit().compareTo(o1.getProfit());
 				}else {
 					return o1.getDate().compareTo(o2.getDate());
 				}
@@ -284,6 +282,39 @@ public class TurtleSimulationApi {
 		
 		return new ResponseContent<List<HoldView>>(ResponseEnum.SUCCESS, views);
 	}
+
+	@GetMapping("/turtle/simulation/briefs/{type}/{date}")
+	public ResponseContent<List<BriefView>> getBriefs(
+			@PathVariable(value="type") String type,
+			@PathVariable(value="date") String date
+			) {
+		
+		List<BriefView> views = new ArrayList<BriefView>();
+		LocalDate theDate = null;
+		try{
+			theDate = LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+		}catch(Exception e){
+			new ResponseContent<List<BriefView>>(ResponseEnum.ERROR, views);
+		}
+
+		
+		Set<Brief> briefs = this.generateBriefs(type,theDate);
+		if(briefs!=null && !briefs.isEmpty()) {
+			for(Brief brief : briefs) {
+				views.add(new BriefView(brief.getItemID(),brief.getItemName(),brief.getProfit().intValue(),brief.getDate(),brief.isHold()));
+			}
+		}
+		
+		Collections.sort(views, new Comparator<BriefView>() {
+			@Override
+			public int compare(BriefView o1, BriefView o2) {
+				return o2.getProfit().compareTo(o1.getProfit());
+			}
+		});
+		
+		return new ResponseContent<List<BriefView>>(ResponseEnum.SUCCESS, views);
+	}
+
 	
 	@GetMapping("/turtle/simulation/amount/{type}/{date}")
 	public ResponseContent<AmountView> getAmount(
@@ -334,8 +365,8 @@ public class TurtleSimulationApi {
 	}
 	
 	
-	private Set<Hold> generateHolds(String type, LocalDate date){
-		Holds holds = new Holds();
+	private Set<Brief> generateBriefs(String type, LocalDate date){
+		Briefs briefs = new Briefs();
 		
 		Map<LocalDate,List<String>> buys = turtleSimulationRepository.getBuys(type); // itemID, itemName, profit
 		
@@ -344,7 +375,7 @@ public class TurtleSimulationApi {
 		for(Map.Entry<LocalDate,List<String>> entry : buys.entrySet()) {
 			if(entry.getKey().isBefore(date)) {
 				for(String str : entry.getValue()) {
-					holds.buy(str);
+					briefs.buy(str);
 				}
 			}
 		}
@@ -352,44 +383,52 @@ public class TurtleSimulationApi {
 		for(Map.Entry<LocalDate,List<String>> entry : sells.entrySet()) {
 			if(entry.getKey().isBefore(date)) {
 				for(String id : entry.getValue()) {
-					holds.sell(id);
+					briefs.sell(id);
 				}
 			}
 		}
 		
-		return holds.getResult();
+		return briefs.getResult();
 	}
 	
-	class Holds{
-		private Map<String, Hold> hs = new HashMap<String,Hold>();
-		Hold hold;
+	class Briefs{
+		private Map<String, Brief> hs = new HashMap<String,Brief>();
+		Brief brief;
 		public void buy(String str) {
 			String[] ss = str.split(",");
-			hold = hs.get(ss[0]);
-			if(hold == null) {
-				hs.put(ss[0], new Hold(str));
+			brief = hs.get(ss[0]);
+			if(brief == null) {
+				hs.put(ss[0], new Brief(str));
 			}else {
-				hold.update(str);
+				brief.update(str);
 			}
 		}
 		
 		public void sell(String id) {
-			hold = hs.get(id);
-			if(hold != null) {
-				hold.deCount();
+			brief = hs.get(id);
+			if(brief != null) {
+				brief.deCount();
 			}else {
 				System.err.println("There is ERROR: no buy, but sell!");
 			}
 		}
 		
-		public Set<Hold> getResult(){
-			Set<Hold> ids = new HashSet<Hold>();
-			for(Map.Entry<String, Hold> entry : hs.entrySet()) {
+		public Set<Brief> getHolds(){
+			Set<Brief> ids = new HashSet<Brief>();
+			for(Map.Entry<String, Brief> entry : hs.entrySet()) {
 				if(entry.getValue().isHold()) {
 					ids.add(entry.getValue());
 				}
 			}
 			return ids;
-		}		
+		}
+		
+		public Set<Brief> getResult(){
+			Set<Brief> ids = new HashSet<Brief>();
+			for(Map.Entry<String, Brief> entry : hs.entrySet()) {
+				ids.add(entry.getValue());
+			}
+			return ids;
+		}	
 	}
 }

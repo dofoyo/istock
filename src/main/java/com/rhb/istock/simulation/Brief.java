@@ -4,14 +4,14 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
-public class Hold {
+public class Brief {
 		private String itemID;
 		private String itemName;
 		private Integer count;
 		private BigDecimal profit;
 		private LocalDate date;
 		
-		public Hold(String itemID, String itemName, BigDecimal profit, LocalDate date) {
+		public Brief(String itemID, String itemName, BigDecimal profit, LocalDate date) {
 			this.itemID = itemID;
 			this.itemName = itemName;
 			this.profit = profit;
@@ -19,7 +19,7 @@ public class Hold {
 			this.count = 1;
 		}
 		
-		public Hold(String str) {
+		public Brief(String str) {
 			String[] ss = str.split(",");
 			this.itemID = ss[0];
 			this.itemName = ss[1];

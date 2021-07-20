@@ -26,18 +26,18 @@ public class SimulationService {
 	@Qualifier("turtleSimulationRepository")
 	TurtleSimulationRepository turtleSimulationRepository;
 	
-	public Set<Hold> getHolds_x(String type, LocalDate date, boolean isAll){
-		Set<Hold> results = new HashSet<Hold>();
+	public Set<Brief> getHolds_x(String type, LocalDate date, boolean isAll){
+		Set<Brief> results = new HashSet<Brief>();
 		
-		Map<String,Hold> holds = new HashMap<String,Hold>();
+		Map<String,Brief> holds = new HashMap<String,Brief>();
 		Map<LocalDate, List<String>> holdsMap = turtleSimulationRepository.getHolds(type);
 		List<String> holdsList = holdsMap.get(date);
-		Hold hold;
+		Brief hold;
 		if(holdsList != null) {
 			String[] holdStr;
 			for(String str : holdsList) {
 				holdStr = str.split(",");
-				holds.put(holdStr[1], new Hold(holdStr[1] +","+ holdStr[2] +","+ holdStr[6] +","+ holdStr[0]));
+				holds.put(holdStr[1], new Brief(holdStr[1] +","+ holdStr[2] +","+ holdStr[6] +","+ holdStr[0]));
 			}
 			for(Map.Entry<LocalDate, List<String>> entry : holdsMap.entrySet()) {
 				if(entry.getKey().isBefore(date)) {
@@ -62,8 +62,8 @@ public class SimulationService {
 		return results;
 	}
 	
-	public Set<Hold> getHolds(String type, LocalDate date, boolean isAll){
-		Set<Hold> results = new HashSet<Hold>();
+	public Set<Brief> getHolds(String type, LocalDate date, boolean isAll){
+		Set<Brief> results = new HashSet<Brief>();
 		
 		Map<LocalDate, List<String>> holdsFile = turtleSimulationRepository.getHolds(type);
 		if(holdsFile.get(date)==null) return results;
@@ -75,7 +75,7 @@ public class SimulationService {
 		
 		Map<String, List<String>> holdsMap = new HashMap<String,List<String>>();
 		List<String> holdsMap_list;
-		Hold hold;
+		Brief hold;
 		String[] hold_id, hs;
 		for(Map.Entry<LocalDate, List<String>> entry : holdsFile.entrySet()) {
 			if(entry.getKey().isBefore(date) || entry.getKey().equals(date)) {
@@ -98,7 +98,7 @@ public class SimulationService {
 		
 		//System.out.println(holdsMap);
 
-		Map<String,Hold> holds = new HashMap<String,Hold>();
+		Map<String,Brief> holds = new HashMap<String,Brief>();
 		for(Map.Entry<String, List<String>> entry : holdsMap.entrySet()) {
 			for(String str : entry.getValue()) {
 				hold_id = str.split(",");
@@ -106,7 +106,7 @@ public class SimulationService {
 				if(hold != null) {
 					hold.update(hold_id[1] +","+ hold_id[2] +","+ hold_id[6] +","+ hold_id[0]);
 				}else {
-					hold = new Hold(hold_id[1] +","+ hold_id[2] +","+ hold_id[6] +","+ hold_id[0]);
+					hold = new Brief(hold_id[1] +","+ hold_id[2] +","+ hold_id[6] +","+ hold_id[0]);
 					holds.put(hold_id[1], hold);
 				}
 			}

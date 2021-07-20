@@ -381,6 +381,10 @@ public class Muster {
 		return this.latestPrice.compareTo(this.close)==1;
 	}
 	
+	public Integer getL21Gap() {
+		return this.latestLowest.subtract(averagePrice21).divide(averagePrice21,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)).intValue();
+	}
+	
 	public Integer getN21Gap() {
 		return latestPrice.subtract(averagePrice21).divide(averagePrice21,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)).intValue();
 	}

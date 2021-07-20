@@ -9,10 +9,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
-import com.rhb.istock.simulation.SimulateAVB;
+import com.rhb.istock.simulation.Simulate;
 import com.rhb.istock.simulation.SimulateAVB2;
 import com.rhb.istock.simulation.SimulateBAV;
 import com.rhb.istock.simulation.SimulateBAV2;
@@ -20,10 +19,6 @@ import com.rhb.istock.simulation.SimulateBDT;
 import com.rhb.istock.simulation.SimulateBDT2;
 import com.rhb.istock.simulation.SimulateBHL;
 import com.rhb.istock.simulation.SimulateBHL2;
-import com.rhb.istock.simulation.SimulateDTB;
-import com.rhb.istock.simulation.SimulateHLB;
-import com.rhb.istock.simulation.SimulateHunt;
-import com.rhb.istock.simulation.SimulateNEWB;
 
 //@Scope("prototype")
 @Service("evaluation")
@@ -35,19 +30,19 @@ public class Evaluation {
 	
 	@Autowired
 	@Qualifier("avb")
-	SimulateAVB avb;
+	Simulate avb;
 
 	@Autowired
 	@Qualifier("bav")
-	SimulateBAV bav;
+	Simulate bav;
 
 	@Autowired
 	@Qualifier("bdt")
-	SimulateBDT bdt;
+	Simulate bdt;
 
 	@Autowired
 	@Qualifier("bhl")
-	SimulateBHL bhl;
+	Simulate bhl;
 
 /*	@Autowired
 	@Qualifier("dtb")
@@ -67,19 +62,19 @@ public class Evaluation {
 
 	@Autowired
 	@Qualifier("avb2")
-	SimulateAVB2 avb2;
+	Simulate avb2;
 
 	@Autowired
 	@Qualifier("bav2")
-	SimulateBAV2 bav2;
+	Simulate bav2;
 
 	@Autowired
 	@Qualifier("bdt2")
-	SimulateBDT2 bdt2;
+	Simulate bdt2;
 
 	@Autowired
 	@Qualifier("bhl2")
-	SimulateBHL2 bhl2;
+	Simulate bhl2;
 
 	
 	@Value("${initCash}")

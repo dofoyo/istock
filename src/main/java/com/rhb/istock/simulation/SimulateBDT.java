@@ -22,7 +22,7 @@ import com.rhb.istock.trade.turtle.simulation.six.repository.TurtleSimulationRep
 
 @Scope("prototype")
 @Component("bdt")
-public class SimulateBDT {
+public class SimulateBDT  implements Simulate{
 	protected static final Logger logger = LoggerFactory.getLogger(SimulateBDT.class);
 
 	@Autowired
@@ -30,13 +30,13 @@ public class SimulateBDT {
 	TurtleSimulationRepository turtleSimulationRepository;
 
 	@Autowired
-	//@Qualifier("newbRupStart")  //test
-	@Qualifier("newbRup")
+	@Qualifier("newbRupStart")  //test
+	//@Qualifier("newbRup")
 	Producer producer;
 
 	@Autowired
-	//@Qualifier("commOperation2") //test
-	@Qualifier("favorOperation") 
+	@Qualifier("rebound") //test
+	//@Qualifier("favorOperation") 
 	Operation operation;
 	
 	@Async("taskExecutor")

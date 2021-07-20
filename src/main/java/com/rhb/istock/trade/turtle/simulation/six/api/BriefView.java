@@ -1,18 +1,20 @@
-package com.rhb.istock.trade.turtle.manual;
+package com.rhb.istock.trade.turtle.simulation.six.api;
 
 import java.time.LocalDate;
 
-public class HoldView {
+public class BriefView {
 	private String itemID;
 	private String name;
-	private Integer profit; // 1--buy, -1--sell, 0--hold
+	private Integer profit; 
 	private LocalDate date;
+	private boolean isHold;
 	
-	public HoldView(String itemID, String name, Integer profit, LocalDate date) {
+	public BriefView(String itemID, String name, Integer profit, LocalDate date, boolean isHold) {
 		this.itemID = itemID;
 		this.name = name;
 		this.profit = profit;
 		this.date = date;
+		this.isHold = isHold;
 	}
 	
 	public LocalDate getDate() {
@@ -30,12 +32,12 @@ public class HoldView {
 		this.itemID = itemID;
 	}
 	public String getName() {
-		return name;
+		return isHold ? "*"+this.name : this.name;
 	}
 	public void setName(String name) {
 		this.name = name;
 	}
-
+	
 	public Integer getProfit() {
 		return profit;
 	}
@@ -50,7 +52,7 @@ public class HoldView {
 
 	@Override
 	public String toString() {
-		return "HoldView [itemID=" + itemID + ", name=" + name + ", profit=" + profit + ", date=" + date + "]";
+		return "BriefView [itemID=" + itemID + ", name=" + name + ", profit=" + profit + ", date=" + date + "]";
 	}
 	
 	

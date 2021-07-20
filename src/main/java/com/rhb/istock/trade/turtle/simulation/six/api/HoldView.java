@@ -5,13 +5,13 @@ import java.time.LocalDate;
 public class HoldView {
 	private String itemID;
 	private String name;
-	private Integer status; // 1--buy, -1--sell, 0--hold
+	private Integer profit; 
 	private LocalDate date;
 	
-	public HoldView(String itemID, String name, Integer status, LocalDate date) {
+	public HoldView(String itemID, String name, Integer profit, LocalDate date) {
 		this.itemID = itemID;
 		this.name = name;
-		this.status = status;
+		this.profit = profit;
 		this.date = date;
 	}
 	
@@ -36,21 +36,21 @@ public class HoldView {
 		this.name = name;
 	}
 
-	public Integer getStatus() {
-		return status;
+	public Integer getProfit() {
+		return profit;
 	}
 
-	public void setStatus(Integer status) {
-		this.status = status;
+	public void setProfit(Integer profit) {
+		this.profit = profit;
 	}
-	
+
 	public String getColor() {
-		return this.status>0 ? "red" : "green";
+		return this.profit>0 ? "red" : "green";
 	}
 
 	@Override
 	public String toString() {
-		return "HoldView [itemID=" + itemID + ", name=" + name + ", status=" + status + "]";
+		return "HoldView [itemID=" + itemID + ", name=" + name + ", profit=" + profit + ", date=" + date + "]";
 	}
 	
 	

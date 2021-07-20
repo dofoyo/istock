@@ -45,7 +45,7 @@ public class ConservativeOperation implements Operation{
 	private StringBuffer breakers_sb;
 	Integer previous_period  = 13; //历史纪录区间，主要用于后面判断
 	
-	public Map<String,String> run(Account account, Map<LocalDate, List<String>> buyList,Map<LocalDate, List<String>> sellList,LocalDate beginDate, LocalDate endDate, String label, int top, boolean isAveValue, Integer quantityType) {
+	public Map<String,String> run(Account account, Map<LocalDate, List<String>> buyList,Map<LocalDate, List<String>> sellList,LocalDate beginDate, LocalDate endDate, String label, int top, boolean isAveValue, Integer quantityType) throws Exception{
 		dailyAmount_sb = new StringBuffer("date,cash,value,total\n");
 		dailyHolds_sb = new StringBuffer("date,itemID,itemName,open,close,quantity,profit,days\n");
 		breakers_sb = new StringBuffer();

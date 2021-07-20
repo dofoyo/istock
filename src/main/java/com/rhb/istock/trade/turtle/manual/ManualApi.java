@@ -34,7 +34,7 @@ import com.rhb.istock.producer.Producer;
 import com.rhb.istock.selector.drum.DrumService;
 import com.rhb.istock.selector.fina.FinaService;
 import com.rhb.istock.selector.newb.NewbService;
-import com.rhb.istock.simulation.Hold;
+import com.rhb.istock.simulation.Brief;
 import com.rhb.istock.simulation.SimulationService;
 import com.rhb.istock.trade.turtle.simulation.six.TurtleMusterSimulation;
 import com.rhb.istock.trade.turtle.simulation.six.TurtleMusterSimulation_avb_plus;
@@ -210,7 +210,12 @@ public class ManualApi {
 		turtleSimulationRepository.evictSellsCache();
 		turtleSimulationRepository.evictHoldsCache();
 
-		manualService.simulate(simulateType, theEndDate); 
+		try {
+			manualService.simulate(simulateType, theEndDate);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
 		
 		kdataService.evictKDataCache();
 		turtleSimulationRepository.evictAmountsCache();
@@ -396,9 +401,9 @@ public class ManualApi {
 		return ids;
 	}
 	
-	private Set<String> getHoldIDs(Set<Hold> holds){
+	private Set<String> getHoldIDs(Set<Brief> holds){
 		Set<String> ids = new HashSet<String>();
-		for(Hold h : holds) {
+		for(Brief h : holds) {
 			ids.add(h.getItemID());
 		}
 		return ids;
@@ -710,9 +715,9 @@ public class ManualApi {
 
 		
 		//Set<Hold> holds = this.generateHolds(type,theDate);
-		Set<Hold> holds = simulationService.getHolds(type, theDate, false);
+		Set<Brief> holds = simulationService.getHolds(type, theDate, false);
 		if(holds!=null && !holds.isEmpty()) {
-			for(Hold hold : holds) {
+			for(Brief hold : holds) {
 				views.add(new HoldView(hold.getItemID(),hold.getItemName(),hold.getProfit().intValue(),hold.getDate()));
 			}
 		}
@@ -721,7 +726,7 @@ public class ManualApi {
 			@Override
 			public int compare(HoldView o1, HoldView o2) {
 				if(o1.getDate().compareTo(o2.getDate()) == 0) {
-					return o2.getStatus().compareTo(o1.getStatus());
+					return o2.getProfit().compareTo(o1.getProfit());
 				}else {
 					return o1.getDate().compareTo(o2.getDate());
 				}
@@ -782,7 +787,7 @@ public class ManualApi {
 		return new ResponseContent<List<String>>(ResponseEnum.SUCCESS, dates);
 	}
 	
-	private Set<Hold> generateHolds(String type, LocalDate date){
+	private Set<Brief> generateHolds(String type, LocalDate date){
 		Holds holds = new Holds();
 		
 		Map<LocalDate,List<String>> buys = turtleSimulationRepository.getBuys(type); // itemID, itemName, profit
@@ -809,13 +814,13 @@ public class ManualApi {
 	}
 	
 	class Holds{
-		private Map<String, Hold> hs = new HashMap<String,Hold>();
-		Hold hold;
+		private Map<String, Brief> hs = new HashMap<String,Brief>();
+		Brief hold;
 		public void buy(String str) {
 			String[] ss = str.split(",");
 			hold = hs.get(ss[0]);
 			if(hold == null) {
-				hs.put(ss[0], new Hold(str));
+				hs.put(ss[0], new Brief(str));
 			}else {
 				hold.update(str);
 			}
@@ -830,9 +835,9 @@ public class ManualApi {
 			}
 		}
 		
-		public Set<Hold> getResult(){
-			Set<Hold> ids = new HashSet<Hold>();
-			for(Map.Entry<String, Hold> entry : hs.entrySet()) {
+		public Set<Brief> getResult(){
+			Set<Brief> ids = new HashSet<Brief>();
+			for(Map.Entry<String, Brief> entry : hs.entrySet()) {
 				if(entry.getValue().isHold()) {
 					ids.add(entry.getValue());
 				}
